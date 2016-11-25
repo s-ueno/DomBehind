@@ -17,6 +17,49 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+
+# DomBehind
+Biz.WebApp/Scripts/App
+App/*.js 
+!.gitignore
+
+Biz.WebApp/Scripts/Core
+Core/*.js 
+!.gitignore
+
+Biz.WebApp/Scripts/collections.js
+
+
+
+# VisualStudio
+packages/*
+*.map
+*.[Oo]bj
+*.user
+*.aps
+*.pch
+*.vspscc
+*.vssscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.[Cc]ache
+*.ilk
+*.log
+*.lib
+*.sbr
+*.sdf
+ipch/
+obj/
+[Bb]in
+[Dd]ebug*/
+[Rr]elease*/
+Ankh.NoLoad
+
 # =========================
 # Operating System Files
 # =========================
@@ -45,3 +88,4 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
