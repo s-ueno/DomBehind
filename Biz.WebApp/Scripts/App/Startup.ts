@@ -1,0 +1,5 @@
+﻿// entory point
+BizApplication.Resolve();
+
+
+

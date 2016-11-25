@@ -1,0 +1,91 @@
+﻿<div class="jumbotron text-center" id="HomeTop">
+    <h1>DOM Behind</h1>
+
+    @*コンポーネント志向開発を促進させる*@
+    <p>Promote component-oriented development</p>
+</div>
+
+<div class="container-fluid fixedNavAnchor" id="about">
+    <div class="row">
+        <div class="col-sm-8">
+            <h2>About DOM Behind</h2><br>
+
+            @*私たちはViewとViewModelを分けたいのだ*@
+            <h4>We want to separate View and ViewModel.</h4>
+            <br>
+
+            @*
+                Web世界には多くのMVVMソリューションがありますが、多くの人々は、観察可能なオブジェクトがデータをViewに転送することに注意を払っていると考えています
+                これは便利な機能ですが、MVVMの本質ではありません。
+
+                ビジネスロジックやビューオブジェクトなどの情報が交差するプレゼンテーションレイヤでは、コンポーネントごとに責任を分けたいと考えています。
+            *@
+            <p>
+                There are many MVVM solutions in the Web world, but many think that observable objects are paying attention to transferring data to View.
+                Although it is a useful function, it is not the essence of MVVM.
+                <br />
+                In a presentation layer where information such as business logic and view objects intersect, we want to separate responsibilities on a component basis.
+            </p>
+
+            @*
+                目的は単一責務の原則にあります。
+                単一の責任の原則を満たすコードを作成することは、コードの量を減らす目的ではないので、苦痛ではありません。
+            *@
+            <p>
+                The aim is on the principle of single responsibility.
+                <br />
+                Creating code that fulfills a single responsibility principle is not painful, as it is not the purpose of reducing the amount of code.
+            </p>
+
+            @*
+                XAMLの世界では、柔軟に対応することができました。
+                依存関係プロパティやコードビハインドといったView用のコードを記述するための考え方が確立済みだったからです
+            *@
+            <p>
+                In the world of XAML, it was able to respond flexibly.
+                <br />
+                That's because the idea for describing code for View such as dependency properties and code-behind has been established
+            </p>
+
+            @*
+                エンタープライズアプリケーションでViewModelでViewを操作するコードを書くことは、単体テストの難しさなどの有害な影響をもたらします。
+
+                View用のコードはViewModelを参照する必要があります。
+                ただし、ViewModelにViewコードが必要ない場合は非常に便利です。
+            *@
+            <p>
+                Writing code that manipulates the View with ViewModel in an enterprise application has harmful effects such as difficulty in unit testing.
+                <br />
+                The view code must reference the ViewModel.
+                However, it is very useful if the ViewModel does not require a View code.
+            </p>
+        </div>
+        <div class="col-sm-4 slideanim slide">
+            <img src="~/Content/images/MVVM.png" />
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid bg-grey fixedNavAnchor" id="component">
+    <div class="row">
+        <div class="col-sm-4">
+            <span class="glyphicon glyphicon-globe logo slideanim"></span>
+        </div>
+        <div class="col-sm-8">
+            <h2>Our Values</h2><br>
+            <h4><strong>MISSION:</strong> Our mission lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h4><br>
+            <p>
+                <strong>VISION:</strong> Our vision Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<div class="fixedNavAnchor" id="contact">
+    <div id="ContactUsView">
+        @Html.Partial("~/Views/ContactUs/_ContactUs.cshtml")
+    </div>
+</div>
