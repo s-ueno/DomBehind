@@ -37,22 +37,4 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://s-ueno.visualstudio.com/
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Biz.WebApp.Tests\\Biz.WebApp.Tests.csproj
-		SccProjectName1 = Biz.WebApp.Tests
-		SccLocalPath1 = Biz.WebApp.Tests
-		SccProjectUniqueName2 = Biz.WebApp\\Biz.WebApp.csproj
-		SccProjectName2 = Biz.WebApp
-		SccLocalPath2 = Biz.WebApp
-		SccProjectUniqueName3 = Biz.Model\\Biz.Model.csproj
-		SccProjectName3 = Biz.Model
-		SccLocalPath3 = Biz.Model
-		SccProjectUniqueName4 = Biz.Service\\Biz.Service.csproj
-		SccProjectName4 = Biz.Service
-		SccLocalPath4 = Biz.Service
-	EndGlobalSection
 EndGlobal
