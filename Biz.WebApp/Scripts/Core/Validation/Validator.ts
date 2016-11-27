@@ -57,17 +57,17 @@
         }
 
         public /* virtual */ RemoveValidation(): void {
-            if (String.IsNullOrWhiteSpace(this.Attribute)) return;
-
-            this.Behavior.Element.removeAttr(this.Attribute);
+            if (!String.IsNullOrWhiteSpace(this.Attribute)) {
+                this.Behavior.Element.removeAttr(this.Attribute);
+            }
             this.Behavior.Element.ClearCustomError();
         }
         public /* virtual */ AddValidation(): void {
-            if (String.IsNullOrWhiteSpace(this.Attribute)) return;
-
             this.RemoveValidation();
 
-            this.Behavior.Element.attr(this.Attribute, this.AttributeValue);
+            if (!String.IsNullOrWhiteSpace(this.Attribute)) {
+                this.Behavior.Element.attr(this.Attribute, this.AttributeValue);
+            }
         }
         public /* virtual */ Validate(value: any): boolean {
             return !this.Behavior.Element.HasError();

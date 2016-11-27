@@ -23,6 +23,7 @@
         return [
             new DomBehind.Core.Data.SuppressDuplicateActionPolicy(),
             new DomBehind.Core.Data.ExceptionHandlingActionPolicy(),
+            new DomBehind.Core.Validation.ValidationExceptionHandlingActionPolicy(),
         ];
     }
 }

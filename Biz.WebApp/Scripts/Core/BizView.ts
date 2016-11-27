@@ -189,6 +189,7 @@
             $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), (i, value) => {
                 value.BindingPolicy.Validators.ClearValidator();
             });
+            this.Container.ClearCustomError();
         }
 
         // #endregion
