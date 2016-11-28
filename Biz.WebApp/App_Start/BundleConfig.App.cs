@@ -11,7 +11,6 @@ namespace Biz.WebApp
         public static void RegisterAppBundles(BundleCollection bundles)
         {
             bundles.Add(new StyleBundle("~/bundles/app.account.css").Include(App_AccountCss));
-
             bundles.Add(new ScriptBundle("~/bundles/app").Include(App));
             bundles.Add(new ScriptBundle("~/bundles/app.shared").Include(App_Shared));
             bundles.Add(new ScriptBundle("~/bundles/app.home").Include(App_Home));

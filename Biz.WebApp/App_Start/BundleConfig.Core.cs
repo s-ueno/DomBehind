@@ -89,8 +89,11 @@ namespace Biz.WebApp
         };
         public static readonly string[] Core_Thread = new string[]
         {
-            "~/Scripts/Core/Thread/WorkerWrapper.js",
-            "~/Scripts/Core/Thread/WorkerPool.js",
+            "~/Scripts/Core/Threading/WorkerWrapper.js",
+            "~/Scripts/Core/Threading/WorkerPool.js",
+
+            "~/Scripts/Core/Threading/TimerThread.js",
+            "~/Scripts/Core/Threading/Thread.js",
         };
         public static readonly string[] Core_Web = new string[]
         {

@@ -19,16 +19,15 @@ $RECYCLE.BIN/
 
 
 # DomBehind
-Biz.WebApp/Scripts/App
-App/*.js 
-!.gitignore
-
-Biz.WebApp/Scripts/Core
-Core/*.js 
-!.gitignore
-
 Biz.WebApp/Scripts/collections.js
 
+Biz.WebApp/Scripts/App/
+*.js 
+!.gitignore
+
+Biz.WebApp/Scripts/Core/
+*.js 
+!.gitignore
 
 
 # VisualStudio

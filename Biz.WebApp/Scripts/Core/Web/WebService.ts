@@ -33,7 +33,7 @@
         }
 
         public ExecuteAsync(request: TRequest): JQueryPromise<TResponse> {
-            return Thread.WorkerPool.Do(PlainXMLHttpRequestThread,
+            return Threading.WorkerPool.Do(PlainXMLHttpRequestThread,
                 {
                     Url : this.Url,
                     Request: request,
