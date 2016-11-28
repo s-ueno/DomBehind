@@ -1,18 +1,18 @@
 ﻿namespace DomBehind.Core {
-    export class DataBindingBehaviorBuilder<T>    {
+    export class DataBindingBehaviorBuilder<T> extends BindingBehaviorBuilder<T>  {
 
         // #region constructor
 
-        constructor(rootBuilder: BindingBehaviorBuilder<T>) {
-            this.Root = rootBuilder;
+        constructor(owner: BizView) {
+            super(owner);
         }
-        protected Root: BindingBehaviorBuilder<T>;
 
         protected get Behavior(): Data.DataBindingBehavior {
-            return <Data.DataBindingBehavior>this.Root.CurrentBehavior;
+            return <Data.DataBindingBehavior>this.CurrentBehavior;
         }
 
         // #endregion
+
 
         /**
          * Give any of the mark to the property.

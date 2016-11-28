@@ -275,6 +275,9 @@
     <TypeScriptCompile Include="Scripts\Core\Extensions\Enum.ts" />
     <TypeScriptCompile Include="Scripts\Core\INotifyPropertyChanged.ts" />
     <TypeScriptCompile Include="Scripts\Core\Repository.ts" />
+    <TypeScriptCompile Include="Scripts\Core\Thread\Thread.ts" />
+    <TypeScriptCompile Include="Scripts\Core\Thread\Timer.ts" />
+    <TypeScriptCompile Include="Scripts\Core\Thread\TimerThread.ts" />
     <TypeScriptCompile Include="Scripts\Core\Thread\WorkerPool.ts" />
     <TypeScriptCompile Include="Scripts\Core\Thread\WorkerWrapper.ts" />
     <TypeScriptCompile Include="Scripts\Core\UI\IModalHelper.ts" />

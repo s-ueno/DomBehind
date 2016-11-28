@@ -61,8 +61,12 @@
             behavior.BindingPolicy.Trigger = !Object.IsNullOrUndefined(updateTrigger) ? updateTrigger : property.UpdateSourceTrigger;
             behavior.BindingPolicy.Mode = !Object.IsNullOrUndefined(mode) ? mode : property.BindingMode;
 
+
+            let dataBindingBuilder = new DataBindingBehaviorBuilder<T>(this.Owner);
+            dataBindingBuilder.CurrentBehavior = this.CurrentBehavior;
+            dataBindingBuilder.CurrentElement = this.CurrentElement;
             // default PartialMark is PropertyName
-            return new DataBindingBehaviorBuilder<T>(this).PartialMark(behavior.BindingPath);
+            return dataBindingBuilder.PartialMark(behavior.BindingPath);
         }
 
         // #endregion
@@ -110,7 +114,11 @@
             behavior.Action = action;
             behavior.ActionParameterCount = action.length;
             behavior.AllowBubbling = allowBubbling;
-            return this;
+
+            let actionBindingBuilder = new ActionBindingBehaviorBuilder<T>(this.Owner);
+            actionBindingBuilder.CurrentBehavior = this.CurrentBehavior;
+            actionBindingBuilder.CurrentElement = this.CurrentElement;
+            return actionBindingBuilder;
         }
 
 

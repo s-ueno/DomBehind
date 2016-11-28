@@ -1,15 +1,14 @@
 ﻿namespace DomBehind.Core {
-    export class ActionBindingBehaviorBuilder<T>  {
+    export class ActionBindingBehaviorBuilder<T> extends BindingBehaviorBuilder<T>  {
 
         // #region constructor
 
-        constructor(rootBuilder: BindingBehaviorBuilder<T>) {
-            this.Root = rootBuilder;
+        constructor(owner: BizView) {
+            super(owner);
         }
-        protected Root: BindingBehaviorBuilder<T>;
 
         protected get Behavior(): Data.ActionBindingBehavior {
-            return <Data.ActionBindingBehavior>this.Root.CurrentBehavior;
+            return <Data.ActionBindingBehavior>this.CurrentBehavior;
         }
 
         // #endregion
