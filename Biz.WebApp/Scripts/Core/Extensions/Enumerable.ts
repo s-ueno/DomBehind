@@ -5,6 +5,7 @@
     OrderBy(selector: (value: T) => any): Array<T>;
     OrderByDecording(selector: (value: T) => any): Array<T>;
     FirstOrDefault(): T;
+    LastOrDefault(): T;
 }
 
 Array.prototype.Where = function (predicate: (value: any) => boolean) {
@@ -30,4 +31,8 @@ Array.prototype.OrderByDecording = function (selector: (value: any) => any) {
 Array.prototype.FirstOrDefault = function () {
     let me: Array<any> = this;
     return 0 < me.length ? me[0] : null;
+}
+Array.prototype.LastOrDefault = function () {
+    let me: Array<any> = this;
+    return 0 < me.length ? me[me.length - 1] : null;
 }

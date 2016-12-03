@@ -21,14 +21,11 @@ $RECYCLE.BIN/
 # DomBehind
 Biz.WebApp/Scripts/collections.js
 
-Biz.WebApp/Scripts/App/
-*.js 
-!.gitignore
+Biz.WebApp/Scripts/App/**/*.js
+Biz.WebApp/Scripts/App/**/*.map
 
-Biz.WebApp/Scripts/Core/
-*.js 
-!.gitignore
-
+Biz.WebApp/Scripts/Core/**/*.js
+Biz.WebApp/Scripts/Core/**/*.map
 
 # VisualStudio
 packages/*
@@ -89,3 +86,7 @@ Temporary Items
 .apdisk
 
 /.vs/
+/Biz.WebApp/Scripts/typings/bootstrap-select
+/Biz.WebApp/Scripts/i18n
+/Biz.WebApp/Scripts/bootstrap-select.min.js
+/Biz.WebApp/Scripts/bootstrap-select.js

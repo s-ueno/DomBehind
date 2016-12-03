@@ -20,6 +20,10 @@
 
             builder.Element("#ContactUsButton").InputType(DomBehind.Core.InputType.Submit)
                 .BindingAction(DomBehind.Core.UIElement.ClickEvent, x => x.ContactUs());
+
+
+            builder.Element("#Sample")
+                .Binding(DomBehind.Core.UIElement.ItemsSourceProperty, x => x.SampleList)
         }
 
         public OnReceiveNotificationMessage(sender: any, e: any) {

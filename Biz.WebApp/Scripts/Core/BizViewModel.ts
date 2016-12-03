@@ -108,8 +108,7 @@
             this.SafeAction(func, overlayPolocy);
         }
         protected SafeAction(func: Function, ...policies: Data.ActionPolicy[]): void {
-            var factory = new TypedFactory(Data.ActionBindingBehavior);
-            var behavior = factory.CreateInstance();
+            var behavior = new Data.ActionBindingBehavior();
             var list: Data.ActionPolicy[] = [new Data.ExceptionHandlingActionPolicy()];
             if (policies) {
                 $.each(policies, (i, value) => list.push(value));

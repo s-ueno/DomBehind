@@ -42,8 +42,6 @@
         // #endregion
 
 
-
-
         // #region UpdateSourceTrigger
 
         /**
@@ -66,6 +64,15 @@
 
         // #endregion
 
+        // #region Ensure Action
+
+        public get Ensure(): (behavior: DataBindingBehavior) => void {
+            return this._ensure;
+        }
+        private _ensure: (behavior: DataBindingBehavior) => void;
+
+        // #endregion
+
         // #region static method
 
         /**
@@ -80,13 +87,15 @@
             getValue: (jQuery: JQuery) => any,
             setValue: (jQuery: JQuery, value: any) => void,
             defaultUpdateSourceTrigger: UpdateSourceTrigger = UpdateSourceTrigger.Explicit,
-            mode: BindingMode = BindingMode.TwoWay): DependencyProperty {
+            mode: BindingMode = BindingMode.TwoWay,
+            ensure?: (behavior: DataBindingBehavior) => void): DependencyProperty {
 
             let dp = new DependencyProperty(propertyName);
             dp._getter = getValue;
             dp._setter = setValue;
             dp._updateSourceTrigger = defaultUpdateSourceTrigger;
             dp._bindingMode = mode;
+            dp._ensure = ensure;
             return dp;
         }
     }

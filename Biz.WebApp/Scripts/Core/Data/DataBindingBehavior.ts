@@ -19,6 +19,8 @@
         protected Getter: (x) => any;
         protected Setter: (x, value) => void;
 
+        public AdditionalInfo: collections.LinkedDictionary<string, any>
+        = new collections.LinkedDictionary<string, any>();
         // #region UpdateSource - UpdateTarget
 
         /**
@@ -32,6 +34,7 @@
             return value;
         }
 
+        public UpdateSourceEvent: IEvent = new TypedEvent<any>();
         /**
          * Sends the current binding target value to the binding source property
          */
@@ -43,6 +46,7 @@
             if (Object.IsNullOrUndefined(this.Property.GetValue)) return;
 
             this.Setter(this.DataContext, this.ValueCore);
+            this.UpdateSourceEvent.Raise(this, this.ValueCore);
 
             if (this.DataContext instanceof NotifiableImp) {
                 var e = new PropertyChangedEventArgs(this.BindingPath);
@@ -50,6 +54,7 @@
             }
         }
 
+        public UpdateTargetEvent: IEvent = new TypedEvent<any>();
         /**
          * Forces a data transfer from the binding source property to the binding target property.
          */
@@ -63,6 +68,7 @@
                 value = this.BindingPolicy.Converter.Convert(value);
             }
             this.Property.SetValue(this.Element, value);
+            this.UpdateTargetEvent.Raise(this, value);
         }
 
         // #endregion
@@ -71,7 +77,7 @@
         // #region Ensure
 
         public Ensure(): void {
-            
+
             if (this.BindingPolicy.Trigger === UpdateSourceTrigger.LostForcus) {
                 let event = UIElement.LostForcusEvent.EventName;
                 this.Events.push(event);
@@ -92,6 +98,10 @@
                 var path = arr[arr.length - 1]
                 lastDataContext[path] = value;
             };
+
+            if ((this.Property) && (this.Property.Ensure)) {
+                this.Property.Ensure(this);
+            }
         }
 
         protected ParseBindingPath(): string {

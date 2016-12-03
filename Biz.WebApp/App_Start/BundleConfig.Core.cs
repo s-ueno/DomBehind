@@ -14,8 +14,8 @@ namespace Biz.WebApp
 
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include("~/Scripts/jquery-{version}.js"));
             bundles.Add(new ScriptBundle("~/bundles/jquery.ui").Include("~/Scripts/jquery-ui-{version}.js"));
-            bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include("~/Scripts/bootstrap.js"));
-            bundles.Add(new ScriptBundle("~/bundles/bootstrap.notify").Include("~/Scripts/bootstrap-notify.js"));
+            bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include("~/Scripts/bootstrap*"));
+
             bundles.Add(new ScriptBundle("~/bundles/collection").Include("~/Scripts/collections.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/core.base").Include(Core_Base));
@@ -30,19 +30,26 @@ namespace Biz.WebApp
 
         }
 
+
         public static readonly string[] Core_Css = new string[]
         {
             "~/Content/bootstrap*",
             "~/Content/themes/base/all.css",
-            "~/Content/Site.css",
             "~/Content/animate.css",
+
+
+            "~/Content/Site.css",
         };
 
         public static readonly string[] Core_Base = new string[]
         {
             "~/Scripts/Core/IDisposable.js",
+            "~/Scripts/Core/Expression.js",
+
             "~/Scripts/Core/EventArgs.js",
             "~/Scripts/Core/CancelEventArgs.js",
+
+
             "~/Scripts/Core/Exception.js",
             "~/Scripts/Core/AjaxException.js",
 
@@ -68,6 +75,7 @@ namespace Biz.WebApp
         {
             "~/Scripts/Core/Data/IValueConverter.js",
             "~/Scripts/Core/Data/DependencyProperty.js",
+            "~/Scripts/Core/Data/ListCollectionView.js",
             "~/Scripts/Core/Data/BindingPolicy.js",
             "~/Scripts/Core/Data/BindingBehavior.js",
             "~/Scripts/Core/Data/DataBindingBehavior.js",
@@ -120,8 +128,11 @@ namespace Biz.WebApp
             "~/Scripts/Core/BizView.js",
             "~/Scripts/Core/BizView.js",
             "~/Scripts/Core/Application.js",
+
             "~/Scripts/Core/UI/InputElement.js",
             "~/Scripts/Core/UI/NavbarElement.js",
+            "~/Scripts/Core/UI/Selector.js",
+
             "~/Scripts/Core/Repository.js",
         };
     }
