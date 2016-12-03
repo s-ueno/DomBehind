@@ -44,11 +44,9 @@ namespace Biz.WebApp
         public static readonly string[] Core_Base = new string[]
         {
             "~/Scripts/Core/IDisposable.js",
-            "~/Scripts/Core/Expression.js",
 
             "~/Scripts/Core/EventArgs.js",
             "~/Scripts/Core/CancelEventArgs.js",
-
 
             "~/Scripts/Core/Exception.js",
             "~/Scripts/Core/AjaxException.js",
@@ -58,6 +56,8 @@ namespace Biz.WebApp
 
             "~/Scripts/Core/INotifyPropertyChanged.js",
             "~/Scripts/Core/NotifiableImp.js",
+
+            "~/Scripts/Core/Expression.js",
         };
 
         public static readonly string[] Core_Extensions = new string[]
@@ -66,10 +66,7 @@ namespace Biz.WebApp
             "~/Scripts/Core/Extensions/Object.js",
             "~/Scripts/Core/Extensions/Enumerable.js",
             "~/Scripts/Core/Extensions/JQueryStatic.js",
-
         };
-
-
 
         public static readonly string[] Core_Data = new string[]
         {

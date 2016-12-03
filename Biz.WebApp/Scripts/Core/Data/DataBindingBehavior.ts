@@ -5,19 +5,8 @@
     export class DataBindingBehavior extends BindingBehavior {
         public Property: Data.DependencyProperty;
 
-        public BindingExpression: (x) => any;
-        public get BindingPath(): string {
-            if (!this._bindingPath) {
-                this._bindingPath = this.ParseBindingPath();
-            }
-            return this._bindingPath;
-        }
-        private _bindingPath: string;
-
+        public Expression: Expression;
         public Marks: string[] = [];
-
-        protected Getter: (x) => any;
-        protected Setter: (x, value) => void;
 
         public AdditionalInfo: collections.LinkedDictionary<string, any>
         = new collections.LinkedDictionary<string, any>();
@@ -41,15 +30,14 @@
         public UpdateSource(): void {
             if (this.BindingPolicy.Mode === BindingMode.OneWay) return;
 
-            if (Object.IsNullOrUndefined(this.Setter)) return;
             if (Object.IsNullOrUndefined(this.Property)) return;
             if (Object.IsNullOrUndefined(this.Property.GetValue)) return;
 
-            this.Setter(this.DataContext, this.ValueCore);
+            this.Expression.SetValue(this.ValueCore);
             this.UpdateSourceEvent.Raise(this, this.ValueCore);
 
             if (this.DataContext instanceof NotifiableImp) {
-                var e = new PropertyChangedEventArgs(this.BindingPath);
+                var e = new PropertyChangedEventArgs(this.Expression.MemberPath);
                 (<NotifiableImp>this.DataContext).PropertyChanged.Raise(this, e);
             }
         }
@@ -61,9 +49,8 @@
         public UpdateTarget(): void {
             if (Object.IsNullOrUndefined(this.Property)) return;
             if (Object.IsNullOrUndefined(this.Property.SetValue)) return;
-            if (Object.IsNullOrUndefined(this.Getter)) return;
 
-            let value = this.Getter(this.DataContext);
+            let value = this.Expression.GetValue();
             if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter)) {
                 value = this.BindingPolicy.Converter.Convert(value);
             }
@@ -77,7 +64,6 @@
         // #region Ensure
 
         public Ensure(): void {
-
             if (this.BindingPolicy.Trigger === UpdateSourceTrigger.LostForcus) {
                 let event = UIElement.LostForcusEvent.EventName;
                 this.Events.push(event);
@@ -88,25 +74,9 @@
                 });
             }
 
-            this.Getter = this.BindingExpression;
-            this.Setter = (vm, value) => {
-                var arr = this.BindingPath.split(".");
-                var lastDataContext: any = this.DataContext;
-                $.each(arr.slice(0, arr.length - 1), (i, source) => {
-                    lastDataContext = lastDataContext[source];
-                });
-                var path = arr[arr.length - 1]
-                lastDataContext[path] = value;
-            };
-
             if ((this.Property) && (this.Property.Ensure)) {
                 this.Property.Ensure(this);
             }
-        }
-
-        protected ParseBindingPath(): string {
-            var lamdaPath = Object.NameOf(this.BindingExpression);
-            return lamdaPath.split(".").slice(1).join(".");
         }
         protected Events: string[] = [];
         protected EventsOff(): void {
@@ -129,8 +99,9 @@
                 this.EventsOff();
 
                 this.Property = null;
-                this.Getter = null;
-                this.Setter = null;
+                if (this.Expression)
+                    this.Expression.Dispose();
+                this.Expression = null;
                 this.Marks.length = 0;
 
                 super.Dispose();

@@ -57,7 +57,7 @@
 
             let behavior = this.Add(new Data.DataBindingBehavior());
             behavior.Property = property;
-            behavior.BindingExpression = bindingExpression;
+            behavior.Expression = new LamdaExpression(this.Owner.DataContext, bindingExpression);
             behavior.BindingPolicy.Trigger = !Object.IsNullOrUndefined(updateTrigger) ? updateTrigger : property.UpdateSourceTrigger;
             behavior.BindingPolicy.Mode = !Object.IsNullOrUndefined(mode) ? mode : property.BindingMode;
 
@@ -66,7 +66,7 @@
             dataBindingBuilder.CurrentBehavior = this.CurrentBehavior;
             dataBindingBuilder.CurrentElement = this.CurrentElement;
             // default PartialMark is PropertyName
-            return dataBindingBuilder.PartialMark(behavior.BindingPath);
+            return dataBindingBuilder.PartialMark(behavior.Expression.MemberPath);
         }
 
         // #endregion

@@ -15,7 +15,7 @@
             }
             behavior.AdditionalInfo[Selector.InstanceMark] = new Selector(behavior);
         }
-        constructor(public Behavior: Data.DataBindingBehavior) {
+         constructor(public Behavior: Data.DataBindingBehavior) {
             Behavior.UpdateTargetEvent.AddHandler(
                 (sender, e) => this.OnUpdateTarget(sender, e));
         }
@@ -38,15 +38,19 @@
             sender: Data.ListCollectionView,
             e: PropertyChangedEventArgs): void {
             if (e.Name === "Current") {
-                this.Select(sender.Current);
+                this.Select(sender);
             } else {
             }
         }
-        protected Select(obj: any) {
-            if (Object.IsNullOrUndefined(obj)) {
+        protected Select(sender: Data.ListCollectionView) {
+            if (Object.IsNullOrUndefined(sender.Current)) {
                 
                 return;
             }
+
+            
+
+
         }
 
         protected Render(source: Data.ListCollectionView) {

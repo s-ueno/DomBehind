@@ -1,10 +1,54 @@
 ﻿namespace DomBehind.Core {
-    export class Expression {
+    export class Expression implements IDisposable {
         constructor(
             public DataContext: any,
-            public LamdaExpression: Function) {
+            public MemberPath: string) {
+        }
+        public SetValue(value: any): void {
+            var arr = this.MemberPath.split(".");
+            var lastDataContext: any = this.DataContext;
+            $.each(arr.slice(0, arr.length - 1), (i, source) => {
+                lastDataContext = lastDataContext[source];
+            });
+            var path = arr[arr.length - 1]
+            lastDataContext[path] = value;
+        }
+        public GetValue(): any {
+            var arr = this.MemberPath.split(".");
+            var lastDataContext: any = this.DataContext;
+            $.each(arr.slice(0, arr.length - 1), (i, source) => {
+                lastDataContext = lastDataContext[source];
+            });
+            var path = arr[arr.length - 1]
+            return lastDataContext[path];
         }
 
+        public Dispose(): void {
+            this.DataContext = null;
+            this.MemberPath = null;
+        }
+    }
 
+
+    export class LamdaExpression extends Expression {
+        constructor(dataContext: any, public Lamda: (x) => any) {
+            super(dataContext, LamdaExpression.ParsePropertyPath(Lamda));
+        }
+        private static ParsePropertyPath(exp: (x) => any): string {
+            var path = LamdaExpression.NameOf(exp);
+            return path.split(".").slice(1).join(".");
+        }
+
+        private static _extractor = new RegExp("return (.*);");
+        private static NameOf(expression: any): string {
+            var m = LamdaExpression._extractor.exec(expression + "");
+            if (m == null) throw new Error("The function does not contain a statement matching 'return variableName;'");
+            return m[1];
+        }
+
+        public Dispose(): void {
+            this.Lamda = null;
+            super.Dispose();
+        }
     }
 }

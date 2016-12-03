@@ -63,6 +63,7 @@
         }
         protected OnPropertyChanged(name?: string): void {
             this.PropertyChanged.Raise(this, new PropertyChangedEventArgs(name));
+
         }
 
 

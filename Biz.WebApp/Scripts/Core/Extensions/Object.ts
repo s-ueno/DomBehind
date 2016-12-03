@@ -21,13 +21,6 @@ Object.IsPromise = value => {
     return promiseThenSrc === valueThenSrc;
 };
 
-var __extractor = new RegExp("return (.*);");
-Object.NameOf = function (name: any) {
-    var m = __extractor.exec(name + "");
-    if (m == null) throw new Error("The function does not contain a statement matching 'return variableName;'");
-    return m[1];
-};
-
 
 
 // !!! Object　は絶対に拡張しないこと！！
