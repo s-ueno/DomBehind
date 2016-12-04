@@ -54,7 +54,7 @@
         public static ClickEvent: Data.IEventBuilder
         = Data.EventBuilder.RegisterAttached<JQueryEventObject>("click");
 
-        public static LostForcusEvent: Data.IEventBuilder
+        public static LostFocusEvent: Data.IEventBuilder
         = Data.EventBuilder.RegisterAttached<JQueryEventObject>("focusout");
 
         public static InitializeEvent: Data.IEventBuilder

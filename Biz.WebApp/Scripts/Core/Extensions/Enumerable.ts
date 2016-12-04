@@ -4,8 +4,8 @@
     Any(predicate: (value: T) => boolean): boolean;
     OrderBy(selector: (value: T) => any): Array<T>;
     OrderByDecording(selector: (value: T) => any): Array<T>;
-    FirstOrDefault(): T;
-    LastOrDefault(): T;
+    FirstOrDefault(predicate?: (x: T) => boolean): T;
+    LastOrDefault(predicate?: (x: T) => boolean): T;
 }
 
 Array.prototype.Where = function (predicate: (value: any) => boolean) {
@@ -28,11 +28,19 @@ Array.prototype.OrderByDecording = function (selector: (value: any) => any) {
     let me: Array<any> = this;
     return me.sort((x, y) => selector(y) - selector(x));
 }
-Array.prototype.FirstOrDefault = function () {
+Array.prototype.FirstOrDefault = function (predicate?: (x: any) => boolean) {
     let me: Array<any> = this;
+
+    if (predicate) {
+        me = me.filter(x => predicate(x));
+    }
     return 0 < me.length ? me[0] : null;
 }
-Array.prototype.LastOrDefault = function () {
+Array.prototype.LastOrDefault = function (predicate?: (x: any) => boolean) {
     let me: Array<any> = this;
+
+    if (predicate) {
+        me = me.filter(x => predicate(x));
+    }
     return 0 < me.length ? me[me.length - 1] : null;
 }

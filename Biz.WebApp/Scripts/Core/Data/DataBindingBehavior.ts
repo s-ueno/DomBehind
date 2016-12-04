@@ -65,7 +65,7 @@
 
         public Ensure(): void {
             if (this.BindingPolicy.Trigger === UpdateSourceTrigger.LostForcus) {
-                let event = UIElement.LostForcusEvent.EventName;
+                let event = UIElement.LostFocusEvent.EventName;
                 this.Events.push(event);
 
                 this.Element.off(event);

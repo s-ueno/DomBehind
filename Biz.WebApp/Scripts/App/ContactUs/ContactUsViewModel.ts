@@ -14,15 +14,17 @@
             list.push({ Value: 1, Text: "BBB", Price: 135 });
             list.push({ Value: 2, Text: "CCC", Price: 700 });
             list.push({ Value: 3, Text: "DDD", Price: 499 });
-            this.SampleList = new DomBehind.Core.Data.ListCollectionView(list);
+            this.SampleList = new DomBehind.Core.Data.ListCollectionView(list, "Text");
         }
         public Name: string;
         public Email: string;
         public Message: string;
         public SampleList: DomBehind.Core.Data.ListCollectionView;
         public ContactUs() {
-            this.UpdateTarget();
-            this.SampleList.Refresh();
+
+            this.SampleList.MoveLast();
+            
+
 
             if (!this.Validate()) return;
 

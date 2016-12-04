@@ -1,24 +1,22 @@
 ﻿namespace DomBehind.Core.Data {
 
     export class ListCollectionView extends NotifiableImp {
-        constructor(public Source: Array<any>) {
+        constructor(public Source: Array<any>,
+            public DisplayMemberPath?: string) {
             super();
             this.List = new collections.LinkedList<any>();
             $.each(Source, (i, value) => {
                 this.List.add(value);
             });
-            this.ViewReflected = ListCollectionView.ViewReflectedState.None;
+            this.ViewReflected = ListCollectionView.ViewReflectedStatus.None;
         }
         public List: collections.LinkedList<any>;
-
-        public DisplayMemberPath: string;
-
-
         private _current: any;
         public get Current(): any { return this._current; }
         public set Current(value: any) {
             if (this.OnCurrentChanging().Cancel) return;
             this._current = value;
+            this.ViewReflected = ListCollectionView.ViewReflectedStatus.NoReflected;
             this.OnCurrentChanged();
         }
 
@@ -35,6 +33,10 @@
         public CurrentChanged: TypedEvent<EventArgs> = new TypedEvent<EventArgs>();
 
 
+        public Find(predicate: (x) => boolean) {
+            return this.List.toArray().FirstOrDefault(predicate);
+        }
+
         public Select(obj: any): void {
             this.Current = obj;
         }
@@ -44,7 +46,7 @@
         public MoveFirst(): void {
             this.Current = this.List.first();
         }
-        public ModeLast(): void {
+        public MoveLast(): void {
             this.Current = this.List.last();
         }
         public Filter: (obj: any) => boolean;
@@ -63,19 +65,16 @@
         }
         protected OnPropertyChanged(name?: string): void {
             this.PropertyChanged.Raise(this, new PropertyChangedEventArgs(name));
-
         }
-
-
-        public ViewReflected: ListCollectionView.ViewReflectedState;
+        public ViewReflected: ListCollectionView.ViewReflectedStatus;
     }
 
 }
 
 namespace DomBehind.Core.Data.ListCollectionView {
-    export enum ViewReflectedState {
+    export enum ViewReflectedStatus {
         None,
-        UnChanged,
-        Modified,
+        NoReflected,
+        Reflected,
     }
 }

@@ -280,6 +280,7 @@
     <TypeScriptCompile Include="Scripts\Core\Exception.ts" />
     <TypeScriptCompile Include="Scripts\Core\Extensions\Enum.ts" />
     <TypeScriptCompile Include="Scripts\Core\Expression.ts" />
+    <TypeScriptCompile Include="Scripts\Core\Global.ts" />
     <TypeScriptCompile Include="Scripts\Core\INotifyPropertyChanged.ts" />
     <TypeScriptCompile Include="Scripts\Core\Repository.ts" />
     <TypeScriptCompile Include="Scripts\Core\Threading\Thread.ts" />

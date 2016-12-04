@@ -39,6 +39,7 @@
             return path.split(".").slice(1).join(".");
         }
 
+        // http://stackoverflow.com/questions/29191451/get-name-of-variable-in-typescript
         private static _extractor = new RegExp("return (.*);");
         private static NameOf(expression: any): string {
             var m = LamdaExpression._extractor.exec(expression + "");
