@@ -3,27 +3,33 @@
         Value: number;
         Text: string;
         Price: number;
+        GroupKey: string;
     }
     export class ContactUsViewModel
         extends DomBehind.Core.BizViewModel {
 
-
-        public Initialize(): void {
-            var list: ISampleList[] = [];
-            list.push({ Value: 0, Text: "AAA", Price: 250 });
-            list.push({ Value: 1, Text: "BBB", Price: 135 });
-            list.push({ Value: 2, Text: "CCC", Price: 700 });
-            list.push({ Value: 3, Text: "DDD", Price: 499 });
-            this.SampleList = new DomBehind.Core.Data.ListCollectionView(list, "Text");
-        }
         public Name: string;
         public Email: string;
         public Message: string;
+
+        public Initialize(): void {
+            var list: ISampleList[] = [];
+            list.push({ Value: 0, Text: "AAA", Price: 250, GroupKey: "A" });
+            list.push({ Value: 1, Text: "BBB", Price: 135, GroupKey: "B" });
+            list.push({ Value: 2, Text: "CCC", Price: 700, GroupKey: "B" });
+            list.push({ Value: 3, Text: "DDD", Price: 499, GroupKey: "A" });
+            this.SampleList = new DomBehind.Core.Data.ListCollectionView(list, "Text");
+            this.SampleList.Grouping = (x: ISampleList) => x.GroupKey;
+
+            this.StringList.push("ABC");
+            this.StringList.push("DEF");
+        }
+        public StringList: string[] = [];
         public SampleList: DomBehind.Core.Data.ListCollectionView;
         public ContactUs() {
 
             this.SampleList.MoveLast();
-            
+
 
 
             if (!this.Validate()) return;

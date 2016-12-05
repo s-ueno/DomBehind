@@ -28,8 +28,6 @@
             this.MemberPath = null;
         }
     }
-
-
     export class LamdaExpression extends Expression {
         constructor(dataContext: any, public Lamda: (x) => any) {
             super(dataContext, LamdaExpression.ParsePropertyPath(Lamda));
@@ -50,6 +48,18 @@
         public Dispose(): void {
             this.Lamda = null;
             super.Dispose();
+        }
+    }
+
+    export class BooleanExpression extends Expression {
+        constructor(public Value: boolean) {
+            super(null, ".");
+        }
+        public /* override */ SetValue(value: any): void {
+
+        }
+        public /* override */ GetValue(): any {
+            return this.Value;
         }
     }
 }

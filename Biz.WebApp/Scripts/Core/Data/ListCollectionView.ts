@@ -36,6 +36,9 @@
         public Find(predicate: (x) => boolean) {
             return this.List.toArray().FirstOrDefault(predicate);
         }
+        public Contains(obj: any): boolean {
+            return this.List.contains(obj);
+        }
 
         public Select(obj: any): void {
             this.Current = obj;
@@ -59,16 +62,21 @@
                         this.List.add(value);
                     }
                 });
-                this.MoveFirst();
-                this.OnPropertyChanged();
+
+                if (this.Current) {
+                    if (!this.Contains(this.Current)) {
+                        this.MoveFirst();
+                    }
+                }
             }
+
+            this.OnPropertyChanged();
         }
         protected OnPropertyChanged(name?: string): void {
             this.PropertyChanged.Raise(this, new PropertyChangedEventArgs(name));
         }
         public ViewReflected: ListCollectionView.ViewReflectedStatus;
     }
-
 }
 
 namespace DomBehind.Core.Data.ListCollectionView {

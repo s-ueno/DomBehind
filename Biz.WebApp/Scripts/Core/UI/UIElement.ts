@@ -37,17 +37,6 @@
         = Data.DependencyProperty.RegisterAttached("maxlength",
             null, (x, y) => x.attr("maxlength", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
 
-        public static ItemsSourceProperty: Data.DependencyProperty
-        = Data.DependencyProperty.RegisterAttached("itemsSource",
-            null,
-            (x, y) => { },
-            Data.UpdateSourceTrigger.Explicit,
-            Data.BindingMode.OneWay,
-            behavior => {
-                Selector.Register(behavior);
-            });
-
-
         /**
          * 
          */

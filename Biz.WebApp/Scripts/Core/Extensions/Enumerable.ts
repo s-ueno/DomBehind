@@ -6,6 +6,7 @@
     OrderByDecording(selector: (value: T) => any): Array<T>;
     FirstOrDefault(predicate?: (x: T) => boolean): T;
     LastOrDefault(predicate?: (x: T) => boolean): T;
+    GroupBy(selector: (value: T) => any): Array<{ Key: any, Values: Array<T> }>;
 }
 
 Array.prototype.Where = function (predicate: (value: any) => boolean) {
@@ -44,3 +45,18 @@ Array.prototype.LastOrDefault = function (predicate?: (x: any) => boolean) {
     }
     return 0 < me.length ? me[me.length - 1] : null;
 }
+
+Array.prototype.GroupBy = function (selector: (value: any) => any) {
+    let me: Array<any> = this;
+    let result = new Array<{ Key: any, Values: Array<any> }>()
+    $.each(me, (i, value) => {
+        let groupKey = selector(value);
+
+        if (!result.some(x => x.Key === groupKey)) {
+            result.push({ Key: groupKey, Values: new Array<any>() });
+        }
+        let item = result.FirstOrDefault(x => x.Key === groupKey);
+        item.Values.push(value);
+    });
+    return result;
+};

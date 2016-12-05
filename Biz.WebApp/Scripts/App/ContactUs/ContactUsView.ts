@@ -23,7 +23,8 @@
 
 
             builder.Element("#Sample")
-                .Binding(DomBehind.Core.UIElement.ItemsSourceProperty, x => x.SampleList)
+                .Binding(DomBehind.Core.Selector.ItemsSourceProperty, x => x.SampleList)
+                .Multiple();
         }
 
         public OnReceiveNotificationMessage(sender: any, e: any) {
