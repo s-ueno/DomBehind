@@ -33,17 +33,13 @@
         = Data.DependencyProperty.RegisterAttached("multiple",
             null,
             (x, y) => {
-                if (y === true) {
-                    
-                    x.attr("multiple", "true");
-
-                    var option = x.data("selectpicker");
-                    option.multiple = true;
-                    option.options.showTick = true;
-
+                if (y === true) {                    
+                    x.attr("multiple", 'true');
                 } else {
                     x.removeAttr("multiple");
                 }
+                x.selectpicker('destroy');
+                x.selectpicker();
             },
             Data.UpdateSourceTrigger.Explicit,
             Data.BindingMode.OneWay);
