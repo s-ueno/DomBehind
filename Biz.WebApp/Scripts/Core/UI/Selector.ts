@@ -1,21 +1,21 @@
 ﻿namespace DomBehind.Core {
 
-    //export interface DataBindingBehaviorBuilder<T> {
-    //    Multiple(): DataBindingBehaviorBuilder<T>;
-    //    Multiple(allowMultiple: (x: T) => boolean): DataBindingBehaviorBuilder<T>;
-    //}
-    //DataBindingBehaviorBuilder.prototype.Multiple = function (allowMultiple?: (x: any) => boolean) {
-    //    let me: DataBindingBehaviorBuilder<any> = this;
-    //    let behavior = me.Add(new Data.DataBindingBehavior());
+    export interface DataBindingBehaviorBuilder<T> {
+        Multiple(): DataBindingBehaviorBuilder<T>;
+        Multiple(allowMultiple: (x: T) => boolean): DataBindingBehaviorBuilder<T>;
+    }
+    DataBindingBehaviorBuilder.prototype.Multiple = function (allowMultiple?: (x: any) => boolean) {
+        let me: DataBindingBehaviorBuilder<any> = this;
+        let behavior = me.Add(new Data.DataBindingBehavior());
 
-    //    behavior.Property = Selector.AllowMultipleProperty;
-    //    if (allowMultiple) {
-    //        behavior.Expression = new LamdaExpression(me.Owner.DataContext, allowMultiple);
-    //    } else {
-    //        behavior.Expression = new BooleanExpression(true);
-    //    }
-    //    return me;
-    //}
+        behavior.Property = Selector.AllowMultipleProperty;
+        if (allowMultiple) {
+            behavior.Expression = new LamdaExpression(me.Owner.DataContext, allowMultiple);
+        } else {
+            behavior.Expression = new BooleanExpression(true);
+        }
+        return me;
+    }
 
     export class Selector {
 
@@ -29,19 +29,24 @@
                 Selector.Register(behavior);
             });
 
-        //public static AllowMultipleProperty: Data.DependencyProperty
-        //= Data.DependencyProperty.RegisterAttached("multiple",
-        //    null,
-        //    (x, y) => {
-        //        if (y === true) {
+        public static AllowMultipleProperty: Data.DependencyProperty
+        = Data.DependencyProperty.RegisterAttached("multiple",
+            null,
+            (x, y) => {
+                if (y === true) {
                     
-        //            x.attr("multiple", "");
-        //        } else {
-        //            x.removeAttr("multiple");
-        //        }
-        //    },
-        //    Data.UpdateSourceTrigger.Explicit,
-        //    Data.BindingMode.OneWay);
+                    x.attr("multiple", "true");
+
+                    var option = x.data("selectpicker");
+                    option.multiple = true;
+                    option.options.showTick = true;
+
+                } else {
+                    x.removeAttr("multiple");
+                }
+            },
+            Data.UpdateSourceTrigger.Explicit,
+            Data.BindingMode.OneWay);
 
 
         private static IgnoreMark: string = "Selector.Ignore";
@@ -62,8 +67,8 @@
             this.UpdateTargetEventHandle = (sender, e) => this.OnUpdateTarget(sender, e);
             Behavior.UpdateTargetEvent.AddHandler(this.UpdateTargetEventHandle);
 
-            //Behavior.Element.off(UIElement.LostFocusEvent.EventName);
-            //Behavior.Element.on(UIElement.LostFocusEvent.EventName, e => this.UpdateSource());
+            Behavior.Element.off(UIElement.LostFocusEvent.EventName);
+            Behavior.Element.on(UIElement.LostFocusEvent.EventName, e => this.UpdateSource());
         }
         /** Hold the handle in order to safely remove the Event */
         protected UpdateTargetEventHandle: (sender, e) => void;
