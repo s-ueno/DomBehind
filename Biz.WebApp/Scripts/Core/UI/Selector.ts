@@ -74,24 +74,32 @@
         protected UpdateTargetEventHandle: (sender, e) => void;
         protected UpdateSourceEventHandle: (sender, e) => void;
         protected PropertyChangedEventHandle: (sender, e) => void;
-
-
         protected UpdateSource(e: JQueryEventObject): boolean {
             if (!this.Behavior.Expression) return;
+
+
 
             var dataSource = this.Behavior.Expression.GetValue();
             if (dataSource instanceof Data.ListCollectionView) {
                 var collectionView = dataSource as Data.ListCollectionView;
 
+                let selectedItems = [];
                 $.each(this.Behavior.Element.find("option"), (i, value: HTMLOptionElement) => {
                     if (value.selected) {
                         var uid = value.getAttribute("uuid");
                         var item = collectionView.Find(x => x.__uuid === uid);
                         if (item) {
+                            selectedItems.push(item);
                             dataSource._current = item;
                         }
                     }
                 });
+
+                if (this.Multiple) {
+                    dataSource._current = selectedItems;
+                } else {
+                    dataSource._current = 0 < selectedItems.length ? selectedItems[0] : null;
+                }
             }
         }
 
