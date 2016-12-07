@@ -77,11 +77,28 @@
         protected UpdateSource(e: JQueryEventObject): boolean {
             if (!this.Behavior.Expression) return;
 
-
-
             var dataSource = this.Behavior.Expression.GetValue();
             if (dataSource instanceof Data.ListCollectionView) {
                 var collectionView = dataSource as Data.ListCollectionView;
+
+                if (collectionView.OnCurrentChanging().Cancel) {
+                    var value: any = collectionView.Current;
+                    if (this.Multiple) {
+                        var values = [];
+                        if (value) {
+                            $.each(value, (i, x) => {
+                                values.push(this.GetDisplayValue(x, collectionView.DisplayMemberPath));
+                            });
+                        }
+                        this.Behavior.Element.val(values);
+                    } else {
+                        value = this.GetDisplayValue(value, collectionView.DisplayMemberPath);
+                        this.Behavior.Element.val(value);
+                    }
+
+                    this.Behavior.Element.selectpicker('refresh');
+                    return false;
+                }
 
                 let selectedItems = [];
                 $.each(this.Behavior.Element.find("option"), (i, value: HTMLOptionElement) => {
@@ -158,23 +175,15 @@
                 value.__uuid = NewUid();
             }
 
-            var displayValue = value;
-            if (source.DisplayMemberPath) {
-                displayValue = new Expression(value, source.DisplayMemberPath).GetValue();
-            }
-
             // HACK bootstrap-select.js val method
-            $(`<option uuid="${value.__uuid}">${displayValue}</option>`).appendTo(element);
+            $(`<option uuid="${value.__uuid}">${this.GetDisplayValue(value, source.DisplayMemberPath)}</option>`)
+                .appendTo(element);
         }
         protected Select(source: Data.ListCollectionView) {
             if (!this.HasChanges(source)) return;
 
             if (!Object.IsNullOrUndefined(source.Current)) {
-                var displayValue = source.Current;
-                if (source.DisplayMemberPath) {
-                    displayValue = new Expression(source.Current, source.DisplayMemberPath).GetValue();
-                }
-                this.Behavior.Element.val(displayValue);
+                this.Behavior.Element.val(this.GetDisplayValue(source.Current, source.DisplayMemberPath));
             }
             this.Behavior.Element.selectpicker('refresh');
             source.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.Reflected;
@@ -195,6 +204,13 @@
             source.PropertyChanged.RemoveHandler(this.PropertyChangedEventHandle);
             action();
             source.PropertyChanged.AddHandler(this.PropertyChangedEventHandle);
+        }
+        protected GetDisplayValue(value: any, displayMemberPath: string): any {
+            var displayValue = value;
+            if (displayMemberPath) {
+                displayValue = new Expression(value, displayMemberPath).GetValue();
+            }
+            return displayValue;
         }
     }
 }

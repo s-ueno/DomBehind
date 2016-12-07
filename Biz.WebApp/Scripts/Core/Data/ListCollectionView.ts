@@ -21,13 +21,13 @@
             this.PropertyChanged.Raise(this, new PropertyChangedEventArgs("Current"));
         }
 
-        protected OnCurrentChanging(): CancelEventArgs {
+        public OnCurrentChanging(): CancelEventArgs {
             var e = new CancelEventArgs();
             this.CurrentChanging.Raise(this, e);
             return e;
         }
         public CurrentChanging: TypedEvent<CancelEventArgs> = new TypedEvent<CancelEventArgs>();
-        protected OnCurrentChanged(): void {
+        public OnCurrentChanged(): void {
             this.CurrentChanged.Raise(this, new EventArgs());
         }
         public CurrentChanged: TypedEvent<EventArgs> = new TypedEvent<EventArgs>();
