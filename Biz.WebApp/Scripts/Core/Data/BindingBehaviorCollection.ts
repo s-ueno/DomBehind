@@ -12,9 +12,18 @@
          * Ensure
          */
         public Ensure(): void {
-            this.forEach(x => {
+            var sortedList: Data.BindingBehavior[] = [];
+            var grouping = this.toArray().GroupBy(x => x.Element);
+            grouping.forEach(x => {
+                var items = x.Values.OrderBy(x => x.Priolity);
+                items.forEach(y => {
+                    sortedList.push(y);
+                });
+            });
+            this.clear();
+            sortedList.forEach(x => {
+                this.add(x);
                 x.Ensure();
-                return true;
             });
         }
 

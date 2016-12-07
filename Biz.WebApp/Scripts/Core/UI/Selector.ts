@@ -9,6 +9,7 @@
         let behavior = me.Add(new Data.DataBindingBehavior());
 
         behavior.Property = Selector.AllowMultipleProperty;
+        behavior.Priolity = -1;
         if (allowMultiple) {
             behavior.Expression = new LamdaExpression(me.Owner.DataContext, allowMultiple);
         } else {
@@ -33,10 +34,10 @@
         = Data.DependencyProperty.RegisterAttached("multiple",
             null,
             (x, y) => {
-                if (y === true) {                    
-                    x.attr("multiple", 'true');
+                if (y === true) {
+                    x.prop('multiple', true);
                 } else {
-                    x.removeAttr("multiple");
+                    x.prop('multiple', false);
                 }
                 x.selectpicker('destroy');
                 x.selectpicker();
@@ -63,14 +64,21 @@
             this.UpdateTargetEventHandle = (sender, e) => this.OnUpdateTarget(sender, e);
             Behavior.UpdateTargetEvent.AddHandler(this.UpdateTargetEventHandle);
 
-            Behavior.Element.off(UIElement.LostFocusEvent.EventName);
-            Behavior.Element.on(UIElement.LostFocusEvent.EventName, e => this.UpdateSource());
+            this.UpdateSourceEventHandle = e => this.UpdateSource(e);
+            Behavior.Element.off('change', this.UpdateSourceEventHandle);
+            Behavior.Element.on('change', this.UpdateSourceEventHandle);
+
+            this.PropertyChangedEventHandle = (sender, e) => this.OnDataSourcePropertyChanged(sender, e);
         }
         /** Hold the handle in order to safely remove the Event */
         protected UpdateTargetEventHandle: (sender, e) => void;
+        protected UpdateSourceEventHandle: (sender, e) => void;
+        protected PropertyChangedEventHandle: (sender, e) => void;
 
-        protected UpdateSource(): void {
+
+        protected UpdateSource(e: JQueryEventObject): boolean {
             if (!this.Behavior.Expression) return;
+
             var dataSource = this.Behavior.Expression.GetValue();
             if (dataSource instanceof Data.ListCollectionView) {
                 var collectionView = dataSource as Data.ListCollectionView;
@@ -109,7 +117,6 @@
             if (!this.HasChanges(source)) return;
 
             this.Behavior.Element.empty();
-
             if (source.Grouping) {
                 $.each(source.List.toArray().GroupBy(source.Grouping), (i, group) => {
                     let optgroup = $(`<optgroup>`, { label: group.Key }).appendTo(this.Behavior.Element);
@@ -122,7 +129,21 @@
                     this.RenderOption(this.Behavior.Element, source, value);
                 });
             }
+            if (this.Multiple) {
+                this.Behavior.Element.selectpicker("deselectAll");
+            } else {
+                if (Object.IsNullOrUndefined(source.Current)) {
+                    this.DisableThrowEvent(source, () => source.MoveFirst());
+                }
+            }
+
             this.Select(source);
+        }
+        protected get Multiple(): boolean {
+            return this.Behavior.Element.prop("multiple") ? true : false;
+        }
+        protected set Multiple(value: boolean) {
+            this.Behavior.Element.prop("multiple", value);
         }
         protected RenderOption(element: JQuery, source: Data.ListCollectionView, value: any): void {
             if (!value.__uuid) {
@@ -140,7 +161,6 @@
         protected Select(source: Data.ListCollectionView) {
             if (!this.HasChanges(source)) return;
 
-            this.Behavior.Element.removeAttr("option:selected").removeAttr("selected");
             if (!Object.IsNullOrUndefined(source.Current)) {
                 var displayValue = source.Current;
                 if (source.DisplayMemberPath) {
@@ -156,15 +176,17 @@
             if (source.ViewReflected === Data.ListCollectionView.ViewReflectedStatus.None) {
 
                 source.Refresh();
-
-                this.PropertyChangedEventHandle = (sender, e) => this.OnDataSourcePropertyChanged(sender, e);
+                source.PropertyChanged.RemoveHandler(this.PropertyChangedEventHandle);
                 source.PropertyChanged.AddHandler(this.PropertyChangedEventHandle);
                 source.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.NoReflected;
             }
             return true;
         }
-        /** Hold the handle in order to safely remove the Event */
-        protected PropertyChangedEventHandle: (sender, e) => void;
-
+        protected DisableThrowEvent(
+            source: Data.ListCollectionView, action: () => void): void {
+            source.PropertyChanged.RemoveHandler(this.PropertyChangedEventHandle);
+            action();
+            source.PropertyChanged.AddHandler(this.PropertyChangedEventHandle);
+        }
     }
 }

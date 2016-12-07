@@ -18,6 +18,7 @@
             this._current = value;
             this.ViewReflected = ListCollectionView.ViewReflectedStatus.NoReflected;
             this.OnCurrentChanged();
+            this.PropertyChanged.Raise(this, new PropertyChangedEventArgs("Current"));
         }
 
         protected OnCurrentChanging(): CancelEventArgs {
@@ -28,7 +29,6 @@
         public CurrentChanging: TypedEvent<CancelEventArgs> = new TypedEvent<CancelEventArgs>();
         protected OnCurrentChanged(): void {
             this.CurrentChanged.Raise(this, new EventArgs());
-            this.PropertyChanged.Raise(this, new PropertyChangedEventArgs("Current"));
         }
         public CurrentChanged: TypedEvent<EventArgs> = new TypedEvent<EventArgs>();
 

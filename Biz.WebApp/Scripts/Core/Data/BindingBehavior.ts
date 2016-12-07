@@ -10,7 +10,7 @@
         public DataContext: any
         public Element: JQuery;
         public BindingPolicy: BindingPolicy = new Data.BindingPolicy();
-
+        public Priolity: number = 0;
         // #endregion
 
         // #region must inherits
