@@ -24,10 +24,6 @@
         public SampleList: DomBehind.Core.Data.ListCollectionView;
         public ContactUs() {
 
-            this.SampleList.MoveLast();
-
-
-
             if (!this.Validate()) return;
 
             return $.PromiseWith(d => {

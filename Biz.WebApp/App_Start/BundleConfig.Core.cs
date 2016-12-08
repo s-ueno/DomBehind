@@ -119,7 +119,10 @@ namespace Biz.WebApp
         public static readonly string[] Core_UI = new string[] {
             "~/Scripts/Core/UI/UIElement.js",
             "~/Scripts/Core/UI/IModalHelper.js",
-
+            "~/Scripts/Core/UI/InputElement.js",
+            "~/Scripts/Core/UI/NavbarElement.js",
+            "~/Scripts/Core/UI/Selector.js",
+            "~/Scripts/Core/UI/Tab.js",
         };
         public static readonly string[] Core = new string[] {
             "~/Scripts/Core/Utils.js",
@@ -127,11 +130,6 @@ namespace Biz.WebApp
             "~/Scripts/Core/BizView.js",
             "~/Scripts/Core/BizView.js",
             "~/Scripts/Core/Application.js",
-
-            "~/Scripts/Core/UI/InputElement.js",
-            "~/Scripts/Core/UI/NavbarElement.js",
-            "~/Scripts/Core/UI/Selector.js",
-
             "~/Scripts/Core/Repository.js",
         };
     }

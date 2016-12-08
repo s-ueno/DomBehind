@@ -143,7 +143,6 @@
             }
             if (this.Multiple) {
                 source.Begin().UnSelect().End();
-                this.Behavior.Element.selectpicker("deselectAll");
             } else {
                 if (Object.IsNullOrUndefined(source.Current)) {
                     source.Begin().MoveFirst().End();
@@ -170,13 +169,17 @@
 
             var value: any = source.Current;
             if (this.Multiple) {
-                var values = [];
-                if (value) {
-                    $.each(value, (i, x) => {
-                        values.push(this.GetDisplayValue(x, source.DisplayMemberPath));
-                    });
+                if (Object.IsNullOrUndefined(value)) {
+                    this.Behavior.Element.selectpicker("deselectAll");
+                } else {
+                    if (value instanceof Array) {
+                        this.Behavior.Element.val(
+                            value.map(x => this.GetDisplayValue(x, source.DisplayMemberPath)));
+                    } else {
+                        this.Behavior.Element.val(this.GetDisplayValue(value, source.DisplayMemberPath));
+                    }
                 }
-                this.Behavior.Element.val(values);
+
             } else {
                 value = this.GetDisplayValue(value, source.DisplayMemberPath);
                 this.Behavior.Element.val(value);

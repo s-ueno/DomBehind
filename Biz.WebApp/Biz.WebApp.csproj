@@ -292,6 +292,7 @@
     <TypeScriptCompile Include="Scripts\Core\UI\NavbarElement.ts" />
     <TypeScriptCompile Include="Scripts\Core\UI\InputElement.ts" />
     <TypeScriptCompile Include="Scripts\Core\UI\Selector.ts" />
+    <TypeScriptCompile Include="Scripts\Core\UI\Tab.ts" />
     <TypeScriptCompile Include="Scripts\Core\Validation\RegexValidator.ts" />
     <TypeScriptCompile Include="Scripts\Core\Validation\MaxLengthValidator.ts" />
     <TypeScriptCompile Include="Scripts\Core\Validation\RequiredValidator.ts" />

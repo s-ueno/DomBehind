@@ -110,7 +110,6 @@ $.fn.SetCustomError = function (errorMessage: string) {
         $.each(me, (i, value) => {
             if (!Object.IsNullOrUndefined(value.setCustomValidity)) {
                 value.setCustomValidity(errorMessage);
-                return false;
             }
         });
     } else {
