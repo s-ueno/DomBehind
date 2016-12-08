@@ -20,11 +20,7 @@
             list.push({ Value: 3, Text: "DDD", Price: 499, GroupKey: "A" });
             this.SampleList = new DomBehind.Core.Data.ListCollectionView(list, "Text");
             this.SampleList.Grouping = (x: ISampleList) => x.GroupKey;
-
-            this.StringList.push("ABC");
-            this.StringList.push("DEF");
         }
-        public StringList: string[] = [];
         public SampleList: DomBehind.Core.Data.ListCollectionView;
         public ContactUs() {
 

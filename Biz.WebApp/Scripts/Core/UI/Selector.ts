@@ -82,21 +82,7 @@
                 var collectionView = dataSource as Data.ListCollectionView;
 
                 if (collectionView.OnCurrentChanging().Cancel) {
-                    var value: any = collectionView.Current;
-                    if (this.Multiple) {
-                        var values = [];
-                        if (value) {
-                            $.each(value, (i, x) => {
-                                values.push(this.GetDisplayValue(x, collectionView.DisplayMemberPath));
-                            });
-                        }
-                        this.Behavior.Element.val(values);
-                    } else {
-                        value = this.GetDisplayValue(value, collectionView.DisplayMemberPath);
-                        this.Behavior.Element.val(value);
-                    }
-
-                    this.Behavior.Element.selectpicker('refresh');
+                    this.Select(collectionView);
                     return false;
                 }
 
@@ -107,16 +93,17 @@
                         var item = collectionView.Find(x => x.__uuid === uid);
                         if (item) {
                             selectedItems.push(item);
-                            dataSource._current = item;
                         }
                     }
                 });
 
+                dataSource.Begin();
                 if (this.Multiple) {
-                    dataSource._current = selectedItems;
+                    dataSource.Current = selectedItems;
                 } else {
-                    dataSource._current = 0 < selectedItems.length ? selectedItems[0] : null;
+                    dataSource.Current = 0 < selectedItems.length ? selectedItems[0] : null;
                 }
+                dataSource.End();
             }
         }
 
@@ -155,10 +142,11 @@
                 });
             }
             if (this.Multiple) {
+                source.Begin().UnSelect().End();
                 this.Behavior.Element.selectpicker("deselectAll");
             } else {
                 if (Object.IsNullOrUndefined(source.Current)) {
-                    this.DisableThrowEvent(source, () => source.MoveFirst());
+                    source.Begin().MoveFirst().End();
                 }
             }
 
@@ -176,14 +164,22 @@
             }
 
             // HACK bootstrap-select.js val method
-            $(`<option uuid="${value.__uuid}">${this.GetDisplayValue(value, source.DisplayMemberPath)}</option>`)
-                .appendTo(element);
+            $(`<option uuid="${value.__uuid}">${this.GetDisplayValue(value, source.DisplayMemberPath)}</option>`).appendTo(element);
         }
         protected Select(source: Data.ListCollectionView) {
-            if (!this.HasChanges(source)) return;
 
-            if (!Object.IsNullOrUndefined(source.Current)) {
-                this.Behavior.Element.val(this.GetDisplayValue(source.Current, source.DisplayMemberPath));
+            var value: any = source.Current;
+            if (this.Multiple) {
+                var values = [];
+                if (value) {
+                    $.each(value, (i, x) => {
+                        values.push(this.GetDisplayValue(x, source.DisplayMemberPath));
+                    });
+                }
+                this.Behavior.Element.val(values);
+            } else {
+                value = this.GetDisplayValue(value, source.DisplayMemberPath);
+                this.Behavior.Element.val(value);
             }
             this.Behavior.Element.selectpicker('refresh');
             source.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.Reflected;
@@ -198,12 +194,6 @@
                 source.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.NoReflected;
             }
             return true;
-        }
-        protected DisableThrowEvent(
-            source: Data.ListCollectionView, action: () => void): void {
-            source.PropertyChanged.RemoveHandler(this.PropertyChangedEventHandle);
-            action();
-            source.PropertyChanged.AddHandler(this.PropertyChangedEventHandle);
         }
         protected GetDisplayValue(value: any, displayMemberPath: string): any {
             var displayValue = value;

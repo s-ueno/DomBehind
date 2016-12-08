@@ -17,8 +17,11 @@
             if (this.OnCurrentChanging().Cancel) return;
             this._current = value;
             this.ViewReflected = ListCollectionView.ViewReflectedStatus.NoReflected;
+
+            if (this.engaged) return;
+            
             this.OnCurrentChanged();
-            this.PropertyChanged.Raise(this, new PropertyChangedEventArgs("Current"));
+            this.OnPropertyChanged("Current");
         }
 
         public OnCurrentChanging(): CancelEventArgs {
@@ -28,6 +31,8 @@
         }
         public CurrentChanging: TypedEvent<CancelEventArgs> = new TypedEvent<CancelEventArgs>();
         public OnCurrentChanged(): void {
+            if (this.engaged) return;
+
             this.CurrentChanged.Raise(this, new EventArgs());
         }
         public CurrentChanged: TypedEvent<EventArgs> = new TypedEvent<EventArgs>();
@@ -40,17 +45,21 @@
             return this.List.contains(obj);
         }
 
-        public Select(obj: any): void {
+        public Select(obj: any): ListCollectionView {
             this.Current = obj;
+            return this;
         }
-        public UnSelect(): void {
+        public UnSelect(): ListCollectionView {
             this.Current = null;
+            return this;
         }
-        public MoveFirst(): void {
+        public MoveFirst(): ListCollectionView {
             this.Current = this.List.first();
+            return this;
         }
-        public MoveLast(): void {
+        public MoveLast(): ListCollectionView {
             this.Current = this.List.last();
+            return this;
         }
         public Filter: (obj: any) => boolean;
         public Grouping: (obj: any) => any;
@@ -73,9 +82,20 @@
             this.OnPropertyChanged();
         }
         protected OnPropertyChanged(name?: string): void {
+            if (this.engaged) return;
             this.PropertyChanged.Raise(this, new PropertyChangedEventArgs(name));
         }
         public ViewReflected: ListCollectionView.ViewReflectedStatus;
+
+        public Begin(): ListCollectionView {
+            this.engaged = true;
+            return this;
+        }
+        public End(): ListCollectionView {
+            this.engaged = false;
+            return this;
+        }
+        private engaged: boolean = false;
     }
 }
 
