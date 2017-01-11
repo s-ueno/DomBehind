@@ -127,6 +127,7 @@
     <Content Include="Content\images\preloader_2.gif" />
     <Content Include="Content\images\proaxia.jpg" />
     <Content Include="Content\images\microsoft.png" />
+    <Content Include="Content\Navbar.css" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\themes\base\accordion.css" />
     <Content Include="Content\themes\base\all.css" />
@@ -203,6 +204,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\ComponentController.cs" />
     <Compile Include="Controllers\ContactUsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
@@ -229,6 +231,11 @@
     <Content Include="Views\ContactUs\Index.cshtml" />
     <Content Include="Views\Account\SignInDialog.cshtml" />
     <Content Include="Views\Shared\_LayoutDialog.cshtml" />
+    <Content Include="Views\Component\Index.cshtml" />
+    <Content Include="Views\Component\_Component.cshtml" />
+    <Content Include="Views\Component\TabContent1.cshtml" />
+    <Content Include="Views\Component\TabContent2.cshtml" />
+    <Content Include="Views\Shared\_LayoutContent.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -246,6 +253,12 @@
     <TypeScriptCompile Include="Scripts\App\Account\SignInViewModel.ts" />
     <TypeScriptCompile Include="Scripts\App\Account\WebServices.ts" />
     <TypeScriptCompile Include="Scripts\App\App.ts" />
+    <TypeScriptCompile Include="Scripts\App\Component\ComponentView.ts" />
+    <TypeScriptCompile Include="Scripts\App\Component\ComponentViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\App\Component\TabContent2View.ts" />
+    <TypeScriptCompile Include="Scripts\App\Component\TabContent2ViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\App\Component\TabContent1ViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\App\Component\TabContent1View.ts" />
     <TypeScriptCompile Include="Scripts\App\ContactUs\ContactUsView.ts" />
     <TypeScriptCompile Include="Scripts\App\ContactUs\ContactUsViewModel.ts" />
     <TypeScriptCompile Include="Scripts\App\ContactUs\WebServices.ts" />

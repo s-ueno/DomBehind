@@ -22,7 +22,7 @@
                 this._dic[name] = value;
                 this._dic[`${name}_old___`] = oldValue;
 
-                this.PropertyChanged.Raise(this, new PropertyChangedEventArgs(name));
+                this.OnPropertyChanged(name);
             }
             return result;
         }
@@ -47,6 +47,9 @@
 
         // #endregion
 
+        public OnPropertyChanged(name: string): void {
+            this.PropertyChanged.Raise(this, new PropertyChangedEventArgs(name));
+        }
     }
 
 }

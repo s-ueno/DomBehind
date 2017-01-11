@@ -17,8 +17,18 @@
         <div class="navbar-collapse collapse" id="navbar">
             <ul class="nav navbar-nav navbar-right">
                 <li><a class="scrolling" href="~/Home#about">ABOUT</a></li>
-                <li><a class="scrolling" href="~/Home#component">COMPONENT</a></li>
-                <li><a class="scrolling" href="~/Home #contact">CONTACT</a></li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" 
+                       data-toggle="dropdown" role="button" 
+                       aria-haspopup="true" aria-expanded="false">COMPONENT<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a class="scrolling" href="~/Home#viewviewmodel">View-ViewModel</a></li>
+                        <li><a class="scrolling" href="~/Home#binding">Binding</a></li>
+                        <li><a href="#">ListCollectionView</a></li>
+                    </ul>
+                </li>
+
+                <li><a class="scrolling" href="~/Home#contact">CONTACT</a></li>
                 @if (!Request.IsAuthenticated)
                 {
                     <li><a id="SignInLink">SIGN IN</a></li>

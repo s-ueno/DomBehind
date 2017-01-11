@@ -18,8 +18,10 @@
                 let disabled = y === false ? true : false;
                 if (disabled === true) {
                     x.attr("disabled", "");
+                    x.addClass("disabled");
                 } else {
                     x.removeAttr("disabled");
+                    x.removeClass("disabled");
                 }
             }, Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
 

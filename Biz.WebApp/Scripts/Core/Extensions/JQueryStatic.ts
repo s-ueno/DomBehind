@@ -19,7 +19,8 @@ $.RegisterViewViewModel = function (selector: string, resolveViewType: () => any
 
     $(selector).ready(function (e) {
         // other page
-        if ($(selector).length === 0) return;
+        var ele = $(selector);
+        if (ele.length === 0) return;
 
         let viewFactory = new DomBehind.Core.TypedFactory(resolveViewType());
         let viewModelFactory = new DomBehind.Core.TypedFactory(resolveViewModelType());
@@ -29,6 +30,8 @@ $.RegisterViewViewModel = function (selector: string, resolveViewType: () => any
         behavior.GetViewModel = x => <DomBehind.Core.BizViewModel>viewModelFactory.CreateInstance();
         behavior.Element = $(selector);
         behavior.Ensure();
+
+        ele.trigger("RegisteredViewViewModel", behavior);
     });
 };
 

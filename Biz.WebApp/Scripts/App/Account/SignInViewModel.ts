@@ -26,7 +26,7 @@
 
                 let svc = new SignInWebService();
                 // ExecuteAsync / ExecuteAjax
-                svc.ExecuteAsync(request).done(x => {
+                svc.ExecuteAjax(request).done(x => {
                     this.OnSuccess(d, x);
                 }).fail(ex => {
                     this.OnSignInError(d, ex);

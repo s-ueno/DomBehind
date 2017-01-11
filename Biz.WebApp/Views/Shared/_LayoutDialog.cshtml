@@ -8,15 +8,11 @@
                 <button type="button" class="close" data-dismiss="modal">
                         <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
                     </button>
-                @*<a class="close ">
-                    <img class="modal_close"
-                         src="~/Content/images/close.png" />
-                </a>*@
                 <h4 class="modal-title" id="modalLabel">@ViewBag.Title</h4>
             </div>
             <div class="modal-body">
                 @RenderBody()
-                @RenderSection("SPAViews", required: false)
+                @RenderSection("DialogViews", required: false)
             </div>
         </div>
     </div>

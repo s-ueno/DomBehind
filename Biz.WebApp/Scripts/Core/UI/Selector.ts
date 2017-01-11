@@ -46,8 +46,8 @@
             Data.BindingMode.OneWay);
 
 
-        private static IgnoreMark: string = "Selector.Ignore";
-        private static InstanceMark: string = "Selector.Instance";
+        protected static IgnoreMark: string = "Selector.Ignore";
+        protected static InstanceMark: string = "Selector.Instance";
         public static Register(behavior: Data.DataBindingBehavior): void {
             if (!behavior.Element) return;
             if (behavior.AdditionalInfo[Selector.IgnoreMark]) return;
@@ -158,13 +158,30 @@
             this.Behavior.Element.prop("multiple", value);
         }
         protected RenderOption(element: JQuery, source: Data.ListCollectionView, value: any): void {
-            if (!value.__uuid) {
+            if (!value.__uuid)
                 value.__uuid = NewUid();
-            }
+            if (!value.__DisplayMemberPath)
+                value.__DisplayMemberPath = source.DisplayMemberPath;
 
             // HACK bootstrap-select.js val method
-            $(`<option uuid="${value.__uuid}">${this.GetDisplayValue(value, source.DisplayMemberPath)}</option>`).appendTo(element);
+            let option = $(`<option uuid="${value.__uuid}">${Selector.GetDisplayValue(value, source.DisplayMemberPath)}</option>`);
+            option.appendTo(element);
+            value.__option = option;
+
+            if (value instanceof NotifiableImp) {
+                if (!value.__EventMarked) {
+                    value.__EventMarked = true;
+
+                    (value as NotifiableImp).PropertyChanged.AddHandler((sender, e) => {
+                        var obj: JQuery = sender.__option
+                        if (obj) {
+                            obj.val(Selector.GetDisplayValue(sender, sender.__DisplayMemberPath));
+                        }
+                    });
+                }
+            }
         }
+
         protected Select(source: Data.ListCollectionView) {
 
             var value: any = source.Current;
@@ -174,14 +191,14 @@
                 } else {
                     if (value instanceof Array) {
                         this.Behavior.Element.val(
-                            value.map(x => this.GetDisplayValue(x, source.DisplayMemberPath)));
+                            value.map(x => Selector.GetDisplayValue(x, source.DisplayMemberPath)));
                     } else {
-                        this.Behavior.Element.val(this.GetDisplayValue(value, source.DisplayMemberPath));
+                        this.Behavior.Element.val(Selector.GetDisplayValue(value, source.DisplayMemberPath));
                     }
                 }
 
             } else {
-                value = this.GetDisplayValue(value, source.DisplayMemberPath);
+                value = Selector.GetDisplayValue(value, source.DisplayMemberPath);
                 this.Behavior.Element.val(value);
             }
             this.Behavior.Element.selectpicker('refresh');
@@ -198,7 +215,7 @@
             }
             return true;
         }
-        protected GetDisplayValue(value: any, displayMemberPath: string): any {
+        public static GetDisplayValue(value: any, displayMemberPath: string): any {
             var displayValue = value;
             if (displayMemberPath) {
                 displayValue = new Expression(value, displayMemberPath).GetValue();

@@ -128,6 +128,18 @@
             return Application.Current.ModalHelper;
         }
 
+        // #region IsEnabled
+
+        public get IsEnabled(): boolean {
+            return this.GetProperty("IsEnabled", true);
+        }
+        public set IsEnabled(value: boolean) {
+            this.SetProperty("IsEnabled", value);
+        }
+
+        // #endregion 
+
+
         // #region Dispose
 
         public Dispose(): void {

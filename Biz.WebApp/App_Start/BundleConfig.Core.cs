@@ -39,6 +39,7 @@ namespace Biz.WebApp
 
 
             "~/Content/Site.css",
+            "~/Content/Navbar.css",
         };
 
         public static readonly string[] Core_Base = new string[]
@@ -55,6 +56,7 @@ namespace Biz.WebApp
 
             "~/Scripts/Core/Data/TypedEvent.js",
             "~/Scripts/Core/TypedFactory.js",
+            "~/Scripts/Core/Repository.js",
 
             "~/Scripts/Core/INotifyPropertyChanged.js",
             "~/Scripts/Core/NotifiableImp.js",
@@ -130,7 +132,6 @@ namespace Biz.WebApp
             "~/Scripts/Core/BizView.js",
             "~/Scripts/Core/BizView.js",
             "~/Scripts/Core/Application.js",
-            "~/Scripts/Core/Repository.js",
         };
     }
 }

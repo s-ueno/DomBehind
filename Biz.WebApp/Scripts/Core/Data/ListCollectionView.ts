@@ -81,7 +81,7 @@
 
             this.OnPropertyChanged();
         }
-        protected OnPropertyChanged(name?: string): void {
+        public OnPropertyChanged(name?: string): void {
             if (this.engaged) return;
             this.PropertyChanged.Raise(this, new PropertyChangedEventArgs(name));
         }

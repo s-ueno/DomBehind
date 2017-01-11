@@ -24,6 +24,11 @@
             let factory = new TypedFactory<T>(value.GetType());
             return factory.CreateInstance();
         }
+
+        public static CreateInstance<T>(resolveType: () => any) {
+            let factory = new DomBehind.Core.TypedFactory(resolveType());
+            return factory.CreateInstance();
+        }
     }
 
 

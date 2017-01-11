@@ -16,6 +16,7 @@ namespace Biz.WebApp
             bundles.Add(new ScriptBundle("~/bundles/app.home").Include(App_Home));
             bundles.Add(new ScriptBundle("~/bundles/app.account").Include(App_Account));
             bundles.Add(new ScriptBundle("~/bundles/app.contact").Include(App_ContactUs));
+            bundles.Add(new ScriptBundle("~/bundles/app.component").Include(App_Component));
         }
         public static readonly string[] App = new string[]
         {
@@ -48,6 +49,10 @@ namespace Biz.WebApp
             "~/Scripts/App/ContactUs/ContactUsViewModel.js",
             "~/Scripts/App/ContactUs/WebServices.js",
         };
-
+        public static readonly string[] App_Component = new string[]
+        {
+            "~/Scripts/App/Component/ComponentView.js",
+            "~/Scripts/App/Component/ComponentViewModel.js",
+        };
     }
 }

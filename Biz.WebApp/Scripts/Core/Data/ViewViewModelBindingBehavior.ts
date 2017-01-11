@@ -6,8 +6,8 @@
         public GetView: (x: any) => BizView;
         public GetViewModel: (x: any) => BizViewModel;
 
-        protected View: BizView;
-        protected ViewModel: BizViewModel;
+        public View: BizView;
+        public ViewModel: BizViewModel;
 
         public Ensure(): void {
             this.View = this.GetView(this.DataContext);
