@@ -131,10 +131,10 @@
         // #region IsEnabled
 
         public get IsEnabled(): boolean {
-            return this.GetProperty(UIElement.IsEnabledProperty.PropertyName, true);
+            return this.GetProperty("IsEnabled", true);
         }
         public set IsEnabled(value: boolean) {
-            this.SetProperty(UIElement.IsEnabledProperty.PropertyName, value);
+            this.SetProperty("IsEnabled", value);
         }
 
         // #endregion 

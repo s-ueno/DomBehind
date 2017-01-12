@@ -122,13 +122,14 @@
                         var title = Selector.GetDisplayValue(this.Option.ViewModel, this.Option.__DisplayMemberPath);
                         this.Header.find("a").text(title);
                         break;
-                    case UIElement.IsEnabledProperty.PropertyName:
-                        var enabled = Selector.GetDisplayValue(this.Option.ViewModel, UIElement.IsEnabledProperty.PropertyName);
+                    case LamdaExpression.Path<BizViewModel>(x => x.IsEnabled):
+                        var enabled = this.Option.ViewModel.IsEnabled;
                         UIElement.IsEnabledProperty.SetValue(this.Header.find("a"), enabled);
                         UIElement.IsEnabledProperty.SetValue(this.Header, enabled);
                         break;
                 }
             }
+
 
         }
 

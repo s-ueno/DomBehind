@@ -49,6 +49,12 @@
             this.Lamda = null;
             super.Dispose();
         }
+
+
+        public static Path<T>(exp: (x: T) => any): string {
+            return LamdaExpression.ParsePropertyPath(exp);
+        }
+
     }
 
     export class BooleanExpression extends Expression {
