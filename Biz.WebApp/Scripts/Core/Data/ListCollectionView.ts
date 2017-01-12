@@ -1,16 +1,20 @@
 ﻿namespace DomBehind.Core.Data {
 
     export class ListCollectionView extends NotifiableImp {
-        constructor(public Source: Array<any>,
+        constructor(source: Array<any>,
             public DisplayMemberPath?: string) {
             super();
+
+            this.Source = new collections.LinkedList<any>();
             this.List = new collections.LinkedList<any>();
-            $.each(Source, (i, value) => {
+            $.each(source, (i, value) => {
+                this.Source.add(value);
                 this.List.add(value);
             });
             this.ViewReflected = ListCollectionView.ViewReflectedStatus.None;
         }
-        public List: collections.LinkedList<any>;
+        protected Source: collections.LinkedList<any>;
+        protected List: collections.LinkedList<any>;
         private _current: any;
         public get Current(): any { return this._current; }
         public set Current(value: any) {
@@ -19,7 +23,7 @@
             this.ViewReflected = ListCollectionView.ViewReflectedStatus.NoReflected;
 
             if (this.engaged) return;
-            
+
             this.OnCurrentChanged();
             this.OnPropertyChanged("Current");
         }
@@ -64,18 +68,21 @@
         public Filter: (obj: any) => boolean;
         public Grouping: (obj: any) => any;
         public Refresh(): void {
-            if (this.Filter) {
-                this.List = new collections.LinkedList<any>();
-                $.each(this.Source, (i, value) => {
+
+            this.List = new collections.LinkedList<any>();
+            $.each(this.Source.toArray(), (i, value) => {
+                if (this.Filter) {
                     if (this.Filter(value)) {
                         this.List.add(value);
                     }
-                });
+                } else {
+                    this.List.add(value);
+                }
+            });
 
-                if (this.Current) {
-                    if (!this.Contains(this.Current)) {
-                        this.MoveFirst();
-                    }
+            if (this.Current) {
+                if (!this.Contains(this.Current)) {
+                    this.MoveFirst();
                 }
             }
 
@@ -95,6 +102,23 @@
             this.engaged = false;
             return this;
         }
+
+        public Add(obj: any): void {
+            this.Source.add(obj);
+            this.Refresh();
+        }
+
+        public Remove(obj: any): void {
+            this.Source.remove(obj);
+            this.Refresh();
+        }
+
+        public ToArray(): Array<any> {
+            return (this.Filter) ?
+                this.List.toArray().Where(x => this.Filter(x)) :
+                this.List.toArray();
+        }
+
         private engaged: boolean = false;
     }
 }

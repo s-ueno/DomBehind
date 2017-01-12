@@ -129,15 +129,16 @@
             if (!this.HasChanges(source)) return;
 
             this.Behavior.Element.empty();
+            var arr = source.ToArray();
             if (source.Grouping) {
-                $.each(source.List.toArray().GroupBy(source.Grouping), (i, group) => {
+                $.each(arr.GroupBy(source.Grouping), (i, group) => {
                     let optgroup = $(`<optgroup>`, { label: group.Key }).appendTo(this.Behavior.Element);
                     $.each(group.Values, (k, each) => {
                         this.RenderOption(optgroup, source, each);
                     });
                 });
             } else {
-                $.each(source.List.toArray(), (i, value) => {
+                $.each(arr, (i, value) => {
                     this.RenderOption(this.Behavior.Element, source, value);
                 });
             }

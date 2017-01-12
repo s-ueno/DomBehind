@@ -33,7 +33,7 @@
             let contentContainer = $(`<div class="tab-content">`);
 
             this.Options.length = 0
-            var arr = source.List.toArray();
+            var arr = source.ToArray();
             for (let i = 0; i < arr.length; i++) {
                 let bindingOption = new Tab.BindingOption();
                 bindingOption.Source = source;
