@@ -100,7 +100,7 @@
                     this.Option.View = behavior.View;
                     this.Option.ViewModel = behavior.ViewModel;
 
-                    let title = Selector.GetDisplayValue(behavior.ViewModel, this.Source.DisplayMemberPath);
+                    let title = Selector.GetDisplayValue(behavior.ViewModel, this.Option.__DisplayMemberPath);
                     $(`<a href="#${this.Option.__uuid}" data-toggle="tab">`)
                         .text(title)
                         .appendTo(this.Header);
@@ -118,18 +118,17 @@
             protected PropertyChangedSafeHandle: (sender: any, e: PropertyChangedEventArgs) => void;
             protected OnRecievePropertyChanged(e: PropertyChangedEventArgs) {
                 switch (e.Name) {
-                    case this.Source.DisplayMemberPath:
+                    case this.Option.__DisplayMemberPath:
                         var title = Selector.GetDisplayValue(this.Option.ViewModel, this.Option.__DisplayMemberPath);
                         this.Header.find("a").text(title);
                         break;
-                    case "IsEnabled":
-                        var enabled = Selector.GetDisplayValue(this.Option.ViewModel, "IsEnabled");
-                        this.IsEnabled.SetValue(this.Header.find("a"), enabled);
-                        this.IsEnabled.SetValue(this.Header, enabled);
+                    case UIElement.IsEnabledProperty.PropertyName:
+                        var enabled = Selector.GetDisplayValue(this.Option.ViewModel, UIElement.IsEnabledProperty.PropertyName);
+                        UIElement.IsEnabledProperty.SetValue(this.Header.find("a"), enabled);
+                        UIElement.IsEnabledProperty.SetValue(this.Header, enabled);
                         break;
                 }
             }
-            protected IsEnabled = UIElement.IsEnabledProperty;
 
         }
 
