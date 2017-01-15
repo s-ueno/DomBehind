@@ -69,6 +69,9 @@
             Behavior.Element.on('change', this.UpdateSourceEventHandle);
 
             this.PropertyChangedEventHandle = (sender, e) => this.OnDataSourcePropertyChanged(sender, e);
+
+            this.AddedHandle = (sender, e) => this.Added(sender, e);
+            this.RemovedHandle = (sender, e) => this.Removed(sender, e);
         }
         /** Hold the handle in order to safely remove the Event */
         protected UpdateTargetEventHandle: (sender, e) => void;
@@ -90,7 +93,7 @@
                 $.each(this.Behavior.Element.find("option"), (i, value: HTMLOptionElement) => {
                     if (value.selected) {
                         var uid = value.getAttribute("uuid");
-                        var item = collectionView.Find(x => x.__uuid === uid);
+                        var item = collectionView.Find(x => (x as IIdentity).__uuid === uid);
                         if (item) {
                             selectedItems.push(item);
                         }
@@ -109,7 +112,15 @@
 
         protected OnUpdateTarget(sender: Data.DataBindingBehavior, data: any): void {
             if (data instanceof Data.ListCollectionView) {
-                this.Render(data as Data.ListCollectionView);
+                var source = data as Data.ListCollectionView;
+
+                source.Removed.RemoveHandler(this.RemovedHandle);
+                source.Removed.AddHandler(this.RemovedHandle);
+
+                source.Added.RemoveHandler(this.AddedHandle);
+                source.Added.AddHandler(this.AddedHandle);
+
+                this.Render(source);
             } else if (data instanceof Array) {
                 var list = [];
                 $.each(data, (i, value) => {
@@ -142,13 +153,6 @@
                     this.RenderOption(this.Behavior.Element, source, value);
                 });
             }
-            if (this.Multiple) {
-                source.Begin().UnSelect().End();
-            } else {
-                if (Object.IsNullOrUndefined(source.Current)) {
-                    source.Begin().MoveFirst().End();
-                }
-            }
 
             this.Select(source);
         }
@@ -159,28 +163,47 @@
             this.Behavior.Element.prop("multiple", value);
         }
         protected RenderOption(element: JQuery, source: Data.ListCollectionView, value: any): void {
-            if (!value.__uuid)
-                value.__uuid = NewUid();
-            if (!value.__DisplayMemberPath)
-                value.__DisplayMemberPath = source.DisplayMemberPath;
+            if (!(value as IIdentity).__uuid)
+                value = $.extend(value, ExtendIIdentity());
+            if (!(value as IDisplayMemberPath).DisplayMemberPath)
+                value = $.extend(value, this.EnsureDisplayMemberPath(source.DisplayMemberPath));
 
             // HACK bootstrap-select.js val method
             let option = $(`<option uuid="${value.__uuid}">${Selector.GetDisplayValue(value, source.DisplayMemberPath)}</option>`);
             option.appendTo(element);
-            value.__option = option;
+            value = $.extend(value, this.EnsureElement(option));
 
             if (value instanceof NotifiableImp) {
                 if (!value.__EventMarked) {
                     value.__EventMarked = true;
 
                     (value as NotifiableImp).PropertyChanged.AddHandler((sender, e) => {
-                        var obj: JQuery = sender.__option
-                        if (obj) {
-                            obj.val(Selector.GetDisplayValue(sender, sender.__DisplayMemberPath));
-                        }
+                        var selectable = sender as Selector.ISelectableElement;
+                        var text = Selector.GetDisplayValue(sender, selectable.DisplayMemberPath);
+                        selectable.__Selector.val(text);
                     });
                 }
             }
+        }
+        protected EnsureDisplayMemberPath(path: string): IDisplayMemberPath {
+            return { DisplayMemberPath: path };
+        }
+        protected EnsureElement(option: JQuery): Selector.ISelectableElement {
+            return {
+                __Selector: option,
+                __Element: option[0] as HTMLOptionElement,
+            };
+        }
+
+        protected AddedHandle: (source: Data.ListCollectionView, obj: any) => void;
+        protected RemovedHandle: (source: Data.ListCollectionView, obj: any) => void;
+        protected Added(source: Data.ListCollectionView, obj: any): void {
+            source.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.NoReflected;
+            source.Refresh();
+        }
+        protected Removed(source: Data.ListCollectionView, obj: any): void {
+            source.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.NoReflected;
+            source.Refresh();
         }
 
         protected Select(source: Data.ListCollectionView) {
@@ -191,16 +214,17 @@
                     this.Behavior.Element.selectpicker("deselectAll");
                 } else {
                     if (value instanceof Array) {
-                        this.Behavior.Element.val(
-                            value.map(x => Selector.GetDisplayValue(x, source.DisplayMemberPath)));
+                        $.each(value, (i, x) => {
+                            var selectable = x as Selector.ISelectableElement;
+                            selectable.__Element.selected = true;
+                        });
                     } else {
-                        this.Behavior.Element.val(Selector.GetDisplayValue(value, source.DisplayMemberPath));
+                        (value as Selector.ISelectableElement).__Element.selected = true;
                     }
                 }
 
             } else {
-                value = Selector.GetDisplayValue(value, source.DisplayMemberPath);
-                this.Behavior.Element.val(value);
+                (value as Selector.ISelectableElement).__Element.selected = true;
             }
             this.Behavior.Element.selectpicker('refresh');
             source.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.Reflected;
@@ -208,7 +232,6 @@
         protected HasChanges(source: Data.ListCollectionView): boolean {
             if (source.ViewReflected === Data.ListCollectionView.ViewReflectedStatus.Reflected) return false;
             if (source.ViewReflected === Data.ListCollectionView.ViewReflectedStatus.None) {
-
                 source.Refresh();
                 source.PropertyChanged.RemoveHandler(this.PropertyChangedEventHandle);
                 source.PropertyChanged.AddHandler(this.PropertyChangedEventHandle);
@@ -223,5 +246,12 @@
             }
             return displayValue;
         }
+    }
+}
+
+namespace DomBehind.Core.Selector {
+    export interface ISelectableElement extends IDisplayMemberPath {
+        __Selector: JQuery;
+        __Element: HTMLOptionElement;
     }
 }

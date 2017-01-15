@@ -301,6 +301,7 @@
     <TypeScriptCompile Include="Scripts\Core\Threading\TimerThread.ts" />
     <TypeScriptCompile Include="Scripts\Core\Threading\WorkerPool.ts" />
     <TypeScriptCompile Include="Scripts\Core\Threading\WorkerWrapper.ts" />
+    <TypeScriptCompile Include="Scripts\Core\UI\IDisplayMemberPath.ts" />
     <TypeScriptCompile Include="Scripts\Core\UI\IModalHelper.ts" />
     <TypeScriptCompile Include="Scripts\Core\UI\NavbarElement.ts" />
     <TypeScriptCompile Include="Scripts\Core\UI\InputElement.ts" />

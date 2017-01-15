@@ -11,3 +11,11 @@ function NewUid(): string {
     }
     return uuid;
 }
+
+interface IIdentity {
+    __uuid?: string;
+}
+
+function ExtendIIdentity(): IIdentity {
+    return { __uuid: NewUid() };
+}

@@ -54,9 +54,7 @@
     }
 
     export namespace Tab {
-        interface OptionInternal {
-            __uuid?: string;
-            __DisplayMemberPath?: string;
+        interface OptionInternal extends IIdentity, IDisplayMemberPath {
             __header?: JQuery;
             __content?: JQuery;
 
@@ -84,8 +82,8 @@
 
                 if (!this.Option.__uuid)
                     this.Option.__uuid = NewUid();
-                if (!this.Option.__DisplayMemberPath)
-                    this.Option.__DisplayMemberPath = this.Source.DisplayMemberPath;
+                if (!this.Option.DisplayMemberPath)
+                    this.Option.DisplayMemberPath = this.Source.DisplayMemberPath;
 
                 var titleCss = this.IsActive ? 'active' : '';
                 this.Header = $(`<li class="${titleCss}">`).appendTo(this.HeaderContainer);
@@ -100,7 +98,7 @@
                     this.Option.View = behavior.View;
                     this.Option.ViewModel = behavior.ViewModel;
 
-                    let title = Selector.GetDisplayValue(behavior.ViewModel, this.Option.__DisplayMemberPath);
+                    let title = Selector.GetDisplayValue(behavior.ViewModel, this.Option.DisplayMemberPath);
                     $(`<a href="#${this.Option.__uuid}" data-toggle="tab">`)
                         .text(title)
                         .appendTo(this.Header);
@@ -118,8 +116,8 @@
             protected PropertyChangedSafeHandle: (sender: any, e: PropertyChangedEventArgs) => void;
             protected OnRecievePropertyChanged(e: PropertyChangedEventArgs) {
                 switch (e.Name) {
-                    case this.Option.__DisplayMemberPath:
-                        var title = Selector.GetDisplayValue(this.Option.ViewModel, this.Option.__DisplayMemberPath);
+                    case this.Option.DisplayMemberPath:
+                        var title = Selector.GetDisplayValue(this.Option.ViewModel, this.Option.DisplayMemberPath);
                         this.Header.find("a").text(title);
                         break;
                     case LamdaExpression.Path<BizViewModel>(x => x.IsEnabled):

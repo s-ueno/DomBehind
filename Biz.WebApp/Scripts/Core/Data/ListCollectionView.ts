@@ -46,6 +46,16 @@
             return this.List.toArray().FirstOrDefault(predicate);
         }
         public Contains(obj: any): boolean {
+            if (obj instanceof Array) {
+                var contains = true;
+                $.each(obj, (i, value) => {
+                    if (!this.List.contains(value)) {
+                        contains = false;
+                        return false;
+                    }
+                });
+                return contains;
+            }
             return this.List.contains(obj);
         }
 
@@ -105,22 +115,39 @@
 
         public Add(obj: any): void {
             this.Source.add(obj);
-            this.Refresh();
+
+            var e = new CollectionChangedEventArgs();
+            e.Item = obj;
+            this.Added.Raise(this, e);
         }
+        public Added: TypedEvent<CollectionChangedEventArgs>
+        = new TypedEvent<CollectionChangedEventArgs>();
+
 
         public Remove(obj: any): void {
             this.Source.remove(obj);
-            this.Refresh();
+
+            var e = new CollectionChangedEventArgs();
+            e.Item = obj;
+            this.Removed.Raise(this, e);
         }
+        public Removed: TypedEvent<CollectionChangedEventArgs>
+        = new TypedEvent<CollectionChangedEventArgs>();
+
 
         public ToArray(): Array<any> {
             return (this.Filter) ?
                 this.List.toArray().Where(x => this.Filter(x)) :
                 this.List.toArray();
         }
-
         private engaged: boolean = false;
     }
+
+
+    export class CollectionChangedEventArgs extends EventArgs {
+        public Item: any;
+    }
+
 }
 
 namespace DomBehind.Core.Data.ListCollectionView {
