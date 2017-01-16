@@ -24,7 +24,8 @@
 
             builder.Element("#Sample")
                 .Binding(DomBehind.Core.Selector.ItemsSourceProperty, x => x.SampleList)
-                .Multiple();
+                //.Multiple()
+                ;
         }
 
         public OnReceiveNotificationMessage(sender: any, e: any) {

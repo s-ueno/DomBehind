@@ -154,6 +154,7 @@
                 });
             }
 
+            this.Behavior.Element.selectpicker('refresh');
             this.Select(source);
         }
         protected get Multiple(): boolean {
@@ -207,28 +208,32 @@
         }
 
         protected Select(source: Data.ListCollectionView) {
-
+            return this.Multiple ? this.MultipleSelect(source) : this.SingleSelect(source);
+        }
+        private SingleSelect(source: Data.ListCollectionView) {
             var value: any = source.Current;
-            if (this.Multiple) {
-                if (Object.IsNullOrUndefined(value)) {
-                    this.Behavior.Element.selectpicker("deselectAll");
-                } else {
-                    if (value instanceof Array) {
-                        $.each(value, (i, x) => {
-                            var selectable = x as Selector.ISelectableElement;
-                            selectable.__Element.selected = true;
-                        });
-                    } else {
-                        (value as Selector.ISelectableElement).__Element.selected = true;
-                    }
-                }
-
+            if (Object.IsNullOrUndefined(value)) {
+                this.Behavior.Element.selectpicker('val', null);
             } else {
                 (value as Selector.ISelectableElement).__Element.selected = true;
+                this.Behavior.Element.selectpicker('refresh');
+            }
+            source.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.Reflected;
+        }
+        private MultipleSelect(source: Data.ListCollectionView) {
+            var value: any = source.Current;
+            if (Object.IsNullOrUndefined(value)) {
+                this.Behavior.Element.selectpicker("deselectAll");
+            } else {
+                $.each(value, (i, x) => {
+                    var selectable = x as Selector.ISelectableElement;
+                    selectable.__Element.selected = true;
+                });
             }
             this.Behavior.Element.selectpicker('refresh');
             source.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.Reflected;
         }
+
         protected HasChanges(source: Data.ListCollectionView): boolean {
             if (source.ViewReflected === Data.ListCollectionView.ViewReflectedStatus.Reflected) return false;
             if (source.ViewReflected === Data.ListCollectionView.ViewReflectedStatus.None) {
