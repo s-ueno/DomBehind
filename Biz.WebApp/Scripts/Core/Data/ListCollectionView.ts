@@ -79,6 +79,11 @@
         public Grouping: (obj: any) => any;
         public Refresh(): void {
 
+            this.RefreshRaw();
+       
+            this.OnPropertyChanged();
+        }
+        protected RefreshRaw(): void {
             this.List = new collections.LinkedList<any>();
             $.each(this.Source.toArray(), (i, value) => {
                 if (this.Filter) {
@@ -95,8 +100,6 @@
                     this.MoveFirst();
                 }
             }
-
-            this.OnPropertyChanged();
         }
         public OnPropertyChanged(name?: string): void {
             if (this.engaged) return;
@@ -115,10 +118,14 @@
 
         public Add(obj: any): void {
             this.Source.add(obj);
+            this.RefreshRaw();
+            this.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.NoReflected;
 
             var e = new CollectionChangedEventArgs();
             e.Item = obj;
             this.Added.Raise(this, e);
+
+            this.OnPropertyChanged("Source - Add");
         }
         public Added: TypedEvent<CollectionChangedEventArgs>
         = new TypedEvent<CollectionChangedEventArgs>();
@@ -126,10 +133,14 @@
 
         public Remove(obj: any): void {
             this.Source.remove(obj);
+            this.RefreshRaw();
+            this.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.NoReflected;
 
             var e = new CollectionChangedEventArgs();
             e.Item = obj;
             this.Removed.Raise(this, e);
+
+            this.OnPropertyChanged("Source - Remove");
         }
         public Removed: TypedEvent<CollectionChangedEventArgs>
         = new TypedEvent<CollectionChangedEventArgs>();

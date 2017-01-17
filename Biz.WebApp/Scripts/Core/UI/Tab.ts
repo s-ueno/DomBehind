@@ -27,29 +27,48 @@
         }
 
         protected Render(source: Data.ListCollectionView) {
+            if (!this.HasChanges(source)) return;
+
             this.Behavior.Element.empty();
 
-            let headerContainer = $('<ul class="nav nav-tabs">');
-            let contentContainer = $(`<div class="tab-content">`);
+            this.HeaderContainer = $('<ul class="nav nav-tabs">');
+            this.ContentContainer = $(`<div class="tab-content">`);
 
             this.Options.length = 0
             var arr = source.ToArray();
             for (let i = 0; i < arr.length; i++) {
-                let bindingOption = new Tab.BindingOption();
-                bindingOption.Source = source;
-                bindingOption.HeaderContainer = headerContainer;
-                bindingOption.ContentContainer = contentContainer;
-                bindingOption.Option = arr[i];
-                bindingOption.IsActive = i === 0;
-                bindingOption.Ensure();
-                this.Options.push(bindingOption);
+                this.NewAdd(source, arr[i], i === 0);
             }
+            this.HeaderContainer.appendTo(this.Behavior.Element);
+            this.ContentContainer.appendTo(this.Behavior.Element);
 
-            headerContainer.appendTo(this.Behavior.Element);
-            contentContainer.appendTo(this.Behavior.Element);
+
+            this.Removed(source, arr[1]);
+
+        }
+        public HeaderContainer: JQuery;
+        public ContentContainer: JQuery;
+
+        protected NewAdd(
+            source: Data.ListCollectionView, option: Tab.UriOption, isActive: boolean = false): Tab.BindingOption {
+            let bindingOption = new Tab.BindingOption(this);
+            bindingOption.Source = source;
+            bindingOption.Option = option;
+            bindingOption.IsActive = isActive;
+            bindingOption.Ensure();
+            this.Options.push(bindingOption);
+            return bindingOption;
         }
 
+
         protected Options: Tab.BindingOption[] = [];
+        protected Added(source: Data.ListCollectionView, obj: any): void {
+            this.NewAdd(source, obj);
+        }
+        protected Removed(source: Data.ListCollectionView, obj: Tab.UriOption): void {
+            obj.__header.detach();
+            obj.__content.detach();
+        }
 
     }
 
@@ -66,11 +85,17 @@
         }
 
         export class BindingOption {
+            constructor(protected Parent: Tab) {
+            }
 
-            public HeaderContainer: JQuery;
+            public get HeaderContainer(): JQuery {
+                return this.Parent.HeaderContainer;
+            }
             public Header: JQuery;
 
-            public ContentContainer: JQuery;
+            public get ContentContainer(): JQuery {
+                return this.Parent.ContentContainer;
+            }
             public Content: JQuery;
 
             public Option: OptionInternal;
@@ -78,7 +103,6 @@
 
             public IsActive: boolean;
             public Ensure(): void {
-                this.PropertyChangedSafeHandle = (sender, e) => this.OnRecievePropertyChanged(e);
 
                 if (!this.Option.__uuid)
                     this.Option.__uuid = NewUid();
@@ -86,11 +110,15 @@
                     this.Option.DisplayMemberPath = this.Source.DisplayMemberPath;
 
                 var titleCss = this.IsActive ? 'active' : '';
-                this.Header = $(`<li class="${titleCss}">`).appendTo(this.HeaderContainer);
+                this.Header = $(`<li class="${titleCss}" uuid="${this.Option.__uuid}">`).appendTo(this.HeaderContainer);
+                this.Option.__header = this.Header;
 
                 // content
                 var contentCss = this.IsActive ? 'tab-pane fade in active' : 'tab-pane fade';
                 this.Content = $(`<div class="${contentCss}" id="${this.Option.__uuid}">`).appendTo(this.ContentContainer);
+                this.Option.__content = this.Content;
+
+
                 this.Content.on('RegisteredViewViewModel', (e: JQueryEventObject, behavior: Data.ViewViewModelBindingBehavior) => {
                     let element = $(e.target);
                     element.off('RegisteredViewViewModel');
@@ -103,6 +131,7 @@
                         .text(title)
                         .appendTo(this.Header);
 
+                    this.PropertyChangedSafeHandle = (sender, e) => this.OnRecievePropertyChanged(e);
                     behavior.ViewModel.PropertyChanged.AddHandler(this.PropertyChangedSafeHandle);
                 });
 

@@ -132,8 +132,6 @@
         protected OnDataSourcePropertyChanged(sender: Data.ListCollectionView, e: PropertyChangedEventArgs): void {
             if (e.Name === "Current") {
                 this.Select(sender);
-            } else {
-                this.Render(sender);
             }
         }
         protected Render(source: Data.ListCollectionView) {
@@ -154,7 +152,7 @@
                 });
             }
 
-            this.Behavior.Element.selectpicker('refresh');
+            // this.Behavior.Element.selectpicker('refresh');
             this.Select(source);
         }
         protected get Multiple(): boolean {
@@ -196,17 +194,14 @@
             };
         }
 
-        protected AddedHandle: (source: Data.ListCollectionView, obj: any) => void;
-        protected RemovedHandle: (source: Data.ListCollectionView, obj: any) => void;
+        private AddedHandle: (source: Data.ListCollectionView, obj: any) => void;
+        private RemovedHandle: (source: Data.ListCollectionView, obj: any) => void;
         protected Added(source: Data.ListCollectionView, obj: any): void {
-            source.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.NoReflected;
-            source.Refresh();
+            this.Render(source);
         }
         protected Removed(source: Data.ListCollectionView, obj: any): void {
-            source.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.NoReflected;
-            source.Refresh();
+            this.Render(source);
         }
-
         protected Select(source: Data.ListCollectionView) {
             return this.Multiple ? this.MultipleSelect(source) : this.SingleSelect(source);
         }
