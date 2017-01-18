@@ -77,11 +77,13 @@
         }
         public Filter: (obj: any) => boolean;
         public Grouping: (obj: any) => any;
-        public Refresh(): void {
+        public Refresh(): ListCollectionView {
 
             this.RefreshRaw();
        
             this.OnPropertyChanged();
+
+            return this;
         }
         protected RefreshRaw(): void {
             this.List = new collections.LinkedList<any>();

@@ -112,15 +112,7 @@
 
         protected OnUpdateTarget(sender: Data.DataBindingBehavior, data: any): void {
             if (data instanceof Data.ListCollectionView) {
-                var source = data as Data.ListCollectionView;
-
-                source.Removed.RemoveHandler(this.RemovedHandle);
-                source.Removed.AddHandler(this.RemovedHandle);
-
-                source.Added.RemoveHandler(this.AddedHandle);
-                source.Added.AddHandler(this.AddedHandle);
-
-                this.Render(source);
+                this.Render(data as Data.ListCollectionView);
             } else if (data instanceof Array) {
                 var list = [];
                 $.each(data, (i, value) => {
@@ -132,6 +124,9 @@
         protected OnDataSourcePropertyChanged(sender: Data.ListCollectionView, e: PropertyChangedEventArgs): void {
             if (e.Name === "Current") {
                 this.Select(sender);
+            }
+            if (!e.Name) {
+                this.Render(sender);
             }
         }
         protected Render(source: Data.ListCollectionView) {
@@ -232,12 +227,25 @@
         protected HasChanges(source: Data.ListCollectionView): boolean {
             if (source.ViewReflected === Data.ListCollectionView.ViewReflectedStatus.Reflected) return false;
             if (source.ViewReflected === Data.ListCollectionView.ViewReflectedStatus.None) {
-                source.Refresh();
-                source.PropertyChanged.RemoveHandler(this.PropertyChangedEventHandle);
-                source.PropertyChanged.AddHandler(this.PropertyChangedEventHandle);
                 source.ViewReflected = Data.ListCollectionView.ViewReflectedStatus.NoReflected;
+
+                source.Begin().Refresh().End();
+
+                this.Subscribe(source);
             }
             return true;
+        }
+        protected Subscribe(source: Data.ListCollectionView): void {
+            this.UnSubscribe(source);
+
+            source.Removed.AddHandler(this.RemovedHandle);
+            source.Added.AddHandler(this.AddedHandle);
+            source.PropertyChanged.AddHandler(this.PropertyChangedEventHandle);
+        }
+        protected UnSubscribe(source: Data.ListCollectionView): void {
+            source.Added.RemoveHandler(this.AddedHandle);
+            source.Removed.RemoveHandler(this.RemovedHandle);
+            source.PropertyChanged.RemoveHandler(this.PropertyChangedEventHandle);
         }
         public static GetDisplayValue(value: any, displayMemberPath: string): any {
             var displayValue = value;

@@ -24,7 +24,7 @@
         }
         public SampleList: DomBehind.Core.Data.ListCollectionView;
         public ContactUs() {
-        
+
             this.SampleList.Add({ Value: 4, Text: "EEE", Price: 800, GroupKey: "A" });
 
             if (!this.Validate()) return;
