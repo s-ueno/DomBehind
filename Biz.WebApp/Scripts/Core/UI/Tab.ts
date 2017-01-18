@@ -41,10 +41,6 @@
             }
             this.HeaderContainer.appendTo(this.Behavior.Element);
             this.ContentContainer.appendTo(this.Behavior.Element);
-
-
-            this.Removed(source, arr[1]);
-
         }
         public HeaderContainer: JQuery;
         public ContentContainer: JQuery;
@@ -73,6 +69,9 @@
     }
 
     export namespace Tab {
+        export enum aaa {
+            bbb
+        }
         interface OptionInternal extends IIdentity, IDisplayMemberPath {
             __header?: JQuery;
             __content?: JQuery;

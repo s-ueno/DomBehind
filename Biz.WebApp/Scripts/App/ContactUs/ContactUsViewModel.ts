@@ -20,11 +20,11 @@
             list.push({ Value: 3, Text: "DDD", Price: 499, GroupKey: "A" });
             this.SampleList = new DomBehind.Core.Data.ListCollectionView(list, "Text");
             this.SampleList.Grouping = (x: ISampleList) => x.GroupKey;
+            this.SampleList.Filter = x => x.Price > 0;
         }
         public SampleList: DomBehind.Core.Data.ListCollectionView;
         public ContactUs() {
         
-            
             this.SampleList.Add({ Value: 4, Text: "EEE", Price: 800, GroupKey: "A" });
 
             if (!this.Validate()) return;

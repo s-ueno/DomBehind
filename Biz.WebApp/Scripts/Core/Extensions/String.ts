@@ -24,28 +24,38 @@ interface String {
     Escape(): string;
     UnEscape(): string;
 }
-String.prototype.Split = function (separator: string, option: StringSplitOptions) {
-    let me: String = this;
 
-    if (Object.IsNullOrUndefined(option) ||
-        option === StringSplitOptions.RemoveEmptyEntries)
-        return me.split(separator).filter(x => !String.IsNullOrWhiteSpace(x));
+"Split".ExtendedPrototype(
+    String.prototype,
+    function (separator: string, option: StringSplitOptions) {
+        let me: String = this;
 
-    return me.split(separator);
-};
-String.prototype.Escape = function () {
-    let me: String = this;
-    return me
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-};
-String.prototype.UnEscape = function () {
-    let me: String = this;
-    return me
-        .replace(/&amp;/g, '&')
-        .replace(/&quot;/g, '"')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>');
-};
+        if (Object.IsNullOrUndefined(option) ||
+            option === StringSplitOptions.RemoveEmptyEntries)
+            return me.split(separator).filter(x => !String.IsNullOrWhiteSpace(x));
+
+        return me.split(separator);
+    }
+);
+"Escape".ExtendedPrototype(
+    String.prototype,
+    function () {
+        let me: String = this;
+        return me
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+);
+"UnEscape".ExtendedPrototype(
+    String.prototype,
+    function () {
+        let me: String = this;
+        return me
+            .replace(/&amp;/g, '&')
+            .replace(/&quot;/g, '"')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>');
+    }
+);

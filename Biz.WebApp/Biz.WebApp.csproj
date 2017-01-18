@@ -291,6 +291,7 @@
     <TypeScriptCompile Include="Scripts\Core\Data\TypedEvent.ts" />
     <TypeScriptCompile Include="Scripts\Core\EventArgs.ts" />
     <TypeScriptCompile Include="Scripts\Core\Exception.ts" />
+    <TypeScriptCompile Include="Scripts\Core\Extensions\DefaultPropertyDescriptor.ts" />
     <TypeScriptCompile Include="Scripts\Core\Extensions\Enum.ts" />
     <TypeScriptCompile Include="Scripts\Core\Expression.ts" />
     <TypeScriptCompile Include="Scripts\Core\Global.ts" />

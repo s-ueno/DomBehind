@@ -23,21 +23,5 @@ Object.IsPromise = value => {
 
 
 
-// !!! Object　は絶対に拡張しないこと！！
-// !!! Ajaxで送信時にここを通る結果、不明な例外を送出する
-
-//interface Object {
-//    Is(type: any): boolean;
-//}
-//Object.prototype.Is = function (type: any) {
-//    let me: any = this;
-
-//    if (Object.IsNullOrUndefined(me)) return false;
-//    if (Object.IsNullOrUndefined(type)) return false;
-
-//    return (me instanceof type) ? true : false;
-//};
-
-
 
 

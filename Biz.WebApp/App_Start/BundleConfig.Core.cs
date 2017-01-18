@@ -45,6 +45,8 @@ namespace Biz.WebApp
         public static readonly string[] Core_Base = new string[]
         {
             "~/Scripts/Core/Global.js",
+            "~/Scripts/Core/Extensions/DefaultPropertyDescriptor.js",
+
 
             "~/Scripts/Core/IDisposable.js",
 
