@@ -272,6 +272,8 @@
     <TypeScriptCompile Include="Scripts\Core\AjaxException.ts" />
     <TypeScriptCompile Include="Scripts\Core\Application.ts" />
     <TypeScriptCompile Include="Scripts\Core\CancelEventArgs.ts" />
+    <TypeScriptCompile Include="Scripts\Core\Commitable.ts" />
+    <TypeScriptCompile Include="Scripts\Core\UI\DataGrid\DataGrid.ts" />
     <TypeScriptCompile Include="Scripts\Core\Data\ActionPolicy\WaitingOverlayActionPolicy.ts" />
     <TypeScriptCompile Include="Scripts\Core\BindingBehaviorBuilder.ts" />
     <TypeScriptCompile Include="Scripts\Core\Data\BindingBehaviorCollection.ts" />

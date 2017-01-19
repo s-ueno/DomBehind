@@ -5,6 +5,7 @@
         Price: number;
         GroupKey: string;
     }
+
     export class ContactUsViewModel
         extends DomBehind.Core.BizViewModel {
 
@@ -22,6 +23,7 @@
             this.SampleList.Grouping = (x: ISampleList) => x.GroupKey;
             this.SampleList.Filter = x => x.Price > 0;
         }
+
         public SampleList: DomBehind.Core.Data.ListCollectionView;
         public ContactUs() {
 

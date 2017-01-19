@@ -24,4 +24,3 @@ Object.IsPromise = value => {
 
 
 
-

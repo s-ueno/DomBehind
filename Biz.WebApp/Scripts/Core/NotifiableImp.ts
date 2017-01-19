@@ -52,4 +52,46 @@
         }
     }
 
+
+    // It is heavy, so we do not recommend it.
+    export class Observable {
+
+        public static Register(target: any, callBack: (sender, e) => void): void {
+            var observer = new DomBehind.Core.Observable(target);
+            observer.PropertyChanged.AddHandler(callBack);
+            target.__observer = observer;
+        }
+
+        // #region INotifyPropertyChanged
+
+        public PropertyChanged: Data.TypedEvent<PropertyChangedEventArgs> = new Data.TypedEvent<PropertyChangedEventArgs>();
+
+        // #endregion
+
+        constructor(protected source: any) {
+            if (source == null) return;
+            var keys = Object.keys(source);
+            for (var i = 0; i < keys.length; i++) {
+                var name = keys[i];
+                Object.defineProperty(source, name, this.CreateDescriptor(name, source[name]));
+            }
+        }
+        protected CreateDescriptor(name: string, value: any): PropertyDescriptor {
+            var notifier = this.PropertyChanged;
+            var sender = this.source;
+            return {
+                get: function () {
+                    return value;
+                },
+                set: function (v) {
+                    value = v;
+                    notifier.Raise(sender, new PropertyChangedEventArgs(name));
+                },
+                enumerable: true,
+                configurable: true
+            }
+        }
+    }
+
+
 }
