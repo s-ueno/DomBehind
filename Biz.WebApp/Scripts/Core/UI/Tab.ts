@@ -69,9 +69,6 @@
     }
 
     export namespace Tab {
-        export enum aaa {
-            bbb
-        }
         interface OptionInternal extends IIdentity, IDisplayMemberPath {
             __header?: JQuery;
             __content?: JQuery;

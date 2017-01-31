@@ -54,12 +54,10 @@
 
 
     // It is heavy, so we do not recommend it.
-    export class Observable {
+    export class Observable<T> {
 
-        public static Register(target: any, callBack: (sender, e) => void): void {
-            var observer = new DomBehind.Core.Observable(target);
-            observer.PropertyChanged.AddHandler(callBack);
-            target.__observer = observer;
+        public static Register<T>(target: T): Observable<T> {
+            return new DomBehind.Core.Observable(target);
         }
 
         // #region INotifyPropertyChanged
@@ -68,24 +66,39 @@
 
         // #endregion
 
-        constructor(protected source: any) {
+        constructor(protected source: T) {
             if (source == null) return;
             var keys = Object.keys(source);
             for (var i = 0; i < keys.length; i++) {
-                var name = keys[i];
-                Object.defineProperty(source, name, this.CreateDescriptor(name, source[name]));
+                this.Recurcive(source, name, null);
             }
         }
-        protected CreateDescriptor(name: string, value: any): PropertyDescriptor {
+
+        protected Recurcive(source: any, name: string, parentName: string) {
+            var value = source[name];
+            var notifibleName = (parentName) ? `${parentName}.${name}` : name;
+            Object.defineProperty(source, name,
+                this.CreateDescriptor(notifibleName, value));
+
+            var keys = Object.keys(value);
+            for (var i = 0; i < keys.length; i++) {
+                this.Recurcive(value, keys[i], notifibleName);
+            }
+        }
+        public get Source(): T {
+            return this.source;
+        }
+        protected CreateDescriptor(notifibleName: string, value: any): PropertyDescriptor {
             var notifier = this.PropertyChanged;
             var sender = this.source;
+            let e = new PropertyChangedEventArgs(notifibleName);
             return {
                 get: function () {
                     return value;
                 },
                 set: function (v) {
                     value = v;
-                    notifier.Raise(sender, new PropertyChangedEventArgs(name));
+                    notifier.Raise(sender, e);
                 },
                 enumerable: true,
                 configurable: true

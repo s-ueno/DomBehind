@@ -12,14 +12,14 @@ namespace Biz.WebApp.Controllers
     public class AccountController : Controller
     {
         [HttpGet]
-        [RequireHttps]
+        //[RequireHttps]
         [AllowAnonymous]
         public ActionResult SignIn()
         {
             return View();
         }
         [HttpGet]
-        [RequireHttps]
+        //[RequireHttps]
         [AllowAnonymous]
         public ActionResult SignInDialog()
         {
@@ -27,7 +27,7 @@ namespace Biz.WebApp.Controllers
         }
 
         [HttpPost]
-        [RequireHttps]
+        //[RequireHttps]
         [AllowAnonymous]
         public ActionResult SignIn(SignInRequest request)
         {
