@@ -14,7 +14,9 @@ body {
     background-color: #ffdddd;
     outline: none;
 }
-
+form:invalid {
+    background-color: transparent;
+}
 
 .modal-overlay {
     display: none; /* Hidden by default */

@@ -19,6 +19,7 @@
             list.push({ Value: 1, Text: "BBB", Price: 135, GroupKey: "B" });
             list.push({ Value: 2, Text: "CCC", Price: 700, GroupKey: "B" });
             list.push({ Value: 3, Text: "DDD", Price: 499, GroupKey: "A" });
+
             this.SampleList = new DomBehind.Core.Data.ListCollectionView(list, "Text");
             this.SampleList.Grouping = (x: ISampleList) => x.GroupKey;
             this.SampleList.Filter = x => x.Price > 0;

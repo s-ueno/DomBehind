@@ -13,6 +13,8 @@
 
     GetDomStorage<T>(key: string, defaultValue?: T): T;
     SetDomStorage<T>(key: string, value: T): void;
+
+
 }
 
 $.RegisterViewViewModel = function (selector: string, resolveViewType: () => any, resolveViewModelType: () => any) {

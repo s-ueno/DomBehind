@@ -180,11 +180,11 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
-    <Content Include="Scripts\bootstrap-select.js" />
     <Content Include="Content\bootstrap-select.css.map" />
     <None Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="Scripts\bootstrap-notify.js" />
     <Content Include="Scripts\bootstrap-notify.min.js" />
+    <Content Include="Scripts\bootstrap-select.js" />
     <Content Include="Scripts\bootstrap-select.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -330,7 +330,7 @@
     <TypeScriptCompile Include="Scripts\Core\Web\PlainXMLHttpRequestThread.ts" />
     <TypeScriptCompile Include="Scripts\Core\Web\WebService.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap-notify.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\bootstrap-select\bootstrap-select.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\bootstrap-select\index.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap\bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
