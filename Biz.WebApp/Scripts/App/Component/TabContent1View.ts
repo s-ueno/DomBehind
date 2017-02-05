@@ -1,5 +1,5 @@
 ﻿namespace App.Component {
-    $.RegisterViewViewModel('#TabContent1', () => TabContent1View, () => TabContent1ViewModel);
+    $.BindViewViewModelWithLoading('#TabContent1', () => TabContent1View, () => TabContent1ViewModel);
     export class TabContent1View
         extends DomBehind.Core.BizView {
 

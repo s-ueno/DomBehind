@@ -1,5 +1,5 @@
 ﻿namespace App.ContactUs {
-    $.RegisterViewViewModel("#ContactUsView", () => ContactUsView, () => ContactUsViewModel);
+    $.BindViewViewModelWithLoading("#ContactUsView", () => ContactUsView, () => ContactUsViewModel);
     export class ContactUsView
         extends DomBehind.Core.BizView {
 

@@ -1,5 +1,5 @@
 ﻿interface JQueryStatic {
-    RegisterViewViewModel(selector: string,
+    BindViewViewModelWithLoading(selector: string,
         resolveViewType: () => any,
         resolveViewModelType: () => any);
 
@@ -17,11 +17,11 @@
 
 }
 
-$.RegisterViewViewModel = function (selector: string, resolveViewType: () => any, resolveViewModelType: () => any) {
+$.BindViewViewModelWithLoading = function (selector: string, resolveViewType: () => any, resolveViewModelType: () => any) {
 
     $(selector).ready(function (e) {
         // other page
-        var ele = $(selector);
+        let ele = $(selector);
         if (ele.length === 0) return;
 
         let viewFactory = new DomBehind.Core.TypedFactory(resolveViewType());

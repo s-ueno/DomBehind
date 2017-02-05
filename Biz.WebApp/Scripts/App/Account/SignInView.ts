@@ -1,7 +1,7 @@
 ﻿namespace App.Account {
     import UIElement = DomBehind.Core.UIElement;
 
-    $.RegisterViewViewModel("#SignInView", () => SignInView, () => SignInViewModel);
+    $.BindViewViewModelWithLoading("#SignInView", () => SignInView, () => SignInViewModel);
     export class SignInView
         extends DomBehind.Core.BizView {
 

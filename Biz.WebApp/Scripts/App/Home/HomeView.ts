@@ -1,5 +1,5 @@
 ﻿namespace App.Home {
-    $.RegisterViewViewModel("#HomeView", () => HomeView, () => HomeViewModel);
+    $.BindViewViewModelWithLoading("#HomeView", () => HomeView, () => HomeViewModel);
     export class HomeView
         extends DomBehind.Core.BizView {
 

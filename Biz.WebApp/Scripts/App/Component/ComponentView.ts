@@ -1,5 +1,5 @@
 ﻿namespace App.Component {
-    $.RegisterViewViewModel("#ComponentView", () => ComponentView, () => ComponentViewModel);
+    $.BindViewViewModelWithLoading("#ComponentView", () => ComponentView, () => ComponentViewModel);
     export class ComponentView
         extends DomBehind.Core.BizView {
 

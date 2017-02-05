@@ -1,5 +1,5 @@
 ﻿namespace App.Shared {
-    $.RegisterViewViewModel("#_Layout", () => _LayoutView, () => _LayoutViewModel);
+    $.BindViewViewModelWithLoading("#_Layout", () => _LayoutView, () => _LayoutViewModel);
     export class _LayoutView
         extends DomBehind.Core.BizView {
 
