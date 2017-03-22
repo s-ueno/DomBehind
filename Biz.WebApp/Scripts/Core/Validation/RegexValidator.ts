@@ -35,6 +35,7 @@
 }
 
 namespace DomBehind.Core {
+ 
     export interface DataBindingBehaviorBuilder<T> {
         Pattern(regex: string, message?: string, applyRule?: (x: T) => boolean): DataBindingBehaviorBuilder<T>;
         Pattern(regex: string, message?: (x: T) => string, applyRule?: (x: T) => boolean): DataBindingBehaviorBuilder<T>;

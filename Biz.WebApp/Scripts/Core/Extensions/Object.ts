@@ -3,7 +3,7 @@
     IsPromise(obj: any): boolean;
     NameOf(name: any): string;
 }
-declare var Object: ObjectConstructor;
+// declare var Object: ObjectConstructor;
 
 Object.IsNullOrUndefined = (obj: any) => {
     if (obj == null) return true;

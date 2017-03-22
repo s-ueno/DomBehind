@@ -69,7 +69,7 @@
     }
 
     export namespace Tab {
-        interface OptionInternal extends IIdentity, IDisplayMemberPath {
+        export interface OptionInternal extends IIdentity, IDisplayMemberPath {
             __header?: JQuery;
             __content?: JQuery;
 

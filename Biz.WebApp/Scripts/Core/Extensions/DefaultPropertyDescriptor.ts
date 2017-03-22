@@ -1,6 +1,8 @@
 ﻿interface String {
     ExtendedPrototype(key: any, value: any): void;
-}
+};
+
+
 Object.defineProperty(String.prototype, "ExtendedPrototype", {
     configurable: true,
     enumerable: false,

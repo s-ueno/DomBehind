@@ -1,4 +1,10 @@
 ﻿namespace DomBehind.Core {
+
+    //interface DataBindingBehaviorBuilderConstructor<T> {
+    //    new (value?: any): DataBindingBehaviorBuilder<T>;
+    //    (): DataBindingBehaviorBuilder<T>;
+    //    (value: any): DataBindingBehaviorBuilder<T>;
+    //}
     export class DataBindingBehaviorBuilder<T> extends BindingBehaviorBuilder<T>  {
 
         // #region constructor

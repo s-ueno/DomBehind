@@ -3,6 +3,7 @@
     export interface DataBindingBehaviorBuilder<T> {
         Multiple(): DataBindingBehaviorBuilder<T>;
         Multiple(allowMultiple: (x: T) => boolean): DataBindingBehaviorBuilder<T>;
+
     }
     DataBindingBehaviorBuilder.prototype.Multiple = function (allowMultiple?: (x: any) => boolean) {
         let me: DataBindingBehaviorBuilder<any> = this;
@@ -19,6 +20,8 @@
     }
 
     export class Selector {
+
+
 
         public static ItemsSourceProperty: Data.DependencyProperty
         = Data.DependencyProperty.RegisterAttached("itemsSource",
@@ -168,8 +171,8 @@
             value = $.extend(value, this.EnsureElement(option));
 
             if (value instanceof NotifiableImp) {
-                if (!value.__EventMarked) {
-                    value.__EventMarked = true;
+                if (!(<any>value).__EventMarked) {
+                    (<any>value).__EventMarked = true;
 
                     (value as NotifiableImp).PropertyChanged.AddHandler((sender, e) => {
                         var selectable = sender as Selector.ISelectableElement;
@@ -179,6 +182,8 @@
                 }
             }
         }
+
+
         protected EnsureDisplayMemberPath(path: string): IDisplayMemberPath {
             return { DisplayMemberPath: path };
         }

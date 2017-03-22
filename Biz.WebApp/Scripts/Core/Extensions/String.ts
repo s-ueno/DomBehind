@@ -4,7 +4,7 @@
 
     Split(value: string, separator: string): string[];
 }
-declare var String: StringConstructor;
+// declare var String: StringConstructor;
 
 String.IsNullOrEmpty = (str: string) => !str;
 String.IsNullOrWhiteSpace = (s: string) => String.IsNullOrEmpty(s) || s.replace(/\s/g, '').length < 1;
