@@ -19,3 +19,4 @@ interface IIdentity {
 function ExtendIIdentity(): IIdentity {
     return { __uuid: NewUid() };
 }
+

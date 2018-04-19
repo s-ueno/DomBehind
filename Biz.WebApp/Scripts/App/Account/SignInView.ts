@@ -23,7 +23,7 @@
                 .BindingAction(UIElement.ClickEvent, x => x.SignIn());
 
             builder.Element(this.Container)
-                .BindingAction(UIElement.ModalClosingEvent, (x, e) => x.OnModalClosing(e));
+                .BindingAction(UIElement.ModalClosingEvent, (x: SignInViewModel, e: any) => x.OnModalClosing(e));
         }
 
         public OnReceiveNotificationMessage(sender: any, e: any) {

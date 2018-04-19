@@ -129,9 +129,7 @@ namespace Biz.WebApp
             "~/Scripts/Core/UI/Tab.js",
         };
         public static readonly string[] Core = new string[] {
-            "~/Scripts/Core/Utils.js",
             "~/Scripts/Core/BizViewModel.js",
-            "~/Scripts/Core/BizView.js",
             "~/Scripts/Core/BizView.js",
             "~/Scripts/Core/Application.js",
         };

@@ -40,7 +40,7 @@
                 class: "modal-overlay",
             });
 
-            overlay.css("z-index", Utils.GenerateZIndex());
+            overlay.css("z-index", $.GenerateZIndex());
             $("body").css("overflow", "hidden");
 
             overlay

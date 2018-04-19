@@ -32,7 +32,7 @@
 
             if (!this.Validate()) return;
 
-            return $.PromiseWith(d => {
+            return $.Deferred(d => {
                 var svc = new SendWebService();
                 return svc.ExecuteAsync({
                     Name: this.Name,
@@ -49,7 +49,7 @@
                 }).fail(x => {
                     d.reject(new DomBehind.Core.Exception(x.ErrorMessage));
                 });
-            });
+            }).promise();
         }
         protected Thanks() {
 

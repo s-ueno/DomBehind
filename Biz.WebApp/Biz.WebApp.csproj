@@ -27,11 +27,12 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TypeScriptToolsVersion>2.1</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.5</TypeScriptToolsVersion>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -325,7 +326,6 @@
     <TypeScriptCompile Include="Scripts\Core\NotifiableImp.ts" />
     <TypeScriptCompile Include="Scripts\Core\TypedFactory.ts" />
     <TypeScriptCompile Include="Scripts\Core\UI\UIElement.ts" />
-    <TypeScriptCompile Include="Scripts\Core\Utils.ts" />
     <TypeScriptCompile Include="Scripts\Core\Validation\ValidatorCollection.ts" />
     <TypeScriptCompile Include="Scripts\Core\Validation\ValidationException.ts" />
     <TypeScriptCompile Include="Scripts\Core\Web\PlainXMLHttpRequest.ts" />

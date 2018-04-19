@@ -21,7 +21,7 @@
         }
 
         protected SignInRaw() {
-            return $.PromiseWith(d => {
+            return $.Deferred(d => {
                 var request = { Email: this.Email, Password: this.Password };
 
                 let svc = new SignInWebService();
@@ -31,7 +31,7 @@
                 }).fail(ex => {
                     this.OnSignInError(d, ex);
                 });
-            });
+            }).promise();
         }
 
         public OnModalClosing(e: JQueryEventObject) {

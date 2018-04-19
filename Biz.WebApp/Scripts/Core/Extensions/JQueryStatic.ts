@@ -3,7 +3,7 @@
         resolveViewType: () => any,
         resolveViewModelType: () => any);
 
-    PromiseWith<T>(action: (deferred: JQueryDeferred<T>) => void): JQueryPromise<T>;
+    GenerateZIndex(): number;
 
     GetLocalStorage<T>(key: string, defaultValue?: T): T;
     SetLocalStorage(key: string, value: any): void;
@@ -13,8 +13,6 @@
 
     GetDomStorage<T>(key: string, defaultValue?: T): T;
     SetDomStorage<T>(key: string, value: T): void;
-
-
 }
 
 $.BindViewViewModelWithLoading = function (selector: string, resolveViewType: () => any, resolveViewModelType: () => any) {
@@ -37,11 +35,14 @@ $.BindViewViewModelWithLoading = function (selector: string, resolveViewType: ()
     });
 };
 
-$.PromiseWith = function (action: (deferred: JQueryDeferred<any>) => void) {
-    var d = $.Deferred();
-    action(d);
-    return d.promise();
-};
+const z_indexKey: string = "z_indexKey";
+$.GenerateZIndex = function () {
+    var value = $.GetDomStorage(z_indexKey, 2000)
+    var newValue = value + 1;
+    $.SetDomStorage(z_indexKey, newValue);
+    return newValue;
+}
+
 $.GetLocalStorage = function (key: string, defaultValue?: any) {
     if (!window.localStorage.getItem(key)) {
         return defaultValue;
