@@ -1,0 +1,75 @@
+﻿.form-twopane {
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+    .form-twopane div.grid {
+        height: 60vh;
+        width: 100%;
+        margin-top: 30px;
+    }
+
+
+    .form-twopane > form > .form-twopane-panel {
+    }
+
+.form-twopane-panel {
+}
+
+
+
+.form-twopane-rowstyle-sample {
+    /*background-color: rgba(243, 144, 202, 0.30);*/
+    font-style: italic;
+}
+
+
+.form-twopane-condition div > div {
+    padding: 1px 2px;
+}
+
+
+
+
+
+/* 詳細部CSS */
+.form-twopane-detail {
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+    .form-twopane-detail > form > .form-twopane-detail-panel {
+    }
+
+        .form-twopane-detail > form > .form-twopane-detail-panel > div[class="input-field-group"] {
+        }
+/*
+    ルートから見て、5階層以上の深さだと、ルート名+（任意の名称）で新しくCSSを切る
+*/
+.form-twopane-detail-input-field-group {
+}
+    /* 基本的な 1ラベル 1入力項目 */
+    .form-twopane-detail-input-field-group > div > div input {
+        margin: 0px 1px;
+        width: 100%;
+    }
+
+    /* お客さま名、カナだけは横並びなので、CSSとID指定でちょっと変える */
+    .form-twopane-detail-input-field-group input[name="FirstName"] {
+        margin: 0px 1px;
+        padding: 0;
+        width: 47%;
+    }
+
+    .form-twopane-detail-input-field-group input[name="LastName"] {
+        margin: 0px 1px;
+        padding: 0;
+        width: 47%;
+    }
+
+    .form-twopane-detail-input-field-group textarea[name="Notes"] {
+        margin: 0px 1px;
+        width: 100%;
+        height: 90px;
+        resize: none;
+    }

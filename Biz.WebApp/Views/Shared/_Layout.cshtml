@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+
+    <title>@ViewBag.Title</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    @Styles.Render("~/bundles/nuget-css")
+    @Styles.Render("~/bundles/app-css")
+
+    @Scripts.Render("~/bundles/nuget-js")
+    @Scripts.Render("~/bundles/dombehind-js")
+    @Scripts.Render("~/bundles/app-js")
+</head>
+<body id="_Layout">
+    <div class="body-content">
+        @RenderSection("SPAViews", required: false)
+        @RenderBody()
+        @RenderSection("Scripts", required: false)
+    </div>
+    <script>
+        $.SetRootUri("@ViewBag.RootUri");
+
+        // w2ui.
+        w2utils.locale('ja-jp');
+
+        // Assign View-ViewModel to the above <div id = "Home" ... 
+        // Since lambda description in the script tag is not supported by IE, it is declared with the old description method
+        // $.BindingAnnotation("#_Layout", () => SIS.App.Shared.LayoutView, () => SIS.App.Shared.LayoutViewModel)
+        $.BindingAnnotation("#_Layout", function () { return Biz.WebApp.Shared.LayoutView; }, function () { return Biz.WebApp.Shared.LayoutViewModel; });
+    </script>
+</body>
+</html>

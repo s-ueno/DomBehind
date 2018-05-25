@@ -1,0 +1,475 @@
+﻿html {
+    position: relative;
+    min-height: 100%;
+    /*font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Yu Gothic", YuGothic, Verdana, Meiryo, "M+ 1p", sans-serif;*/
+}
+
+body {
+    padding-top: 0px;
+    /* 下部にfotterが必要な場合は、ここにマージンとる */
+    /* padding-bottom: 10px; */
+}
+
+:invalid {
+    background-color: #ffdddd;
+    outline: none;
+}
+
+form:invalid {
+    background-color: transparent;
+}
+
+input.error {
+    background-color: #ffdddd;
+}
+
+label.error {
+    color: #a94442;
+    padding: 0px 0px 0px 10px;
+}
+
+tr > .error {
+    background-color: #ffdddd;
+}
+
+.zero-margin {
+    margin: 0px;
+}
+
+.zero-padding {
+    padding: 0px;
+}
+
+.vertical-center {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    /* border: 1px dashed deeppink; */
+}
+
+.horizontal-center {
+}
+    /* 項目ラベルの場合 */
+    .horizontal-center > label {
+        display: block;
+        text-align: center;
+        padding-top: 5px;
+    }
+
+.input-field-group {
+    background-color: #f9f9f9;
+    margin: 5px 0px 10px 0px;
+    padding: 10px 5px;
+    border-top: 1px solid #dcdcdc;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+/*
+    タイトルラベル
+*/
+.title-label {
+    padding: 3px;
+    font-weight: bold;
+    color: #777;
+}
+
+/*
+    項目ラベルの色をここで一元管理する
+*/
+.input-field-label {
+    background-color: #e0e0e0;
+    color: #666;
+}
+
+.input-field-button {
+    min-width: 80px;
+}
+
+/* 
+    入力系コントロールの高さをアプリ固定することで、
+    高さに関するマージを容易化する
+
+*/
+div > .input-field {
+    height: 30px;
+}
+
+.input-field > label {
+    width: 100%;
+}
+
+.input-field > input {
+    width: 100%;
+    min-height: 26px;
+}
+
+.input-field > select {
+    width: 100%;
+    min-height: 26px;
+}
+
+.input-field > div[class="radio-inline"] {
+    margin-left: 20px;
+}
+
+
+.input-field-span2 {
+    height: 60px;
+}
+
+.input-field-span3 {
+    height: 90px;
+}
+
+.input-field-span4 {
+    height: 120px;
+}
+
+.input-field-span5 {
+    height: 150px;
+}
+
+.input-field-span6 {
+    height: 180px;
+}
+
+.input-field-span7 {
+    height: 210px;
+}
+
+.input-field-span8 {
+    height: 240px;
+}
+
+.sidemenu-scrollable {
+    min-height: 500px;
+    /*height: 100%;*/
+    overflow-y: auto;
+}
+
+/* bootstrap-selectは外観上エンタープライズと合わせにくいので、廃止した */
+.bootstrap-select {
+    height: 24px;
+    width: 100% !important;
+}
+/* JQueryValidationExtension - showErrors　でポップアップスタイル適用時に利用*/
+.popover.popover-validation {
+    background-color: #f9f2f4;
+    color: #c7254e;
+}
+
+    .popover.popover-validation > .arrow:after {
+        border-bottom-color: #f9f2f4;
+    }
+
+/* セパレータが押せなくなる問題が */
+.w2ui-layout > div .w2ui-resizer {
+    z-index: 1000;
+}
+
+.modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 120%; /* Full height supported mobile */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vertical-alignment-helper {
+    display: table;
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+}
+
+.vertical-align-center {
+    /* To center vertically */
+    display: table-cell;
+    vertical-align: middle;
+    pointer-events: none;
+}
+
+.modal-content {
+    /* Bootstrap sets the size of the modal in the modal-dialog class, we need to inherit it */
+    width: inherit;
+    height: inherit;
+    /* To center horizontally */
+    margin: 0 auto;
+    pointer-events: all;
+    border-radius: 0px;
+    border: 2px solid #035d86;
+}
+
+/* bootstrap4 は超オシャレだけど移行が大変だった */
+.p-1 {
+    padding: 10px;
+}
+
+.p-2 {
+    padding: 10px;
+}
+
+.p-3 {
+    padding: 10px;
+}
+
+.p-4 {
+    padding: 40px;
+}
+
+.p-5 {
+    padding: 50px;
+}
+
+
+
+.m-1 {
+    margin: 10px;
+}
+
+.m-2 {
+    margin: 20px;
+}
+
+.m-3 {
+    margin: 30px;
+}
+
+.m-4 {
+    margin: 40px;
+}
+
+.m-5 {
+    margin: 50px;
+}
+
+.displaySize {
+    height: 100vh;
+    width: 100%;
+}
+
+.parent-size {
+    height: 100%;
+    width: 100%;
+}
+
+.displaySize-90vh {
+    max-height: 90vh;
+}
+
+/*.modal-header {
+    height: 60px;
+}*/
+
+/*.close {
+    opacity: 1;
+}
+    .close:hover {
+        opacity: 0.9;
+    }*/
+
+.modal_close {
+    position: relative;
+    top: -25px;
+    left: 25px;
+    float: right;
+    display: block;
+    height: 50px;
+    width: 50px;
+}
+
+
+.footer {
+    position: absolute;
+    min-width: 100%;
+    margin: 10px 20px 0px 0px;
+    bottom: 0px;
+    height: 40px;
+    background-color: #f5f5f5;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 0px;
+    padding-right: 0px;
+    width: 100%;
+    height: 100%;
+}
+
+.fixedNavAnchor {
+    padding-top: 40px;
+}
+
+
+
+
+
+
+.slideanim {
+    visibility: hidden;
+}
+
+.slide {
+    animation-name: slide;
+    -webkit-animation-name: slide;
+    animation-duration: 1s;
+    -webkit-animation-duration: 1s;
+    visibility: visible;
+}
+
+@keyframes slide {
+    0% {
+        opacity: 0;
+        transform: translateY(70%);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0%);
+    }
+}
+
+@-webkit-keyframes slide {
+    0% {
+        opacity: 0;
+        -webkit-transform: translateY(70%);
+    }
+
+    100% {
+        opacity: 1;
+        -webkit-transform: translateY(0%);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .col-sm-4 {
+        text-align: center;
+        margin: 25px 0;
+    }
+
+    .btn-lg {
+        width: 100%;
+        margin-bottom: 35px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .logo {
+        font-size: 150px;
+    }
+}
+
+@media (min-width: 768px ) {
+    .row {
+        position: relative;
+    }
+
+    .vertical-align-bottom-full {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+
+    .vertical-align-bottom {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        padding-bottom: 10px;
+    }
+}
+
+
+
+.logo-small {
+    color: #035d86;
+    font-size: 50px;
+}
+
+.logo {
+    color: #035d86;
+    font-size: 200px;
+}
+
+.card {
+    background-color: #eee;
+    padding: 20px 25px 30px;
+    margin: 0 auto 25px;
+    width: 304px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 2px 2px rgba(0,0,0,0.3);
+}
+
+.jumbotron {
+    padding: 100px 25px;
+    font-family: Montserrat, sans-serif;
+}
+
+
+@font-face {
+    font-family: "Yu Gothic";
+    src: local("Yu Gothic Medium");
+    font-weight: 100;
+}
+
+@font-face {
+    font-family: "Yu Gothic";
+    src: local("Yu Gothic Medium");
+    font-weight: 200;
+}
+
+@font-face {
+    font-family: "Yu Gothic";
+    src: local("Yu Gothic Medium");
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: "Yu Gothic";
+    src: local("Yu Gothic Medium");
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: "Yu Gothic";
+    src: local("Yu Gothic Bold");
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "Helvetica Neue";
+    src: local("Helvetica Neue Regular");
+    font-weight: 100;
+}
+
+@font-face {
+    font-family: "Helvetica Neue";
+    src: local("Helvetica Neue Regular");
+    font-weight: 200;
+}
+
+@media all and (-ms-high-contrast: none) {
+    html {
+        font-family: Verdana, Meiryo, sans-serif;
+    }
+}
+
+@media all and (-ms-high-contrast: active) {
+    html {
+        font-family: Verdana, Meiryo, sans-serif;
+    }
+}

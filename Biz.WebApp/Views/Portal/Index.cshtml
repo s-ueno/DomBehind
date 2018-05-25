@@ -1,0 +1,18 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section SPAViews {
+    <div id="Portal">
+        <div id="PortalLayout" class="displaySize"></div>
+    </div>
+}
+
+@section Scripts{
+    <script>
+        // Assign View-ViewModel to the above <div id = "Home" ...
+        // Since lambda description in the script tag is not supported by IE, it is declared with the old description method
+        // $.BindingAnnotation("#Portal", () => Biz.WebApp.Portal.PortalView, () => Biz.WebApp.Portal.PortalViewModel)
+        $.BindingAnnotation("#Portal", function () { return Biz.WebApp.Portal.PortalView; }, function () { return Biz.WebApp.Portal.PortalViewModel; })
+    </script>
+}
+

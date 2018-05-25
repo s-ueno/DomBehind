@@ -1,0 +1,94 @@
+﻿@section SPAViews {
+    <div id="TwoPainMainView" class="parent-size form-twopane">
+        <form>
+            <div class="row form-twopane-panel">
+                <div class="col-sm-9 input-field-group">
+                    <div class="col-sm-2 input-field-span4 input-field-label">
+                        <label class="vertical-center">Condition</label>
+                    </div>
+                    <div class="col-sm-10 form-twopane-condition">
+                        <div class="row zero-padding">
+                            <div class="col-sm-3">
+                                <div class="input-field input-field-label horizontal-center">
+                                    <label>
+                                        Amount data
+                                    </label>
+                                </div>
+                                <div class="input-field">
+                                    <input name="RecordCount" />
+                                </div>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="input-field input-field-label horizontal-center">
+                                    <label>
+                                        Customer name
+                                    </label>
+                                </div>
+                                <div class="input-field">
+                                    <input name="CustomerName" />
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="input-field input-field-label horizontal-center">
+                                    <label class="">Direction</label>
+                                </div>
+                                <div class="input-field">
+                                    <div class="radio-inline">
+                                        <input type="radio" name="searcRadio" id="ForwardRadio" />
+                                        <label for="ForwardRadio">Forward</label>
+                                    </div>
+                                    <div class="radio-inline">
+                                        <input type="radio" name="searcRadio" id="PartialRadio" />
+                                        <label for="PartialRadio">Partial</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row zero-padding">
+                            <div class="col-sm-6">
+                                <div class="input-field input-field-label horizontal-center">
+                                    <label>
+                                        Parent
+                                    </label>
+                                </div>
+                                <div class="input-field">
+                                    <input name="ParentList" />
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="input-field input-field-label horizontal-center">
+                                    <label>
+                                        Child
+                                    </label>
+                                </div>
+                                <div class="input-field">
+                                    <input name="ChildList" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 vertical-align-bottom">
+                    <div class="col-sm-6">
+                        <input type="button" class="input-field-button" value="SEARCH" name="SearchButton" />
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="button" class="input-field-button" value="CLEAR" name="ClearButton" />
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row grid"></div>
+    </div>
+}
+
+@section Scripts{
+    <script>
+        // Assign View-ViewModel to the above <div id = "Home" ...
+        // $.BindingAnnotation("#TwnPainMainView", () => Biz.WebApp.TwoPane.MainView, () => Biz.WebApp.TwoPane.MainViewModel)
+
+        // Since lambda description in the script tag is not supported by IE, it is declared with the old description method
+        $.BindingAnnotation("#TwoPainMainView", function () { return Biz.WebApp.TwoPane.MainView; }, function () { return Biz.WebApp.TwoPane.MainViewModel; })
+    </script>
+}
