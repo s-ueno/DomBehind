@@ -1,0 +1,26 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>DOM-Behind</id>
+    <version>$version$</version>
+    <title>DOM Behind</title>
+    <authors>uEN</authors>
+    <owners>uEN</owners>
+    <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/s-ueno/DomBehind</projectUrl>
+    <tags>typescript javascript jquery mvvm uen dombehind</tags>
+    <description>
+      MVVM with TypeScript for C # programmer      
+    </description>
+    <dependencies>
+      <dependency id="jQuery"></dependency>
+      <dependency id="jquery.TypeScript.DefinitelyTyped"></dependency>
+      <dependency id="jQuery.Validation"></dependency>
+      <dependency id="jquery.validation.TypeScript.DefinitelyTyped"></dependency>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Scripts/dombehind.*" target="Content\Scripts\" />
+    <file src="Content/dombehind.*" target="Content\Content\" />
+  </files>
+</package>

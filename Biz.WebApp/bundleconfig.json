@@ -120,5 +120,16 @@
       "commentMode": "all"
     },
     "sourceMap": true
+  },
+  {
+    "inputFiles": [
+      /* 
+        d.tsファイルはロード順序関係ないので、wildcard指定。
+        jsをwildcard指定すると、依存関係無視でBundleするので、実行時エラーとなった。
+        Gulpって、そういうもの？？？
+      */
+      "Scripts/DomBehind/**/*.d.ts"
+    ],
+    "outputFileName": "Scripts/typings/dombehind/dombehind.d.ts"
   }
 ]

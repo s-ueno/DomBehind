@@ -61,6 +61,19 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>latest</LangVersion>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
+    <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptRemoveComments>True</TypeScriptRemoveComments>
+    <TypeScriptOutFile />
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptSourceMap>True</TypeScriptSourceMap>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Antlr3.Runtime">
@@ -259,6 +272,7 @@
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <None Include="gulpfile.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\dombehind.js" />
@@ -270,10 +284,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Content\bootstrap.min.css.map" />
-    <Content Include="Content\bootstrap.css.map" />
-    <Content Include="Content\bootstrap-theme.min.css.map" />
-    <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="fonts\FontAwesome.otf" />
     <Content Include="fonts\fontawesome-webfont.woff2" />
     <Content Include="fonts\fontawesome-webfont.woff" />
@@ -284,6 +294,36 @@
       <DependentUpon>dombehind.min.js</DependentUpon>
     </Content>
     <Content Include="locale\ja-jp.json" />
+    <Content Include="package.json" />
+    <Content Include="nuget.nuspec">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="locale\az-az.json" />
+    <Content Include="locale\ba-ba.json" />
+    <Content Include="locale\bg-bg.json" />
+    <Content Include="locale\ca-es.json" />
+    <Content Include="locale\de-de.json" />
+    <Content Include="locale\en-gb.json" />
+    <Content Include="locale\en-us.json" />
+    <Content Include="locale\es-es.json" />
+    <Content Include="locale\es-mx.json" />
+    <Content Include="locale\fr-fr.json" />
+    <Content Include="locale\gl-es.json" />
+    <Content Include="locale\hr-hr.json" />
+    <Content Include="locale\hu-hu.json" />
+    <Content Include="locale\id-id.json" />
+    <Content Include="locale\it-it.json" />
+    <Content Include="locale\ko-kr.json" />
+    <Content Include="locale\lt-lt.json" />
+    <Content Include="locale\nl-nl.json" />
+    <Content Include="locale\no-no.json" />
+    <Content Include="locale\pl-pl.json" />
+    <Content Include="locale\pt-br.json" />
+    <Content Include="locale\ru-ru.json" />
+    <Content Include="locale\sk-sk.json" />
+    <Content Include="locale\sl-si.json" />
+    <Content Include="locale\tr-tr.json" />
+    <Content Include="locale\zh-cn.json" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
@@ -326,7 +366,9 @@
     <Folder Include="Views\ThreePane\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Biz.Model\Biz.Model.csproj">
@@ -437,6 +479,7 @@
     <TypeScriptCompile Include="Scripts\DomBehind\Web\PlainXMLHttpRequestWorker.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Web\WebService.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap\index.d.ts" />
+    <None Include="Scripts\typings\dombehind\dombehind.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
@@ -481,6 +524,9 @@
     <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.2.4.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.2.4.0\build\Microsoft.Net.Compilers.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.8\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.8\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) == Release $(SolutionDir)nuget.exe pack "$(ProjectDir)nuget.nuspec" -OutputDirectory "$(ProjectDir)bin\Release"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
