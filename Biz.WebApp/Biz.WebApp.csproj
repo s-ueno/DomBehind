@@ -475,9 +475,9 @@
     <TypeScriptCompile Include="Scripts\DomBehind\W2UI\MessageBox.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\W2UI\Sidebar.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\W2UI\Toolbar.ts" />
-    <TypeScriptCompile Include="Scripts\DomBehind\Web\PlainXMLHttpRequest.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Web\PlainXMLHttpRequestWorker.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Web\WebService.ts" />
+    <TypeScriptCompile Include="Scripts\dombehind-PlainXMLHttpRequest.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap\index.d.ts" />
     <None Include="Scripts\typings\dombehind\dombehind.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />

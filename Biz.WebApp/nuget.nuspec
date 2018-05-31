@@ -2,17 +2,19 @@
 <package >
   <metadata>
     <id>DomBehind</id>
-    <version>1.0.2</version>
+    <version>1.0.4</version>
     <title>DOM Behind</title>
     <authors>uEN</authors>
     <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/s-ueno/DomBehind</projectUrl>
     <tags>typescript javascript jquery mvvm</tags>
     <description>
-      MVVM with TypeScript for C # programmer      
+      MVVM with TypeScript for C # programmer
     </description>
     <releaseNotes>
-      
+      ・include w2ui-1.5.rc1.css
+      ・exclude dombehind.css(Offered in "Project Template")
+      ・Correcting the path of Web Worker
     </releaseNotes>
     <dependencies>
       <dependency id="jQuery" version="3.1.1"></dependency>
@@ -25,12 +27,14 @@
   <files>
     <file src="Scripts/dombehind.js" target="Content/Scripts/" />
     <file src="Scripts/dombehind.min.js" target="Content/Scripts/" />
-    <file src="Scripts/dombehind.min.js.map" target="Content/Scripts/" />    
+    <file src="Scripts/dombehind.min.js.map" target="Content/Scripts/" />
+    <file src="Scripts/dombehind-PlainXMLHttpRequest.ts" target="Content/Scripts/" />
     <file src="Scripts/typings/dombehind/dombehind.d.ts" target="Content/Scripts/typings/dombehind" />
     <file src="Scripts/collections.ts" target="Content/Scripts/" />
     <file src="Scripts/w2ui-1.5.rc1.js" target="Content/Scripts/" />
-    
-    <file src="Content/dombehind.css" target="Content/Content/" />
+
+    <!--<file src="Content/dombehind.css" target="Content/Content/" />-->
+    <file src="Content/w2ui-1.5.rc1.css" target="Content/Content/" />
 
     <file src="locale/az-az.json" target="Content/locale/" />
     <file src="locale/ba-ba.json" target="Content/locale/" />

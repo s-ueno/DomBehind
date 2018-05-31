@@ -901,6 +901,7 @@ declare namespace DomBehind {
         constructor(dataContext: any, Lamda: (x) => any);
         private static ParsePropertyPath(exp);
         private static _extractor;
+        private static _extractor_Minified;
         private static NameOf(expression);
         Dispose(): void;
         static Path<T>(exp: (x: T) => any): string;
@@ -1289,10 +1290,6 @@ declare namespace DomBehind {
         BuildToolBar(action?: (x: T, args: any) => void, name?: string): W2ToolBarBindingBehaviorBuilder<T>;
     }
 }
-
-declare function IsNullOrUndefined(obj: any): boolean;
-declare function Post(url: string, request: any): any;
-declare function Get(url: string, request: any): any;
 
 declare namespace DomBehind.Web {
     class PlainXMLHttpRequestWorker extends Threading.WorkerWrapper {

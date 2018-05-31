@@ -2669,7 +2669,7 @@ var DomBehind;
             }
             Object.defineProperty(PlainXMLHttpRequestWorker.prototype, "WorkerScript", {
                 get: function () {
-                    return "/Scripts/DomBehind/Web/PlainXMLHttpRequest.js";
+                    return "/Scripts/dombehind-PlainXMLHttpRequest.js";
                 },
                 enumerable: true,
                 configurable: true
