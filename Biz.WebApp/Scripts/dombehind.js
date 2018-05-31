@@ -377,8 +377,9 @@ var DomBehind;
         };
         LamdaExpression.NameOf = function (expression) {
             var m = LamdaExpression._extractor_Minified.exec(expression + "");
-            var s = m[1];
-            if (s.charAt(s.length - 1) === "}") {
+            var s = m[1].trim();
+            if (s.charAt(s.length - 1) === "}" ||
+                s.charAt(s.length - 1) === ";") {
                 m = LamdaExpression._extractor.exec(expression + "");
                 s = m[1];
             }

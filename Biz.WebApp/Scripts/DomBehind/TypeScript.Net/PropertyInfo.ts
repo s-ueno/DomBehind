@@ -62,9 +62,10 @@
         private static NameOf(expression: any): string {
             // console.info(`★${expression}`);
             let m = LamdaExpression._extractor_Minified.exec(expression + "");            
-            let s = m[1];
+            let s = m[1].trim();
             // console.info(`★${s}`);
-            if (s.charAt(s.length - 1) === "}") {
+            if (s.charAt(s.length - 1) === "}" || 
+                s.charAt(s.length - 1) === ";" ) {
                 m = LamdaExpression._extractor.exec(expression + "");
                 s = m[1];
             }

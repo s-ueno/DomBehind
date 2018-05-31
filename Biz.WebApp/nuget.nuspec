@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>DomBehind</id>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <title>DOM Behind</title>
     <authors>uEN</authors>
     <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
@@ -12,9 +12,7 @@
       MVVM with TypeScript for C # programmer
     </description>
     <releaseNotes>
-      ・include w2ui-1.5.rc1.css
-      ・exclude dombehind.css(Offered in "Project Template")
-      ・Correcting the path of Web Worker
+・Expression analysis bug
     </releaseNotes>
     <dependencies>
       <dependency id="jQuery" version="3.1.1"></dependency>
