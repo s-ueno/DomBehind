@@ -110,7 +110,7 @@ var DomBehind;
             get: function () {
                 if (this.JqXHR) {
                     var json = this.JqXHR.responseJSON;
-                    if (json.Message) {
+                    if (json && json.Message) {
                         return json.Message;
                     }
                     return $(this.JqXHR.responseText).filter("title").text();

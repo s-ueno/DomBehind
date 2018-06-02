@@ -14,7 +14,7 @@
             if (this.JqXHR) {
                 // MVC Controller経由の緩いコントラクト
                 let json = this.JqXHR.responseJSON;
-                if (json.Message) {
+                if (json && json.Message) {
                     return json.Message;
                 }
                 // ERROR HTMLからタイトル抜粋
