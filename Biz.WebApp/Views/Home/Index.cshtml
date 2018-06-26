@@ -1,4 +1,7 @@
-﻿@section SPAViews {
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section SPAViews {
     <div id="Home" class="m-1">
         <div class="center row">
             @*ロゴの写真*@
@@ -41,7 +44,7 @@
 
 @section Scripts{
     <script>
-        // Assign View-ViewModel to the above <div id = "Home" ... 
+        // Assign View-ViewModel to the above <div id = "Home" ...
         // $.BindingAnnotation("#Home", () => Biz.WebApp.Home.HomeView, () => Biz.WebApp.Home.HomeViewModel)
 
         // Since lambda description in the script tag is not supported by IE, it is declared with the old description method

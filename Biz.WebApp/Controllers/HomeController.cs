@@ -54,7 +54,9 @@ namespace Biz.WebApp.Controllers
         public ActionResult SignOut()
         {
             FormsAuthentication.SignOut();
-            return Redirect("/Home");
+            // Conforms to JSON protocol of client JQueryAjaxSettings
+            return new JsonResult() { Data = new object() };
+            // return new EmptyResult();
         }
     }
 

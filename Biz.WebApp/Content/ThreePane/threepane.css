@@ -1,0 +1,12 @@
+﻿.form-three {
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+.form-threepane {
+}
+
+    .form-threepane > div input[type="button"] {
+        margin-left: 2px;
+        margin-right: 2px;
+    }

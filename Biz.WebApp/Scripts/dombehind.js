@@ -1,3 +1,5 @@
+// http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+// https://gist.github.com/jcxplorer/823878
 function NewUid() {
     var uuid = "", i, random;
     for (i = 0; i < 32; i++) {
@@ -24,7 +26,7 @@ function using(resource, func) {
 //# sourceMappingURL=IDisposable.js.map
 var DomBehind;
 (function (DomBehind) {
-    var EventArgs = (function () {
+    var EventArgs = /** @class */ (function () {
         function EventArgs() {
         }
         return EventArgs;
@@ -34,7 +36,7 @@ var DomBehind;
 //# sourceMappingURL=EventArgs.js.map
 var DomBehind;
 (function (DomBehind) {
-    var CancelEventArgs = (function () {
+    var CancelEventArgs = /** @class */ (function () {
         function CancelEventArgs(Cancel) {
             if (Cancel === void 0) { Cancel = false; }
             this.Cancel = Cancel;
@@ -56,7 +58,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var DomBehind;
 (function (DomBehind) {
-    var CollectionChangedEventArgs = (function (_super) {
+    var CollectionChangedEventArgs = /** @class */ (function (_super) {
         __extends(CollectionChangedEventArgs, _super);
         function CollectionChangedEventArgs() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -68,7 +70,7 @@ var DomBehind;
 //# sourceMappingURL=CollectionChangedEventArgs.js.map
 var DomBehind;
 (function (DomBehind) {
-    var Exception = (function () {
+    var Exception = /** @class */ (function () {
         function Exception(Message) {
             this.Message = Message;
         }
@@ -90,7 +92,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var DomBehind;
 (function (DomBehind) {
-    var AjaxException = (function (_super) {
+    var AjaxException = /** @class */ (function (_super) {
         __extends(AjaxException, _super);
         function AjaxException(JqXHR, TextStatus, ErrorThrown) {
             var _this = _super.call(this, TextStatus) || this;
@@ -109,12 +111,15 @@ var DomBehind;
         Object.defineProperty(AjaxException.prototype, "ErrorTitle", {
             get: function () {
                 if (this.JqXHR) {
+                    // MVC Controller経由の緩いコントラクト
                     var json = this.JqXHR.responseJSON;
                     if (json && json.Message) {
                         return json.Message;
                     }
+                    // ERROR HTMLからタイトル抜粋
                     return $(this.JqXHR.responseText).filter("title").text();
                 }
+                // JqueryAjax以外
                 return this.TextStatus + ":" + this.ErrorThrown;
             },
             enumerable: true,
@@ -132,7 +137,7 @@ var DomBehind;
 (function (DomBehind) {
     var Validation;
     (function (Validation) {
-        var ValidationException = (function () {
+        var ValidationException = /** @class */ (function () {
             function ValidationException(Message, Selector) {
                 this.Message = Message;
                 this.Selector = Selector;
@@ -140,7 +145,7 @@ var DomBehind;
             return ValidationException;
         }());
         Validation.ValidationException = ValidationException;
-        var AggregateValidationException = (function () {
+        var AggregateValidationException = /** @class */ (function () {
             function AggregateValidationException(Items) {
                 this.Items = Items;
             }
@@ -152,10 +157,17 @@ var DomBehind;
 //# sourceMappingURL=ValidationException.js.map
 var DomBehind;
 (function (DomBehind) {
-    var TypedEvent = (function () {
+    /**
+     * define typed events
+     */
+    var TypedEvent = /** @class */ (function () {
         function TypedEvent() {
+            // #region implements interface of IEventName
+            // #endregion
+            // #region implements interface of IEvent
             this.handlers = [];
             this._disposed = false;
+            // #endregion
         }
         Object.defineProperty(TypedEvent.prototype, "EventName", {
             get: function () {
@@ -167,15 +179,29 @@ var DomBehind;
             enumerable: true,
             configurable: true
         });
+        /**
+         * Handle the defined event
+         * @param handler
+         */
         TypedEvent.prototype.AddHandler = function (handler) {
             this.handlers.push(handler);
         };
+        /**
+         * Remove the handle from the defined event
+         * @param handler
+         */
         TypedEvent.prototype.RemoveHandler = function (handler) {
             this.handlers = this.handlers.filter(function (h) { return h !== handler; });
         };
+        /**
+         * Notify all of the handle
+         * @param sender
+         * @param data
+         */
         TypedEvent.prototype.Raise = function (sender, data) {
             this.handlers.slice(0).forEach(function (h) { return h(sender, data); });
         };
+        // #endregion
         TypedEvent.prototype.Clear = function () {
             var _this = this;
             $.each(this.handlers, function (i, each) {
@@ -183,6 +209,7 @@ var DomBehind;
             });
             this.handlers = [];
         };
+        // #region IDisposable
         TypedEvent.prototype.Dispose = function () {
             if (!this._disposed) {
                 if (this.handlers) {
@@ -194,7 +221,10 @@ var DomBehind;
         return TypedEvent;
     }());
     DomBehind.TypedEvent = TypedEvent;
-    var EventBuilder = (function () {
+    /**
+     * Generate a typed event class.
+     */
+    var EventBuilder = /** @class */ (function () {
         function EventBuilder(eventName) {
             this._eventName = eventName;
         }
@@ -204,12 +234,20 @@ var DomBehind;
             return event;
         };
         Object.defineProperty(EventBuilder.prototype, "EventName", {
+            /**
+             * It gets the event name.
+             * Event name will be used in JQuery
+             */
             get: function () {
                 return this._eventName;
             },
             enumerable: true,
             configurable: true
         });
+        /**
+         * Generate a typed event class.
+         * @param eventName
+         */
         EventBuilder.RegisterAttached = function (eventName) {
             var builder = new EventBuilder(eventName);
             return builder;
@@ -231,7 +269,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var DomBehind;
 (function (DomBehind) {
-    var PropertyChangedEventArgs = (function (_super) {
+    var PropertyChangedEventArgs = /** @class */ (function (_super) {
         __extends(PropertyChangedEventArgs, _super);
         function PropertyChangedEventArgs(Name) {
             var _this = _super.call(this) || this;
@@ -255,7 +293,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var DomBehind;
 (function (DomBehind) {
-    var PropertyChangingEventArgs = (function (_super) {
+    var PropertyChangingEventArgs = /** @class */ (function (_super) {
         __extends(PropertyChangingEventArgs, _super);
         function PropertyChangingEventArgs(Name, OldValue, NewValue) {
             var _this = _super.call(this) || this;
@@ -271,12 +309,15 @@ var DomBehind;
 //# sourceMappingURL=INotifyPropertyChanging.js.map
 var DomBehind;
 (function (DomBehind) {
-    var NotifiableImp = (function () {
+    var NotifiableImp = /** @class */ (function () {
         function NotifiableImp() {
+            // #region INotifyPropertyChanged
             this.PropertyChanged = new DomBehind.TypedEvent();
             this._dic = {};
             this._disposed = false;
         }
+        // #endregion
+        // #region Property Backing Store
         NotifiableImp.prototype.GetProperty = function (name, defaultValue) {
             var obj = this._dic[name];
             return Object.IsNullOrUndefined(obj) ? defaultValue : obj;
@@ -292,6 +333,8 @@ var DomBehind;
             }
             return result;
         };
+        // #endregion
+        // #region Dispose
         NotifiableImp.prototype.Dispose = function () {
             if (!this._disposed) {
                 this._dic = null;
@@ -301,6 +344,7 @@ var DomBehind;
             }
             this._disposed = true;
         };
+        // #endregion
         NotifiableImp.prototype.OnPropertyChanged = function (name) {
             this.PropertyChanged.Raise(this, new DomBehind.PropertyChangedEventArgs(name));
         };
@@ -322,7 +366,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var DomBehind;
 (function (DomBehind) {
-    var PropertyInfo = (function () {
+    var PropertyInfo = /** @class */ (function () {
         function PropertyInfo(DataContext, MemberPath) {
             this.DataContext = DataContext;
             this.MemberPath = MemberPath;
@@ -364,7 +408,7 @@ var DomBehind;
         return PropertyInfo;
     }());
     DomBehind.PropertyInfo = PropertyInfo;
-    var LamdaExpression = (function (_super) {
+    var LamdaExpression = /** @class */ (function (_super) {
         __extends(LamdaExpression, _super);
         function LamdaExpression(dataContext, Lamda) {
             var _this = _super.call(this, dataContext, LamdaExpression.ParsePropertyPath(Lamda)) || this;
@@ -376,8 +420,10 @@ var DomBehind;
             return path.split(".").slice(1).join(".");
         };
         LamdaExpression.NameOf = function (expression) {
+            // console.info(`★${expression}`);
             var m = LamdaExpression._extractor_Minified.exec(expression + "");
             var s = m[1].trim();
+            // console.info(`★${s}`);
             if (s.charAt(s.length - 1) === "}" ||
                 s.charAt(s.length - 1) === ";") {
                 m = LamdaExpression._extractor.exec(expression + "");
@@ -396,12 +442,13 @@ var DomBehind;
             var exp = new LamdaExpression(dataContext, lamda);
             return exp.GetValue();
         };
+        // http://stackoverflow.com/questions/29191451/get-name-of-variable-in-typescript
         LamdaExpression._extractor = new RegExp("return (.*);");
         LamdaExpression._extractor_Minified = new RegExp("return (.*)}");
         return LamdaExpression;
     }(PropertyInfo));
     DomBehind.LamdaExpression = LamdaExpression;
-    var BooleanFakeExpression = (function (_super) {
+    var BooleanFakeExpression = /** @class */ (function (_super) {
         __extends(BooleanFakeExpression, _super);
         function BooleanFakeExpression(Value) {
             var _this = _super.call(this, null, ".") || this;
@@ -432,7 +479,7 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ListCollectionView = (function (_super) {
+        var ListCollectionView = /** @class */ (function (_super) {
             __extends(ListCollectionView, _super);
             function ListCollectionView(source, DisplayMemberPath) {
                 var _this = _super.call(this) || this;
@@ -594,10 +641,22 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
+        /**
+         * Describes the timing of binding source updates.
+         */
         var UpdateSourceTrigger;
         (function (UpdateSourceTrigger) {
+            /**
+             * Updates the binding source only when you call the UpdateSource method.
+             */
             UpdateSourceTrigger[UpdateSourceTrigger["Explicit"] = 0] = "Explicit";
+            /**
+             * Updates the binding source whenever the binding target element loses focus.
+             */
             UpdateSourceTrigger[UpdateSourceTrigger["LostForcus"] = 1] = "LostForcus";
+            /**
+             * This is for extension
+             */
             UpdateSourceTrigger[UpdateSourceTrigger["PropertyChanged"] = 2] = "PropertyChanged";
         })(UpdateSourceTrigger = Data.UpdateSourceTrigger || (Data.UpdateSourceTrigger = {}));
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
@@ -627,7 +686,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var DomBehind;
 (function (DomBehind) {
-    var List = (function (_super) {
+    var List = /** @class */ (function (_super) {
         __extends(List, _super);
         function List() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -639,10 +698,12 @@ var DomBehind;
 //# sourceMappingURL=List.js.map
 var DomBehind;
 (function (DomBehind) {
-    var Observable = (function () {
+    var Observable = /** @class */ (function () {
+        // #endregion
         function Observable(source, marks) {
             this.source = source;
             this.marks = marks;
+            // #region INotifyPropertyChanged
             this.PropertyChanging = new DomBehind.TypedEvent();
             this.PropertyChanged = new DomBehind.TypedEvent();
             if (source == null)
@@ -811,6 +872,7 @@ Object.defineProperty(String.prototype, "ExtendedPrototype", {
     return result;
 });
 //# sourceMappingURL=EnumerableExtensions.js.map
+// declare var Object: ObjectConstructor;
 Object.IsNullOrUndefined = function (obj) {
     if (obj == null)
         return true;
@@ -831,6 +893,7 @@ Object.IsPromise = function (value) {
     return promiseThenSrc === valueThenSrc;
 };
 //# sourceMappingURL=ObjectExtensions.js.map
+// declare var String: StringConstructor;
 String.IsNullOrEmpty = function (str) { return !str; };
 String.IsNullOrWhiteSpace = function (s) { return String.IsNullOrEmpty(s) || s.replace(/\s/g, '').length < 1; };
 String.Split = function (s, sep) {
@@ -984,7 +1047,7 @@ $.fn.Raise = function (event) {
 //# sourceMappingURL=JQueryExtensions.js.map
 var DomBehind;
 (function (DomBehind) {
-    var TypedFactory = (function () {
+    var TypedFactory = /** @class */ (function () {
         function TypedFactory(_ctor) {
             this._ctor = _ctor;
         }
@@ -998,7 +1061,7 @@ var DomBehind;
 //# sourceMappingURL=TypedFactory.js.map
 var DomBehind;
 (function (DomBehind) {
-    var Repository = (function () {
+    var Repository = /** @class */ (function () {
         function Repository() {
         }
         Repository.AddService = function (context, getType, priority) {
@@ -1032,11 +1095,17 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var DependencyProperty = (function () {
+        /**
+         * To communicate the View and ViewModel properties using JQuery
+         */
+        var DependencyProperty = /** @class */ (function () {
+            // #region  constructor
             function DependencyProperty(name) {
                 this._propertyName = name;
             }
             Object.defineProperty(DependencyProperty.prototype, "PropertyName", {
+                // #endregion
+                // #region PropertyName
                 get: function () {
                     return this._propertyName;
                 },
@@ -1044,6 +1113,11 @@ var DomBehind;
                 configurable: true
             });
             Object.defineProperty(DependencyProperty.prototype, "GetValue", {
+                // #endregion
+                // #region GetValue-SetValue
+                /**
+                 * Using JQuery to get the value from the View
+                 */
                 get: function () {
                     return this._getter;
                 },
@@ -1051,6 +1125,9 @@ var DomBehind;
                 configurable: true
             });
             Object.defineProperty(DependencyProperty.prototype, "SetValue", {
+                /**
+                 * Using JQuery and set the value to View
+                 */
                 get: function () {
                     return this._setter;
                 },
@@ -1058,6 +1135,11 @@ var DomBehind;
                 configurable: true
             });
             Object.defineProperty(DependencyProperty.prototype, "UpdateSourceTrigger", {
+                // #endregion
+                // #region UpdateSourceTrigger
+                /**
+                 * Default UpdateSourceTrigger
+                 */
                 get: function () {
                     return this._updateSourceTrigger;
                 },
@@ -1065,6 +1147,8 @@ var DomBehind;
                 configurable: true
             });
             Object.defineProperty(DependencyProperty.prototype, "BindingMode", {
+                // #endregion
+                // #region Binding Mode
                 get: function () {
                     return this._bindingMode;
                 },
@@ -1072,12 +1156,23 @@ var DomBehind;
                 configurable: true
             });
             Object.defineProperty(DependencyProperty.prototype, "Ensure", {
+                // #endregion
+                // #region Ensure Action
                 get: function () {
                     return this._ensure;
                 },
                 enumerable: true,
                 configurable: true
             });
+            // #endregion
+            // #region static method
+            /**
+             * It defines the communication using JQuery
+             * @param propertyName
+             * @param getValue
+             * @param setValue
+             * @param updateSourceTrigger
+             */
             DependencyProperty.RegisterAttached = function (propertyName, getValue, setValue, defaultUpdateSourceTrigger, mode, ensure) {
                 if (defaultUpdateSourceTrigger === void 0) { defaultUpdateSourceTrigger = Data.UpdateSourceTrigger.Explicit; }
                 if (mode === void 0) { mode = Data.BindingMode.TwoWay; }
@@ -1099,7 +1194,10 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var BindingPolicy = (function () {
+        /**
+         * policy on binding
+         */
+        var BindingPolicy = /** @class */ (function () {
             function BindingPolicy() {
                 this.Trigger = Data.UpdateSourceTrigger.Explicit;
                 this.Mode = Data.BindingMode.TwoWay;
@@ -1115,12 +1213,19 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var BindingBehavior = (function () {
+        /**
+         * supports the link of the view and the view model
+         */
+        var BindingBehavior = /** @class */ (function () {
             function BindingBehavior() {
+                // #region property
                 this.BindingPolicy = new Data.BindingPolicy();
                 this.Priolity = 0;
                 this._disposed = false;
+                // #endregion
             }
+            // #endregion
+            // #region Dispose
             BindingBehavior.prototype.Dispose = function () {
                 if (!this._disposed) {
                     this.DataContext = null;
@@ -1148,7 +1253,10 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var DataBindingBehavior = (function (_super) {
+        /**
+         * linking the properties of the view and the ViewModel
+         */
+        var DataBindingBehavior = /** @class */ (function (_super) {
             __extends(DataBindingBehavior, _super);
             function DataBindingBehavior() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -1158,6 +1266,7 @@ var DomBehind;
                 _this.UpdateTargetEvent = new DomBehind.TypedEvent();
                 _this.Events = [];
                 return _this;
+                // #endregion
             }
             Object.defineProperty(DataBindingBehavior.prototype, "PInfo", {
                 get: function () {
@@ -1175,6 +1284,10 @@ var DomBehind;
                 configurable: true
             });
             Object.defineProperty(DataBindingBehavior.prototype, "ValueCore", {
+                // #region UpdateSource - UpdateTarget
+                /**
+                 *  ValueCore is the input value of the view that is not transferred to the ViewModel
+                 */
                 get: function () {
                     var value = this.Property.GetValue(this.Element);
                     if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter)) {
@@ -1185,6 +1298,9 @@ var DomBehind;
                 enumerable: true,
                 configurable: true
             });
+            /**
+             * Sends the current binding target value to the binding source property
+             */
             DataBindingBehavior.prototype.UpdateSource = function () {
                 if (this.BindingPolicy.Mode === Data.BindingMode.OneWay)
                     return;
@@ -1199,6 +1315,9 @@ var DomBehind;
                     this.DataContext.PropertyChanged.Raise(this, e);
                 }
             };
+            /**
+             * Forces a data transfer from the binding source property to the binding target property.
+             */
             DataBindingBehavior.prototype.UpdateTarget = function () {
                 if (Object.IsNullOrUndefined(this.Property))
                     return;
@@ -1211,6 +1330,8 @@ var DomBehind;
                 this.Property.SetValue(this.Element, value);
                 this.UpdateTargetEvent.Raise(this, value);
             };
+            // #endregion
+            // #region Ensure
             DataBindingBehavior.prototype.Ensure = function () {
                 var _this = this;
                 if (this.BindingPolicy.Trigger === Data.UpdateSourceTrigger.LostForcus) {
@@ -1237,6 +1358,8 @@ var DomBehind;
                     }
                 });
             };
+            // #endregion
+            // #region Dispose
             DataBindingBehavior.prototype.Dispose = function () {
                 if (!this._disposed) {
                     this.EventsOff();
@@ -1268,13 +1391,21 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ActionBindingBehavior = (function (_super) {
+        /**
+         * linked the method of the View of the event and the ViewModel
+         */
+        var ActionBindingBehavior = /** @class */ (function (_super) {
             __extends(ActionBindingBehavior, _super);
             function ActionBindingBehavior() {
+                // #region Event property
                 var _this = _super !== null && _super.apply(this, arguments) || this;
+                // #endregion
+                // #region ActionPolicy
                 _this.ActionPolicyCollection = [];
                 return _this;
+                // #endregion
             }
+            // #region Ensure
             ActionBindingBehavior.prototype.Ensure = function () {
                 var _this = this;
                 this.ActionHandle = function (x) { return _this.OnTrigger(x); };
@@ -1320,6 +1451,13 @@ var DomBehind;
                 });
                 return list[0];
             };
+            // #endregion
+            // #region Do
+            /**
+             * Run the linked action
+             * @param sender
+             * @param e
+             */
             ActionBindingBehavior.prototype.Do = function (sender, e) {
                 var _this = this;
                 if (!this.AllowBubbling) {
@@ -1343,6 +1481,8 @@ var DomBehind;
                     return result;
                 });
             };
+            // #endregion
+            // #region Dispose
             ActionBindingBehavior.prototype.Dispose = function () {
                 if (!this._disposed) {
                     if (!Object.IsNullOrUndefined(this.Element)) {
@@ -1382,7 +1522,7 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ViewViewModelBindingBehavior = (function (_super) {
+        var ViewViewModelBindingBehavior = /** @class */ (function (_super) {
             __extends(ViewViewModelBindingBehavior, _super);
             function ViewViewModelBindingBehavior() {
                 return _super !== null && _super.apply(this, arguments) || this;
@@ -1429,13 +1569,21 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var BindingBehaviorCollection = (function (_super) {
+        /**
+         * provides the ability to easily use behaviors
+         */
+        var BindingBehaviorCollection = /** @class */ (function (_super) {
             __extends(BindingBehaviorCollection, _super);
             function BindingBehaviorCollection() {
+                // #region Ensure
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this._disposed = false;
                 return _this;
+                // #endregion
             }
+            /**
+             * Ensure
+             */
             BindingBehaviorCollection.prototype.Ensure = function () {
                 var _this = this;
                 var sortedList = [];
@@ -1452,6 +1600,12 @@ var DomBehind;
                     x.Ensure();
                 });
             };
+            // #endregion
+            // #region List
+            /**
+             * lists the more behaviors
+             * @param mark
+             */
             BindingBehaviorCollection.prototype.ListDataBindingBehavior = function (mark) {
                 var list = this.toArray().filter(function (x) { return x instanceof Data.DataBindingBehavior; });
                 if (!String.IsNullOrWhiteSpace(mark)) {
@@ -1459,18 +1613,32 @@ var DomBehind;
                 }
                 return list;
             };
+            // #endregion
+            // #region UpdateTarget - UpdateSource
+            /**
+             * Forces a data transfer from the binding source property to the binding target property.
+             * @param mark
+             */
             BindingBehaviorCollection.prototype.UpdateTarget = function (mark) {
                 var list = this.ListDataBindingBehavior(mark);
                 $.each(list, function (i, x) {
                     x.UpdateTarget();
                 });
             };
+            /**
+             * Sends the current binding target value to the binding source property
+             * @param mark
+             */
             BindingBehaviorCollection.prototype.UpdateSource = function (mark) {
                 var list = this.ListDataBindingBehavior(mark);
                 $.each(list, function (i, x) {
                     x.UpdateSource();
                 });
             };
+            // #endregion
+            // #region
+            // #endregion
+            // #region Dispose
             BindingBehaviorCollection.prototype.Dispose = function () {
                 if (!this._disposed) {
                     $.each(this.toArray(), function (i, x) { return x.Dispose(); });
@@ -1486,7 +1654,11 @@ var DomBehind;
 //# sourceMappingURL=BindingBehaviorCollection.js.map
 var DomBehind;
 (function (DomBehind) {
-    var BindingBehaviorBuilder = (function () {
+    /**
+     * support the construction of behavior
+     */
+    var BindingBehaviorBuilder = /** @class */ (function () {
+        // #region constructor
         function BindingBehaviorBuilder(owner) {
             this.Owner = owner;
         }
@@ -1501,6 +1673,15 @@ var DomBehind;
             this.CurrentBehavior = null;
             return this;
         };
+        // #endregion
+        // #region Binding is linking the properties of the view and the view model
+        /**
+         * linking the properties of the view and the view model
+         * @param property
+         * @param getter
+         * @param setter
+         * @param updateTrigger is update timing of view model
+         */
         BindingBehaviorBuilder.prototype.Binding = function (property, bindingExpression, mode, updateTrigger) {
             var behavior = this.Add(new DomBehind.Data.DataBindingBehavior());
             behavior.Property = property;
@@ -1510,14 +1691,22 @@ var DomBehind;
             var dataBindingBuilder = new DomBehind.Data.DataBindingBehaviorBuilder(this.Owner);
             dataBindingBuilder.CurrentBehavior = this.CurrentBehavior;
             dataBindingBuilder.CurrentElement = this.CurrentElement;
+            // default PartialMark is PropertyName
             return dataBindingBuilder.PartialMark(behavior.PInfo.MemberPath);
         };
+        // #endregion
+        // #region BindingViewModel
         BindingBehaviorBuilder.prototype.BindingViewViewModel = function (view, viewModel) {
             var behavior = this.Add(new DomBehind.Data.ViewViewModelBindingBehavior());
             behavior.GetView = view;
             behavior.GetViewModel = viewModel;
             return this;
         };
+        /**
+         * linking the action of the view and the view model
+         * @param event
+         * @param action
+         */
         BindingBehaviorBuilder.prototype.BindingAction = function (event, action, allowBubbling) {
             if (allowBubbling === void 0) { allowBubbling = false; }
             var behavior = this.Add(new DomBehind.Data.ActionBindingBehavior());
@@ -1530,6 +1719,12 @@ var DomBehind;
             actionBindingBuilder.CurrentElement = this.CurrentElement;
             return actionBindingBuilder;
         };
+        // #endregion
+        // #region Add
+        /**
+         * Register the behavior
+         * @param behavior
+         */
         BindingBehaviorBuilder.prototype.Add = function (behavior) {
             this.CurrentBehavior = behavior;
             behavior.DataContext = this.Owner.DataContext;
@@ -1556,8 +1751,9 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var DataBindingBehaviorBuilder = (function (_super) {
+        var DataBindingBehaviorBuilder = /** @class */ (function (_super) {
             __extends(DataBindingBehaviorBuilder, _super);
+            // #region constructor
             function DataBindingBehaviorBuilder(owner) {
                 return _super.call(this, owner) || this;
             }
@@ -1568,6 +1764,12 @@ var DomBehind;
                 enumerable: true,
                 configurable: true
             });
+            // #endregion
+            /**
+             * Give any of the mark to the property.
+             * It is possible to perform partial updating and partial validation.
+             * @param region
+             */
             DataBindingBehaviorBuilder.prototype.PartialMark = function () {
                 var _this = this;
                 var mark = [];
@@ -1579,6 +1781,10 @@ var DomBehind;
                 });
                 return this;
             };
+            /**
+             *
+             * @param converter
+             */
             DataBindingBehaviorBuilder.prototype.Converter = function (converter) {
                 this.Behavior.BindingPolicy.Converter = converter;
                 return this;
@@ -1608,8 +1814,9 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ActionBindingBehaviorBuilder = (function (_super) {
+        var ActionBindingBehaviorBuilder = /** @class */ (function (_super) {
             __extends(ActionBindingBehaviorBuilder, _super);
+            // #region constructor
             function ActionBindingBehaviorBuilder(owner) {
                 return _super.call(this, owner) || this;
             }
@@ -1620,6 +1827,7 @@ var DomBehind;
                 enumerable: true,
                 configurable: true
             });
+            // #endregion
             ActionBindingBehaviorBuilder.prototype.ActionPolicy = function () {
                 var _this = this;
                 var policies = [];
@@ -1641,9 +1849,17 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ActionPolicy = (function () {
+        /**
+         * Apply any of the policy to the bindable action
+         */
+        var ActionPolicy = /** @class */ (function () {
             function ActionPolicy() {
             }
+            // #endregion
+            /**
+             *
+             * @param func
+             */
             ActionPolicy.prototype.Do = function (func) {
                 var _this = this;
                 var result;
@@ -1704,7 +1920,7 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ActionPolicyExceptionEventArgs = (function (_super) {
+        var ActionPolicyExceptionEventArgs = /** @class */ (function (_super) {
             __extends(ActionPolicyExceptionEventArgs, _super);
             function ActionPolicyExceptionEventArgs(sender, errorData) {
                 var _this = _super.call(this) || this;
@@ -1734,7 +1950,7 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ExceptionHandlingActionPolicy = (function (_super) {
+        var ExceptionHandlingActionPolicy = /** @class */ (function (_super) {
             __extends(ExceptionHandlingActionPolicy, _super);
             function ExceptionHandlingActionPolicy() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -1782,7 +1998,7 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ValidationExceptionHandlingActionPolicy = (function (_super) {
+        var ValidationExceptionHandlingActionPolicy = /** @class */ (function (_super) {
             __extends(ValidationExceptionHandlingActionPolicy, _super);
             function ValidationExceptionHandlingActionPolicy() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -1868,7 +2084,8 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var DefaultWaitingOverlayOption = (function () {
+        // #region http://gasparesganga.com/labs/jquery-loading-overlay/
+        var DefaultWaitingOverlayOption = /** @class */ (function () {
             function DefaultWaitingOverlayOption() {
                 this.Color = "rgba(255, 255, 255, 0.8)";
                 this.Custom = "";
@@ -1884,7 +2101,7 @@ var DomBehind;
             }
             return DefaultWaitingOverlayOption;
         }());
-        var WaitingOverlayActionPolicy = (function (_super) {
+        var WaitingOverlayActionPolicy = /** @class */ (function (_super) {
             __extends(WaitingOverlayActionPolicy, _super);
             function WaitingOverlayActionPolicy(option) {
                 var _this = _super.call(this) || this;
@@ -2006,7 +2223,8 @@ var DomBehind;
             return WaitingOverlayActionPolicy;
         }(Data.ActionPolicy));
         Data.WaitingOverlayActionPolicy = WaitingOverlayActionPolicy;
-        var ElementWaitingOverlayActionPolicy = (function (_super) {
+        // #endregion
+        var ElementWaitingOverlayActionPolicy = /** @class */ (function (_super) {
             __extends(ElementWaitingOverlayActionPolicy, _super);
             function ElementWaitingOverlayActionPolicy(element, option) {
                 var _this = _super.call(this, option) || this;
@@ -2023,7 +2241,7 @@ var DomBehind;
             return ElementWaitingOverlayActionPolicy;
         }(WaitingOverlayActionPolicy));
         Data.ElementWaitingOverlayActionPolicy = ElementWaitingOverlayActionPolicy;
-        var WindowWaitingOverlayActionPolicy = (function (_super) {
+        var WindowWaitingOverlayActionPolicy = /** @class */ (function (_super) {
             __extends(WindowWaitingOverlayActionPolicy, _super);
             function WindowWaitingOverlayActionPolicy(option) {
                 return _super.call(this, $(document), option) || this;
@@ -2064,14 +2282,15 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var SuppressDuplicateWorkException = (function (_super) {
+        // SuppressDuplicateActionPolicy is the work
+        var SuppressDuplicateWorkException = /** @class */ (function (_super) {
             __extends(SuppressDuplicateWorkException, _super);
             function SuppressDuplicateWorkException() {
                 return _super.call(this, "This exception is a safe exception issued to prevent double press") || this;
             }
             return SuppressDuplicateWorkException;
         }(DomBehind.Exception));
-        var SuppressDuplicateActionPolicy = (function (_super) {
+        var SuppressDuplicateActionPolicy = /** @class */ (function (_super) {
             __extends(SuppressDuplicateActionPolicy, _super);
             function SuppressDuplicateActionPolicy() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -2129,7 +2348,7 @@ var DomBehind;
     (function (Navigation) {
         var OnModalCloseEventName = "ModalClose";
         var ReferenceCountKey = "ReferenceCountKey";
-        var DefaultNavigator = (function () {
+        var DefaultNavigator = /** @class */ (function () {
             function DefaultNavigator() {
                 this.DefaultSetting = {
                     FadeInDuration: 100,
@@ -2143,12 +2362,17 @@ var DomBehind;
             }
             DefaultNavigator.prototype.Move = function (uri, historyBack) {
                 uri = $.AbsoluteUri(uri);
+                if (location.href === uri)
+                    return;
                 if (historyBack) {
                     location.href = uri;
                 }
                 else {
                     location.replace(uri);
                 }
+            };
+            DefaultNavigator.prototype.Reload = function (forcedReload) {
+                location.reload(forcedReload);
             };
             DefaultNavigator.prototype.ShowModal = function (arg, option) {
                 var setting = $.extend(true, this.DefaultSetting, option);
@@ -2203,6 +2427,7 @@ var DomBehind;
                             .css("left", setting.StartupLocationLeft);
                     }
                 }
+                // domに追加
                 overlay.append(container);
                 container.find(".modal-dialog").draggable({
                     handle: ".modal-header",
@@ -2245,7 +2470,7 @@ var DomBehind;
 (function (DomBehind) {
     var Validation;
     (function (Validation) {
-        var Validator = (function () {
+        var Validator = /** @class */ (function () {
             function Validator(attribute) {
                 this._disposed = false;
                 this.Attribute = attribute;
@@ -2320,6 +2545,7 @@ var DomBehind;
                 }
                 return errorMessage;
             };
+            // #region Dispose
             Validator.prototype.Dispose = function () {
                 if (!this._disposed) {
                 }
@@ -2345,12 +2571,13 @@ var DomBehind;
 (function (DomBehind) {
     var Validation;
     (function (Validation) {
-        var ValidatorCollection = (function (_super) {
+        var ValidatorCollection = /** @class */ (function (_super) {
             __extends(ValidatorCollection, _super);
             function ValidatorCollection() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this._disposed = false;
                 return _this;
+                // #endregion
             }
             ValidatorCollection.prototype.ClearValidator = function () {
                 $.each(this.toArray(), function (i, x) { return x.RemoveValidation(); });
@@ -2368,6 +2595,7 @@ var DomBehind;
                 });
                 return result;
             };
+            // #region Dispose
             ValidatorCollection.prototype.Dispose = function () {
                 if (!this._disposed) {
                     $.each(this.toArray(), function (i, x) { return x.Dispose(); });
@@ -2395,11 +2623,12 @@ var DomBehind;
 (function (DomBehind) {
     var Validation;
     (function (Validation) {
-        var MaxLengthValidator = (function (_super) {
+        var MaxLengthValidator = /** @class */ (function (_super) {
             __extends(MaxLengthValidator, _super);
             function MaxLengthValidator() {
                 return _super.call(this, "maxlength") || this;
             }
+            // #region Dispose
             MaxLengthValidator.prototype.Dispose = function () {
                 if (!this._disposed) {
                     _super.prototype.Dispose.call(this);
@@ -2438,7 +2667,7 @@ var DomBehind;
 (function (DomBehind) {
     var Validation;
     (function (Validation) {
-        var RegexValidator = (function (_super) {
+        var RegexValidator = /** @class */ (function (_super) {
             __extends(RegexValidator, _super);
             function RegexValidator() {
                 return _super.call(this, "pattern") || this;
@@ -2454,6 +2683,7 @@ var DomBehind;
                 }
                 return message;
             };
+            // #region Dispose
             RegexValidator.prototype.Dispose = function () {
                 if (!this._disposed) {
                     _super.prototype.Dispose.call(this);
@@ -2492,11 +2722,12 @@ var DomBehind;
 (function (DomBehind) {
     var Validation;
     (function (Validation) {
-        var RequiredValidator = (function (_super) {
+        var RequiredValidator = /** @class */ (function (_super) {
             __extends(RequiredValidator, _super);
             function RequiredValidator() {
                 return _super.call(this, "required") || this;
             }
+            // #region Dispose
             RequiredValidator.prototype.Dispose = function () {
                 if (!this._disposed) {
                     _super.prototype.Dispose.call(this);
@@ -2533,7 +2764,7 @@ var DomBehind;
 (function (DomBehind) {
     var Threading;
     (function (Threading) {
-        var WorkerPool = (function () {
+        var WorkerPool = /** @class */ (function () {
             function WorkerPool() {
             }
             WorkerPool.Register = function (type, defaultPoolCount) {
@@ -2590,7 +2821,7 @@ var DomBehind;
 (function (DomBehind) {
     var Threading;
     (function (Threading) {
-        var WorkerWrapper = (function () {
+        var WorkerWrapper = /** @class */ (function () {
             function WorkerWrapper() {
                 this.PoolType = DomBehind.PoolType.PreLoad;
             }
@@ -2663,7 +2894,7 @@ var DomBehind;
     var Web;
     (function (Web) {
         DomBehind.Threading.WorkerPool.Register(function () { return PlainXMLHttpRequestWorker; });
-        var PlainXMLHttpRequestWorker = (function (_super) {
+        var PlainXMLHttpRequestWorker = /** @class */ (function (_super) {
             __extends(PlainXMLHttpRequestWorker, _super);
             function PlainXMLHttpRequestWorker() {
                 return _super !== null && _super.apply(this, arguments) || this;
@@ -2685,7 +2916,7 @@ var DomBehind;
 (function (DomBehind) {
     var Web;
     (function (Web) {
-        var WebService = (function () {
+        var WebService = /** @class */ (function () {
             function WebService() {
                 this.Timeout = 1000 * 30;
             }
@@ -2743,9 +2974,12 @@ var DomBehind;
 //# sourceMappingURL=WebService.js.map
 var DomBehind;
 (function (DomBehind) {
-    var UIElement = (function () {
+    var UIElement = /** @class */ (function () {
         function UIElement() {
         }
+        /**
+         * Gets or sets the val attribute of the element
+         */
         UIElement.ValueProperty = DomBehind.Data.DependencyProperty.RegisterAttached("val", function (x) { return x.val(); }, function (x, y) { return x.val(y); }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
         UIElement.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("enabled", null, function (x, y) {
             var disabled = y === false ? true : false;
@@ -2798,30 +3032,102 @@ var DomBehind;
         me.CurrentElement.attr("type", typeName);
         return me;
     };
+    /**
+     * HTML5
+     */
     var InputType;
     (function (InputType) {
+        /**
+         * hidden
+         */
         InputType[InputType["Hidden"] = 0] = "Hidden";
+        /**
+         * text
+         */
         InputType[InputType["Text"] = 1] = "Text";
+        /**
+         * search
+         */
         InputType[InputType["Search"] = 2] = "Search";
+        /**
+         * tel
+         */
         InputType[InputType["Tel"] = 3] = "Tel";
+        /**
+         * url
+         */
         InputType[InputType["Url"] = 4] = "Url";
+        /**
+         * email
+         */
         InputType[InputType["Email"] = 5] = "Email";
+        /**
+         * password
+         */
         InputType[InputType["Password"] = 6] = "Password";
+        /**
+         * datetime
+         */
         InputType[InputType["DateTime"] = 7] = "DateTime";
+        /**
+         * date
+         */
         InputType[InputType["Date"] = 8] = "Date";
+        /**
+         * month
+         */
         InputType[InputType["Month"] = 9] = "Month";
+        /**
+         * week
+         */
         InputType[InputType["Week"] = 10] = "Week";
+        /**
+         * time
+         */
         InputType[InputType["Time"] = 11] = "Time";
+        /**
+         * datetime-local
+         */
         InputType[InputType["DateTimeLocal"] = 12] = "DateTimeLocal";
+        /**
+         * number
+         */
         InputType[InputType["Number"] = 13] = "Number";
+        /**
+         * range
+         */
         InputType[InputType["Range"] = 14] = "Range";
+        /**
+         * color
+         */
         InputType[InputType["Color"] = 15] = "Color";
+        /**
+         * checkbox
+         */
         InputType[InputType["Checkbox"] = 16] = "Checkbox";
+        /**
+         * radio
+         */
         InputType[InputType["Radio"] = 17] = "Radio";
+        /**
+         * file
+         */
         InputType[InputType["File"] = 18] = "File";
+        /**
+         * submit
+         */
         InputType[InputType["Submit"] = 19] = "Submit";
+        /**
+         * image
+         */
         InputType[InputType["Image"] = 20] = "Image";
+        /**
+         * reset
+         */
         InputType[InputType["Reset"] = 21] = "Reset";
+        /**
+         * button
+         */
         InputType[InputType["Button"] = 22] = "Button";
     })(InputType = DomBehind.InputType || (DomBehind.InputType = {}));
 })(DomBehind || (DomBehind = {}));
@@ -2865,7 +3171,7 @@ var DomBehind;
 (function (DomBehind) {
     var Controls;
     (function (Controls) {
-        var Selector = (function () {
+        var Selector = /** @class */ (function () {
             function Selector(Behavior) {
                 var _this = this;
                 this.Behavior = Behavior;
@@ -2961,6 +3267,7 @@ var DomBehind;
                         _this.RenderOption(_this.Behavior.Element, source, value);
                     });
                 }
+                // this.Behavior.Element.selectpicker('refresh');
                 this.Select(source);
             };
             Object.defineProperty(Selector.prototype, "Multiple", {
@@ -2978,6 +3285,7 @@ var DomBehind;
                     value = $.extend(value, ExtendIIdentity());
                 if (!value.DisplayMemberPath)
                     value = $.extend(value, this.EnsureDisplayMemberPath(source.DisplayMemberPath));
+                // HACK bootstrap-select.js val method
                 var option = $("<option uuid=\"" + value.__uuid + "\">" + Selector.GetDisplayValue(value, source.DisplayMemberPath) + "</option>");
                 option.appendTo(element);
                 value = $.extend(value, this.EnsureElement(option));
@@ -3120,7 +3428,7 @@ var DomBehind;
 (function (DomBehind) {
     var Controls;
     (function (Controls) {
-        var Tab = (function (_super) {
+        var Tab = /** @class */ (function (_super) {
             __extends(Tab, _super);
             function Tab() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -3181,7 +3489,7 @@ var DomBehind;
         }(Controls.Selector));
         Controls.Tab = Tab;
         (function (Tab) {
-            var BindingOption = (function () {
+            var BindingOption = /** @class */ (function () {
                 function BindingOption(Parent) {
                     this.Parent = Parent;
                 }
@@ -3208,6 +3516,7 @@ var DomBehind;
                     var titleCss = this.IsActive ? 'active' : '';
                     this.Header = $("<li class=\"" + titleCss + "\" uuid=\"" + this.Option.__uuid + "\">").appendTo(this.HeaderContainer);
                     this.Option.__header = this.Header;
+                    // content
                     var contentCss = this.IsActive ? 'tab-pane fade in active' : 'tab-pane fade';
                     this.Content = $("<div class=\"" + contentCss + "\" id=\"" + this.Option.__uuid + "\">").appendTo(this.ContentContainer);
                     this.Option.__content = this.Content;
@@ -3223,6 +3532,7 @@ var DomBehind;
                         _this.PropertyChangedSafeHandle = function (sender, e) { return _this.OnRecievePropertyChanged(e); };
                         behavior.ViewModel.PropertyChanged.AddHandler(_this.PropertyChangedSafeHandle);
                     });
+                    // 
                     var uriOption = this.Option;
                     if (uriOption.Uri) {
                         this.Content.load(uriOption.Uri);
@@ -3256,7 +3566,7 @@ var DomBehind;
         MessageStatus[MessageStatus["Warning"] = 1] = "Warning";
         MessageStatus[MessageStatus["Error"] = 2] = "Error";
     })(MessageStatus = DomBehind.MessageStatus || (DomBehind.MessageStatus = {}));
-    var MessaageBox = (function () {
+    var MessaageBox = /** @class */ (function () {
         function MessaageBox() {
         }
         MessaageBox.ShowInfomation = function (message, title) {
@@ -3299,14 +3609,18 @@ var DomBehind;
         return MessaageBox;
     }());
     DomBehind.MessaageBox = MessaageBox;
+    // デフォルトのビルトイン
     MessaageBox.BuiltIn(function () { return DefaultMessageContainer; });
-    var DefaultMessageContainer = (function () {
+    var DefaultMessageContainer = /** @class */ (function () {
         function DefaultMessageContainer() {
         }
         DefaultMessageContainer.prototype.ShowMessage = function (message, title, status) {
+            // デフォルトのアラートメッセージ
             window.alert(message);
         };
         DefaultMessageContainer.prototype.ShowYesNo = function (message, title, option) {
+            // window.confirm はjavascriptを止めるタイプのメッセージボックスなので、このほうが嬉しいシチュエーションの方がエンタープライズだと多いと思われる
+            // 通常、JSやCSS系のFWだとjavascriptを止めないで、callbackでOK、Cancelなどを実行するが、それでも良いなら割とデザインに幅が広がる
             if (window.confirm(message)) {
                 if (option && option.yesCallback) {
                     option.yesCallback();
@@ -3319,6 +3633,8 @@ var DomBehind;
             }
         };
         DefaultMessageContainer.prototype.ShowOkCancel = function (message, title, option) {
+            // window.confirm はjavascriptを止めるタイプのメッセージボックスなので、このほうが嬉しいシチュエーションの方がエンタープライズだと多いと思われる
+            // 通常、JSやCSS系のFWだとjavascriptを止めないで、callbackでOK、Cancelなどを実行するが、それでも良いなら割とデザインに幅が広がる
             if (window.confirm(message)) {
                 if (option && option.okCallback) {
                     option.okCallback();
@@ -3348,19 +3664,30 @@ var DomBehind;
 (function (DomBehind) {
     var W2ToolbarItemType;
     (function (W2ToolbarItemType) {
+        // button
         W2ToolbarItemType[W2ToolbarItemType["Default"] = 0] = "Default";
+        // button
         W2ToolbarItemType[W2ToolbarItemType["Button"] = 1] = "Button";
+        // radio
         W2ToolbarItemType[W2ToolbarItemType["RadioButton"] = 2] = "RadioButton";
+        // check
         W2ToolbarItemType[W2ToolbarItemType["Checkbox"] = 3] = "Checkbox";
+        // break
         W2ToolbarItemType[W2ToolbarItemType["Separator"] = 4] = "Separator";
+        // spacer
         W2ToolbarItemType[W2ToolbarItemType["Space"] = 5] = "Space";
+        // menu
         W2ToolbarItemType[W2ToolbarItemType["Menu"] = 6] = "Menu";
+        // menu-check
         W2ToolbarItemType[W2ToolbarItemType["CheckMenu"] = 7] = "CheckMenu";
+        // menu-radio
         W2ToolbarItemType[W2ToolbarItemType["RadioMenu"] = 8] = "RadioMenu";
+        // drop
         W2ToolbarItemType[W2ToolbarItemType["DropHtml"] = 9] = "DropHtml";
+        // html
         W2ToolbarItemType[W2ToolbarItemType["Html"] = 10] = "Html";
     })(W2ToolbarItemType = DomBehind.W2ToolbarItemType || (DomBehind.W2ToolbarItemType = {}));
-    var W2ToolBarBindingBehavior = (function (_super) {
+    var W2ToolBarBindingBehavior = /** @class */ (function (_super) {
         __extends(W2ToolBarBindingBehavior, _super);
         function W2ToolBarBindingBehavior() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -3378,7 +3705,7 @@ var DomBehind;
         return W2ToolBarBindingBehavior;
     }(DomBehind.Data.ActionBindingBehavior));
     DomBehind.W2ToolBarBindingBehavior = W2ToolBarBindingBehavior;
-    var W2ToolBarBindingBehaviorBuilder = (function (_super) {
+    var W2ToolBarBindingBehaviorBuilder = /** @class */ (function (_super) {
         __extends(W2ToolBarBindingBehaviorBuilder, _super);
         function W2ToolBarBindingBehaviorBuilder(owner) {
             return _super.call(this, owner) || this;
@@ -3415,10 +3742,14 @@ var DomBehind;
             var w2Behavior = this.CurrentBehavior;
             var itemIdentity = NewUid();
             var menuItem = {
+                /* メニューを識別するアイデンティティ */
                 id: itemIdentity,
+                /* 文字固定 */
                 text: title,
+                /* メニューのタイプ */
                 type: this.TypeToString(type),
             };
+            // 活性制御をバインド指定している場合
             if (option && option.EnabledBinding) {
                 var enabledP = DomBehind.Data.DependencyProperty.RegisterAttached(itemIdentity, function (el) {
                     var td = $("#tb_" + w2Behavior.Name + "_item_" + itemIdentity);
@@ -3435,6 +3766,7 @@ var DomBehind;
                 enabledBindingBehavior.Property = enabledP;
                 enabledBindingBehavior.PInfo = new DomBehind.LamdaExpression(this.Owner.DataContext, option.EnabledBinding);
             }
+            // 個別メニュークリックをバインド指定している場合
             if (option && option.ClickAction) {
                 var clickEvent_1 = new DomBehind.TypedEvent();
                 clickEvent_1.EventName = itemIdentity;
@@ -3447,6 +3779,7 @@ var DomBehind;
                     clickEvent_1.Raise(_this, e);
                 };
             }
+            // font-awesome
             if (option && option.Icon) {
                 menuItem.icon = option.Icon;
             }
@@ -3472,6 +3805,7 @@ var DomBehind;
                         w2uiToolbar.refresh();
                     }
                 });
+                // データバインドする
                 var dataBindingBehavior = this.Add(new DomBehind.Data.DataBindingBehavior());
                 dataBindingBehavior.Property = newP;
                 dataBindingBehavior.PInfo = new DomBehind.LamdaExpression(this.Owner.DataContext, option.IsChecked);
@@ -3509,14 +3843,17 @@ var DomBehind;
                 itemsBindingBehavior.PInfo = new DomBehind.LamdaExpression(this.Owner.DataContext, option.ItemsBinding);
             }
             w2Behavior.MenuList.add(menuItem);
+            // 最後にカレントを元に戻す
             this.CurrentBehavior = w2Behavior;
             return menuItem;
         };
         W2ToolBarBindingBehaviorBuilder.prototype.AddMenuBinding = function (bindingTitle, type, option) {
             var w2Behavior = this.CurrentBehavior;
             var itemIdentity = NewUid();
+            // タイトルのデフォルト値を設定して、追加処理へ
             var defaultTitle = DomBehind.LamdaExpression.GetValueCore(this.Owner.DataContext, bindingTitle);
             var menuItem = this.AddMenu(defaultTitle, type, option);
+            // 新しいDependencyPropertyを生成し、メニューを識別するIdentityを生やす
             var newP = DomBehind.Data.DependencyProperty.RegisterAttached("title-" + itemIdentity, function (el) {
                 var cell = $("#tb_" + w2Behavior.Name + "_item_" + itemIdentity + " .w2ui-tb-caption");
                 return cell.text();
@@ -3524,6 +3861,7 @@ var DomBehind;
                 var cell = $("#tb_" + w2Behavior.Name + "_item_" + itemIdentity + " .w2ui-tb-caption");
                 cell.text(newValue);
             });
+            // Captionをデータバインドする
             var dataBindingBehavior = this.Add(new DomBehind.Data.DataBindingBehavior());
             dataBindingBehavior.Property = newP;
             dataBindingBehavior.PInfo = new DomBehind.LamdaExpression(this.Owner.DataContext, bindingTitle);
@@ -3584,14 +3922,20 @@ var DomBehind;
 (function (DomBehind) {
     var W2LayoutType;
     (function (W2LayoutType) {
+        /* top */
         W2LayoutType[W2LayoutType["Top"] = 0] = "Top";
+        /* left */
         W2LayoutType[W2LayoutType["Left"] = 1] = "Left";
+        /* right */
         W2LayoutType[W2LayoutType["Right"] = 2] = "Right";
+        /* main */
         W2LayoutType[W2LayoutType["Main"] = 3] = "Main";
+        /* preview */
         W2LayoutType[W2LayoutType["Preview"] = 4] = "Preview";
+        /* bottom */
         W2LayoutType[W2LayoutType["Bottom"] = 5] = "Bottom";
     })(W2LayoutType = DomBehind.W2LayoutType || (DomBehind.W2LayoutType = {}));
-    var W2LayoutBindingBehavior = (function (_super) {
+    var W2LayoutBindingBehavior = /** @class */ (function (_super) {
         __extends(W2LayoutBindingBehavior, _super);
         function W2LayoutBindingBehavior() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -3668,14 +4012,18 @@ var DomBehind;
                 }
                 option.content = each.Container;
                 options.push(option);
+                // w2layout-type
                 option.content.attr("w2layout-type", typeString);
+                // 表示・非表示オプション
                 if (each.Visibility) {
                     var dataBehavior = _this.NewAdd(new DomBehind.Data.DataBindingBehavior());
                     dataBehavior.Property = W2LayoutBindingBehavior.IsVisibleProperty;
                     dataBehavior.PInfo = new DomBehind.LamdaExpression(_this.DataContext, each.Visibility);
                     dataBehavior.Element = option.content;
                 }
+                // uri 
                 if (typeof each.Uri === "string") {
+                    // 非同期
                     var ajax = $.ajax({
                         url: each.Uri,
                         async: true,
@@ -3685,7 +4033,9 @@ var DomBehind;
                     ajax.done(function (html) {
                         var body = $(html).filter(".body-content");
                         option.content.append(body);
+                        //$.PopAnnotation();
                     }).fail(function (ex) {
+                        //  Todo load失敗時
                     });
                 }
                 else {
@@ -3735,6 +4085,8 @@ var DomBehind;
             div.show();
             var loaded = div.attr("loaded");
             if (!loaded) {
+                // Todo 常にサーバーにデータ取得するのではなく、DOMキャッシュの戦略を立てる
+                // 非同期
                 var ajax = $.ajax({
                     url: newValue,
                     async: true,
@@ -3746,6 +4098,7 @@ var DomBehind;
                     div.empty();
                     div.append(body);
                 }).fail(function (ex) {
+                    //  Todo load失敗時
                 });
             }
             div.attr("loaded", "true");
@@ -3753,7 +4106,7 @@ var DomBehind;
         return W2LayoutBindingBehavior;
     }(DomBehind.Data.BindingBehavior));
     DomBehind.W2LayoutBindingBehavior = W2LayoutBindingBehavior;
-    var W2LayoutBindingBehaviorBuilder = (function (_super) {
+    var W2LayoutBindingBehaviorBuilder = /** @class */ (function (_super) {
         __extends(W2LayoutBindingBehaviorBuilder, _super);
         function W2LayoutBindingBehaviorBuilder(owner) {
             return _super.call(this, owner) || this;
@@ -3784,8 +4137,10 @@ var DomBehind;
             if (!parentId) {
                 parentId = NewUid().Replace("-", "");
             }
+            // div確保
             var identity = "panel-" + NewUid().Replace("-", "");
             var div = $("<div id=\"" + identity + "\" parent-id=\"" + parentId + "\" class=\"parent-size\"></div>");
+            //div.css("z-index", $.GenerateZIndex());
             w2Behavior.Types[type] = { Uri: uri, Visibility: bindingVisible, Container: div, Option: option };
         };
         return W2LayoutBindingBehaviorBuilder;
@@ -3816,7 +4171,7 @@ var DomBehind;
 (function (DomBehind) {
     var __w2sidebarIdentity = "w2sidebar-id";
     var __w2sidebarDependencyPropertyAtt = "w2sidebar-dp";
-    var W2SidebarBindingBehavior = (function (_super) {
+    var W2SidebarBindingBehavior = /** @class */ (function (_super) {
         __extends(W2SidebarBindingBehavior, _super);
         function W2SidebarBindingBehavior() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -3902,6 +4257,7 @@ var DomBehind;
                 if (viewStatus === DomBehind.Data.ListCollectionView.ViewReflectedStatus.Reflected) {
                     return;
                 }
+                // 反映済みのフラグを立てる
                 newValue.ViewReflected = DomBehind.Data.ListCollectionView.ViewReflectedStatus.Reflected;
                 var option = {
                     name: id,
@@ -3917,6 +4273,7 @@ var DomBehind;
                 if (behavior.AllowMenuExpand) {
                     option.flatButton = true;
                     option.onFlat = function (e) {
+                        // サイドメニュー最小化
                         behavior.Element.css('width', (e.goFlat ? '35px' : '200px'));
                     };
                 }
@@ -3926,6 +4283,7 @@ var DomBehind;
                     w2uiSb.select(current.Id);
                     behavior.ClickEvent.Raise(behavior, current);
                 }
+                // ListCollectionViewの変更通知を実装する
                 newValue.PropertyChanged.AddHandler(function (sender, e) {
                     if (String.IsNullOrWhiteSpace(e.Name)) {
                         var obj = w2ui[id];
@@ -3944,7 +4302,7 @@ var DomBehind;
         return W2SidebarBindingBehavior;
     }(DomBehind.Data.BindingBehavior));
     DomBehind.W2SidebarBindingBehavior = W2SidebarBindingBehavior;
-    var W2SidebarBindingBehaviorBuilder = (function (_super) {
+    var W2SidebarBindingBehaviorBuilder = /** @class */ (function (_super) {
         __extends(W2SidebarBindingBehaviorBuilder, _super);
         function W2SidebarBindingBehaviorBuilder(owner) {
             return _super.call(this, owner) || this;
@@ -3955,20 +4313,24 @@ var DomBehind;
     DomBehind.BindingBehaviorBuilder.prototype.BuildSidebar = function (bindingNodes, selectedAction, useCloseMenu) {
         var me = this;
         var behavior = me.Add(new W2SidebarBindingBehavior());
+        // クリックイベント、ユニークキーの割り当て
         behavior.ClickEvent = new DomBehind.TypedEvent();
         behavior.ClickEvent.EventName = "NodeClick";
         behavior.Identity = NewUid();
         behavior.AllowMenuExpand = useCloseMenu;
         me.CurrentElement.attr(__w2sidebarIdentity, behavior.Identity);
         $.SetWindowDynamic(behavior.Identity, behavior);
+        // nodeのリストをバインド
         var nodeBindingBehavior = me.Add(new DomBehind.Data.DataBindingBehavior());
         nodeBindingBehavior.Property = W2SidebarBindingBehavior.ItemsSource;
         nodeBindingBehavior.PInfo = new DomBehind.LamdaExpression(me.Owner.DataContext, bindingNodes);
+        // nodeのクリックイベントをバインド
         var actionBindingBehavior = this.Add(new DomBehind.Data.ActionBindingBehavior());
         actionBindingBehavior.Event = behavior.ClickEvent;
         actionBindingBehavior.Action = selectedAction;
         actionBindingBehavior.ActionParameterCount = selectedAction.length;
         actionBindingBehavior.AllowBubbling = false;
+        // カレントを再設定
         this.CurrentBehavior = behavior;
         var newMe = new W2SidebarBindingBehaviorBuilder(me.Owner);
         newMe.CurrentElement = me.CurrentElement;
@@ -3991,31 +4353,54 @@ var DomBehind;
 (function (DomBehind) {
     var FieldType;
     (function (FieldType) {
+        /* text */
         FieldType[FieldType["Text"] = 1] = "Text";
+        /* int */
         FieldType[FieldType["Int"] = 2] = "Int";
+        /* float */
         FieldType[FieldType["Double"] = 3] = "Double";
+        /* date */
         FieldType[FieldType["Date"] = 4] = "Date";
+        /* hex */
         FieldType[FieldType["Hex"] = 5] = "Hex";
+        /* money */
         FieldType[FieldType["Money"] = 6] = "Money";
+        /* currency */
         FieldType[FieldType["Currency"] = 7] = "Currency";
+        /* percent */
         FieldType[FieldType["Percent"] = 8] = "Percent";
+        /* alphanumeric */
         FieldType[FieldType["Alphanumeric"] = 9] = "Alphanumeric";
+        /* time */
         FieldType[FieldType["Time"] = 10] = "Time";
+        /* color */
         FieldType[FieldType["Color"] = 11] = "Color";
+        /* list */
         FieldType[FieldType["List"] = 12] = "List";
     })(FieldType = DomBehind.FieldType || (DomBehind.FieldType = {}));
+    /**
+     * シンプルなカスタム表示
+     * */
     var RenderType;
     (function (RenderType) {
+        /* 三桁カンマ区切りで表示する数値表現 */
         RenderType[RenderType["Number"] = 1] = "Number";
+        /* 10進表示(decimal) */
         RenderType[RenderType["Currency"] = 2] = "Currency";
+        /* 金額表示 */
         RenderType[RenderType["Money"] = 3] = "Money";
+        /* % 表示 */
         RenderType[RenderType["Percent"] = 4] = "Percent";
+        /* 時間 */
         RenderType[RenderType["Time"] = 5] = "Time";
+        /* 日付 */
         RenderType[RenderType["Date"] = 6] = "Date";
+        /* 年齢 */
         RenderType[RenderType["Age"] = 7] = "Age";
+        /* トグル */
         RenderType[RenderType["Toggle"] = 8] = "Toggle";
     })(RenderType = DomBehind.RenderType || (DomBehind.RenderType = {}));
-    var EditableWrapper = (function () {
+    var EditableWrapper = /** @class */ (function () {
         function EditableWrapper(Owner) {
             this.Owner = Owner;
         }
@@ -4044,7 +4429,7 @@ var DomBehind;
         });
         return EditableWrapper;
     }());
-    var W2GridBindingBehavior = (function (_super) {
+    var W2GridBindingBehavior = /** @class */ (function (_super) {
         __extends(W2GridBindingBehavior, _super);
         function W2GridBindingBehavior() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -4117,18 +4502,22 @@ var DomBehind;
             }
             if (this.GridOption.headerOption) {
                 w2GridOption.show.toolbar = true;
+                // add
                 if (this.GridOption.headerOption.add) {
                     w2GridOption.show.toolbarAdd = true;
                     w2GridOption.onAdd = function (e) { return _this.OnToolbarAdd(_this.DataContext, e); };
                 }
+                // edit
                 if (this.GridOption.headerOption.edit) {
                     w2GridOption.show.toolbarEdit = true;
                     w2GridOption.onEdit = function (e) { return _this.OnToolbarEdit(_this.DataContext, e); };
                 }
+                // save
                 if (this.GridOption.headerOption.save) {
                     w2GridOption.show.toolbarSave = true;
                     w2GridOption.onSave = function (e) { return _this.OnToolbarSave(_this.DataContext, e); };
                 }
+                // delete
                 if (this.GridOption.headerOption.delete) {
                     w2GridOption.show.toolbarDelete = true;
                     w2GridOption.onDelete = function (e) { return _this.OnToolbarDelete(_this.DataContext, e); };
@@ -4151,6 +4540,7 @@ var DomBehind;
                     };
                 });
             }
+            // hack
             this.Grid = this.Element.w2grid(w2GridOption);
             var dp = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", function (el) {
             }, function (el, newValue) {
@@ -4163,7 +4553,65 @@ var DomBehind;
                         if (grid.records === rows)
                             return;
                         $.each(rows, function (i, value) {
+                            // row injection(build bind)
                             _this.RowInjection(value);
+                            //// selectableなために必要なw2ui管理列
+                            //value.recid = this.GenerateRecId();
+                            //// 拡張機能用のインスタンスがない場合は確保
+                            //if (!value.w2ui) {
+                            //    value.w2ui = {};
+                            //}
+                            //// 行styleバインド
+                            //if (this.RowStyleBinding) {
+                            //    // デフォルトスタイルが指定している場合は、適用する
+                            //    let defaultValue = this.RowStyleBinding(value);
+                            //    if (!String.IsNullOrWhiteSpace(defaultValue)) {
+                            //        value.w2ui.style = defaultValue;
+                            //    }
+                            //    // バインドする                                    
+                            //    let observable = Observable.Register(value, LamdaExpression.Path(this.RowStyleBinding));
+                            //    observable.PropertyChanged.Clear();
+                            //    observable.PropertyChanged.AddHandler((ss, ee) => {
+                            //        let id = ss.recid;
+                            //        let style = this.RowStyleBinding(ss);
+                            //        value.w2ui.style = style;
+                            //        this.Grid.refreshRow(id);
+                            //    });
+                            //}
+                            //// cellスタイルバインド
+                            //if (this.CellStyleBinding) {
+                            //    // デフォルトスタイルが指定している場合は、適用する
+                            //    let defaultValue = this.CellStyleBinding(value);
+                            //    if (!String.IsNullOrWhiteSpace(defaultValue)) {
+                            //        value.w2ui.style = this.ParseCellStyles(defaultValue);
+                            //    }
+                            //    // バインドする                                    
+                            //    let observable = Observable.Register(value, LamdaExpression.Path(this.CellStyleBinding));
+                            //    observable.PropertyChanged.Clear();
+                            //    observable.PropertyChanged.AddHandler((ss, ee) => {
+                            //        let id = ss.recid;
+                            //        let style = this.CellStyleBinding(ss);
+                            //        value.w2ui.style = this.ParseCellStyles(style);
+                            //        this.Grid.refreshRow(id);
+                            //    });
+                            //}
+                            //// 行単位で css をバインド
+                            //if (this.RowClassBinding) {
+                            //    // デフォルトスタイルが指定している場合は、適用する
+                            //    let defaultValue = this.RowClassBinding(value);
+                            //    if (!String.IsNullOrWhiteSpace(defaultValue)) {
+                            //        value.w2ui.class = defaultValue;
+                            //    }
+                            //    // バインドする                                    
+                            //    let observable = Observable.Register(value, LamdaExpression.Path(this.RowClassBinding));
+                            //    observable.PropertyChanged.Clear();
+                            //    observable.PropertyChanged.AddHandler((ss, ee) => {
+                            //        let id = ss.recid;
+                            //        let style = this.RowClassBinding(ss);
+                            //        value.w2ui.class = style;
+                            //        this.Grid.refreshRow(id);
+                            //    });
+                            //}
                         });
                         grid.clear(true);
                         grid.records = rows;
@@ -4171,6 +4619,7 @@ var DomBehind;
                         grid.refresh();
                         grid.onClick = function (ee) {
                             _this.OnSelect(_this.DataContext, ee);
+                            // フォーカス用オブジェに合わせる
                             var gridFocus = $("#grid_" + id_1 + "_focus");
                             gridFocus.focus();
                         };
@@ -4185,6 +4634,7 @@ var DomBehind;
             itemSource.Element = this.Element;
         };
         W2GridBindingBehavior.prototype.SuppressListCollectionViewAction = function (action) {
+            // 通知イベントを落とした状態で、モデルのカレントレコードを設定する
             this.ListCollectionView.Begin();
             action(this.ListCollectionView);
             this.ListCollectionView.ViewReflected = DomBehind.Data.ListCollectionView.ViewReflectedStatus.Reflected;
@@ -4249,6 +4699,7 @@ var DomBehind;
             if (this.GridOption &&
                 this.GridOption.headerOption &&
                 this.GridOption.headerOption.delete) {
+                // 消す直前に来る処理でバックアップを取得する
                 if (!e.force) {
                     this._deleteTargets = this.SelectedObject;
                 }
@@ -4260,12 +4711,14 @@ var DomBehind;
             }
         };
         W2GridBindingBehavior.prototype.OnCurrentChanged = function (sender, e) {
+            // プロパティ未指定の場合は、リフレッシュする
             if (String.IsNullOrWhiteSpace(e.Name)) {
                 if (this.Grid) {
                     this.Grid.refresh();
                 }
             }
             else if (e.Name === "Current") {
+                // カレント行が変更されたので、選択状態とする
             }
         };
         W2GridBindingBehavior.FieldTypeToString = function (type) {
@@ -4346,6 +4799,7 @@ var DomBehind;
             for (var each in json) {
                 for (var i = 0; i < this.Column.length; i++) {
                     var c = this.Column[i];
+                    // フィールド名が一致
                     if (c.field === each) {
                         styleArray[i] = json[each];
                         break;
@@ -4362,11 +4816,14 @@ var DomBehind;
                 value.w2ui = {};
             }
             value.recid = this.GenerateRecId();
+            // Row Style Binding
             if (this.RowStyleBinding) {
+                // defaultStyle
                 var defaultValue = this.RowStyleBinding(value);
                 if (!String.IsNullOrWhiteSpace(defaultValue)) {
                     value.w2ui.style = defaultValue;
                 }
+                // build bind
                 if (!value.__rowStyleObserver) {
                     var observable = DomBehind.Observable.Register(value, DomBehind.LamdaExpression.Path(this.RowStyleBinding));
                     observable.PropertyChanged.Clear();
@@ -4379,11 +4836,14 @@ var DomBehind;
                     value.__rowStyleObserver = observable;
                 }
             }
+            // Cell Style Binding
             if (this.CellStyleBinding) {
+                // defaultStyle
                 var defaultValue = this.CellStyleBinding(value);
                 if (!String.IsNullOrWhiteSpace(defaultValue)) {
                     value.w2ui.style = this.ParseCellStyles(defaultValue);
                 }
+                // build bind
                 var observable = DomBehind.Observable.Register(value, DomBehind.LamdaExpression.Path(this.CellStyleBinding));
                 observable.PropertyChanged.Clear();
                 observable.PropertyChanged.AddHandler(function (ss, ee) {
@@ -4393,11 +4853,14 @@ var DomBehind;
                     _this.Grid.refreshRow(id);
                 });
             }
+            // css of record binding
             if (this.RowClassBinding) {
+                // default style
                 var defaultValue = this.RowClassBinding(value);
                 if (!String.IsNullOrWhiteSpace(defaultValue)) {
                     value.w2ui.class = defaultValue;
                 }
+                // build bind
                 var observable = DomBehind.Observable.Register(value, DomBehind.LamdaExpression.Path(this.RowClassBinding));
                 observable.PropertyChanged.Clear();
                 observable.PropertyChanged.AddHandler(function (ss, ee) {
@@ -4434,7 +4897,7 @@ var DomBehind;
         return W2GridBindingBehavior;
     }(DomBehind.Data.BindingBehavior));
     DomBehind.W2GridBindingBehavior = W2GridBindingBehavior;
-    var W2GridBindingBehaviorBuilder = (function (_super) {
+    var W2GridBindingBehaviorBuilder = /** @class */ (function (_super) {
         __extends(W2GridBindingBehaviorBuilder, _super);
         function W2GridBindingBehaviorBuilder(owner) {
             return _super.call(this, owner) || this;
@@ -4472,16 +4935,45 @@ var DomBehind;
             gridBehavior.AddColumn(op);
             return this;
         };
+        /**
+         * 行スタイルをバインドします。
+         *
+         * ラムダで指定されたプロパティに格納する例：
+         *  "background-color: #FBFEC0"
+         *
+         *  注意点として、RowStyleBindingとCellStyleBindingはどちらかしか利用できません。
+         *  Rowのスタイル適用　+　Cellに個別スタイルを適用する場合は、CellStyleBinding + RowCssBinding を利用してください。
+         *
+         * @param styleBinding　style属性値の文字列を示すプロパティ先をラムダで指定します。
+         *
+         */
         W2GridBindingBehaviorBuilder.prototype.RowStyleBinding = function (styleBinding) {
             var gridBehavior = this.CurrentBehavior;
             gridBehavior.RowStyleBinding = styleBinding;
             return this;
         };
+        /**
+         * 任意のclass属性を行にバインドします
+         *
+         * @param classBinding css名の文字列を示すプロパティ先をラムダで指定します
+         *
+         */
         W2GridBindingBehaviorBuilder.prototype.RowCssBinding = function (classBinding) {
             var gridBehavior = this.CurrentBehavior;
             gridBehavior.RowClassBinding = classBinding;
             return this;
         };
+        /**
+         * セルスタイルをバインドします。
+         *
+         * ラムダで指定されたプロパティに格納する例（SampleIDフィールド、SampleNameフィールドがあるとして）：
+         *  '{ "SampleID": "background-color: #FBFEC0; color: red", "SampleName": "background-color: #FBFEC0" }'
+         *
+         *  注意点として、RowStyleBindingとCellStyleBindingはどちらかしか利用できません。
+         *  Rowのスタイル適用　+　Cellに個別スタイルを適用する場合は、CellStyleBinding + RowCssBinding を利用してください。
+         *
+         * @param cellStyleBinding style属性値の文字列を示すプロパティ先をラムダで指定します。ただし、列を示すJSON形式です
+         */
         W2GridBindingBehaviorBuilder.prototype.CellStyleBinding = function (cellStyleBinding) {
             var gridBehavior = this.CurrentBehavior;
             gridBehavior.CellStyleBinding = cellStyleBinding;
@@ -4501,6 +4993,7 @@ var DomBehind;
             b.Property = W2GridBindingBehavior.IsSpinningProperty;
             b.PInfo = new DomBehind.LamdaExpression(me.Owner.DataContext, option.isSpinning);
         }
+        // カレントをDataBindingBehaviorに変える
         me.CurrentBehavior = behavior;
         var newMe = new W2GridBindingBehaviorBuilder(me.Owner);
         newMe.CurrentElement = me.CurrentElement;
@@ -4511,10 +5004,19 @@ var DomBehind;
 //# sourceMappingURL=Grid.js.map
 var DomBehind;
 (function (DomBehind) {
-    var MessageBox = (function () {
+    // デフォルトのメッセージをW2UI+Bootstrapでカスタマイズする
+    // MessaageBox.BuiltIn(() => MessageBox);
+    var MessageBox = /** @class */ (function () {
         function MessageBox() {
         }
         MessageBox.prototype.ShowMessage = function (message, title, status) {
+            //w2popup.message({
+            //    title: title,
+            //    width: 580,
+            //    height: 350,                
+            //    body: `<div class="w2ui-centered">${message}</div>`,
+            //    buttons: '<button class="w2ui-btn">Ok</button>'
+            //});
             w2popup.open({
                 width: 580,
                 height: 350,
@@ -4538,7 +5040,7 @@ var DomBehind;
 (function (DomBehind) {
     var Controls;
     (function (Controls) {
-        var Dropdown = (function () {
+        var Dropdown = /** @class */ (function () {
             function Dropdown() {
                 this._engaged = false;
             }
@@ -4581,13 +5083,16 @@ var DomBehind;
             Dropdown.prototype.OnCurrentChanged = function (sender, e) {
                 if (this._engaged)
                     return;
+                // プログラム上(ViewModel)からの反映を、Viewへ適用する
                 var dd = sender.__element;
                 var el = dd.Element;
+                // プロパティ未指定の場合は、リフレッシュする
                 if (String.IsNullOrWhiteSpace(e.Name)) {
                     Dropdown.Rebuild(el, sender);
                     el.data('w2field').refresh();
                 }
                 else if (e.Name === "Current") {
+                    // カレント行が変更されたので、選択状態とする
                     var list = el.data('w2field');
                     var id_2 = sender.Current.recid;
                     var items = list.options.items;
@@ -4599,10 +5104,14 @@ var DomBehind;
                 }
             };
             Dropdown.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", function (el) {
+                // UpdateSource
+                // oneway なので、未実装で良い
             }, function (el, newValue) {
+                // UpdaateTarget
                 if (newValue instanceof DomBehind.Data.ListCollectionView) {
                     if (!Dropdown.Rebuild(el, newValue))
                         return;
+                    // 
                     var dd_1 = newValue.__element;
                     if (!dd_1) {
                         dd_1 = newValue.__element = new Dropdown();
@@ -4612,13 +5121,16 @@ var DomBehind;
                     var list = el.data('w2field');
                     list.refresh();
                     list.__Dropdown = dd_1;
+                    // UI上からの変更をデータソースへ反映する
                     el.off('change');
                     el.on('change', function (e) {
                         var selectedId = el.data("selected").id;
                         dd_1._engaged = true;
                         try {
+                            // dd.Items.Begin();
                             var current = newValue.ToArray().FirstOrDefault(function (x) { return x.recid == selectedId; });
                             dd_1.Items.Select(current);
+                            // dd.Items.End();
                         }
                         finally {
                             dd_1._engaged = false;
@@ -4638,7 +5150,7 @@ var DomBehind;
 //# sourceMappingURL=Dropdown.js.map
 var DomBehind;
 (function (DomBehind) {
-    var Application = (function () {
+    var Application = /** @class */ (function () {
         function Application() {
             this._navigator = new DomBehind.Navigation.DefaultNavigator();
         }
@@ -4664,6 +5176,7 @@ var DomBehind;
                 };
             });
         };
+        //Back Button in Browser using jquery?
         Application.prototype.OnBrowserBack = function () { };
         Object.defineProperty(Application.prototype, "DefaultActionPolicy", {
             get: function () {
@@ -4686,9 +5199,15 @@ var DomBehind;
 //# sourceMappingURL=Application.js.map
 var DomBehind;
 (function (DomBehind) {
-    var BizView = (function () {
+    /**
+     * It is the code behind the view
+     * to promotes component-oriented developers
+     */
+    var BizView = /** @class */ (function () {
         function BizView() {
+            // #region Container is HTML(JQuery)
             this._disposed = false;
+            // #endregion
         }
         Object.defineProperty(BizView.prototype, "Container", {
             get: function () {
@@ -4707,6 +5226,8 @@ var DomBehind;
             configurable: true
         });
         Object.defineProperty(BizView.prototype, "DataContext", {
+            // #endregion
+            // #region DataContext is ViewModel
             get: function () {
                 return this._dataContext;
             },
@@ -4718,10 +5239,14 @@ var DomBehind;
             enumerable: true,
             configurable: true
         });
+        // #endregion
+        // #region may be inherited
         BizView.prototype.OnDataContextPropertyChanged = function (sender, e) {
             this.UpdateTarget(e.Name);
         };
         BizView.prototype.ViewLoaded = function (responseText, textStatus, XMLHttpRequest) { };
+        // #endregion
+        // #region Ensure
         BizView.prototype.Ensure = function () {
             if (!this.DataContext)
                 return;
@@ -4735,6 +5260,7 @@ var DomBehind;
             this.BuildBinding();
             this.Subscribe();
             this.BindingBehaviors.Ensure();
+            // 利用ライブラリ固有のヴァリデーション方言を吸収する
             if (this.DependencyValidateSetup) {
                 this.DependencyValidateSetup();
             }
@@ -4745,24 +5271,40 @@ var DomBehind;
             this.UpdateTarget();
             this.Container.Raise(DomBehind.UIElement.ViewLoaded);
         };
+        // #endregion
+        // #region Event subscribe
         BizView.prototype.UnSubscribe = function () {
         };
         BizView.prototype.Subscribe = function () {
         };
+        //#endregion
+        /**
+         * start the build of the binding
+         */
         BizView.prototype.CreateBindingBuilder = function () {
             var builder = new DomBehind.BindingBehaviorBuilder(this);
             builder.Element(this.Container).BindingAction(DomBehind.UIElement.Initialize, function (vm) { return vm.Initialize(); });
             builder.Element(this.Container).BindingAction(DomBehind.UIElement.ViewLoaded, function (vm) { return vm.ViewLoaded(); });
             return builder;
         };
+        /**
+         * Forces a data transfer from the binding source property to the binding target property.
+         * @param mark
+         */
         BizView.prototype.UpdateTarget = function (mark) {
             if (this.BindingBehaviors)
                 this.BindingBehaviors.UpdateTarget(mark);
         };
+        /**
+         * Sends the current binding target value to the binding source property
+         * @param mark
+         */
         BizView.prototype.UpdateSource = function (mark) {
             if (this.BindingBehaviors)
                 this.BindingBehaviors.UpdateSource(mark);
         };
+        // #endregion
+        // #region Validate
         BizView.prototype.Validate = function (mark) {
             var result = true;
             if (this.BindingBehaviors) {
@@ -4776,6 +5318,7 @@ var DomBehind;
                     this.ClearValidator(mark);
                 }
             }
+            // サードパーティやNugetライブラリ拡張用
             if (this.DependencyValidate) {
                 this.DependencyValidate(mark);
             }
@@ -4786,10 +5329,13 @@ var DomBehind;
                 value.BindingPolicy.Validators.ClearValidator();
             });
             this.Container.ClearCustomError();
+            // サードパーティやNugetライブラリ拡張用
             if (this.DependencyValidateClear) {
                 this.DependencyValidateClear(mark);
             }
         };
+        // #endregion
+        // #region Dispose
         BizView.prototype.Dispose = function () {
             if (!this._disposed) {
                 this.UnSubscribe();
@@ -4828,10 +5374,18 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var DomBehind;
 (function (DomBehind) {
-    var BizViewModel = (function (_super) {
+    /**
+     * ViewModel
+     * to promotes component-oriented developers
+     */
+    var BizViewModel = /** @class */ (function (_super) {
         __extends(BizViewModel, _super);
         function BizViewModel() {
             var _this = _super.call(this) || this;
+            // #endregion
+            // #region IsWaiting
+            // #endregion
+            // #region Initialize
             _this.Initialized = false;
             DomBehind.Locator.Push(_this);
             return _this;
@@ -4852,6 +5406,7 @@ var DomBehind;
             configurable: true
         });
         Object.defineProperty(BizViewModel.prototype, "View", {
+            // #region View Property
             get: function () {
                 return this._view;
             },
@@ -4866,17 +5421,32 @@ var DomBehind;
         });
         BizViewModel.prototype.OnViewChanged = function () {
         };
+        /**
+         * inherit if necessary ViewLoaded method.
+         */
         BizViewModel.prototype.ViewLoaded = function () { };
+        // #endregion 
+        // #region Update
+        /**
+         * Forces a data transfer from the binding source property to the binding target property.
+         * @param mark
+         */
         BizViewModel.prototype.UpdateTarget = function (mark) {
             if (this.View) {
                 this.View.UpdateTarget(mark);
             }
         };
+        /**
+         * Sends the current binding target value to the binding source property
+         * @param mark
+         */
         BizViewModel.prototype.UpdateSource = function (mark) {
             if (this.View) {
                 this.View.UpdateSource(mark);
             }
         };
+        // #endregion
+        // #region
         BizViewModel.prototype.Validate = function (mark) {
             var result = false;
             if (this.View) {
@@ -4884,6 +5454,8 @@ var DomBehind;
             }
             return result;
         };
+        // #endregion
+        // #region 
         BizViewModel.prototype.WaitingOverlay = function (func, image) {
             var overlayPolocy = new DomBehind.Data.WindowWaitingOverlayActionPolicy();
             if (image) {
@@ -4904,6 +5476,8 @@ var DomBehind;
             var invoker = behavior.CreateActionInvoker(list);
             invoker.Do(func);
         };
+        // #endregion
+        // IExceptionHandling 実装
         BizViewModel.prototype.Catch = function (ex) {
             if (ex.Data instanceof DomBehind.AjaxException) {
             }
@@ -4916,6 +5490,7 @@ var DomBehind;
             configurable: true
         });
         Object.defineProperty(BizViewModel.prototype, "IsEnabled", {
+            // #region IsEnabled
             get: function () {
                 return this.GetProperty("IsEnabled", true);
             },
@@ -4925,6 +5500,7 @@ var DomBehind;
             enumerable: true,
             configurable: true
         });
+        // #endregion 
         BizViewModel.prototype.ShowInfomation = function (message, title) {
             DomBehind.MessaageBox.ShowMessage(message, title, DomBehind.MessageStatus.Infomation);
         };
@@ -4944,8 +5520,13 @@ var DomBehind;
             DomBehind.MessaageBox.ShowOkCancel(message, title, option);
         };
         BizViewModel.prototype.ShowModal = function (obj, option) {
+            // あまりに重い場合は、個別に画面でオーバレイ出してもらう
             this.Navigator.ShowModal(obj, option);
+            //this.WaitingOverlay(() => {
+            //    this.Navigator.ShowModal(obj, option);
+            //});
         };
+        // #region Dispose
         BizViewModel.prototype.Dispose = function () {
             if (!this._disposed) {
                 _super.prototype.Dispose.call(this);
@@ -4956,7 +5537,7 @@ var DomBehind;
     DomBehind.BizViewModel = BizViewModel;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=BizViewModel.js.map
-var annotationCollection = (function () {
+var annotationCollection = /** @class */ (function () {
     function annotationCollection() {
         this.lazyList = [];
     }
@@ -4994,8 +5575,10 @@ var annotationCollection = (function () {
         var _this = this;
         $.each(this.ToArray(), function (i, each) {
             if (!peek) {
+                // 消す（ポップする）
                 _this.Remove(each.Selector, each.ResolveViewType, each.ResolveViewModelType);
             }
+            // リトライ
             $.BindingAnnotation(each.Selector, each.ResolveViewType, each.ResolveViewModelType);
         });
     };
@@ -5006,8 +5589,10 @@ $.BindingAnnotation = function (selector, resolveViewType, resolveViewModelType)
     var d = $.Deferred();
     var view = $(selector);
     view.ready(function (e) {
+        // other page or lazy loaded
         var ele = $(selector);
         if (ele.length === 0) {
+            // 未登録の場合
             if (!__lazyCollection.Any(selector, resolveViewType, resolveViewModelType)) {
                 __lazyCollection.Add(selector, resolveViewType, resolveViewModelType);
             }
@@ -5029,7 +5614,7 @@ $.BindingAnnotation = function (selector, resolveViewType, resolveViewModelType)
 //# sourceMappingURL=BindingAnnotation.js.map
 var DomBehind;
 (function (DomBehind) {
-    var Locator = (function () {
+    var Locator = /** @class */ (function () {
         function Locator() {
         }
         Locator.Push = function (ins) {
@@ -5088,6 +5673,7 @@ var DomBehind;
     DomBehind.Locator = Locator;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Locator.js.map
+// デフォルトポリシーの上書き
 $.validator.setDefaults({
     ignore: "",
     errorPlacement: function (error, element) {
@@ -5101,16 +5687,35 @@ $.validator.setDefaults({
             if (post.length != 0) {
                 error.insertAfter(post);
             }
+            // 直近のFormからツリー検索
             var form = element.closest("form");
             var closet = form.find("[for=\"" + id + "\"]");
             if (closet.length != 0) {
                 error.insertAfter(closet);
             }
+            // エラー項目が明示的に指定していない場合は、デフォルトのエラー挿入に従う
             if (pre.length === 0 && post.length === 0 && closet.length === 0) {
                 error.insertAfter(element);
             }
         }
     }
+    // 上述の errorPlacement をコメントアウトして、下記を復帰するとポップアップスタイルのValidationが有効化する
+    //,
+    //showErrors: function (errorMap, errorList) {
+    //    $.each(this.successList, function (index, value) {
+    //        $(value).popover('hide');
+    //    });
+    //    $.each(errorList, function (index, value) {
+    //        var _popover = $(value.element).popover({
+    //            trigger: 'manual',
+    //            placement: 'auto right',
+    //            content: value.message,
+    //            template: "<div class='popover popover-validation' role='tooltip'><div class='arrow'></div><h3 class='popover-title'></h3><div class='popover-content'></div></div>"
+    //        });
+    //        _popover.data('bs.popover').options.content = value.message; // popover要素のテキストを更新する
+    //        $(value.element).popover('show');
+    //    });
+    //}
 });
 var DomBehind;
 (function (DomBehind) {
@@ -5128,6 +5733,7 @@ var DomBehind;
         }
         if (container.length == 0)
             return;
+        // name 属性、classに一意なIDを付与する
         $.each(me.BindingBehaviors.ListDataBindingBehavior(), function (i, behavior) {
             $.each(behavior.BindingPolicy.Validators.toArray(), function (k, validator) {
                 var el = behavior.Element;
@@ -5140,11 +5746,15 @@ var DomBehind;
                 if (!el.hasClass(cls)) {
                     el.addClass(cls);
                 }
+                // Jquery validatorの実装上、Name属性がない場合はエラー項目名が一意にならない
                 var name = el.attr("name");
                 if (String.IsNullOrWhiteSpace(name)) {
                     el.attr("name", "name-" + identity);
                 }
                 var funcName = "func-" + identity;
+                // なぜか、jQuery.Validationの 1.11.1 だと ルート指定がcls名じゃないんだけど
+                // js追っていくとそうなっているので暫定。もしかしたら、
+                //let o = JSON.parse(`{ "${cls}": { "${funcName}": true } }`);
                 var o = JSON.parse("{ \"" + funcName + "\": { \"" + funcName + "\": true }  }");
                 $.validator.addClassRules(cls, o);
                 if (validator instanceof DomBehind.Validation.RequiredValidator) {
@@ -5177,6 +5787,7 @@ var DomBehind;
             $.each(behavior.BindingPolicy.Validators.toArray(), function (k, validator) {
                 var el = behavior.Element;
                 if (validator instanceof DomBehind.Validation.RequiredValidator) {
+                    // HTML5 の required バリデーションが上書きするので、JqueryValidation使う場合は削除する
                     if (el.attr(validator.Attribute)) {
                         el.removeAttr(validator.Attribute);
                     }
@@ -5184,6 +5795,9 @@ var DomBehind;
                 el.valid();
             });
         });
+        // デバックしやすいように...
+        // let result = container.valid();
+        // return result;
     };
     DomBehind.BizView.prototype.DependencyValidateClear = function (mark) {
         var me = this;

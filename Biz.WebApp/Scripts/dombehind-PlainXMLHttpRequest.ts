@@ -3,7 +3,7 @@
     if (IsNullOrUndefined(arg)) return;
     if (!arg.Url) return;
 
-    // chorme
+    // chrome
     var callBack: Function = self.postMessage;
     if ((arg.SendType) && (arg.SendType === "GET")) {
         callBack(Get(arg.Url, arg.Request));

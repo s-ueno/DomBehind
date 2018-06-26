@@ -198,7 +198,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AppController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\PortalController.cs" />
+    <Compile Include="Controllers\ThreePaneController.cs" />
     <Compile Include="Controllers\TwoPaneController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -221,7 +221,7 @@
     <Content Include="Content\Home\home.css" />
     <Content Include="Content\Home\home.jpg" />
     <Content Include="Content\images\preloader.gif" />
-    <Content Include="Content\Portal\portal.css" />
+    <Content Include="Content\jquery.ui.layout.css" />
     <Content Include="Content\Shared\layout.css" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\themes\base\accordion.css" />
@@ -265,6 +265,7 @@
     <Content Include="Content\themes\base\tabs.css" />
     <Content Include="Content\themes\base\theme.css" />
     <Content Include="Content\themes\base\tooltip.css" />
+    <Content Include="Content\ThreePane\threepane.css" />
     <Content Include="Content\TwoPane\twopane.css" />
     <Content Include="Content\w2ui-1.4.3.css" />
     <Content Include="Content\w2ui-1.5.rc1.css" />
@@ -331,7 +332,11 @@
     <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
     <Content Include="Scripts\jquery-ui-1.12.1.js" />
     <Content Include="Scripts\jquery-ui-1.12.1.min.js" />
+    <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
+    <Content Include="Scripts\jquery-3.3.1.min.map" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.layout.js" />
+    <Content Include="Scripts\jquery.layout.min.js" />
     <Content Include="Scripts\jquery.validate.japlugin.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
@@ -353,16 +358,12 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Views\Shared\_LayoutDialog.cshtml" />
-    <Content Include="Views\Portal\Index.cshtml" />
-    <Content Include="Views\Portal\TitleBar.cshtml" />
-    <Content Include="Views\Portal\SideMenu.cshtml" />
     <Content Include="Views\TwoPane\Main.cshtml" />
-    <Content Include="Views\TwoPane\Detail.cshtml" />
+    <Content Include="Views\Shared\_LayoutSPA.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Scripts\App\ThreePane\" />
-    <Folder Include="Views\App\" />
+    <Folder Include="Scripts\DomBehind\JQueryUI\" />
     <Folder Include="Views\ThreePane\" />
   </ItemGroup>
   <ItemGroup>
@@ -386,16 +387,16 @@
     <TypeScriptCompile Include="Scripts\App\Home\HomeView.ts" />
     <TypeScriptCompile Include="Scripts\App\Home\HomeViewModel.ts" />
     <TypeScriptCompile Include="Scripts\App\Home\WebServiceProxy.ts" />
-    <TypeScriptCompile Include="Scripts\App\Portal\PortalViewModel.ts" />
-    <TypeScriptCompile Include="Scripts\App\Portal\PortalView.ts" />
-    <TypeScriptCompile Include="Scripts\App\Portal\SideMenuViewModel.ts" />
-    <TypeScriptCompile Include="Scripts\App\Portal\SideMenuView.ts" />
-    <TypeScriptCompile Include="Scripts\App\Portal\TitleBarViewModel.ts" />
-    <TypeScriptCompile Include="Scripts\App\Portal\TitleBarView.ts" />
+    <TypeScriptCompile Include="Scripts\App\Shared\LayoutSPAView.ts" />
+    <TypeScriptCompile Include="Scripts\App\Shared\LayoutSPAViewModel.ts" />
     <TypeScriptCompile Include="Scripts\App\Shared\LayoutView.ts" />
     <TypeScriptCompile Include="Scripts\App\Shared\LayoutViewModel.ts" />
     <TypeScriptCompile Include="Scripts\App\Shared\WebServiceProxy.ts" />
     <TypeScriptCompile Include="Scripts\App\Startup.ts" />
+    <TypeScriptCompile Include="Scripts\App\ThreePane\MainView.ts" />
+    <TypeScriptCompile Include="Scripts\App\ThreePane\MainViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\App\ThreePane\Mediator.ts" />
+    <TypeScriptCompile Include="Scripts\App\ThreePane\WebServiceProxy.ts" />
     <TypeScriptCompile Include="Scripts\App\TwoPane\DetailViewModel.ts" />
     <TypeScriptCompile Include="Scripts\App\TwoPane\DetailView.ts" />
     <TypeScriptCompile Include="Scripts\App\TwoPane\Mediator.ts" />
@@ -480,6 +481,7 @@
     <TypeScriptCompile Include="Scripts\dombehind-PlainXMLHttpRequest.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap\index.d.ts" />
     <None Include="Scripts\typings\dombehind\dombehind.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery.ui.layout\jquery.ui.layout.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />

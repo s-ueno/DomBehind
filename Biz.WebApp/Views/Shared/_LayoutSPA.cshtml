@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+
+    <title>@ViewBag.Title</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    @Styles.Render("~/bundles/nuget-css")
+    @Styles.Render("~/bundles/app-css")
+
+    @Scripts.Render("~/bundles/nuget-js")
+    @Scripts.Render("~/bundles/dombehind-js")
+    @Scripts.Render("~/bundles/app-js")
+</head>
+<body id="_Layout">
+    @* titlebar *@
+    <div class="ui-layout-north">
+        <nav id="SharedNavbar" class="navbar navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" id="AppBrand">
+                        DOM Behind
+                    </a>
+                </div>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a id="ContactButton">CONTACT</a></li>
+                    <li><a id="SignOutButton">SIGN OUT</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    @* side menu *@
+    <div class="ui-layout-west">
+        <div id="SideMenu" style="max-height:90vh">
+            <form class="form-inline">
+                <div>
+                    <label id="LoginUserName">Jane Doe</label>
+                    (
+                    <label id="LoginUserId">EMP-0001</label>
+                    )
+                </div>
+            </form>
+            <div id="SharedSidemenu" class="sidemenu-scrollable"></div>
+        </div>
+    </div>
+
+    @* main content *@
+    <div class="ui-layout-center">
+        @RenderSection("SPAViews", required: false)
+        @RenderBody()
+    </div>
+
+    <div class="ui-layout-east">
+        @RenderSection("SPADetailViews", required: false)
+    </div>
+    <div class="ui-layout-south">
+        @RenderSection("SPAPreviewViews", required: false)
+    </div>
+
+
+    <script>
+        // Assign View-ViewModel to the above <div id = "_Layout" ...
+        // Since lambda description in the script tag is not supported by IE, it is declared with the old description method
+        // $.BindingAnnotation("#_Layout", () => Biz.WebApp.Shared.LayoutSPAView, () => Biz.WebApp.Shared.LayoutSPAViewModel)
+        $.BindingAnnotation("#_Layout", function () { return Biz.WebApp.Shared.LayoutSPAView; }, function () { return Biz.WebApp.Shared.LayoutSPAViewModel; });
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

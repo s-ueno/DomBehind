@@ -7,11 +7,18 @@
         public Move(uri: string, historyBack: boolean);
         public Move(uri: any, historyBack?: any) {
             uri = $.AbsoluteUri(uri);
+
+            if (location.href === uri) return;
+
             if (historyBack) {
                 location.href = uri;
             } else {
                 location.replace(uri);
             }
+        }
+
+        public Reload(forcedReload?: boolean) {
+            location.reload(forcedReload);
         }
 
         protected DefaultSetting: IModalHelperSettings = {

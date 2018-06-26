@@ -32,8 +32,14 @@ namespace Biz.WebApp
         public static readonly string[] Nuget_Css = new string[] {
                 /* bootstrap */
                 "~/Content/bootstrap*",
+
+                /* jquery ui layout */
+                "~/Content/jquery.ui.layout.css",
+
                 /* jquery ui */
-                "~/Content/themes/base/all.css",            
+                "~/Content/themes/base/all.css",
+
+
                 /* animate css */
                 "~/Content/animate.css",
 
@@ -51,10 +57,10 @@ namespace Biz.WebApp
                 "~/Content/Shared/layout.css",
                 /* Home */
                 "~/Content/Home/home.css",
-                /* Portal */
-                "~/Content/Home/portal.css",
                 /* TwoPane */
                 "~/Content/TwoPane/twopane.css",
+                /* ThreePane */
+                "~/Content/ThreePane/threepane.css",
         };
 
         public static readonly string[] Nuget_JS = new string[] {
@@ -71,7 +77,8 @@ namespace Biz.WebApp
 
             /* JQuery ui */
             "~/Scripts/jquery-ui-{version}.js",
-
+            /* JQuery ui layout */
+            "~/Scripts/jquery.layout.js",
 
             /* bootstrap系 */
             "~/Scripts/bootstrap.js",
@@ -206,19 +213,12 @@ namespace Biz.WebApp
             "~/Scripts/App/Shared/WebServiceProxy.js",
             "~/Scripts/App/Shared/LayoutView.js",
             "~/Scripts/App/Shared/LayoutViewModel.js",
+            "~/Scripts/App/Shared/LayoutSPAView.js",
+            "~/Scripts/App/Shared/LayoutSPAViewModel.js",
 
             "~/Scripts/App/Home/WebServiceProxy.js",
             "~/Scripts/App/Home/HomeView.js",
             "~/Scripts/App/Home/HomeViewModel.js",
-
-            "~/Scripts/App/Portal/PortalView.js",
-            "~/Scripts/App/Portal/PortalViewModel.js",
-
-            "~/Scripts/App/Portal/TitleBarView.js",
-            "~/Scripts/App/Portal/TitleBarViewModel.js",
-
-            "~/Scripts/App/Portal/SideMenuView.js",
-            "~/Scripts/App/Portal/SideMenuViewModel.js",
 
 
             "~/Scripts/App/TwoPane/WebServiceProxy.js",
@@ -229,6 +229,14 @@ namespace Biz.WebApp
 
             "~/Scripts/App/TwoPane/DetailView.js",
             "~/Scripts/App/TwoPane/DetailViewModel.js",
+
+
+            "~/Scripts/App/ThreePane/WebServiceProxy.js",
+            "~/Scripts/App/ThreePane/Mediator.js",
+
+            "~/Scripts/App/ThreePane/MainView.js",
+            "~/Scripts/App/ThreePane/MainViewModel.js",
+
         };
     }
 }

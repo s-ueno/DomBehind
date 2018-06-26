@@ -21,5 +21,7 @@
 
         Move(uri: string);
         Move(uri: string, historyBack: boolean);
+
+        Reload(forcedReload?: boolean);
     }
 }

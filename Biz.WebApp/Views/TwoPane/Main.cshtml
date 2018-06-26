@@ -1,5 +1,9 @@
-﻿@section SPAViews {
-    <div id="TwoPainMainView" class="parent-size form-twopane">
+﻿@{
+    Layout = "~/Views/Shared/_LayoutSPA.cshtml";
+}
+
+@section SPAViews {
+    <div id="TwoPaneMainView" name="TwoPaneMainView" class="parent-size form-twopane ui-layout-center">
         <form>
             <div class="row form-twopane-panel">
                 <div class="col-sm-9 input-field-group">
@@ -83,12 +87,87 @@
     </div>
 }
 
+@section SPADetailViews{
+    <div id="TwoPainDetailView" name="TwoPainDetailView" class="form-twopane-detail">
+        <form>
+            <div class="row form-twopane-detail-panel">
+                <div class="title-label">General</div>
+                <div class="input-field-group form-twopane-detail-input-field-group">
+                    <div class="w2ui-field w2ui-span5">
+                        <label>Customer Id</label>
+                        <div>
+                            <input name="CustomerId">
+                        </div>
+                    </div>
+                    <div class="w2ui-field w2ui-span5">
+                        <label>Customer</label>
+                        <div class="form-twopane-detail-input-field-group">
+                            <input class="col-sm-4" name="FirstName">
+                            <input class="col-sm-4 pull-right" name="LastName">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="title-label">Address</div>
+                <div class="input-field-group form-twopane-detail-input-field-group">
+                    <div class="w2ui-field w2ui-span5">
+                        <label>Address</label>
+                        <div>
+                            <input name="Address">
+                        </div>
+                    </div>
+                    <div class="w2ui-field w2ui-span5">
+                        <label>City</label>
+                        <div>
+                            <input name="City">
+                        </div>
+                    </div>
+                    <div class="w2ui-field w2ui-span5">
+                        <label>ZipCode</label>
+                        <div>
+                            <input name="ZipCode">
+                        </div>
+                    </div>
+                    <div class="w2ui-field w2ui-span5">
+                        <label>PhoneNo</label>
+                        <div>
+                            <input name="PhoneNo">
+                        </div>
+                    </div>
+                    <div class="w2ui-field w2ui-span5">
+                        <label>UpdateDate</label>
+                        <div>
+                            <input name="UpdateDate">
+                        </div>
+                    </div>
+                    <div class="w2ui-field w2ui-span5">
+                        <label>Notes</label>
+                        <div>
+                            <textarea name="Notes"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pull-right form-twopane-detail-panel">
+                <input type="button" class="input-field-button" name="CloseButton" value="閉じる" />
+                <input type="button" class="input-field-button" name="SaveButton" value="保存" />
+            </div>
+        </form>
+    </div>
+}
+
 @section Scripts{
     <script>
         // Assign View-ViewModel to the above <div id = "Home" ...
-        // $.BindingAnnotation("#TwnPainMainView", () => Biz.WebApp.TwoPane.MainView, () => Biz.WebApp.TwoPane.MainViewModel)
+        // $.BindingAnnotation('div.form-twopane[name="TwoPainMainView"]', () => Biz.WebApp.TwoPane.MainView, () => Biz.WebApp.TwoPane.MainViewModel)
 
         // Since lambda description in the script tag is not supported by IE, it is declared with the old description method
-        $.BindingAnnotation("#TwoPainMainView", function () { return Biz.WebApp.TwoPane.MainView; }, function () { return Biz.WebApp.TwoPane.MainViewModel; })
+        $.BindingAnnotation('#TwoPaneMainView',
+            function () { return Biz.WebApp.TwoPane.MainView; },
+            function () { return Biz.WebApp.TwoPane.MainViewModel; })
+
+        $.BindingAnnotation('#TwoPainDetailView',
+            function () { return Biz.WebApp.TwoPane.DetailView; },
+            function () { return Biz.WebApp.TwoPane.DetailViewModel; });
     </script>
 }
