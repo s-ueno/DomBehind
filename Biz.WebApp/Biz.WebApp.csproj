@@ -27,7 +27,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TypeScriptToolsVersion>2.6</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.0</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -363,7 +363,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Scripts\DomBehind\JQueryUI\" />
     <Folder Include="Views\ThreePane\" />
   </ItemGroup>
   <ItemGroup>
@@ -436,6 +435,7 @@
     <TypeScriptCompile Include="Scripts\DomBehind\Extensions\ObjectExtensions.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Extensions\PropertyDescriptorExtensions.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Extensions\StringExtensions.ts" />
+    <TypeScriptCompile Include="Scripts\DomBehind\JQueryUI\Tooltip.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Locator.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Navigation\DefaultNavigator.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Navigation\INavigator.ts" />

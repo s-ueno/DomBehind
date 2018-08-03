@@ -42,6 +42,11 @@
 
         // #endregion
 
+        public SetValue(dp: Data.DependencyProperty, value: any): BindingBehaviorBuilder<T>{
+            dp.SetValue(this.CurrentElement, value);
+            return this;
+        }
+
         // #region Binding is linking the properties of the view and the view model
 
         /**

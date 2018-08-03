@@ -67,7 +67,7 @@
                     let behavior: W2SidebarBindingBehavior = $.GetWindowDynamic(behaviorId);
 
 
-                    if (newValue instanceof Data.ListCollectionView) {
+                    if (behavior && (newValue instanceof Data.ListCollectionView)) {
                         let viewStatus: Data.ListCollectionView.ViewReflectedStatus
                             = newValue.ViewReflected;
                         if (viewStatus === Data.ListCollectionView.ViewReflectedStatus.Reflected) {

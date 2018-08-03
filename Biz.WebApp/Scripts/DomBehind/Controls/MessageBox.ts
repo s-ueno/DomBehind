@@ -56,7 +56,7 @@
 
     // デフォルトのビルトイン
     MessaageBox.BuiltIn(() => DefaultMessageContainer);
-    class DefaultMessageContainer implements IMessageContainer {
+    export class DefaultMessageContainer implements IMessageContainer {
         ShowMessage(message: string, title?: string, status?: MessageStatus) {
             // デフォルトのアラートメッセージ
             window.alert(message);

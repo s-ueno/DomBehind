@@ -74,6 +74,11 @@
             this.Current = this.List.last();
             return this;
         }
+        public MoveToPosition(index: number): ListCollectionView {
+            this.Current = this.List.elementAtIndex(index);
+            return this;
+        }
+
         public Filter: (obj: any) => boolean;
         public Grouping: (obj: any) => any;
         public Refresh(): ListCollectionView {
@@ -145,6 +150,7 @@
         }
         public Removed: TypedEvent<CollectionChangedEventArgs>
             = new TypedEvent<CollectionChangedEventArgs>();
+
 
 
         public ToArray(): Array<any> {

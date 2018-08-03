@@ -106,3 +106,4 @@ Temporary Items
 /Biz.WebApp/Scripts/App/**/*.d.ts
 
 /Biz.WebApp/Scripts/dombehind-PlainXMLHttpRequest.js
+/.vscode

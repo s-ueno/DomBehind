@@ -98,6 +98,9 @@
       "Scripts/DomBehind/Controls/MessageBox.js",
 
       /* DomBehind/W2UI */
+      "Scripts/DomBehind/JQueryUI/Tooltip.js",
+
+      /* DomBehind/W2UI */
       "Scripts/DomBehind/W2UI/Toolbar.js",
       "Scripts/DomBehind/W2UI/Layout.js",
       "Scripts/DomBehind/W2UI/Sidebar.js",

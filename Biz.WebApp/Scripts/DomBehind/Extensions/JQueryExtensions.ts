@@ -16,6 +16,7 @@
 
 
     SetRootUri(uri: string): void;
+    GetRootUri(): string;
     AbsoluteUri(uri: string): string;
 }
 
@@ -70,6 +71,9 @@ $.SetRootUri = function (uri: string) {
 
     $.SetLocalStorage("RootUri", uri);
 };
+$.GetRootUri = function () {
+    return $.GetLocalStorage("RootUri");
+}
 
 $.AbsoluteUri = function (uri: string): string {
     let rootUri = $.GetLocalStorage("RootUri", "");

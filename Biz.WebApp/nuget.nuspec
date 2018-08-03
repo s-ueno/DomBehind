@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>DomBehind</id>
-    <version>1.0.5</version>
+    <version>1.0.7</version>
     <title>DOM Behind</title>
     <authors>uEN</authors>
     <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
@@ -12,13 +12,13 @@
       MVVM with TypeScript for C # programmer
     </description>
     <releaseNotes>
-・Expression analysis bug
+・bug fix
     </releaseNotes>
     <dependencies>
       <dependency id="jQuery" version="3.1.1"></dependency>
       <dependency id="jquery.TypeScript.DefinitelyTyped" version="1.5.1"></dependency>
       <dependency id="jQuery.Validation" version="1.13.1"></dependency>
-      <dependency id="jquery.validation.TypeScript.DefinitelyTyped" version="0.4.6"></dependency>
+      <dependency id="jquery.validation.TypeScript.DefinitelyTyped" version="0.4.6"></dependency>      
       <dependency id="w2ui.TypeScript.DefinitelyTyped" version="0.0.3"></dependency>
     </dependencies>
   </metadata>

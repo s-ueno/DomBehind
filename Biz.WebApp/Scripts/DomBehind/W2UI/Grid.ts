@@ -175,7 +175,7 @@
     }
 
     export class W2GridBindingBehavior extends Data.BindingBehavior {
-
+        public static Refresh = new DomBehind.TypedEvent<any>();
         public static IsSpinningProperty = Data.DependencyProperty.RegisterAttached("w2ui.isSpinning",
             el => {
                 let value = el.attr("w2ui.isSpinning");
@@ -428,6 +428,14 @@
             itemSource.Property = dp;
             itemSource.PInfo = this.ItemsSource;
             itemSource.Element = this.Element;
+
+            W2GridBindingBehavior.Refresh.AddHandler((sender, e) => {
+                try {
+                    this.Grid.refresh();
+                } catch (e) {
+                    // error free
+                }
+            });
         }
         protected SuppressListCollectionViewAction(action: (lc: Data.ListCollectionView) => void) {
             // 通知イベントを落とした状態で、モデルのカレントレコードを設定する

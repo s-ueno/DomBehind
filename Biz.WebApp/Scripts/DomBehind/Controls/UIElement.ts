@@ -9,6 +9,11 @@
             = Data.DependencyProperty.RegisterAttached("val",
                 x => x.val(), (x, y) => x.val(y), Data.UpdateSourceTrigger.LostForcus, Data.BindingMode.TwoWay);
 
+        public static TextProperty: Data.DependencyProperty
+            = Data.DependencyProperty.RegisterAttached("text",
+                x => x.text(), (x, y) => x.text(y), Data.UpdateSourceTrigger.LostForcus, Data.BindingMode.TwoWay);
+
+
         public static IsEnabledProperty: Data.DependencyProperty
             = Data.DependencyProperty.RegisterAttached("enabled",
                 null, (x, y) => {
@@ -21,6 +26,20 @@
                         x.removeClass("disabled");
                     }
                 }, Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
+
+        public static IsVisibleProperty: Data.DependencyProperty
+            = Data.DependencyProperty.RegisterAttached("display",
+                x => x.attr("display") === "none" ? false : true,
+                (x, y) => {
+                    let visible = y ? true : false;
+                    if (visible) {
+                        x.attr("display", "");
+                        x.show();
+                    } else {
+                        x.attr("display", "none");
+                        x.hide();
+                    }
+                }, Data.UpdateSourceTrigger.Explicit, Data.BindingMode.TwoWay);
 
         public static PlaceHolderProperty: Data.DependencyProperty
             = Data.DependencyProperty.RegisterAttached("placeholder",
@@ -35,6 +54,14 @@
         public static MaxLengthProperty: Data.DependencyProperty
             = Data.DependencyProperty.RegisterAttached("maxlength",
                 null, (x, y) => x.attr("maxlength", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
+
+        public static MaxNumericProperty: Data.DependencyProperty
+            = Data.DependencyProperty.RegisterAttached("maxlength",
+                null, (x, y) => x.attr("max", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
+
+        public static MinNumericProperty: Data.DependencyProperty
+            = Data.DependencyProperty.RegisterAttached("maxlength",
+                null, (x, y) => x.attr("min", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
 
 
         public static HtmlSource: Data.DependencyProperty

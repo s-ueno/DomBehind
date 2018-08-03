@@ -3,6 +3,12 @@
     const ReferenceCountKey: string = "ReferenceCountKey";
 
     export class DefaultNavigator implements INavigator {
+
+        public static Move(uri: string) {
+            
+        }
+
+
         public Move(uri: string);
         public Move(uri: string, historyBack: boolean);
         public Move(uri: any, historyBack?: any) {
