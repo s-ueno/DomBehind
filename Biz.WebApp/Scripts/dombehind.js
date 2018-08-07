@@ -4593,10 +4593,6 @@ var DomBehind;
         };
         W2GridBindingBehavior.Refresh = new DomBehind.TypedEvent();
         W2GridBindingBehavior.IsSpinningProperty = DomBehind.Data.DependencyProperty.RegisterAttached("w2ui.isSpinning", function (el) {
-            var value = el.attr("w2ui.isSpinning");
-            if (!value)
-                return false;
-            return Boolean(value);
         }, function (el, newValue) {
             var oldValue = el.attr("w2ui.isSpinning");
             if (oldValue === "true" && newValue)
@@ -4614,7 +4610,7 @@ var DomBehind;
                     grid.unlock();
                 }
             }
-        });
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         return W2GridBindingBehavior;
     }(DomBehind.Data.BindingBehavior));
     DomBehind.W2GridBindingBehavior = W2GridBindingBehavior;
@@ -4820,6 +4816,37 @@ var DomBehind;
     })(Controls = DomBehind.Controls || (DomBehind.Controls = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Dropdown.js.map
+var DomBehind;
+(function (DomBehind) {
+    var Controls;
+    (function (Controls) {
+        var DatePicker = (function () {
+            function DatePicker() {
+            }
+            DatePicker.FormatProperty = DomBehind.Data.DependencyProperty.RegisterAttached("DateFormat", function (el) {
+            }, function (el, newValue) {
+                el.attr("DateFormat", newValue);
+            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+            DatePicker.ValueProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", function (el) {
+                return el.val();
+            }, function (el, newValue) {
+                var initialized = el.attr("DateFormatted");
+                if (!initialized) {
+                    el.attr("DateFormatted", "true");
+                    var format = el.attr("DateFormat");
+                    if (!format) {
+                        format = "yyyy/MM/dd";
+                    }
+                    el.w2field("date", { format: format });
+                }
+                el.val(newValue);
+            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
+            return DatePicker;
+        }());
+        Controls.DatePicker = DatePicker;
+    })(Controls = DomBehind.Controls || (DomBehind.Controls = {}));
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=DatePicker.js.map
 var DomBehind;
 (function (DomBehind) {
     var Application = (function () {

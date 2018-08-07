@@ -470,6 +470,7 @@
     <TypeScriptCompile Include="Scripts\DomBehind\Validation\RequiredValidator.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Validation\Validator.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Validation\ValidatorCollection.ts" />
+    <TypeScriptCompile Include="Scripts\DomBehind\W2UI\DatePicker.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\W2UI\Dropdown.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\W2UI\Grid.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\W2UI\Layout.ts" />

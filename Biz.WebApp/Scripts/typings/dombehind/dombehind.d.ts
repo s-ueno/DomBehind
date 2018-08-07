@@ -646,6 +646,7 @@ declare namespace DomBehind.Controls {
 
 declare namespace DomBehind.Navigation {
     class DefaultNavigator implements INavigator {
+        static Move(uri: string): void;
         Move(uri: string): any;
         Move(uri: string, historyBack: boolean): any;
         Reload(forcedReload?: boolean): void;
@@ -1048,6 +1049,13 @@ declare namespace DomBehind.Validation {
         Validate(): boolean;
         Dispose(): void;
         protected _disposed: boolean;
+    }
+}
+
+declare namespace DomBehind.Controls {
+    class DatePicker {
+        static FormatProperty: Data.DependencyProperty;
+        static ValueProperty: Data.DependencyProperty;
     }
 }
 

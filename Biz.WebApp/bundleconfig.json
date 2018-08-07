@@ -107,6 +107,7 @@
       "Scripts/DomBehind/W2UI/Grid.js",
       "Scripts/DomBehind/W2UI/MessageBox.js",
       "Scripts/DomBehind/W2UI/Dropdown.js",
+      "Scripts/DomBehind/W2UI/DatePicker.js",
 
       /* DomBehind(MVVM) */
       "Scripts/DomBehind/Application.js",

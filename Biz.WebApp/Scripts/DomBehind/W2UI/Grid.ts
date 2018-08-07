@@ -178,9 +178,9 @@
         public static Refresh = new DomBehind.TypedEvent<any>();
         public static IsSpinningProperty = Data.DependencyProperty.RegisterAttached("w2ui.isSpinning",
             el => {
-                let value = el.attr("w2ui.isSpinning");
-                if (!value) return false;
-                return Boolean(value);
+                //let value = el.attr("w2ui.isSpinning");
+                //if (!value) return false;
+                //return Boolean(value);
             },
             (el: JQuery, newValue: boolean) => {
                 let oldValue = el.attr("w2ui.isSpinning");
@@ -198,7 +198,9 @@
                         grid.unlock();
                     }
                 }
-            }
+            },
+            Data.UpdateSourceTrigger.Explicit,
+            Data.BindingMode.OneWay
         );
         public NewAdd: (value: Data.DataBindingBehavior) => Data.DataBindingBehavior;
         public ItemsSource: PropertyInfo;
