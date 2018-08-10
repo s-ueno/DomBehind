@@ -34,6 +34,9 @@
     <!--<file src="Content/dombehind.css" target="Content/Content/" />-->
     <file src="Content/w2ui-1.5.rc1.css" target="Content/Content/" />
 
+    <file src="Scripts/ts-nameof.js" target="Content/Scripts/" />
+    <file src="Scripts/typings/ts-nameof/ts-nameof.d.ts" target="Content/Scripts/typings/ts-nameof" />
+
     <file src="locale/az-az.json" target="Content/locale/" />
     <file src="locale/ba-ba.json" target="Content/locale/" />
     <file src="locale/bg-bg.json" target="Content/locale/" />

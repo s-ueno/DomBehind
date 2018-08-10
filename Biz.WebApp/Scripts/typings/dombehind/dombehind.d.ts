@@ -87,9 +87,22 @@ declare namespace DomBehind {
             okCallback?: Function;
             cancelCallBack?: Function;
         }): void;
-        ShowModal(uri: string, option?: Navigation.IModalHelperSettings): any;
-        ShowModal(jquery: JQuery, option?: Navigation.IModalHelperSettings): any;
         Dispose(): void;
+    }
+}
+
+declare namespace DomBehind {
+    class IndexedDBHelper<T> {
+        DbName: string;
+        constructor(ctor: TypedConstructor<T>, DbName: string);
+        TableName: string;
+        FindRowAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T>;
+        FindRowsAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T[]>;
+        protected FetchCursor(indexStore: IDBIndex, value: string | number, d: JQueryDeferred<any>): void;
+        UpsertAsync(entity: T, primaryKey?: (obj: T) => string | number): JQueryPromise<any>;
+        DeleteAsync(entity: T): JQueryPromise<any>;
+        protected Open(): JQueryPromise<IDBDatabase>;
+        protected Upgrade(version: number, action: (db: any) => void): void;
     }
 }
 
@@ -646,7 +659,7 @@ declare namespace DomBehind.Controls {
 
 declare namespace DomBehind.Navigation {
     class DefaultNavigator implements INavigator {
-        static Move(uri: string): void;
+        NewWindow(uri: string, target?: string, style?: string): Window;
         Move(uri: string): any;
         Move(uri: string, historyBack: boolean): any;
         Reload(forcedReload?: boolean): void;
@@ -668,12 +681,15 @@ declare namespace DomBehind.Navigation {
         StartupLocation?: ModalStartupLocation;
         StartupLocationTop?: number;
         StartupLocationLeft?: number;
+        Height?: string;
+        Width?: string;
     }
     interface INavigator {
         ShowModal(uri: string, option?: IModalHelperSettings): any;
         ShowModal(jquery: JQuery, option?: IModalHelperSettings): any;
         Move(uri: string): any;
         Move(uri: string, historyBack: boolean): any;
+        NewWindow(uri: string, target?: string, style?: string): Window;
         Reload(forcedReload?: boolean): any;
     }
 }

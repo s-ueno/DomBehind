@@ -337,7 +337,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var DomBehind;
 (function (DomBehind) {
-    var PropertyInfo = (function () {
+    var PropertyInfo = /** @class */ (function () {
         function PropertyInfo(DataContext, MemberPath) {
             this.DataContext = DataContext;
             this.MemberPath = MemberPath;
@@ -379,7 +379,7 @@ var DomBehind;
         return PropertyInfo;
     }());
     DomBehind.PropertyInfo = PropertyInfo;
-    var LamdaExpression = (function (_super) {
+    var LamdaExpression = /** @class */ (function (_super) {
         __extends(LamdaExpression, _super);
         function LamdaExpression(dataContext, Lamda) {
             var _this = _super.call(this, dataContext, LamdaExpression.ParsePropertyPath(Lamda)) || this;
@@ -391,8 +391,10 @@ var DomBehind;
             return path.split(".").slice(1).join(".");
         };
         LamdaExpression.NameOf = function (expression) {
+            // console.info(`★${expression}`);
             var m = LamdaExpression._extractor_Minified.exec(expression + "");
             var s = m[1].trim();
+            // console.info(`★${s}`);
             if (s.charAt(s.length - 1) === "}" ||
                 s.charAt(s.length - 1) === ";") {
                 m = LamdaExpression._extractor.exec(expression + "");
@@ -411,12 +413,13 @@ var DomBehind;
             var exp = new LamdaExpression(dataContext, lamda);
             return exp.GetValue();
         };
+        // http://stackoverflow.com/questions/29191451/get-name-of-variable-in-typescript
         LamdaExpression._extractor = new RegExp("return (.*);");
         LamdaExpression._extractor_Minified = new RegExp("return (.*)}");
         return LamdaExpression;
     }(PropertyInfo));
     DomBehind.LamdaExpression = LamdaExpression;
-    var BooleanFakeExpression = (function (_super) {
+    var BooleanFakeExpression = /** @class */ (function (_super) {
         __extends(BooleanFakeExpression, _super);
         function BooleanFakeExpression(Value) {
             var _this = _super.call(this, null, ".") || this;
@@ -1056,6 +1059,179 @@ var DomBehind;
     DomBehind.Repository = Repository;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Repository.js.map
+var DomBehind;
+(function (DomBehind) {
+    var IndexedDBHelper = (function () {
+        function IndexedDBHelper(ctor, DbName) {
+            this.DbName = DbName;
+            var schema = new ctor();
+            var name = schema.constructor.name;
+            if (name == "Object") {
+                throw Error("dynamic object is not supported");
+            }
+            this.TableName = name;
+        }
+        IndexedDBHelper.prototype.FindRowAsync = function (exp, value) {
+            var d = $.Deferred();
+            this.FindRowsAsync(exp, value).done(function (x) {
+                d.resolve(x.FirstOrDefault());
+            }).fail(function (x) {
+                d.reject(x);
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.FindRowsAsync = function (exp, value) {
+            var _this = this;
+            var path = DomBehind.LamdaExpression.Path(exp);
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    d.reject();
+                    return;
+                }
+                var trans = x.transaction(_this.TableName, "readwrite");
+                var objectStore = trans.objectStore(_this.TableName);
+                if (objectStore.keyPath === path) {
+                    var dbRequest_1 = objectStore.get(value);
+                    dbRequest_1.onsuccess = function (e) {
+                        var result = [dbRequest_1.result];
+                        d.resolve(result);
+                    };
+                    dbRequest_1.onerror = function (e) {
+                        d.reject(e);
+                    };
+                }
+                else if (objectStore.indexNames.contains(path)) {
+                    _this.FetchCursor(objectStore.index(path), value, d);
+                }
+                else {
+                    x.close();
+                    _this.Upgrade(x.version + 1, function (y) {
+                        var newDb = y.target.result;
+                        var newTrans = y.target.transaction;
+                        var newObjectStore = newTrans.objectStore(_this.TableName);
+                        var indexStore = newObjectStore.createIndex(path, path, { unique: false });
+                        _this.FetchCursor(indexStore, value, d);
+                    });
+                }
+            }).fail(function (x) {
+                d.reject(x);
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.FetchCursor = function (indexStore, value, d) {
+            var list = new DomBehind.List();
+            var cursorHandler = indexStore.openCursor(value);
+            cursorHandler.onsuccess = function (e) {
+                var cursor = e.target.result;
+                if (cursor) {
+                    var value_1 = cursor.value;
+                    if (!Object.IsNullOrUndefined(value_1)) {
+                        list.add(value_1);
+                    }
+                    cursor.continue();
+                }
+                else {
+                    d.resolve(list.toArray());
+                }
+            };
+            cursorHandler.onerror = function (e) {
+                d.reject(e);
+            };
+        };
+        IndexedDBHelper.prototype.UpsertAsync = function (entity, primaryKey) {
+            var _this = this;
+            var path;
+            if (primaryKey) {
+                path = DomBehind.LamdaExpression.Path(primaryKey);
+            }
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    x.close();
+                    _this.Upgrade(x.version + 1, function (y) {
+                        var newDb = y.target.result;
+                        var newStore;
+                        if (path) {
+                            newStore = newDb.createObjectStore(_this.TableName, { keyPath: path });
+                        }
+                        else {
+                            newStore = newDb.createObjectStore(_this.TableName, { keyPath: "__identity", autoIncrement: true });
+                        }
+                        newStore.transaction.oncomplete = function (e) {
+                            newDb.close();
+                            _this.UpsertAsync(entity, primaryKey).done(function (x) { return d.resolve(); }).fail(function (x) { return d.reject(x); });
+                        };
+                    });
+                    return;
+                }
+                var trans = x.transaction(_this.TableName, "readwrite");
+                var store = trans.objectStore(_this.TableName);
+                store.put(entity);
+                d.resolve();
+            }).fail(function (x) {
+                d.reject(x);
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.DeleteAsync = function (entity) {
+            var _this = this;
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                var trans = x.transaction(_this.TableName, "readwrite");
+                if (trans.objectStoreNames.contains(_this.TableName)) {
+                    var store = trans.objectStore(_this.TableName);
+                    var identity = entity["" + store.keyPath];
+                    store.delete(identity);
+                    d.resolve();
+                }
+                else {
+                    d.reject("table not found. " + _this.TableName);
+                }
+            }).fail(function (x) {
+                d.reject(x);
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.Open = function () {
+            var d = $.Deferred();
+            var factory = window.indexedDB;
+            var openRequest = factory.open(this.DbName);
+            openRequest.onsuccess = function (e) {
+                var db = openRequest.result;
+                d.resolve(db);
+                db.close();
+            };
+            openRequest.onblocked = function (e) {
+                d.reject(e);
+            };
+            openRequest.onerror = function (e) {
+                d.reject(e);
+            };
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.Upgrade = function (version, action) {
+            var factory = window.indexedDB;
+            var openRequest = factory.open(this.DbName, version);
+            openRequest.onsuccess = function (e) {
+                var dummy = e;
+            };
+            openRequest.onupgradeneeded = function (e) {
+                var db = e.target.result;
+                action(e);
+                db.close();
+            };
+            openRequest.onerror = function (e) {
+            };
+        };
+        return IndexedDBHelper;
+    }());
+    DomBehind.IndexedDBHelper = IndexedDBHelper;
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=IndexedDBHelper.js.map
 var DomBehind;
 (function (DomBehind) {
     var Data;
@@ -2206,7 +2382,11 @@ var DomBehind;
                     StartupLocationLeft: null
                 };
             }
-            DefaultNavigator.Move = function (uri) {
+            DefaultNavigator.prototype.NewWindow = function (uri, target, style) {
+                if (!String.IsNullOrWhiteSpace(uri) && uri !== "about:blank") {
+                    uri = $.AbsoluteUri(uri);
+                }
+                return window.open(uri, target, style);
             };
             DefaultNavigator.prototype.Move = function (uri, historyBack) {
                 uri = $.AbsoluteUri(uri);
@@ -2239,7 +2419,7 @@ var DomBehind;
                 if (typeof arg === "string") {
                     var ex;
                     var ajax = $.ajax({
-                        url: arg,
+                        url: $.AbsoluteUri(arg),
                         async: false,
                         type: "GET",
                         cache: false,
@@ -2276,10 +2456,17 @@ var DomBehind;
                     }
                 }
                 overlay.append(container);
-                container.find(".modal-dialog").draggable({
+                var modal = container.find(".modal-dialog");
+                modal.draggable({
                     handle: ".modal-header",
                     cursor: "move",
                 });
+                if (option.Width) {
+                    modal.css("width", option.Width);
+                }
+                if (option.Height) {
+                    modal.css("height", option.Height);
+                }
                 if (setting.AllowCloseByClickOverlay) {
                     overlay.click(overlay, function (e) {
                         e.data.trigger(OnModalCloseEventName);
@@ -5156,9 +5343,6 @@ var DomBehind;
         };
         BizViewModel.prototype.ShowOkCancel = function (message, title, option) {
             DomBehind.MessaageBox.ShowOkCancel(message, title, option);
-        };
-        BizViewModel.prototype.ShowModal = function (obj, option) {
-            this.Navigator.ShowModal(obj, option);
         };
         BizViewModel.prototype.Dispose = function () {
             if (!this._disposed) {

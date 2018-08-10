@@ -4,10 +4,12 @@
 
     export class DefaultNavigator implements INavigator {
 
-        public static Move(uri: string) {
-            
+        public NewWindow(uri: string, target?: string, style?: string): Window {
+            if (!String.IsNullOrWhiteSpace(uri) && uri !== "about:blank") {
+                uri = $.AbsoluteUri(uri);
+            }
+            return window.open(uri, target, style);
         }
-
 
         public Move(uri: string);
         public Move(uri: string, historyBack: boolean);
@@ -59,7 +61,7 @@
             if (typeof arg === "string") {
                 var ex: Exception;
                 var ajax = $.ajax({
-                    url: arg,
+                    url: $.AbsoluteUri(arg),
                     async: false,
                     type: "GET",
                     cache: false,
@@ -102,11 +104,18 @@
             // domに追加
             overlay.append(container);
 
-
-            container.find(".modal-dialog").draggable({
+            let modal = container.find(".modal-dialog");
+            modal.draggable({
                 handle: ".modal-header",
                 cursor: "move",
             });
+
+            if (option.Width) {
+                modal.css("width", option.Width);
+            }
+            if (option.Height) {
+                modal.css("height", option.Height);
+            }
 
 
             if (setting.AllowCloseByClickOverlay) {

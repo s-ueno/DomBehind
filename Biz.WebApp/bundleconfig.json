@@ -44,6 +44,7 @@
       /* DomBehind(Base)  */
       "Scripts/DomBehind/TypedFactory.js",
       "Scripts/DomBehind/Repository.js",
+      "Scripts/DomBehind/IndexedDBHelper.js",
 
       /* DomBehind/Data */
       "Scripts/DomBehind/Data/DependencyProperty.js",
@@ -115,6 +116,7 @@
       "Scripts/DomBehind/BizViewModel.js",
       "Scripts/DomBehind/BindingAnnotation.js",
       "Scripts/DomBehind/Locator.js",
+
 
       /* JQuery Extension */
       "Scripts/DomBehind/Validation/JQueryValidationExtension.js"

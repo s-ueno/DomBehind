@@ -13,6 +13,8 @@
         StartupLocation?: ModalStartupLocation;
         StartupLocationTop?: number;
         StartupLocationLeft?: number;
+        Height?: string;
+        Width?: string;
     }
 
     export interface INavigator {
@@ -21,6 +23,8 @@
 
         Move(uri: string);
         Move(uri: string, historyBack: boolean);
+
+        NewWindow(uri: string, target?: string, style?: string) : Window;
 
         Reload(forcedReload?: boolean);
     }

@@ -206,6 +206,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="cache-polyfill.js" />
     <Content Include="Content\animate.css" />
     <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
@@ -273,7 +274,6 @@
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
-    <None Include="gulpfile.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\dombehind.js" />
@@ -342,6 +342,7 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\w2ui-1.4.3.js" />
     <Content Include="Scripts\w2ui-1.5.rc1.js" />
+    <Content Include="sw.js" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
@@ -435,6 +436,7 @@
     <TypeScriptCompile Include="Scripts\DomBehind\Extensions\ObjectExtensions.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Extensions\PropertyDescriptorExtensions.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Extensions\StringExtensions.ts" />
+    <TypeScriptCompile Include="Scripts\DomBehind\IndexedDBHelper.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\JQueryUI\Tooltip.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Locator.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Navigation\DefaultNavigator.ts" />

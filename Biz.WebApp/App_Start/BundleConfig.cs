@@ -91,6 +91,8 @@ namespace Biz.WebApp
 
             /* C#ライクなコレクションライブラリ */
             "~/Scripts/collections.js",
+
+            "~/Scripts/ts-nameof.js",
         };
 
         public static readonly string[] DomBehind_JS = new string[] {

@@ -166,21 +166,6 @@
             MessaageBox.ShowOkCancel(message, title, option);
         }
 
-
-        public ShowModal(uri: string, option?: Navigation.IModalHelperSettings);
-        public ShowModal(jquery: JQuery, option?: Navigation.IModalHelperSettings);
-        public ShowModal(obj: any, option?: Navigation.IModalHelperSettings) {
-
-            // あまりに重い場合は、個別に画面でオーバレイ出してもらう
-            this.Navigator.ShowModal(obj, option);
-
-            //this.WaitingOverlay(() => {
-            //    this.Navigator.ShowModal(obj, option);
-            //});
-
-        }
-
-
         // #region Dispose
 
         public Dispose(): void {
