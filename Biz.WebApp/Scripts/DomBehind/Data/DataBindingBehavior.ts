@@ -66,7 +66,7 @@
             if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter)) {
                 value = this.BindingPolicy.Converter.Convert(value);
             }
-            this.Property.SetValue(this.Element, value);
+            this.Property.SetValue(this.Element, value, this);
             this.UpdateTargetEvent.Raise(this, value);
         }
 

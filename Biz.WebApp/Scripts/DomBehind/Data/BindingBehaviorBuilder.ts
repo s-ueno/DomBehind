@@ -42,8 +42,8 @@
 
         // #endregion
 
-        public SetValue(dp: Data.DependencyProperty, value: any): BindingBehaviorBuilder<T>{
-            dp.SetValue(this.CurrentElement, value);
+        public SetValue(dp: Data.DependencyProperty, value: any): BindingBehaviorBuilder<T> {
+            dp.SetValue(this.CurrentElement, value, this.CurrentBehavior);
             return this;
         }
 

@@ -34,10 +34,10 @@
         /**
          * Using JQuery and set the value to View
          */
-        public get SetValue(): (jQuery: JQuery, value: any) => void {
+        public get SetValue(): (jQuery: JQuery, value: any, caller?: any) => void {
             return this._setter;
         }
-        private _setter: (jQuery: JQuery, value: any) => void
+        private _setter: (jQuery: JQuery, value: any, caller?: any) => void
 
         // #endregion
 
@@ -85,7 +85,7 @@
         public static RegisterAttached(
             propertyName: string,
             getValue: (jQuery: JQuery) => any,
-            setValue: (jQuery: JQuery, value: any) => void,
+            setValue: (jQuery: JQuery, value: any, caller?: any) => void,
             defaultUpdateSourceTrigger: UpdateSourceTrigger = UpdateSourceTrigger.Explicit,
             mode: BindingMode = BindingMode.TwoWay,
             ensure?: (behavior: DataBindingBehavior) => void): DependencyProperty {
