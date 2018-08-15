@@ -12,6 +12,59 @@
         }
         public TableName: string;
 
+        public List(): JQueryPromise<T[]> {
+            let d = $.Deferred<any>();
+            let db = this.Open();
+
+            db.done(x => {
+                if (!x.objectStoreNames.contains(this.TableName)) {
+                    d.reject();
+                    return;
+                }
+                let trans = x.transaction(this.TableName, "readwrite");
+                let objectStore = trans.objectStore(this.TableName);
+
+
+                let dbRequest = objectStore.getAll();
+                dbRequest.onsuccess = e => {
+                    let result = dbRequest.result;
+                    d.resolve(result);
+
+                };
+                dbRequest.onerror = e => {
+                    d.reject();
+                };
+            }).fail(() => {
+                d.reject();
+            });
+            return d.promise();
+        }
+
+        public Truncate() {
+            let d = $.Deferred<any>();
+            let db = this.Open();
+
+            db.done(x => {
+                if (!x.objectStoreNames.contains(this.TableName)) {
+                    d.reject();
+                    return;
+                }
+                let trans = x.transaction(this.TableName, "readwrite");
+                let objectStore = trans.objectStore(this.TableName);
+
+                let dbRequest = objectStore.clear();
+                dbRequest.onsuccess = e => {
+                    d.resolve();
+                };
+                dbRequest.onerror = e => {
+                    d.reject();
+                };
+            }).fail(() => {
+                d.reject();
+            });
+            return d.promise();
+        }
+
         public FindRowAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T> {
             let d = $.Deferred<any>();
             this.FindRowsAsync(exp, value).done(x => {
@@ -49,7 +102,7 @@
                     x.close();
                     this.Upgrade(x.version + 1, y => {
                         let newDb: IDBDatabase = y.target.result;
-                        let newTrans : IDBTransaction = y.target.transaction;
+                        let newTrans: IDBTransaction = y.target.transaction;
                         let newObjectStore = newTrans.objectStore(this.TableName);
                         let indexStore = newObjectStore.createIndex(path, path, { unique: false });
                         this.FetchCursor(indexStore, value, d);

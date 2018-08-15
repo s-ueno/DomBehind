@@ -34,7 +34,7 @@
             FadeOutDuration: 100,
             AllowCloseByClickOverlay: true,
             ShowCloseButton: true,
-
+            ShowHeader: true,
             StartupLocation: ModalStartupLocation.CenterScreen,
             StartupLocationTop: null,
             StartupLocationLeft: null
@@ -101,8 +101,8 @@
                 }
             }
 
-            // domに追加
-            overlay.append(container);
+            //// domに追加
+            //overlay.append(container);
 
             let modal = container.find(".modal-dialog");
             modal.draggable({
@@ -110,13 +110,16 @@
                 cursor: "move",
             });
 
-            if (option.Width) {
+            if (setting.Width) {
                 modal.css("width", option.Width);
             }
-            if (option.Height) {
+            if (setting.Height) {
                 modal.css("height", option.Height);
             }
-
+            if (!setting.ShowHeader) {
+                container.find(".modal-header").hide();
+                container.find(".modal-body").css("height", "100%");
+            }
 
             if (setting.AllowCloseByClickOverlay) {
                 overlay.click(overlay, e => {
@@ -148,6 +151,9 @@
                 });
             });
 
+            // domに追加
+            overlay.append(container);
+            container.hide().show(0);
         }
     }
 }

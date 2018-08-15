@@ -9,6 +9,7 @@
         FadeOutDuration?: number;
         AllowCloseByClickOverlay?: boolean;
         ShowCloseButton?: boolean;
+        ShowHeader?: boolean;
 
         StartupLocation?: ModalStartupLocation;
         StartupLocationTop?: number;
@@ -24,7 +25,7 @@
         Move(uri: string);
         Move(uri: string, historyBack: boolean);
 
-        NewWindow(uri: string, target?: string, style?: string) : Window;
+        NewWindow(uri: string, target?: string, style?: string): Window;
 
         Reload(forcedReload?: boolean);
     }

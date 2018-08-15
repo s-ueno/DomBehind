@@ -215,6 +215,11 @@ var DomBehind;
             });
             this.handlers = [];
         };
+        TypedEvent.prototype.Ensure = function (behavior /*: Data.ActionBindingBehavior */) {
+            if (this.EnsureHandler) {
+                this.EnsureHandler(behavior);
+            }
+        };
         // #region IDisposable
         TypedEvent.prototype.Dispose = function () {
             if (!this._disposed) {
@@ -237,6 +242,7 @@ var DomBehind;
         EventBuilder.prototype.Create = function () {
             var event = new TypedEvent();
             event.EventName = this.EventName;
+            event.EnsureHandler = this.ensureHandler;
             return event;
         };
         Object.defineProperty(EventBuilder.prototype, "EventName", {
@@ -254,8 +260,9 @@ var DomBehind;
          * Generate a typed event class.
          * @param eventName
          */
-        EventBuilder.RegisterAttached = function (eventName) {
+        EventBuilder.RegisterAttached = function (eventName, ensure) {
             var builder = new EventBuilder(eventName);
+            builder.ensureHandler = ensure;
             return builder;
         };
         return EventBuilder;
@@ -1131,6 +1138,53 @@ var DomBehind;
             }
             this.TableName = name;
         }
+        IndexedDBHelper.prototype.List = function () {
+            var _this = this;
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    d.reject();
+                    return;
+                }
+                var trans = x.transaction(_this.TableName, "readwrite");
+                var objectStore = trans.objectStore(_this.TableName);
+                var dbRequest = objectStore.getAll();
+                dbRequest.onsuccess = function (e) {
+                    var result = dbRequest.result;
+                    d.resolve(result);
+                };
+                dbRequest.onerror = function (e) {
+                    d.reject();
+                };
+            }).fail(function () {
+                d.reject();
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.Truncate = function () {
+            var _this = this;
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    d.reject();
+                    return;
+                }
+                var trans = x.transaction(_this.TableName, "readwrite");
+                var objectStore = trans.objectStore(_this.TableName);
+                var dbRequest = objectStore.clear();
+                dbRequest.onsuccess = function (e) {
+                    d.resolve();
+                };
+                dbRequest.onerror = function (e) {
+                    d.reject();
+                };
+            }).fail(function () {
+                d.reject();
+            });
+            return d.promise();
+        };
         IndexedDBHelper.prototype.FindRowAsync = function (exp, value) {
             var d = $.Deferred();
             this.FindRowsAsync(exp, value).done(function (x) {
@@ -1619,6 +1673,9 @@ var DomBehind;
             ActionBindingBehavior.prototype.Ensure = function () {
                 var _this = this;
                 this.ActionHandle = function (x) { return _this.OnTrigger(x); };
+                if (this.Event && this.Event) {
+                    this.Event.Ensure(this);
+                }
                 if (this.Event && !String.IsNullOrWhiteSpace(this.Event.EventName)) {
                     this.Element.on(this.Event.EventName, function (e) { return _this.ActionHandle(e); });
                 }
@@ -2596,6 +2653,7 @@ var DomBehind;
                     FadeOutDuration: 100,
                     AllowCloseByClickOverlay: true,
                     ShowCloseButton: true,
+                    ShowHeader: true,
                     StartupLocation: Navigation.ModalStartupLocation.CenterScreen,
                     StartupLocationTop: null,
                     StartupLocationLeft: null
@@ -2674,18 +2732,22 @@ var DomBehind;
                             .css("left", setting.StartupLocationLeft);
                     }
                 }
-                // domに追加
-                overlay.append(container);
+                //// domに追加
+                //overlay.append(container);
                 var modal = container.find(".modal-dialog");
                 modal.draggable({
                     handle: ".modal-header",
                     cursor: "move",
                 });
-                if (option.Width) {
+                if (setting.Width) {
                     modal.css("width", option.Width);
                 }
-                if (option.Height) {
+                if (setting.Height) {
                     modal.css("height", option.Height);
+                }
+                if (!setting.ShowHeader) {
+                    container.find(".modal-header").hide();
+                    container.find(".modal-body").css("height", "100%");
                 }
                 if (setting.AllowCloseByClickOverlay) {
                     overlay.click(overlay, function (e) {
@@ -2713,6 +2775,9 @@ var DomBehind;
                         }
                     });
                 });
+                // domに追加
+                overlay.append(container);
+                container.hide().show(0);
             };
             return DefaultNavigator;
         }());
@@ -3285,6 +3350,7 @@ var DomBehind;
          */
         UIElement.ValueProperty = DomBehind.Data.DependencyProperty.RegisterAttached("val", function (x) { return x.val(); }, function (x, y) { return x.val(y); }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
         UIElement.TextProperty = DomBehind.Data.DependencyProperty.RegisterAttached("text", function (x) { return x.text(); }, function (x, y) { return x.text(y); }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
+        UIElement.SrcProperty = DomBehind.Data.DependencyProperty.RegisterAttached("src", function (x) { return x.attr("src"); }, function (x, y) { return x.attr("src", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("enabled", null, function (x, y) {
             var disabled = y === false ? true : false;
             if (disabled === true) {
@@ -3327,6 +3393,15 @@ var DomBehind;
             });
         }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.Click = DomBehind.EventBuilder.RegisterAttached("click");
+        UIElement.Enter = DomBehind.EventBuilder.RegisterAttached("enter", function (x) {
+            if (x.Element) {
+                x.Element.keydown(function (e) {
+                    if (e.which === 13) {
+                        x.Element.trigger("enter");
+                    }
+                });
+            }
+        });
         UIElement.LostFocus = DomBehind.EventBuilder.RegisterAttached("focusout");
         UIElement.Initialize = DomBehind.EventBuilder.RegisterAttached("initialize");
         UIElement.ViewLoaded = DomBehind.EventBuilder.RegisterAttached("viewLoaded");

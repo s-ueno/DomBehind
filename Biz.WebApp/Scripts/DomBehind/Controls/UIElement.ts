@@ -13,6 +13,11 @@
             = Data.DependencyProperty.RegisterAttached("text",
                 x => x.text(), (x, y) => x.text(y), Data.UpdateSourceTrigger.LostForcus, Data.BindingMode.TwoWay);
 
+        public static SrcProperty: Data.DependencyProperty
+            = Data.DependencyProperty.RegisterAttached("src",
+                x => x.attr("src"), (x, y) => x.attr("src", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
+
+
 
         public static IsEnabledProperty: Data.DependencyProperty
             = Data.DependencyProperty.RegisterAttached("enabled",
@@ -88,6 +93,18 @@
 
         public static Click: IEventBuilder
             = EventBuilder.RegisterAttached<JQueryEventObject>("click");
+
+        public static Enter: IEventBuilder
+            = EventBuilder.RegisterAttached<JQueryEventObject>("enter", (x: Data.ActionBindingBehavior) => {
+                if (x.Element) {
+                    x.Element.keydown(e => {
+                        if (e.which === 13) {
+                            x.Element.trigger("enter");
+                        }
+                    });
+                }
+            });
+
 
         public static LostFocus: IEventBuilder
             = EventBuilder.RegisterAttached<JQueryEventObject>("focusout");

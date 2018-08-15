@@ -7,6 +7,7 @@
         RemoveHandler(handler: { (sender: any, data: any): void }): void;
         Clear();
         Raise(sender: any, data: any): void;
+        Ensure(behavior /* : Data.ActionBindingBehavior */);
     }
 
     /**
@@ -62,6 +63,13 @@
             this.handlers = [];
         }
 
+        public EnsureHandler: (behavior /*: Data.ActionBindingBehavior */) => void;
+        public Ensure(behavior /*: Data.ActionBindingBehavior */) {
+            if (this.EnsureHandler) {
+                this.EnsureHandler(behavior);
+            }
+        }
+
         // #region IDisposable
 
         public Dispose(): void {
@@ -96,6 +104,7 @@
         public Create(): IEvent {
             let event = new TypedEvent<T>();
             event.EventName = this.EventName;
+            event.EnsureHandler = this.ensureHandler;
             return event;
         }
 
@@ -112,10 +121,12 @@
          * Generate a typed event class.
          * @param eventName
          */
-        public static RegisterAttached<T>(eventName?: string): IEventBuilder {
+        public static RegisterAttached<T>(eventName?: string, ensure?: (behavior /* : Data.ActionBindingBehavior */) => void): IEventBuilder {
             let builder = new EventBuilder<T>(eventName);
+            builder.ensureHandler = ensure;
             return builder;
         }
+        private ensureHandler: (behavior /* :Data.ActionBindingBehavior */) => void;
     }
 }
 

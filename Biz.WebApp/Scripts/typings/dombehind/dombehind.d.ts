@@ -132,6 +132,8 @@ declare namespace DomBehind {
         DbName: string;
         constructor(ctor: TypedConstructor<T>, DbName: string);
         TableName: string;
+        List(): JQueryPromise<T[]>;
+        Truncate(): JQueryPromise<any>;
         FindRowAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T>;
         FindRowsAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T[]>;
         protected FetchCursor(indexStore: IDBIndex, value: string | number, d: JQueryDeferred<any>): void;
@@ -431,6 +433,7 @@ declare namespace DomBehind {
          */
         static ValueProperty: Data.DependencyProperty;
         static TextProperty: Data.DependencyProperty;
+        static SrcProperty: Data.DependencyProperty;
         static IsEnabledProperty: Data.DependencyProperty;
         static IsVisibleProperty: Data.DependencyProperty;
         static PlaceHolderProperty: Data.DependencyProperty;
@@ -440,6 +443,7 @@ declare namespace DomBehind {
         static MinNumericProperty: Data.DependencyProperty;
         static HtmlSource: Data.DependencyProperty;
         static Click: IEventBuilder;
+        static Enter: IEventBuilder;
         static LostFocus: IEventBuilder;
         static Initialize: IEventBuilder;
         static ViewLoaded: IEventBuilder;
@@ -919,6 +923,7 @@ declare namespace DomBehind.Navigation {
         FadeOutDuration?: number;
         AllowCloseByClickOverlay?: boolean;
         ShowCloseButton?: boolean;
+        ShowHeader?: boolean;
         StartupLocation?: ModalStartupLocation;
         StartupLocationTop?: number;
         StartupLocationLeft?: number;
@@ -1012,6 +1017,7 @@ declare namespace DomBehind {
         }): void;
         Clear(): any;
         Raise(sender: any, data: any): void;
+        Ensure(behavior: any): any;
     }
     /**
      * define typed events
@@ -1041,6 +1047,8 @@ declare namespace DomBehind {
          */
         Raise(sender: any, data: T): void;
         Clear(): void;
+        EnsureHandler: (behavior: any) => void;
+        Ensure(behavior: any): void;
         Dispose(): void;
         protected _disposed: boolean;
     }
@@ -1064,7 +1072,8 @@ declare namespace DomBehind {
          * Generate a typed event class.
          * @param eventName
          */
-        static RegisterAttached<T>(eventName?: string): IEventBuilder;
+        static RegisterAttached<T>(eventName?: string, ensure?: (behavior: any) => void): IEventBuilder;
+        private ensureHandler;
     }
 }
 

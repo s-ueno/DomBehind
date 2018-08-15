@@ -33,6 +33,10 @@
         public Ensure(): void {
             this.ActionHandle = x => this.OnTrigger(x);
 
+            if (this.Event && this.Event) {
+                this.Event.Ensure(this);
+            }
+
             if (this.Event && !String.IsNullOrWhiteSpace(this.Event.EventName)) {
                 this.Element.on(this.Event.EventName, e => this.ActionHandle(e));
             }
