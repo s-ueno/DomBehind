@@ -437,6 +437,7 @@
     <TypeScriptCompile Include="Scripts\DomBehind\Extensions\PropertyDescriptorExtensions.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Extensions\StringExtensions.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\IndexedDBHelper.ts" />
+    <TypeScriptCompile Include="Scripts\DomBehind\JQueryUI\Selectmenu.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\JQueryUI\Tooltip.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Locator.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Navigation\DefaultNavigator.ts" />

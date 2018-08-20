@@ -91,6 +91,7 @@
                 let obj = items.FirstOrDefault(x => x.id === id);
                 options.selected = obj;
             }
+
             el.w2field('list', options);
 
             return true;

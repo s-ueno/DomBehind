@@ -23,7 +23,7 @@
 
 const z_indexKey: string = "z_indexKey";
 $.GenerateZIndex = function () {
-    var value = $.GetDomStorage(z_indexKey, 2000)
+    var value = $.GetDomStorage(z_indexKey, 500)
     var newValue = value + 1;
     $.SetDomStorage(z_indexKey, newValue);
     return newValue;
@@ -62,6 +62,15 @@ $.SetDomStorage = function (key: string, value: any) {
             type: "hidden",
             id: `DomStorage_${key}`,
         }).appendTo("body");
+    }
+
+    if (Object.IsNullOrUndefined(value)) {
+        let domId = `#DomStorage_${key}`;
+        let dom = $(domId);
+        if (dom.length !== 0) {
+            dom.remove();
+            return;
+        }
     }
     $("body").find(`#DomStorage_${key}`).val(JSON.stringify(value));
 };

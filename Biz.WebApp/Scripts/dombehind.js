@@ -966,7 +966,7 @@ var StringSplitOptions;
 //# sourceMappingURL=StringExtensions.js.map
 var z_indexKey = "z_indexKey";
 $.GenerateZIndex = function () {
-    var value = $.GetDomStorage(z_indexKey, 2000);
+    var value = $.GetDomStorage(z_indexKey, 500);
     var newValue = value + 1;
     $.SetDomStorage(z_indexKey, newValue);
     return newValue;
@@ -1002,6 +1002,14 @@ $.SetDomStorage = function (key, value) {
             type: "hidden",
             id: "DomStorage_" + key,
         }).appendTo("body");
+    }
+    if (Object.IsNullOrUndefined(value)) {
+        var domId = "#DomStorage_" + key;
+        var dom = $(domId);
+        if (dom.length !== 0) {
+            dom.remove();
+            return;
+        }
     }
     $("body").find("#DomStorage_" + key).val(JSON.stringify(value));
 };
@@ -2712,8 +2720,9 @@ var DomBehind;
                 else {
                     container = arg;
                 }
-                container.find(".close").click(overlay, function (e) {
-                    e.data.trigger(OnModalCloseEventName);
+                container.find(".close").on("click", function (e, args) {
+                    $(e.target).trigger(OnModalCloseEventName, args);
+                    // e.data.trigger(OnModalCloseEventName, args);
                 });
                 if (!setting.ShowCloseButton) {
                     container.find(".close").hide();
@@ -2751,19 +2760,24 @@ var DomBehind;
                 }
                 if (setting.AllowCloseByClickOverlay) {
                     overlay.click(overlay, function (e) {
-                        e.data.trigger(OnModalCloseEventName);
+                        $(e.target).trigger(OnModalCloseEventName);
+                        // e.data.trigger(OnModalCloseEventName);
                     });
                     container.click(function (e) {
                         e.stopPropagation();
                     });
                 }
+                var d = $.Deferred();
                 overlay.off(OnModalCloseEventName);
-                overlay.on(OnModalCloseEventName, { me: overlay, option: setting, target: container }, function (e) {
+                overlay.on(OnModalCloseEventName, { me: overlay, option: setting, target: container }, function (e, args) {
                     var eventObj = $.Event('modalClosing');
                     var modalBody = e.data.target.find(".modal-body");
                     $(modalBody.children()[0]).trigger(eventObj);
-                    if (eventObj.result === false)
+                    if (eventObj.result === false) {
+                        d.reject();
                         return;
+                    }
+                    d.resolve(args);
                     var eventOption = e.data.option;
                     var me = e.data.me;
                     me.off(OnModalCloseEventName);
@@ -2778,6 +2792,7 @@ var DomBehind;
                 // domに追加
                 overlay.append(container);
                 container.hide().show(0);
+                return d.promise();
             };
             return DefaultNavigator;
         }());
@@ -4071,6 +4086,116 @@ var DomBehind;
     })(Controls = DomBehind.Controls || (DomBehind.Controls = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Tooltip.js.map
+var DomBehind;
+(function (DomBehind) {
+    var Controls;
+    (function (Controls) {
+        var Selectmenu = /** @class */ (function () {
+            function Selectmenu() {
+                this._engaged = false;
+            }
+            Selectmenu.Register = function (behavior) {
+            };
+            Selectmenu.Rebuild = function (el, list) {
+                var newArray = list.ToArray();
+                if (newArray.SequenceEqual(list.__oldArray)) {
+                    return false;
+                }
+                el.empty();
+                var identity = el.data("menu_identity");
+                if (!identity) {
+                    identity = "menu_" + NewUid();
+                    el.data("menu_identity", identity);
+                }
+                var oldArray = list.__oldArray;
+                list.__oldArray = newArray;
+                var index = 0;
+                var items = newArray.Select(function (x) {
+                    if (Object.IsNullOrUndefined(x))
+                        return null;
+                    x.recid = identity + "_" + ++index;
+                    var text;
+                    if (list.DisplayMemberPath) {
+                        text = x[list.DisplayMemberPath];
+                    }
+                    else {
+                        text = x.toString();
+                    }
+                    var newVal = {
+                        id: x.recid,
+                        text: text,
+                        obj: x,
+                    };
+                    el.append("<option value=\"" + newVal.id + "\">" + newVal.text + "</option>");
+                    return newVal;
+                });
+                Selectmenu.UpdateCurrent(el, list);
+                return true;
+            };
+            Selectmenu.UpdateCurrent = function (el, list) {
+                var widget = el.selectmenu();
+                if (list.Current != null) {
+                    var id = list.Current.recid;
+                    widget.val(id);
+                }
+                widget.selectmenu("refresh");
+            };
+            Selectmenu.prototype.OnCurrentChanged = function (sender, e) {
+                if (this._engaged)
+                    return;
+                var me = sender.__widget;
+                var el = me.Element;
+                // プロパティ未指定の場合は、リフレッシュする
+                if (String.IsNullOrWhiteSpace(e.Name)) {
+                    Selectmenu.Rebuild(el, sender);
+                }
+                else if (e.Name === "Current") {
+                    Selectmenu.UpdateCurrent(el, sender);
+                }
+            };
+            Selectmenu.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", function (el) {
+            }, function (el, newValue) {
+                if (newValue instanceof DomBehind.Data.ListCollectionView) {
+                    if (!Selectmenu.Rebuild(el, newValue))
+                        return;
+                    // 
+                    var sm_1 = newValue.__widget;
+                    if (!sm_1) {
+                        sm_1 = newValue.__widget = new Selectmenu();
+                    }
+                    var option = {
+                        change: function (e) {
+                            var recId = el.val();
+                            sm_1._engaged = true;
+                            try {
+                                if (sm_1.Items) {
+                                    var current = sm_1.Items.ToArray().FirstOrDefault(function (x) { return x.recid === recId; });
+                                    sm_1.Items.Select(current);
+                                }
+                            }
+                            finally {
+                                sm_1._engaged = false;
+                            }
+                        },
+                        classes: {
+                            "ui-selectmenu-menu": "jqueryui-highlight"
+                        }
+                    };
+                    sm_1.Element = el.selectmenu(option);
+                    sm_1.Element.selectmenu("refresh");
+                    sm_1.Items = newValue;
+                    newValue.PropertyChanged.RemoveHandler(sm_1.OnCurrentChanged);
+                    newValue.PropertyChanged.AddHandler(sm_1.OnCurrentChanged);
+                }
+            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, function (behavior) {
+                Selectmenu.Register(behavior);
+            });
+            return Selectmenu;
+        }());
+        Controls.Selectmenu = Selectmenu;
+    })(Controls = DomBehind.Controls || (DomBehind.Controls = {}));
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Selectmenu.js.map
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||

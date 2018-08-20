@@ -40,9 +40,10 @@
             StartupLocationLeft: null
         };
 
-        public ShowModal(arg: any, option?: IModalHelperSettings) {
-            var setting: IModalHelperSettings = $.extend(true, this.DefaultSetting, option);;
-            var overlay = $("<div>", {
+        public ShowModal(arg: any, option?: IModalHelperSettings): JQueryPromise<any> {
+
+            let setting: IModalHelperSettings = $.extend(true, this.DefaultSetting, option);;
+            let overlay = $("<div>", {
                 class: "modal-overlay",
             });
 
@@ -77,10 +78,11 @@
             } else {
                 container = arg;
             }
-            container.find(".close").click(overlay, e => {
-                e.data.trigger(OnModalCloseEventName);
-            });
 
+            container.find(".close").on("click", (e, args) => {
+                $(e.target).trigger(OnModalCloseEventName, args);
+                // e.data.trigger(OnModalCloseEventName, args);
+            });
 
             if (!setting.ShowCloseButton) {
                 container.find(".close").hide();
@@ -100,6 +102,7 @@
                         .css("left", setting.StartupLocationLeft);
                 }
             }
+
 
             //// domに追加
             //overlay.append(container);
@@ -123,21 +126,27 @@
 
             if (setting.AllowCloseByClickOverlay) {
                 overlay.click(overlay, e => {
-                    e.data.trigger(OnModalCloseEventName);
+                    $(e.target).trigger(OnModalCloseEventName);
+                    // e.data.trigger(OnModalCloseEventName);
                 });
                 container.click(e => {
                     e.stopPropagation();
                 });
             }
 
+            let d = $.Deferred();
             overlay.off(OnModalCloseEventName);
-            overlay.on(OnModalCloseEventName, { me: overlay, option: setting, target: container }, e => {
+            overlay.on(OnModalCloseEventName, { me: overlay, option: setting, target: container }, (e, args) => {
 
                 var eventObj = $.Event('modalClosing');
                 var modalBody = e.data.target.find(".modal-body");
                 $(modalBody.children()[0]).trigger(eventObj);
-                if (eventObj.result === false) return;
+                if (eventObj.result === false) {
+                    d.reject();
+                    return;
+                }
 
+                d.resolve(args);
                 var eventOption = e.data.option as IModalHelperSettings;
                 var me = e.data.me;
                 me.off(OnModalCloseEventName);
@@ -154,6 +163,8 @@
             // domに追加
             overlay.append(container);
             container.hide().show(0);
+
+            return d.promise();
         }
     }
 }

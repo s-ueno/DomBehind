@@ -19,8 +19,8 @@
     }
 
     export interface INavigator {
-        ShowModal(uri: string, option?: IModalHelperSettings);
-        ShowModal(jquery: JQuery, option?: IModalHelperSettings);
+        ShowModal(uri: string, option?: IModalHelperSettings): JQueryPromise<any>;
+        ShowModal(jquery: JQuery, option?: IModalHelperSettings): JQueryPromise<any>;
 
         Move(uri: string);
         Move(uri: string, historyBack: boolean);

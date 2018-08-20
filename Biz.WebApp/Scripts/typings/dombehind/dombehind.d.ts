@@ -897,6 +897,19 @@ interface String {
 }
 
 declare namespace DomBehind.Controls {
+    class Selectmenu {
+        static ItemsSourceProperty: Data.DependencyProperty;
+        static Register(behavior: Data.DataBindingBehavior): void;
+        static Rebuild(el: JQuery, list: Data.ListCollectionView): boolean;
+        _engaged: boolean;
+        Items: Data.ListCollectionView;
+        Element: JQuery;
+        private static UpdateCurrent;
+        OnCurrentChanged(sender: Data.ListCollectionView, e: PropertyChangedEventArgs): void;
+    }
+}
+
+declare namespace DomBehind.Controls {
     class Tooltip {
         static TextProperty: Data.DependencyProperty;
     }
@@ -909,7 +922,7 @@ declare namespace DomBehind.Navigation {
         Move(uri: string, historyBack: boolean): any;
         Reload(forcedReload?: boolean): void;
         protected DefaultSetting: IModalHelperSettings;
-        ShowModal(arg: any, option?: IModalHelperSettings): void;
+        ShowModal(arg: any, option?: IModalHelperSettings): JQueryPromise<any>;
     }
 }
 
@@ -931,8 +944,8 @@ declare namespace DomBehind.Navigation {
         Width?: string;
     }
     interface INavigator {
-        ShowModal(uri: string, option?: IModalHelperSettings): any;
-        ShowModal(jquery: JQuery, option?: IModalHelperSettings): any;
+        ShowModal(uri: string, option?: IModalHelperSettings): JQueryPromise<any>;
+        ShowModal(jquery: JQuery, option?: IModalHelperSettings): JQueryPromise<any>;
         Move(uri: string): any;
         Move(uri: string, historyBack: boolean): any;
         NewWindow(uri: string, target?: string, style?: string): Window;
@@ -1629,6 +1642,47 @@ declare namespace DomBehind {
          *
          */
         BuildSidebar(bindingNodes: (x: T) => any, selectedAction?: (x: T, args: any) => void, useCloseMenu?: boolean): W2SidebarBindingBehaviorBuilder<T>;
+    }
+}
+
+declare namespace DomBehind {
+    interface ISidemenuNode {
+        Title: string;
+        Icon?: string;
+        Image?: string;
+        Badge?: number;
+        Style?: string;
+        IsGroup?: boolean;
+        AllowShowHideGroupNode?: boolean;
+        AddtionalInfo?: any;
+        Selected?: boolean;
+        Expanded?: boolean;
+        IsVisible?: boolean;
+        Enabled?: boolean;
+        OnClick?: Function;
+        Id?: string;
+        Children?: ISidemenuNode[];
+    }
+    class W2SidemenuBindingBehavior extends Data.BindingBehavior {
+        Identity: string;
+        ClickEvent: IEvent;
+        AllowMenuExpand: boolean;
+        static ItemsSource: Data.DependencyProperty;
+        static BuildW2Node(value: ISidemenuNode): any;
+        static RecursiveNode(value: ISidemenuNode[]): any;
+        static FindModel(value: ISidemenuNode[], id: string): any;
+        Ensure(): void;
+    }
+    class W2SidemenuBindingBehaviorBuilder<T> extends BindingBehaviorBuilder<T> {
+        constructor(owner: BizView);
+    }
+    interface BindingBehaviorBuilder<T> {
+        /**
+         * Divタグにw2sidebar機構を組み込みます。
+         * 実装例：
+         *
+         */
+        BuildSidemenu(bindingNodes: (x: T) => any, selectedAction?: (x: T, args: any) => void, useCloseMenu?: boolean): W2SidebarBindingBehaviorBuilder<T>;
     }
 }
 

@@ -183,6 +183,10 @@ namespace Biz.WebApp
       "~/Scripts/DomBehind/Controls/Tab.js",
       "~/Scripts/DomBehind/Controls/MessageBox.js",
 
+      /* DomBehind/JQueryUI */
+      "~/Scripts/DomBehind/JQueryUI/Tooltip.js",
+      "~/Scripts/DomBehind/JQueryUI/Selectmenu.js",
+
       /* DomBehind/W2UI */
       "~/Scripts/DomBehind/W2UI/Toolbar.js",
       "~/Scripts/DomBehind/W2UI/Layout.js",
