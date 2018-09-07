@@ -39,6 +39,8 @@ namespace Biz.WebApp
                 /* jquery ui */
                 "~/Content/themes/base/all.css",
 
+                /* full calender */
+                "~/Content/fullcalendar.css",
 
                 /* animate css */
                 "~/Content/animate.css",
@@ -80,8 +82,20 @@ namespace Biz.WebApp
             /* JQuery ui layout */
             "~/Scripts/jquery.layout.js",
 
+
+            /* fullcalendar */
+            "~/Scripts/moment.js",
+            "~/Scripts/moment-with-locales.js",
+
+            "~/Scripts/fullcalendar/fullcalendar.js",
+            "~/Scripts/fullcalendar/gcal.js",
+            "~/Scripts/fullcalendar/locale-all.js",
+            "~/Scripts/fullcalendar/ja.js",
+
+
             /* bootstrap系 */
             "~/Scripts/bootstrap.js",
+            "~/Scripts/bootstrap-wysiwyg.js",
 
             // bootstrap のドロップダウン日本語化
             // "~/Scripts/i18n/defaults-ja_JP.js",
@@ -182,10 +196,18 @@ namespace Biz.WebApp
       "~/Scripts/DomBehind/Controls/Selector.js",
       "~/Scripts/DomBehind/Controls/Tab.js",
       "~/Scripts/DomBehind/Controls/MessageBox.js",
+      "~/Scripts/DomBehind/Controls/ListView.js",
 
       /* DomBehind/JQueryUI */
       "~/Scripts/DomBehind/JQueryUI/Tooltip.js",
       "~/Scripts/DomBehind/JQueryUI/Selectmenu.js",
+
+      /* DomBehind/Calendar */
+      "~/Scripts/DomBehind/Calendar/Calendar.js",
+
+      /* DomBehind/bootstrap */
+      "~/Scripts/DomBehind/Bootstrap/Editor.js",
+
 
       /* DomBehind/W2UI */
       "~/Scripts/DomBehind/W2UI/Toolbar.js",
@@ -217,31 +239,26 @@ namespace Biz.WebApp
             "~/Scripts/App/Startup.js",
 
             "~/Scripts/App/Shared/WebServiceProxy.js",
-            "~/Scripts/App/Shared/LayoutView.js",
             "~/Scripts/App/Shared/LayoutViewModel.js",
-            "~/Scripts/App/Shared/LayoutSPAView.js",
+            "~/Scripts/App/Shared/LayoutView.js",            
             "~/Scripts/App/Shared/LayoutSPAViewModel.js",
+            "~/Scripts/App/Shared/LayoutSPAView.js",            
 
             "~/Scripts/App/Home/WebServiceProxy.js",
-            "~/Scripts/App/Home/HomeView.js",
             "~/Scripts/App/Home/HomeViewModel.js",
-
+            "~/Scripts/App/Home/HomeView.js",            
 
             "~/Scripts/App/TwoPane/WebServiceProxy.js",
             "~/Scripts/App/TwoPane/Mediator.js",
-
-            "~/Scripts/App/TwoPane/MainView.js",
             "~/Scripts/App/TwoPane/MainViewModel.js",
-
-            "~/Scripts/App/TwoPane/DetailView.js",
+            "~/Scripts/App/TwoPane/MainView.js",                        
             "~/Scripts/App/TwoPane/DetailViewModel.js",
+            "~/Scripts/App/TwoPane/DetailView.js",
 
-
-            "~/Scripts/App/ThreePane/WebServiceProxy.js",
-            "~/Scripts/App/ThreePane/Mediator.js",
-
-            "~/Scripts/App/ThreePane/MainView.js",
-            "~/Scripts/App/ThreePane/MainViewModel.js",
+            "~/Scripts/App/Calendar/WebServiceProxy.js",
+            "~/Scripts/App/Calendar/Mediator.js",
+            "~/Scripts/App/Calendar/CalendarViewModel.js",
+            "~/Scripts/App/Calendar/CalendarView.js",
 
         };
     }

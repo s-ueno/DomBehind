@@ -732,9 +732,8 @@ var DomBehind;
 (function (DomBehind) {
     var Observable = /** @class */ (function () {
         // #endregion
-        function Observable(source, marks) {
+        function Observable(source, option) {
             this.source = source;
-            this.marks = marks;
             // #region INotifyPropertyChanged
             this.PropertyChanging = new DomBehind.TypedEvent();
             this.PropertyChanged = new DomBehind.TypedEvent();
@@ -745,8 +744,14 @@ var DomBehind;
                 var name_1 = keys[i];
                 if (String.IsNullOrWhiteSpace(name_1))
                     return "continue";
-                if (marks) {
-                    if (marks.Any(function (x) { return x === name_1; })) {
+                if (option) {
+                    this_1.Wrapper = option.wrapper;
+                    if (option.marks) {
+                        if (option.marks.Any(function (x) { return x === name_1; })) {
+                            this_1.Recurcive(source, name_1, null);
+                        }
+                    }
+                    else {
                         this_1.Recurcive(source, name_1, null);
                     }
                 }
@@ -764,7 +769,10 @@ var DomBehind;
             for (var _i = 1; _i < arguments.length; _i++) {
                 marks[_i - 1] = arguments[_i];
             }
-            return new Observable(target, marks);
+            return new Observable(target, { marks: marks });
+        };
+        Observable.RegisterAttached = function (target, option) {
+            return new Observable(target, option);
         };
         Observable.prototype.Recurcive = function (source, name, parentName) {
             var value = source[name];
@@ -789,10 +797,13 @@ var DomBehind;
         Observable.prototype.CreateDescriptor = function (notifibleName, value) {
             var changing = this.PropertyChanging;
             var notifier = this.PropertyChanged;
+            var wrapper = this.Wrapper;
             var e = new DomBehind.PropertyChangedEventArgs(notifibleName);
             var sender = this.source;
             return {
                 get: function () {
+                    if (wrapper)
+                        return wrapper(value);
                     return value;
                 },
                 set: function (v) {
@@ -903,6 +914,14 @@ Object.defineProperty(String.prototype, "ExtendedPrototype", {
     }
     return result;
 });
+"Sum".ExtendedPrototype(Array.prototype, function (selector) {
+    var me = this;
+    var value = 0;
+    me.forEach(function (x) {
+        value += selector(x);
+    });
+    return value;
+});
 //# sourceMappingURL=EnumerableExtensions.js.map
 // declare var Object: ObjectConstructor;
 Object.IsNullOrUndefined = function (obj) {
@@ -962,6 +981,74 @@ var StringSplitOptions;
 "Replace".ExtendedPrototype(String.prototype, function (searchValue, replaceValue) {
     var me = this;
     return me.split(searchValue).join(replaceValue);
+});
+"Repeat".ExtendedPrototype(String.prototype, function (count) {
+    'use strict';
+    if (this == null) {
+        throw new TypeError('can\'t convert ' + this + ' to object');
+    }
+    var str = '' + this;
+    count = +count;
+    if (count != count) {
+        count = 0;
+    }
+    if (count < 0) {
+        throw new RangeError('repeat count must be non-negative');
+    }
+    if (count == Infinity) {
+        throw new RangeError('repeat count must be less than infinity');
+    }
+    count = Math.floor(count);
+    if (str.length == 0 || count == 0) {
+        return '';
+    }
+    if (str.length * count >= 1 << 28) {
+        throw new RangeError('repeat count must not overflow maximum string size');
+    }
+    var rpt = '';
+    for (;;) {
+        if ((count & 1) == 1) {
+            rpt += str;
+        }
+        count >>>= 1;
+        if (count == 0) {
+            break;
+        }
+        str += str;
+    }
+    return rpt;
+});
+"PadLeft".ExtendedPrototype(String.prototype, function (totalWidth, paddingChar) {
+    totalWidth = totalWidth >> 0; //truncate if number or convert non-number to 0;
+    paddingChar = String((typeof paddingChar !== 'undefined' ? paddingChar : ' '));
+    if (this.length > totalWidth) {
+        return String(this);
+    }
+    else {
+        totalWidth = totalWidth - this.length;
+        if (totalWidth > paddingChar.length) {
+            paddingChar += paddingChar.Repeat(totalWidth / paddingChar.length); //append to original to ensure we are longer than needed
+        }
+        return paddingChar.slice(0, totalWidth) + String(this);
+    }
+});
+"PadRight".ExtendedPrototype(String.prototype, function (totalWidth, paddingChar) {
+    totalWidth = totalWidth >> 0; //floor if number or convert non-number to 0;
+    paddingChar = String((typeof paddingChar !== 'undefined' ? paddingChar : ' '));
+    if (this.length > totalWidth) {
+        return String(this);
+    }
+    else {
+        totalWidth = totalWidth - this.length;
+        if (totalWidth > paddingChar.length) {
+            paddingChar += paddingChar.Repeat(totalWidth / paddingChar.length); //append to original to ensure we are longer than needed
+        }
+        return String(this) + paddingChar.slice(0, totalWidth);
+    }
+});
+"SubString".ExtendedPrototype(String.prototype, function (start, length) {
+    var me = this;
+    return me.toString().substr(start, length);
 });
 //# sourceMappingURL=StringExtensions.js.map
 var z_indexKey = "z_indexKey";
@@ -1979,6 +2066,32 @@ var DomBehind;
             // default PartialMark is PropertyName
             return dataBindingBuilder.PartialMark(behavior.PInfo.MemberPath);
         };
+        /**
+         * Assign "IValueConverter"
+         * @param conv
+         */
+        BindingBehaviorBuilder.prototype.SetConverter = function (conv) {
+            this.CurrentBehavior.BindingPolicy.Converter = conv;
+            return this;
+        };
+        BindingBehaviorBuilder.prototype.ConvertTarget = function (exp) {
+            if (this.CurrentBehavior.BindingPolicy.Converter) {
+                throw new DomBehind.Exception("Another 'IValueConverter' has already been assigned.");
+            }
+            var conv = new SimpleConverter();
+            conv.ConvertHandler = exp;
+            this.CurrentBehavior.BindingPolicy.Converter = conv;
+            return this;
+        };
+        BindingBehaviorBuilder.prototype.ConvertSource = function (exp) {
+            if (this.CurrentBehavior.BindingPolicy.Converter) {
+                throw new DomBehind.Exception("Another 'IValueConverter' has already been assigned.");
+            }
+            var conv = new SimpleConverter();
+            conv.ConvertBackHandler = exp;
+            this.CurrentBehavior.BindingPolicy.Converter = conv;
+            return this;
+        };
         // #endregion
         // #region BindingViewModel
         BindingBehaviorBuilder.prototype.BindingViewViewModel = function (view, viewModel) {
@@ -1987,11 +2100,6 @@ var DomBehind;
             behavior.GetViewModel = viewModel;
             return this;
         };
-        /**
-         * linking the action of the view and the view model
-         * @param event
-         * @param action
-         */
         BindingBehaviorBuilder.prototype.BindingAction = function (event, action, allowBubbling) {
             if (allowBubbling === void 0) { allowBubbling = false; }
             var behavior = this.Add(new DomBehind.Data.ActionBindingBehavior());
@@ -2020,6 +2128,17 @@ var DomBehind;
         return BindingBehaviorBuilder;
     }());
     DomBehind.BindingBehaviorBuilder = BindingBehaviorBuilder;
+    var SimpleConverter = /** @class */ (function () {
+        function SimpleConverter() {
+        }
+        SimpleConverter.prototype.Convert = function (value) {
+            return this.ConvertHandler(value);
+        };
+        SimpleConverter.prototype.ConvertBack = function (value) {
+            return this.ConvertBackHandler(value);
+        };
+        return SimpleConverter;
+    }());
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=BindingBehaviorBuilder.js.map
 var __extends = (this && this.__extends) || (function () {
@@ -3154,8 +3273,9 @@ var DomBehind;
                     var factory = new DomBehind.TypedFactory(type());
                     for (var i = 0; i < defaultPoolCount; i++) {
                         var newThread = factory.CreateInstance();
-                        if (newThread.PoolType & DomBehind.PoolType.PreLoad)
+                        if ((newThread.PoolType & DomBehind.PoolType.PreLoad) == DomBehind.PoolType.PreLoad) {
                             newThread.Load();
+                        }
                         _this.Pool.push(newThread);
                     }
                 });
@@ -3203,7 +3323,7 @@ var DomBehind;
     (function (Threading) {
         var WorkerWrapper = /** @class */ (function () {
             function WorkerWrapper() {
-                this.PoolType = DomBehind.PoolType.PreLoad;
+                this.PoolType = DomBehind.PoolType.Reload;
             }
             Object.defineProperty(WorkerWrapper.prototype, "Thread", {
                 get: function () { return this._thread; },
@@ -3284,7 +3404,7 @@ var DomBehind;
             }
             Object.defineProperty(PlainXMLHttpRequestWorker.prototype, "WorkerScript", {
                 get: function () {
-                    return "/Scripts/dombehind-PlainXMLHttpRequest.js";
+                    return "~/Scripts/dombehind-PlainXMLHttpRequest.js";
                 },
                 enumerable: true,
                 configurable: true
@@ -3329,11 +3449,17 @@ var DomBehind;
                 });
                 return d.promise();
             };
-            WebService.prototype.ExecuteAsync = function (request) {
-                return DomBehind.Threading.WorkerPool.Do(Web.PlainXMLHttpRequestWorker, {
-                    Url: $.AbsoluteUri(this.Url),
-                    Request: request
+            WebService.prototype.ExecuteAsync = function (request, option) {
+                var d = $.Deferred();
+                var p = $.extend(true, this.DefaultPostSetting, option);
+                p.data = JSON.stringify(request);
+                p.async = true;
+                $.ajax(p).done(function (x) {
+                    d.resolve(x);
+                }).fail(function (x) {
+                    d.reject(new DomBehind.AjaxException(x));
                 });
+                return d.promise();
             };
             Object.defineProperty(WebService.prototype, "DefaultPostSetting", {
                 get: function () {
@@ -3408,15 +3534,16 @@ var DomBehind;
             });
         }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.Click = DomBehind.EventBuilder.RegisterAttached("click");
-        UIElement.Enter = DomBehind.EventBuilder.RegisterAttached("enter", function (x) {
-            if (x.Element) {
+        UIElement.Enter = DomBehind.EventBuilder.RegisterAttached("enterKeydown", function (x) {
+            if (x && x.Element) {
                 x.Element.keydown(function (e) {
                     if (e.which === 13) {
-                        x.Element.trigger("enter");
+                        x.Element.trigger("enterKeydown");
                     }
                 });
             }
         });
+        UIElement.Keydown = DomBehind.EventBuilder.RegisterAttached("keydown");
         UIElement.LostFocus = DomBehind.EventBuilder.RegisterAttached("focusout");
         UIElement.Initialize = DomBehind.EventBuilder.RegisterAttached("initialize");
         UIElement.ViewLoaded = DomBehind.EventBuilder.RegisterAttached("viewLoaded");
@@ -4061,6 +4188,170 @@ var DomBehind;
     DomBehind.DefaultMessageContainer = DefaultMessageContainer;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=MessageBox.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var DomBehind;
+(function (DomBehind) {
+    var ListView = /** @class */ (function (_super) {
+        __extends(ListView, _super);
+        function ListView() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(ListView.prototype, "ItemsSource", {
+            get: function () {
+                return this._items;
+            },
+            set: function (newValue) {
+                var _this = this;
+                if (Object.IsNullOrUndefined(newValue)) {
+                    this.Clear();
+                    this._items = newValue;
+                    return;
+                }
+                var newItems = newValue.ToArray();
+                if (!Object.IsNullOrUndefined(this._items) &&
+                    newItems.SequenceEqual(this._items.ToArray())) {
+                    return;
+                }
+                this.Clear();
+                var body = this.Element.find("#" + this.BodyId);
+                $.each(newItems, function (i, value) {
+                    var tr = $("<tr></tr>");
+                    $.each(_this.Columns, function (k, column) {
+                        var td = $("<td></td>");
+                        if (column.cellClass) {
+                            td.addClass(column.cellClass);
+                        }
+                        var cellValue = column.value(value);
+                        if (column.convertTarget) {
+                            cellValue = column.convertTarget(cellValue);
+                        }
+                        td.text(cellValue);
+                        tr.append(td);
+                    });
+                    body.append(tr);
+                });
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ListView.prototype.Clear = function () {
+            var body = this.Element.find("#" + this.BodyId);
+            body.empty();
+        };
+        Object.defineProperty(ListView.prototype, "DefaultTableOption", {
+            get: function () {
+                return {
+                    class: "",
+                };
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ListView.prototype.Ensure = function () {
+            _super.prototype.Ensure.call(this);
+            this.Element.empty();
+            if (!this.Element.hasClass("table-responsive")) {
+                this.Element.addClass("table-responsive");
+            }
+            var identity = "lv-" + NewUid();
+            this.Element.attr("listview-identity", identity);
+            window[identity] = this;
+            this.TableId = "tb-" + NewUid();
+            this.HeaderId = "th-" + NewUid();
+            this.BodyId = "tr-" + NewUid();
+            var table = $("<table id=\"" + this.TableId + "\" class=\"table\"></table>");
+            if (this.TableOption.isHover) {
+                table.addClass("table-hover");
+            }
+            if (this.TableOption.isBordered) {
+                table.addClass("table-bordered");
+            }
+            if (this.TableOption.isStriped) {
+                table.addClass("table-striped");
+            }
+            if (this.TableOption.class) {
+                table.addClass(this.TableOption.class);
+            }
+            var header = $("<thead id=\"" + this.HeaderId + "\"></thead>");
+            var headerRow = $("<tr></tr>");
+            $.each(this.Columns, function (i, value) {
+                var th = $("<th>" + value.caption + "</th>");
+                if (value.width) {
+                    th.css('width', value.width);
+                }
+                if (value.headerClass) {
+                    th.addClass(value.headerClass);
+                }
+                headerRow.append(th);
+            });
+            header.append(headerRow);
+            table.append(header);
+            var body = $("<tbody id=\"" + this.BodyId + "\"></tbody>");
+            table.append(body);
+            this.Element.append(table);
+        };
+        ListView.prototype.AddColumn = function (option) {
+            if (!this.Columns) {
+                this.Columns = new Array();
+            }
+            this.Columns.push(option);
+        };
+        ListView.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", function (el) {
+        }, function (el, newValue) {
+            var identity = el.attr("listview-identity");
+            var me = window[identity];
+            if (newValue instanceof DomBehind.Data.ListCollectionView) {
+                me.ItemsSource = newValue;
+            }
+            else {
+                me.ItemsSource = new DomBehind.Data.ListCollectionView([]);
+            }
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        return ListView;
+    }(DomBehind.Data.DataBindingBehavior));
+    DomBehind.ListView = ListView;
+    var TableBindingBehaviorBuilder = /** @class */ (function (_super) {
+        __extends(TableBindingBehaviorBuilder, _super);
+        function TableBindingBehaviorBuilder(owner) {
+            return _super.call(this, owner) || this;
+        }
+        TableBindingBehaviorBuilder.prototype.ColumnBinding = function (title, binding, option) {
+            if (this.CurrentBehavior instanceof ListView) {
+                var op = $.extend(true, {}, option);
+                op.value = binding;
+                op.caption = title;
+                this.CurrentBehavior.AddColumn(op);
+            }
+            return this;
+        };
+        return TableBindingBehaviorBuilder;
+    }(DomBehind.BindingBehaviorBuilder));
+    DomBehind.TableBindingBehaviorBuilder = TableBindingBehaviorBuilder;
+    DomBehind.BindingBehaviorBuilder.prototype.BuildListView = function (itemSource, option) {
+        var me = this;
+        var behavior = me.Add(new ListView());
+        behavior.Property = ListView.ItemsSourceProperty;
+        behavior.PInfo = new DomBehind.LamdaExpression(me.Owner.DataContext, itemSource);
+        behavior.TableOption = option;
+        var newMe = new TableBindingBehaviorBuilder(me.Owner);
+        newMe.CurrentBehavior = me.CurrentBehavior;
+        newMe.CurrentElement = me.CurrentElement;
+        return newMe;
+    };
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=ListView.js.map
 var DomBehind;
 (function (DomBehind) {
     var Controls;
@@ -4095,6 +4386,11 @@ var DomBehind;
                 this._engaged = false;
             }
             Selectmenu.Register = function (behavior) {
+                var el = behavior.Element;
+                var value = el.data("native-menu");
+                if (String.IsNullOrWhiteSpace(value)) {
+                    el.data("native-menu", "false");
+                }
             };
             Selectmenu.Rebuild = function (el, list) {
                 var newArray = list.ToArray();
@@ -4196,6 +4492,607 @@ var DomBehind;
     })(Controls = DomBehind.Controls || (DomBehind.Controls = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Selectmenu.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var DomBehind;
+(function (DomBehind) {
+    var CalendarViewMode;
+    (function (CalendarViewMode) {
+        CalendarViewMode[CalendarViewMode["month"] = 0] = "month";
+        CalendarViewMode[CalendarViewMode["agendaWeek"] = 1] = "agendaWeek";
+        CalendarViewMode[CalendarViewMode["agendaDay"] = 2] = "agendaDay";
+    })(CalendarViewMode = DomBehind.CalendarViewMode || (DomBehind.CalendarViewMode = {}));
+    var CalendarHeaderButtons;
+    (function (CalendarHeaderButtons) {
+        CalendarHeaderButtons[CalendarHeaderButtons["prevYear"] = 1] = "prevYear";
+        CalendarHeaderButtons[CalendarHeaderButtons["prev"] = 2] = "prev";
+        CalendarHeaderButtons[CalendarHeaderButtons["next"] = 4] = "next";
+        CalendarHeaderButtons[CalendarHeaderButtons["nextYear"] = 8] = "nextYear";
+        CalendarHeaderButtons[CalendarHeaderButtons["month"] = 16] = "month";
+        CalendarHeaderButtons[CalendarHeaderButtons["agendaWeek"] = 32] = "agendaWeek";
+        CalendarHeaderButtons[CalendarHeaderButtons["agendaDay"] = 64] = "agendaDay";
+        CalendarHeaderButtons[CalendarHeaderButtons["title"] = 128] = "title";
+        CalendarHeaderButtons[CalendarHeaderButtons["today"] = 256] = "today";
+    })(CalendarHeaderButtons = DomBehind.CalendarHeaderButtons || (DomBehind.CalendarHeaderButtons = {}));
+    var EventDataWrapper = /** @class */ (function () {
+        function EventDataWrapper() {
+            this.CalendarBindings = {};
+        }
+        Object.defineProperty(EventDataWrapper.prototype, "id", {
+            get: function () {
+                return this.GetValue("id");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "title", {
+            get: function () {
+                return this.GetValue("title");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "start", {
+            get: function () {
+                var value = this.GetValue("start");
+                return moment(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "end", {
+            get: function () {
+                var value = this.GetValue("end");
+                return moment(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "allDay", {
+            get: function () {
+                return this.GetValue("allDay");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "url", {
+            get: function () {
+                return this.GetValue("url");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "className", {
+            get: function () {
+                return this.GetValue("className");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "editable", {
+            get: function () {
+                return this.GetValue("editable", true);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "color", {
+            get: function () {
+                return this.GetValue("color");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "backgroundColor", {
+            get: function () {
+                return this.GetValue("backgroundColor");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "borderColor", {
+            get: function () {
+                return this.GetValue("borderColor");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "textColor", {
+            get: function () {
+                return this.GetValue("textColor");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "rendering", {
+            get: function () {
+                return this.GetValue("rendering");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "startEditable", {
+            get: function () {
+                return this.GetValue("startEditable", true);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EventDataWrapper.prototype, "overlap", {
+            get: function () {
+                return this.GetValue("overlap", true);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        EventDataWrapper.prototype.GetValue = function (key, defaultValue) {
+            var option = this.CalendarBindings[key];
+            if (!option || !option.Expression)
+                return defaultValue;
+            var value = option.Expression(this.EventData);
+            if (option.ConvertTarget) {
+                value = option.ConvertTarget(value);
+            }
+            return value;
+        };
+        return EventDataWrapper;
+    }());
+    var Calendar = /** @class */ (function (_super) {
+        __extends(Calendar, _super);
+        function Calendar() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.CalendarBindings = {};
+            return _this;
+        }
+        Calendar.prototype.Ensure = function () {
+            var _this = this;
+            _super.prototype.Ensure.call(this);
+            this.Option = $.extend(true, this.DefaultOption, this.Option);
+            // ユニークなIDを属性に付与した上で、グローバル管理
+            var identity = "id-" + NewUid();
+            this.Element.attr("fullCalendar-identity", identity);
+            window[identity] = this;
+            var option = {
+                header: {
+                    left: this.ParseCalendarHeaderButtons(this.Option.header.left),
+                    center: this.ParseCalendarHeaderButtons(this.Option.header.center),
+                    right: this.ParseCalendarHeaderButtons(this.Option.header.right)
+                },
+                defaultDate: this.Option.defaultDate,
+                businessHours: this.Option.businessHours,
+                editable: this.Option.editable,
+                theme: this.Option.theme,
+                defaultView: this.ParseCalendarViewMode(this.Option.defaultView),
+                scrollTime: this.ParseScrollTime(this.Option.scrollTime),
+                slotDuration: this.ParseSlotDuration(this.Option.slotDuration),
+            };
+            // patch
+            option.eventAfterAllRender = function (view) {
+            };
+            if (this.Option.eventClick) {
+                option.eventClick = function (a, b, c) {
+                    if (a.EventData) {
+                        var e_1 = {
+                            sender: _this,
+                            original: a.EventData,
+                            event: b,
+                            view: c
+                        };
+                        DomBehind.Application.Current.SafeAction(function () {
+                            return _this.Option.eventClick(_this.DataContext, e_1);
+                        });
+                    }
+                };
+            }
+            if (this.Option.dayClick) {
+                // hack d.tsがjsの変更に追いついていない
+                option.dayClick = function (date, jsEvent, view) {
+                    var e = {
+                        event: jsEvent,
+                        view: view,
+                        date: date && date.toDate() ? date.toDate() : date,
+                    };
+                    DomBehind.Application.Current.SafeAction(function () {
+                        return _this.Option.dayClick(_this.DataContext, e);
+                    });
+                };
+            }
+            var nativeOption = {
+                lang: this.Option.lang,
+                locale: this.Option.lang
+            };
+            option = $.extend(option, nativeOption);
+            this.Element.fullCalendar(option);
+            if (this.Option.viewModeClick) {
+                var monthButton = this.Element.find(".fc-month-button span");
+                if (monthButton.length !== 0) {
+                    monthButton.click(function (e) {
+                        var eventArgs = {
+                            sender: _this,
+                            mode: CalendarViewMode.month,
+                            original: e,
+                        };
+                        _this.Option.viewModeClick(_this.DataContext, eventArgs);
+                        //Application.Current.SafeAction((vm: any, option: ICalendarOption<any>, e: ICalendarEventArgs) => {
+                        //    option.viewModeClick(vm, e);
+                        //}, this.DataContext, this.DataContext, this.Option, eventArgs);
+                    });
+                }
+                var agendaWeekButton = this.Element.find(".fc-agendaWeek-button span");
+                if (agendaWeekButton.length !== 0) {
+                    agendaWeekButton.click(function (e) {
+                        var eventArgs = {
+                            sender: _this,
+                            mode: CalendarViewMode.agendaWeek,
+                            original: e,
+                        };
+                        _this.Option.viewModeClick(_this.DataContext, eventArgs);
+                    });
+                }
+                var agendaDayButton = this.Element.find(".fc-agendaDay-button span");
+                if (agendaDayButton.length !== 0) {
+                    agendaDayButton.click(function (e) {
+                        var eventArgs = {
+                            sender: _this,
+                            mode: CalendarViewMode.agendaDay,
+                            original: e,
+                        };
+                        _this.Option.viewModeClick(_this.DataContext, eventArgs);
+                    });
+                }
+            }
+        };
+        Calendar.prototype.ParseCalendarHeaderButtons = function (status) {
+            var list = new DomBehind.List();
+            if (this.HasFlag(status, CalendarHeaderButtons.prevYear)) {
+                list.add("prevYear");
+            }
+            if (this.HasFlag(status, CalendarHeaderButtons.prev)) {
+                list.add("prev");
+            }
+            if (this.HasFlag(status, CalendarHeaderButtons.next)) {
+                list.add("next");
+            }
+            if (this.HasFlag(status, CalendarHeaderButtons.nextYear)) {
+                list.add("nextYear");
+            }
+            if (this.HasFlag(status, CalendarHeaderButtons.month)) {
+                list.add("month");
+            }
+            if (this.HasFlag(status, CalendarHeaderButtons.agendaWeek)) {
+                list.add("agendaWeek");
+            }
+            if (this.HasFlag(status, CalendarHeaderButtons.agendaDay)) {
+                list.add("agendaDay");
+            }
+            if (this.HasFlag(status, CalendarHeaderButtons.title)) {
+                list.add("title");
+            }
+            if (this.HasFlag(status, CalendarHeaderButtons.today)) {
+                list.add("today");
+            }
+            return list.toArray().join(",");
+        };
+        Calendar.prototype.HasFlag = function (status, flag) {
+            return ((status & flag) == flag);
+        };
+        Calendar.prototype.ParseCalendarViewMode = function (status) {
+            if (status === CalendarViewMode.agendaDay) {
+                return "agendaDay";
+            }
+            else if (status === CalendarViewMode.agendaWeek) {
+                return "agendaWeek";
+            }
+            else {
+                return "month";
+            }
+        };
+        Calendar.prototype.ParseScrollTime = function (hour) {
+            return moment.duration(hour, "hour");
+        };
+        Calendar.prototype.ParseSlotDuration = function (minute) {
+            return moment.duration(minute, "minute");
+        };
+        Object.defineProperty(Calendar.prototype, "DefaultOption", {
+            get: function () {
+                return {
+                    header: {
+                        left: CalendarHeaderButtons.prev | CalendarHeaderButtons.today | CalendarHeaderButtons.next,
+                        center: CalendarHeaderButtons.title,
+                        right: CalendarHeaderButtons.month | CalendarHeaderButtons.agendaWeek | CalendarHeaderButtons.agendaDay
+                    },
+                    defaultDate: new Date(),
+                    businessHours: true,
+                    editable: true,
+                    theme: false,
+                    defaultView: CalendarViewMode.agendaWeek,
+                    scrollTime: 9,
+                    slotDuration: 15,
+                    lang: "ja",
+                };
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Calendar.prototype, "ItemsSource", {
+            set: function (newValue) {
+                var _this = this;
+                this.RemoveAll();
+                var events = new DomBehind.List();
+                $.each(newValue.ToArray(), function (i, value) {
+                    var newValue = new EventDataWrapper();
+                    newValue.EventData = value;
+                    newValue.CalendarBindings = _this.CalendarBindings;
+                    events.add(newValue);
+                });
+                this.Element.fullCalendar("addEventSource", events.toArray());
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Calendar.prototype.RemoveAll = function () {
+            this.Element.fullCalendar("removeEvents");
+        };
+        Calendar.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", function (el) {
+        }, function (el, newValue) {
+            var identity = el.attr("fullCalendar-identity");
+            var calendar = window[identity];
+            if (newValue instanceof DomBehind.Data.ListCollectionView) {
+                calendar.ItemsSource = newValue;
+            }
+            else {
+                calendar.ItemsSource = new DomBehind.Data.ListCollectionView([]);
+            }
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        return Calendar;
+    }(DomBehind.Data.DataBindingBehavior));
+    DomBehind.Calendar = Calendar;
+    var CalendarBindingBehaviorBuilder = /** @class */ (function (_super) {
+        __extends(CalendarBindingBehaviorBuilder, _super);
+        function CalendarBindingBehaviorBuilder(owner) {
+            return _super.call(this, owner) || this;
+        }
+        CalendarBindingBehaviorBuilder.prototype.BindingIdentity = function (exp) {
+            return this.AddBinding("id", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingTitle = function (exp) {
+            return this.AddBinding("title", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingStartDate = function (exp) {
+            return this.AddBinding("start", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingEndDate = function (exp) {
+            return this.AddBinding("end", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingAllDay = function (exp) {
+            return this.AddBinding("allDay", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingUrl = function (exp) {
+            return this.AddBinding("url", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingClass = function (exp) {
+            return this.AddBinding("className", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingEditable = function (exp) {
+            return this.AddBinding("editable", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingColor = function (exp) {
+            return this.AddBinding("color", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingBackgroundColor = function (exp) {
+            return this.AddBinding("backgroundColor", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingBorderColor = function (exp) {
+            return this.AddBinding("borderColor", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingTextColor = function (exp) {
+            return this.AddBinding("textColor", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingRendering = function (exp) {
+            return this.AddBinding("rendering", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingStartEditable = function (exp) {
+            return this.AddBinding("startEditable", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.BindingOverlap = function (exp) {
+            return this.AddBinding("overlap", exp);
+        };
+        CalendarBindingBehaviorBuilder.prototype.AddBinding = function (key, exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof Calendar) {
+                me.CurrentBehavior.CalendarBindings[key] = {
+                    Expression: exp,
+                };
+                me.CurrentBehavior.LastOption = me.CurrentBehavior.CalendarBindings[key];
+            }
+            return me;
+        };
+        return CalendarBindingBehaviorBuilder;
+    }(DomBehind.BindingBehaviorBuilder));
+    DomBehind.CalendarBindingBehaviorBuilder = CalendarBindingBehaviorBuilder;
+    DomBehind.BindingBehaviorBuilder.prototype.BuildCalendar = function (itemsSource, option) {
+        var me = this;
+        var behavior = me.Add(new Calendar());
+        behavior.Property = Calendar.ItemsSourceProperty;
+        behavior.PInfo = new DomBehind.LamdaExpression(me.Owner.DataContext, itemsSource);
+        behavior.Option = option;
+        var newMe = new CalendarBindingBehaviorBuilder(me.Owner);
+        newMe.CurrentBehavior = me.CurrentBehavior;
+        newMe.CurrentElement = me.CurrentElement;
+        return newMe;
+    };
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Calendar.js.map
+var DomBehind;
+(function (DomBehind) {
+    var Editor = /** @class */ (function () {
+        function Editor() {
+        }
+        Editor.HtmlProperty = DomBehind.Data.DependencyProperty.RegisterAttached("html", function (el) {
+            return el.html();
+        }, function (el, newValue) {
+            el.html(newValue);
+        }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
+        Editor.TextProperty = DomBehind.Data.DependencyProperty.RegisterAttached("text", function (el) {
+            return el.text();
+        }, function (el, newValue) {
+            el.text(newValue);
+        }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
+        Editor.toolBarHtml = "" +
+            "<div class=\"btn-toolbar editor\" data-role=\"editor-toolbar\" data-target=\"#@Id\">" +
+            "  <div class=\"btn-group\">" +
+            "    <a class=\"btn dropdown-toggle\" data-toggle=\"dropdown\" title=\"Font Size\" aria-expanded=\"false\">" +
+            "      <i class=\"fa fa-text-height\"></i>&nbsp;" +
+            "      <b class=\"caret\"></b>" +
+            "    </a>" +
+            "    <ul class=\"dropdown-menu\">" +
+            "      <li>" +
+            "        <a data-edit=\"fontSize 5\" class=\"\">" +
+            "          <p style=\"font-size:17px\">Huge</p>" +
+            "        </a>" +
+            "      </li>" +
+            "      <li>" +
+            "        <a data-edit=\"fontSize 3\" class=\"\">" +
+            "          <p style=\"font-size:14px\">Normal</p>" +
+            "        </a>" +
+            "      </li>" +
+            "      <li>" +
+            "        <a data-edit=\"fontSize 1\">" +
+            "          <p style=\"font-size:11px\">Small</p>" +
+            "        </a>" +
+            "      </li>" +
+            "    </ul>" +
+            "  </div>" +
+            "  <div class=\"btn-group\">" +
+            "    <a class=\"btn\" data-edit=\"bold\" title=\"Bold (Ctrl/Cmd+B)\">" +
+            "      <i class=\"fa fa-bold\"></i>" +
+            "    </a>" +
+            "    <a class=\"btn\" data-edit=\"italic\" title=\"Italic (Ctrl/Cmd+I)\">" +
+            "      <i class=\"fa fa-italic\"></i>" +
+            "    </a>" +
+            "    <a class=\"btn\" data-edit=\"strikethrough\" title=\"Strikethrough\">" +
+            "      <i class=\"fa fa-strikethrough\"></i>" +
+            "    </a>" +
+            "    <a class=\"btn\" data-edit=\"underline\" title=\"Underline (Ctrl/Cmd+U)\">" +
+            "      <i class=\"fa fa-underline\"></i>" +
+            "    </a>" +
+            "  </div>" +
+            "  <div class=\"btn-group\">" +
+            "    <a class=\"btn\" data-edit=\"insertunorderedlist\" title=\"Bullet list\">" +
+            "      <i class=\"fa fa-list-ul\"></i>" +
+            "    </a>" +
+            "    <a class=\"btn\" data-edit=\"insertorderedlist\" title=\"Number list\">" +
+            "      <i class=\"fa fa-list-ol\"></i>" +
+            "    </a>" +
+            "    <a class=\"btn\" data-edit=\"outdent\" title=\"Reduce indent (Shift+Tab)\">" +
+            "      <i class=\"fa fa-dedent\"></i>" +
+            "    </a>" +
+            "    <a class=\"btn\" data-edit=\"indent\" title=\"Indent (Tab)\">" +
+            "      <i class=\"fa fa-indent\"></i>" +
+            "    </a>" +
+            "  </div>" +
+            "  <div class=\"btn-group\">" +
+            "    <a class=\"btn\" data-edit=\"justifyleft\" title=\"Align Left (Ctrl/Cmd+L)\">" +
+            "      <i class=\"fa fa-align-left\"></i>" +
+            "    </a>" +
+            "    <a class=\"btn\" data-edit=\"justifycenter\" title=\"Center (Ctrl/Cmd+E)\">" +
+            "      <i class=\"fa fa-align-center\"></i>" +
+            "    </a>" +
+            "    <a class=\"btn\" data-edit=\"justifyright\" title=\"Align Right (Ctrl/Cmd+R)\">" +
+            "      <i class=\"fa fa-align-right\"></i>" +
+            "    </a>" +
+            "    <a class=\"btn\" data-edit=\"justifyfull\" title=\"Justify (Ctrl/Cmd+J)\">" +
+            "      <i class=\"fa fa-align-justify\"></i>" +
+            "    </a>" +
+            "  </div>" +
+            "  <div class=\"btn-group\">" +
+            "    <a class=\"btn dropdown-toggle\" data-toggle=\"dropdown\" title=\"Hyperlink\">" +
+            "      <i class=\"fa fa-link\"></i>" +
+            "    </a>" +
+            "    <div class=\"dropdown-menu input-append\">" +
+            "      <input class=\"span2\" placeholder=\"URL\" type=\"text\" data-edit=\"createLink\">" +
+            "      <button class=\"btn\" type=\"button\">Add</button>" +
+            "    </div>" +
+            "    <a class=\"btn\" data-edit=\"unlink\" title=\"Remove Hyperlink\">" +
+            "      <i class=\"fa fa-cut\"></i>" +
+            "    </a>" +
+            "  </div>" +
+            "  <div class=\"btn-group\">" +
+            "    <a class=\"btn\" title=\"Insert picture (or just drag &amp; drop)\" id=\"@pictureBtnId\">" +
+            "      <i class=\"fa fa-picture-o\"></i>" +
+            "    </a>" +
+            "    <input type=\"file\" data-role=\"magic-overlay\" data-target=\"#@pictureBtnId\" data-edit=\"insertImage\">" +
+            "  </div>" +
+            "  <div class=\"btn-group\">" +
+            "    <a class=\"btn\" data-edit=\"undo\" title=\"Undo (Ctrl/Cmd+Z)\">" +
+            "      <i class=\"fa fa-undo\"></i>" +
+            "    </a>" +
+            "    <a class=\"btn\" data-edit=\"redo\" title=\"Redo (Ctrl/Cmd+Y)\">" +
+            "      <i class=\"fa fa-repeat\"></i>" +
+            "    </a>" +
+            "  </div>" +
+            "</div>" +
+            "";
+        return Editor;
+    }());
+    DomBehind.Editor = Editor;
+    DomBehind.BindingBehaviorBuilder.prototype.BuildEditor = function (html, str) {
+        var me = this;
+        try {
+            var el = me.CurrentElement;
+            var id = el.attr("id");
+            if (!id) {
+                id = "id-" + NewUid();
+            }
+            var toolBarString = Editor.toolBarHtml
+                .Replace("@Id", id)
+                .Replace("@pictureBtnId", "id-" + NewUid())
+                .Replace("@voiceBtnId", "id-" + NewUid());
+            var tb = $(toolBarString);
+            el.before(tb);
+            tb.find(".dropdown-toggle").dropdown();
+            el.wysiwyg({
+                toolbarSelector: '[data-target="#' + id + '"]',
+            });
+            //tb.find('[data-toggle="dropdown"]').each((i, el) => {
+            //    let parent = $(el.parentElement)
+            //    if (parent.hasClass("btn-group")) {
+            //        parent.click(e => {
+            //            let a = $(e.target);
+            //            let me = a.closest("div.btn-group");
+            //            me.toggleClass("open");
+            //        });
+            //    }
+            //});
+            if (html) {
+                var behavior = me.Add(new DomBehind.Data.DataBindingBehavior());
+                behavior.Property = Editor.HtmlProperty;
+                behavior.PInfo = new DomBehind.LamdaExpression(me.Owner.DataContext, html);
+            }
+            if (str) {
+                var behavior = me.Add(new DomBehind.Data.DataBindingBehavior());
+                behavior.Property = Editor.TextProperty;
+                behavior.PInfo = new DomBehind.LamdaExpression(me.Owner.DataContext, str);
+            }
+        }
+        catch (e) {
+            console.error(e);
+        }
+        return me;
+    };
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Editor.js.map
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -5111,65 +6008,7 @@ var DomBehind;
                         if (grid.records === rows)
                             return;
                         $.each(rows, function (i, value) {
-                            // row injection(build bind)
                             _this.RowInjection(value);
-                            //// selectableなために必要なw2ui管理列
-                            //value.recid = this.GenerateRecId();
-                            //// 拡張機能用のインスタンスがない場合は確保
-                            //if (!value.w2ui) {
-                            //    value.w2ui = {};
-                            //}
-                            //// 行styleバインド
-                            //if (this.RowStyleBinding) {
-                            //    // デフォルトスタイルが指定している場合は、適用する
-                            //    let defaultValue = this.RowStyleBinding(value);
-                            //    if (!String.IsNullOrWhiteSpace(defaultValue)) {
-                            //        value.w2ui.style = defaultValue;
-                            //    }
-                            //    // バインドする                                    
-                            //    let observable = Observable.Register(value, LamdaExpression.Path(this.RowStyleBinding));
-                            //    observable.PropertyChanged.Clear();
-                            //    observable.PropertyChanged.AddHandler((ss, ee) => {
-                            //        let id = ss.recid;
-                            //        let style = this.RowStyleBinding(ss);
-                            //        value.w2ui.style = style;
-                            //        this.Grid.refreshRow(id);
-                            //    });
-                            //}
-                            //// cellスタイルバインド
-                            //if (this.CellStyleBinding) {
-                            //    // デフォルトスタイルが指定している場合は、適用する
-                            //    let defaultValue = this.CellStyleBinding(value);
-                            //    if (!String.IsNullOrWhiteSpace(defaultValue)) {
-                            //        value.w2ui.style = this.ParseCellStyles(defaultValue);
-                            //    }
-                            //    // バインドする                                    
-                            //    let observable = Observable.Register(value, LamdaExpression.Path(this.CellStyleBinding));
-                            //    observable.PropertyChanged.Clear();
-                            //    observable.PropertyChanged.AddHandler((ss, ee) => {
-                            //        let id = ss.recid;
-                            //        let style = this.CellStyleBinding(ss);
-                            //        value.w2ui.style = this.ParseCellStyles(style);
-                            //        this.Grid.refreshRow(id);
-                            //    });
-                            //}
-                            //// 行単位で css をバインド
-                            //if (this.RowClassBinding) {
-                            //    // デフォルトスタイルが指定している場合は、適用する
-                            //    let defaultValue = this.RowClassBinding(value);
-                            //    if (!String.IsNullOrWhiteSpace(defaultValue)) {
-                            //        value.w2ui.class = defaultValue;
-                            //    }
-                            //    // バインドする                                    
-                            //    let observable = Observable.Register(value, LamdaExpression.Path(this.RowClassBinding));
-                            //    observable.PropertyChanged.Clear();
-                            //    observable.PropertyChanged.AddHandler((ss, ee) => {
-                            //        let id = ss.recid;
-                            //        let style = this.RowClassBinding(ss);
-                            //        value.w2ui.class = style;
-                            //        this.Grid.refreshRow(id);
-                            //    });
-                            //}
                         });
                         grid.clear(true);
                         grid.records = rows;
@@ -5207,6 +6046,9 @@ var DomBehind;
             this.ListCollectionView.End();
         };
         W2GridBindingBehavior.prototype.OnSelect = function (sender, e) {
+            if (!this.GridOption.onSelect) {
+                return;
+            }
             var recId = e.recid;
             var obj = this.Grid.get(recId);
             this.SuppressListCollectionViewAction(function (x) { return x.Current = obj; });
@@ -5436,6 +6278,14 @@ var DomBehind;
                     _this.Grid.refreshRow(id);
                 });
             }
+            $.each(this.Column, function (i, v) {
+                if (v.convertTarget) {
+                    var filedInjection = DomBehind.Observable.RegisterAttached(value, {
+                        marks: [v.field],
+                        wrapper: function (x) { return v.convertTarget(x); }
+                    });
+                }
+            });
         };
         W2GridBindingBehavior.Refresh = new DomBehind.TypedEvent();
         W2GridBindingBehavior.IsSpinningProperty = DomBehind.Data.DependencyProperty.RegisterAttached("w2ui.isSpinning", function (el) {
@@ -5549,6 +6399,7 @@ var DomBehind;
     }(DomBehind.BindingBehaviorBuilder));
     DomBehind.W2GridBindingBehaviorBuilder = W2GridBindingBehaviorBuilder;
     DomBehind.BindingBehaviorBuilder.prototype.BuildGrid = function (itemSource, option) {
+        option = $.extend(true, {}, option);
         var me = this;
         var behavior = me.Add(new W2GridBindingBehavior());
         behavior.NewAdd = function (x) { return me.Add(x); };
@@ -5721,13 +6572,7 @@ var DomBehind;
         var DatePicker = /** @class */ (function () {
             function DatePicker() {
             }
-            DatePicker.FormatProperty = DomBehind.Data.DependencyProperty.RegisterAttached("DateFormat", function (el) {
-            }, function (el, newValue) {
-                el.attr("DateFormat", newValue);
-            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-            DatePicker.ValueProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", function (el) {
-                return el.val();
-            }, function (el, newValue) {
+            DatePicker.SetValue = function (el, newValue) {
                 var initialized = el.attr("DateFormatted");
                 if (!initialized) {
                     el.attr("DateFormatted", "true");
@@ -5738,6 +6583,36 @@ var DomBehind;
                     el.w2field("date", { format: format });
                 }
                 el.val(newValue);
+            };
+            DatePicker.FormatProperty = DomBehind.Data.DependencyProperty.RegisterAttached("DateFormat", function (el) {
+            }, function (el, newValue) {
+                el.attr("DateFormat", newValue);
+            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+            DatePicker.ValueProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", function (el) {
+                return el.val();
+            }, function (el, newValue) {
+                DatePicker.SetValue(el, newValue);
+            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
+            DatePicker.DateProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", function (el) {
+                var text = el.val();
+                return new Date(text);
+            }, function (el, newValue) {
+                if (newValue instanceof Date) {
+                    var oldFormat = el.attr("DateFormat");
+                    if (!oldFormat || oldFormat !== "yyyy/MM/dd") {
+                        el.w2field("date", { format: "yyyy/MM/dd" });
+                    }
+                    var year = "" + newValue.getFullYear();
+                    var month = new String("" + (newValue.getMonth() + 1)).PadLeft(2, "0");
+                    var day = new String("" + newValue.getDate()).PadLeft(2, "0");
+                    el.val(year + "/" + month + "/" + day);
+                    if (oldFormat && oldFormat !== "yyyy/MM/dd") {
+                        el.w2field("date", { format: oldFormat });
+                    }
+                }
+                else {
+                    DatePicker.SetValue(el, newValue);
+                }
             }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
             return DatePicker;
         }());
@@ -5761,11 +6636,15 @@ var DomBehind;
         Application.Resolve = function () {
             if (Application._app)
                 return;
+            //let me: any = this;
+            //let appFactory = new TypedFactory(me);
+            //let app = appFactory.CreateInstance();
+            //Application._app = <Application>app;
             var me = this;
-            var appFactory = new DomBehind.TypedFactory(me);
-            var app = appFactory.CreateInstance();
-            Application._app = app;
             $(document).ready(function () {
+                var appFactory = new DomBehind.TypedFactory(me);
+                var app = appFactory.CreateInstance();
+                Application._app = app;
                 window.history.pushState(null, "", window.location.href);
                 window.onpopstate = function () {
                     window.history.pushState(null, "", window.location.href);
@@ -5775,6 +6654,23 @@ var DomBehind;
         };
         //Back Button in Browser using jquery?
         Application.prototype.OnBrowserBack = function () { };
+        Application.prototype.SafeAction = function (func, context) {
+            var args = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                args[_i - 2] = arguments[_i];
+            }
+            try {
+                if (context) {
+                    return $.proxy(func, context, args);
+                }
+                else {
+                    return func();
+                }
+            }
+            catch (e) {
+                this.UnhandledException(e);
+            }
+        };
         Object.defineProperty(Application.prototype, "DefaultActionPolicy", {
             get: function () {
                 return [];

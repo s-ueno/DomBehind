@@ -34,12 +34,17 @@
             return d.promise();
         }
 
-        public ExecuteAsync(request: TRequest): JQueryPromise<TResponse> {
-            return Threading.WorkerPool.Do(PlainXMLHttpRequestWorker,
-                {
-                    Url: $.AbsoluteUri(this.Url),
-                    Request: request
-                });
+        public ExecuteAsync(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse> {
+            let d = $.Deferred<TResponse>();
+            let p: JQueryAjaxSettings = $.extend(true, this.DefaultPostSetting, option);
+            p.data = JSON.stringify(request);
+            p.async = true;
+            $.ajax(p).done(x => {
+                d.resolve(x);
+            }).fail(x => {
+                d.reject(new AjaxException(x));
+            });
+            return d.promise();
         }
 
         protected get DefaultPostSetting(): JQueryAjaxSettings {

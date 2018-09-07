@@ -53,7 +53,11 @@
 
 
         public static Register(behavior: Data.DataBindingBehavior) {
-
+            let el = behavior.Element;
+            let value = el.data("native-menu");
+            if (String.IsNullOrWhiteSpace(value)) {
+                el.data("native-menu", "false");
+            }
         }
         public static Rebuild(el: JQuery, list: Data.ListCollectionView): boolean {
             let newArray = list.ToArray();

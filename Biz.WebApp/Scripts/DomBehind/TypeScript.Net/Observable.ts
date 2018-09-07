@@ -2,17 +2,27 @@
     export class Observable<T> {
 
         public static Register<T>(target: T, ...marks: string[]): Observable<T> {
-            return new Observable(target, marks);
+            return new Observable(target, { marks: marks });
+        }
+        public static RegisterAttached<T>(target: T, option?: {
+            wrapper?: (value: any) => any
+            marks?: string[],
+        }): Observable<T> {
+            return new Observable(target, option);
         }
 
         // #region INotifyPropertyChanged
 
         public PropertyChanging: TypedEvent<PropertyChangingEventArgs> = new TypedEvent<PropertyChangingEventArgs>();
         public PropertyChanged: TypedEvent<PropertyChangedEventArgs> = new TypedEvent<PropertyChangedEventArgs>();
+        protected Wrapper: (value: any) => any;
 
         // #endregion
 
-        constructor(protected source: T, protected marks?: string[]) {
+        constructor(protected source: T, option?: {
+            wrapper?: (value: any) => any
+            marks?: string[],
+        }) {
             if (source == null) return;
 
             let keys = Object.keys(source);
@@ -20,8 +30,13 @@
                 let name = keys[i];
                 if (String.IsNullOrWhiteSpace(name)) continue;
 
-                if (marks) {
-                    if (marks.Any(x => x === name)) {
+                if (option) {
+                    this.Wrapper = option.wrapper;
+                    if (option.marks) {
+                        if (option.marks.Any(x => x === name)) {
+                            this.Recurcive(source, name, null);
+                        }
+                    } else {
                         this.Recurcive(source, name, null);
                     }
                 } else {
@@ -31,15 +46,15 @@
         }
 
         protected Recurcive(source: any, name: string, parentName: string) {
-            var value = source[name];
-            var notifibleName = (parentName) ? `${parentName}.${name}` : name;
+            let value = source[name];
+            let notifibleName = (parentName) ? `${parentName}.${name}` : name;
             Object.defineProperty(source, name,
                 this.CreateDescriptor(notifibleName, value));
 
             if (Object.IsNullOrUndefined(value)) return;
             if (typeof value !== "object") return;
 
-            var keys = Object.keys(value);
+            let keys = Object.keys(value);
             for (var i = 0; i < keys.length; i++) {
                 this.Recurcive(value, keys[i], notifibleName);
             }
@@ -48,12 +63,15 @@
             return this.source;
         }
         protected CreateDescriptor(notifibleName: string, value: any): PropertyDescriptor {
-            var changing = this.PropertyChanging;
-            var notifier = this.PropertyChanged;
+            let changing = this.PropertyChanging;
+            let notifier = this.PropertyChanged;
+            let wrapper = this.Wrapper;
             let e = new PropertyChangedEventArgs(notifibleName);
-            var sender = this.source;
+            let sender = this.source;
             return {
                 get: function () {
+                    if (wrapper)
+                        return wrapper(value);
                     return value;
                 },
                 set: function (v) {

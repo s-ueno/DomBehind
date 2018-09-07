@@ -1,0 +1,21 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutSPA.cshtml";
+}
+
+
+@section SPAViews {
+    <div id="CalendarView">
+        <div id="MyCalendar"></div>
+    </div>
+}
+
+@section Scripts{
+    <script>
+
+
+        $.BindingAnnotation('#CalendarView',
+            function () { return Biz.WebApp.Calendar.CalendarView; },
+            function () { return Biz.WebApp.Calendar.CalendarViewModel; });
+
+    </script>
+}

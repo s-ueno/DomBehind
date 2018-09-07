@@ -97,10 +97,17 @@
       "Scripts/DomBehind/Controls/Selector.js",
       "Scripts/DomBehind/Controls/Tab.js",
       "Scripts/DomBehind/Controls/MessageBox.js",
+      "Scripts/DomBehind/Controls/ListView.js",
 
       /* DomBehind/JQueryUI */
       "Scripts/DomBehind/JQueryUI/Tooltip.js",
       "Scripts/DomBehind/JQueryUI/Selectmenu.js",
+
+      /* DomBehind/Calendar */
+      "Scripts/DomBehind/Calendar/Calendar.js",
+
+      /* DomBehind/bootstrap-wysiwyg  */
+      "Scripts/DomBehind/Bootstrap/Editor.js",
 
       /* DomBehind/W2UI */
       "Scripts/DomBehind/W2UI/Toolbar.js",

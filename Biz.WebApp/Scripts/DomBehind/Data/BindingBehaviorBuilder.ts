@@ -76,6 +76,37 @@
             return dataBindingBuilder.PartialMark(behavior.PInfo.MemberPath);
         }
 
+        /**
+         * Assign "IValueConverter"
+         * @param conv
+         */
+        public SetConverter(conv: IValueConverter): BindingBehaviorBuilder<T> {
+            this.CurrentBehavior.BindingPolicy.Converter = conv;
+            return this;
+        }
+
+        public ConvertTarget(exp: (x: any) => any): BindingBehaviorBuilder<T> {
+            if (this.CurrentBehavior.BindingPolicy.Converter) {
+                throw new Exception("Another 'IValueConverter' has already been assigned.");
+            }
+            let conv = new SimpleConverter();
+            conv.ConvertHandler = exp;
+            this.CurrentBehavior.BindingPolicy.Converter = conv;
+
+            return this;
+        }
+
+        public ConvertSource(exp: (x: any) => any): BindingBehaviorBuilder<T> {
+            if (this.CurrentBehavior.BindingPolicy.Converter) {
+                throw new Exception("Another 'IValueConverter' has already been assigned.");
+            }
+            let conv = new SimpleConverter();
+            conv.ConvertBackHandler = exp;
+            this.CurrentBehavior.BindingPolicy.Converter = conv;
+
+            return this;
+        }
+
         // #endregion
 
         // #region BindingViewModel
@@ -108,14 +139,8 @@
          * @param event
          * @param action
          */
-        public BindingAction(event: IEventBuilder,
-            action: (x: T, args: any) => void): BindingBehaviorBuilder<T>;
-        /**
-         * linking the action of the view and the view model
-         * @param event
-         * @param action
-         */
-        public BindingAction(event: IEventBuilder, action: Function, allowBubbling: boolean = false): BindingBehaviorBuilder<T> {
+        public BindingAction(event: IEventBuilder, action: (x: T, args: any) => void): BindingBehaviorBuilder<T>;
+        public BindingAction(event: IEventBuilder, action: (x: T, args: any) => void, allowBubbling: boolean = false): BindingBehaviorBuilder<T> {
             let behavior = this.Add(new Data.ActionBindingBehavior());
             behavior.Event = event.Create();
             behavior.Action = action;
@@ -146,6 +171,19 @@
         }
 
         // #endregion
+
+    }
+
+    class SimpleConverter implements DomBehind.IValueConverter {
+        Convert(value: any) {
+            return this.ConvertHandler(value);
+        }
+        public ConvertHandler: (x: any) => any;
+
+        ConvertBack(value: any) {
+            return this.ConvertBackHandler(value);
+        }
+        public ConvertBackHandler: (x: any) => any;
 
     }
 }

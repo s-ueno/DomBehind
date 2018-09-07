@@ -3,7 +3,7 @@
     export class PlainXMLHttpRequestWorker
         extends Threading.WorkerWrapper {
         protected get WorkerScript(): string {
-            return "/Scripts/dombehind-PlainXMLHttpRequest.js";
+            return "~/Scripts/dombehind-PlainXMLHttpRequest.js";
         }
     }
 }

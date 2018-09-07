@@ -24,6 +24,10 @@ interface String {
     Escape(): string;
     UnEscape(): string;
     Replace(searchValue: string, replaceValue: string): string;
+    Repeat(count: number): string;
+    PadLeft(totalWidth: number, paddingChar: string): string;
+    PadRight(totalWidth: number, paddingChar: string): string;
+    SubString(start: number, length: number): string;
 }
 
 "Split".ExtendedPrototype(
@@ -65,5 +69,90 @@ interface String {
     function (searchValue: string, replaceValue: string) {
         let me: String = this;
         return me.split(searchValue).join(replaceValue);
+    }
+);
+
+"Repeat".ExtendedPrototype(
+    String.prototype,
+    function (count: number) {
+        'use strict';
+        if (this == null) {
+            throw new TypeError('can\'t convert ' + this + ' to object');
+        }
+        var str = '' + this;
+        count = +count;
+        if (count != count) {
+            count = 0;
+        }
+        if (count < 0) {
+            throw new RangeError('repeat count must be non-negative');
+        }
+        if (count == Infinity) {
+            throw new RangeError('repeat count must be less than infinity');
+        }
+        count = Math.floor(count);
+        if (str.length == 0 || count == 0) {
+            return '';
+        }
+        if (str.length * count >= 1 << 28) {
+            throw new RangeError('repeat count must not overflow maximum string size');
+        }
+        var rpt = '';
+        for (; ;) {
+            if ((count & 1) == 1) {
+                rpt += str;
+            }
+            count >>>= 1;
+            if (count == 0) {
+                break;
+            }
+            str += str;
+        }
+        return rpt;
+    }
+);
+
+"PadLeft".ExtendedPrototype(
+    String.prototype,
+    function (totalWidth: number, paddingChar: string) {
+        totalWidth = totalWidth >> 0; //truncate if number or convert non-number to 0;
+        paddingChar = String((typeof paddingChar !== 'undefined' ? paddingChar : ' '));
+        if (this.length > totalWidth) {
+            return String(this);
+        }
+        else {
+            totalWidth = totalWidth - this.length;
+            if (totalWidth > paddingChar.length) {
+                paddingChar += paddingChar.Repeat(totalWidth / paddingChar.length); //append to original to ensure we are longer than needed
+            }
+            return paddingChar.slice(0, totalWidth) + String(this);
+        }
+
+    }
+);
+
+"PadRight".ExtendedPrototype(
+    String.prototype,
+    function (totalWidth: number, paddingChar: string) {
+        totalWidth = totalWidth >> 0; //floor if number or convert non-number to 0;
+        paddingChar = String((typeof paddingChar !== 'undefined' ? paddingChar : ' '));
+        if (this.length > totalWidth) {
+            return String(this);
+        }
+        else {
+            totalWidth = totalWidth - this.length;
+            if (totalWidth > paddingChar.length) {
+                paddingChar += paddingChar.Repeat(totalWidth / paddingChar.length); //append to original to ensure we are longer than needed
+            }
+            return String(this) + paddingChar.slice(0, totalWidth);
+        }
+    }
+);
+
+"SubString".ExtendedPrototype(
+    String.prototype,
+    function (start: number, length: number) {
+        let me: String = this;
+        return me.toString().substr(start, length);
     }
 );

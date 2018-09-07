@@ -4,6 +4,7 @@ declare namespace DomBehind {
         private static _app;
         static Resolve(): void;
         protected OnBrowserBack(): void;
+        SafeAction(func: Function, context?: any, ...args: any[]): any;
         abstract UnhandledException(error: any): void;
         readonly DefaultActionPolicy: Data.ActionPolicy[];
         readonly Navigator: Navigation.INavigator;
@@ -177,6 +178,113 @@ declare namespace DomBehind {
 }
 
 declare namespace DomBehind {
+    class Editor {
+        static HtmlProperty: Data.DependencyProperty;
+        static TextProperty: Data.DependencyProperty;
+        static readonly toolBarHtml: string;
+    }
+    interface BindingBehaviorBuilder<T> {
+        BuildEditor(html: (x: T) => string, str?: (x: T) => string): BindingBehaviorBuilder<T>;
+    }
+}
+
+declare namespace DomBehind {
+    interface ICalendarOption<T> {
+        controller?: (vm: T) => Calendar;
+        header?: ICalendarHeader;
+        defaultDate?: Date;
+        defaultView?: CalendarViewMode;
+        businessHours?: boolean;
+        editable?: boolean;
+        theme?: boolean;
+        buttonIcons?: {
+            prev: string;
+            next: string;
+        };
+        firstDay?: number;
+        weekends?: boolean;
+        scrollTime?: number;
+        slotDuration?: number;
+        lang?: string;
+        dayClick?: (vm: T, args: ICalendarEventArgs) => void;
+        eventClick?: (vm: T, args: ICalendarEventArgs) => void;
+        viewModeClick?: (vm: T, args: ICalendarEventArgs) => void;
+    }
+    interface ICalendarEventArgs {
+        sender?: Calendar;
+        original?: any;
+        event?: JQueryEventObject;
+        view?: any;
+        date?: Date;
+        mode?: CalendarViewMode;
+    }
+    enum CalendarViewMode {
+        month = 0,
+        agendaWeek = 1,
+        agendaDay = 2
+    }
+    enum CalendarHeaderButtons {
+        prevYear = 1,
+        prev = 2,
+        next = 4,
+        nextYear = 8,
+        month = 16,
+        agendaWeek = 32,
+        agendaDay = 64,
+        title = 128,
+        today = 256
+    }
+    interface ICalendarHeader {
+        left?: CalendarHeaderButtons;
+        center?: CalendarHeaderButtons;
+        right?: CalendarHeaderButtons;
+    }
+    class Calendar extends Data.DataBindingBehavior {
+        static ItemsSourceProperty: Data.DependencyProperty;
+        Option: ICalendarOption<any>;
+        Ensure(): void;
+        protected ParseCalendarHeaderButtons(status: CalendarHeaderButtons): string;
+        protected HasFlag(status: CalendarHeaderButtons, flag: CalendarHeaderButtons): boolean;
+        protected ParseCalendarViewMode(status: CalendarViewMode): string;
+        protected ParseScrollTime(hour: number): any;
+        protected ParseSlotDuration(minute: number): any;
+        protected readonly DefaultOption: ICalendarOption<any>;
+        ItemsSource: Data.ListCollectionView;
+        RemoveAll(): void;
+        CalendarBindings: {
+            [key: string]: CalendarOption;
+        };
+        LastOption: CalendarOption;
+    }
+    interface CalendarOption {
+        Expression?: (row: any) => any;
+        ConvertTarget?: (value: any) => any;
+    }
+    class CalendarBindingBehaviorBuilder<T> extends BindingBehaviorBuilder<T> {
+        constructor(owner: BizView);
+        BindingIdentity(exp: (row: T) => string | number): CalendarBindingBehaviorBuilder<T>;
+        BindingTitle(exp: (row: T) => string): CalendarBindingBehaviorBuilder<T>;
+        BindingStartDate(exp: (row: T) => string | Date): CalendarBindingBehaviorBuilder<T>;
+        BindingEndDate(exp: (row: T) => string | Date): CalendarBindingBehaviorBuilder<T>;
+        BindingAllDay(exp: (row: T) => boolean | string): CalendarBindingBehaviorBuilder<T>;
+        BindingUrl(exp: (row: T) => string): CalendarBindingBehaviorBuilder<T>;
+        BindingClass(exp: (row: T) => string | Array<string>): CalendarBindingBehaviorBuilder<T>;
+        BindingEditable(exp: (row: T) => boolean | string): CalendarBindingBehaviorBuilder<T>;
+        BindingColor(exp: (row: T) => string): CalendarBindingBehaviorBuilder<T>;
+        BindingBackgroundColor(exp: (row: T) => string): CalendarBindingBehaviorBuilder<T>;
+        BindingBorderColor(exp: (row: T) => string): CalendarBindingBehaviorBuilder<T>;
+        BindingTextColor(exp: (row: T) => string): CalendarBindingBehaviorBuilder<T>;
+        BindingRendering(exp: (row: T) => string): CalendarBindingBehaviorBuilder<T>;
+        BindingStartEditable(exp: (row: T) => boolean): CalendarBindingBehaviorBuilder<T>;
+        BindingOverlap(exp: (row: T) => boolean): CalendarBindingBehaviorBuilder<T>;
+        protected AddBinding(key: string, exp: any): CalendarBindingBehaviorBuilder<any>;
+    }
+    interface BindingBehaviorBuilder<T> {
+        BuildCalendar<TRow>(itemsSource: (x: T) => any, option?: ICalendarOption<T>): CalendarBindingBehaviorBuilder<TRow>;
+    }
+}
+
+declare namespace DomBehind {
     interface BindingBehaviorBuilder<T> {
         InputType(inputType: InputType): BindingBehaviorBuilder<T>;
     }
@@ -276,6 +384,49 @@ declare namespace DomBehind {
          * button
          */
         Button = 22
+    }
+}
+
+declare namespace DomBehind {
+    interface ITableOption {
+        class?: string;
+        isHover?: boolean;
+        isStriped?: boolean;
+        isBordered?: boolean;
+    }
+    interface ITableHeaderBodyOption {
+        caption?: string;
+        width?: string;
+        value?: (x: any) => any;
+        convertTarget?: (x: any) => any;
+        headerClass?: string;
+        cellClass?: (x: any) => any;
+    }
+    class ListView extends Data.DataBindingBehavior {
+        static ItemsSourceProperty: Data.DependencyProperty;
+        ItemsSource: Data.ListCollectionView;
+        Clear(): void;
+        private _items;
+        TableOption: ITableOption;
+        protected readonly DefaultTableOption: ITableOption;
+        Ensure(): void;
+        protected TableId: string;
+        protected HeaderId: string;
+        protected BodyId: string;
+        AddColumn(option: ITableHeaderBodyOption): void;
+        Columns: Array<ITableHeaderBodyOption>;
+    }
+    class TableBindingBehaviorBuilder<TRow> extends BindingBehaviorBuilder<TRow> {
+        constructor(owner: BizView);
+        ColumnBinding(title: string, binding: (row: TRow) => any, option?: ITableHeaderBodyOption): TableBindingBehaviorBuilder<TRow>;
+    }
+    interface BindingBehaviorBuilder<T> {
+        /**
+         * Divタグにテーブルタグを生成します
+         * 実装例：
+         *
+         */
+        BuildListView<TRow>(itemSource: (x: T) => any, option?: ITableOption): TableBindingBehaviorBuilder<TRow>;
     }
 }
 
@@ -444,6 +595,7 @@ declare namespace DomBehind {
         static HtmlSource: Data.DependencyProperty;
         static Click: IEventBuilder;
         static Enter: IEventBuilder;
+        static Keydown: IEventBuilder;
         static LostFocus: IEventBuilder;
         static Initialize: IEventBuilder;
         static ViewLoaded: IEventBuilder;
@@ -535,6 +687,13 @@ declare namespace DomBehind {
          * @param updateTrigger is update timing of view model
          */
         Binding<P>(property: Data.DependencyProperty, bindingExpression: (x: T) => P, mode?: Data.BindingMode, updateTrigger?: Data.UpdateSourceTrigger): Data.DataBindingBehaviorBuilder<T>;
+        /**
+         * Assign "IValueConverter"
+         * @param conv
+         */
+        SetConverter(conv: IValueConverter): BindingBehaviorBuilder<T>;
+        ConvertTarget(exp: (x: any) => any): BindingBehaviorBuilder<T>;
+        ConvertSource(exp: (x: any) => any): BindingBehaviorBuilder<T>;
         BindingViewViewModel(view: (x: T) => BizView, viewModel: (x: T) => BizViewModel): BindingBehaviorBuilder<T>;
         /**
          * linking the action of the view and the view model
@@ -840,6 +999,7 @@ interface Array<T> {
         Values: Array<T>;
     }>;
     SequenceEqual(target: Array<T>, predicate?: (x1: T, x2: T) => boolean): boolean;
+    Sum(selector: (value: T) => number): number;
 }
 
 interface JQueryStatic {
@@ -894,6 +1054,10 @@ interface String {
     Escape(): string;
     UnEscape(): string;
     Replace(searchValue: string, replaceValue: string): string;
+    Repeat(count: number): string;
+    PadLeft(totalWidth: number, paddingChar: string): string;
+    PadRight(totalWidth: number, paddingChar: string): string;
+    SubString(start: number, length: number): string;
 }
 
 declare namespace DomBehind.Controls {
@@ -1211,11 +1375,18 @@ declare namespace DomBehind {
 declare namespace DomBehind {
     class Observable<T> {
         protected source: T;
-        protected marks?: string[];
         static Register<T>(target: T, ...marks: string[]): Observable<T>;
+        static RegisterAttached<T>(target: T, option?: {
+            wrapper?: (value: any) => any;
+            marks?: string[];
+        }): Observable<T>;
         PropertyChanging: TypedEvent<PropertyChangingEventArgs>;
         PropertyChanged: TypedEvent<PropertyChangedEventArgs>;
-        constructor(source: T, marks?: string[]);
+        protected Wrapper: (value: any) => any;
+        constructor(source: T, option?: {
+            wrapper?: (value: any) => any;
+            marks?: string[];
+        });
         protected Recurcive(source: any, name: string, parentName: string): void;
         readonly Source: T;
         protected CreateDescriptor(notifibleName: string, value: any): PropertyDescriptor;
@@ -1374,6 +1545,8 @@ declare namespace DomBehind.Controls {
     class DatePicker {
         static FormatProperty: Data.DependencyProperty;
         static ValueProperty: Data.DependencyProperty;
+        static DateProperty: Data.DependencyProperty;
+        private static SetValue;
     }
 }
 
@@ -1421,7 +1594,7 @@ declare namespace DomBehind {
         Color = 11,
         List = 12
     }
-    interface IColumnBinding<TRow> extends IColumnBindingOption {
+    interface IColumnBinding<TRow> extends IColumnBindingOption, IColumnConverter {
         advancedSearch?: FieldType;
         renderType?: RenderType;
     }
@@ -1437,6 +1610,9 @@ declare namespace DomBehind {
         Date = 6,
         Age = 7,
         Toggle = 8
+    }
+    interface IColumnConverter {
+        convertTarget?: (x: any) => any;
     }
     interface IColumnBindingOption {
         caption?: string;
@@ -1474,7 +1650,7 @@ declare namespace DomBehind {
         RowStyleBinding: (row: any) => string;
         CellStyleBinding: (row: any) => string;
         RowClassBinding: (row: any) => string;
-        protected Column: IColumnBinding<any>[];
+        Column: IColumnBinding<any>[];
         protected Grid: W2UI.W2Grid;
         protected readonly IsMultiSelect: boolean;
         protected GenerateRecId(): number;
@@ -1755,7 +1931,7 @@ declare namespace DomBehind.Web {
         Timeout: number;
         Execute(request: TRequest): TResponse;
         ExecuteAjax(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
-        ExecuteAsync(request: TRequest): JQueryPromise<TResponse>;
+        ExecuteAsync(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
         protected readonly DefaultPostSetting: JQueryAjaxSettings;
     }
 }

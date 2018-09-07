@@ -6,9 +6,10 @@ using System.Web.Mvc;
 
 namespace Biz.WebApp.Controllers
 {
-    public class ThreePaneController : Controller
+    [Authorize]
+    public class CalendarController : AppController
     {
-        public ActionResult Main()
+        public ActionResult Index()
         {
             return View();
         }

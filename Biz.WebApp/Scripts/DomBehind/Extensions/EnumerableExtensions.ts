@@ -8,6 +8,7 @@
     LastOrDefault(predicate?: (x: T) => boolean): T;
     GroupBy(selector: (value: T) => any): Array<{ Key: any, Values: Array<T> }>;
     SequenceEqual(target: Array<T>, predicate?: (x1: T, x2: T) => boolean): boolean;
+    Sum(selector: (value: T) => number): number;
 }
 "Where".ExtendedPrototype(
     Array.prototype,
@@ -120,4 +121,14 @@
         return result;
     }
 );
-
+"Sum".ExtendedPrototype(
+    Array.prototype,
+    function (selector: (value: any) => number) {
+        let me: Array<any> = this;
+        let value: number = 0;
+        me.forEach(x => {
+            value += selector(x);
+        });
+        return value;
+    }
+);

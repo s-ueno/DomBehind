@@ -9,8 +9,10 @@
                 let factory = new TypedFactory(type());
                 for (var i = 0; i < defaultPoolCount; i++) {
                     let newThread: WorkerWrapper = factory.CreateInstance() as WorkerWrapper;
-                    if (newThread.PoolType & PoolType.PreLoad)
+                    if ((newThread.PoolType & PoolType.PreLoad) == PoolType.PreLoad) {
                         newThread.Load();
+                    }
+
                     this.Pool.push(newThread);
                 }
             });

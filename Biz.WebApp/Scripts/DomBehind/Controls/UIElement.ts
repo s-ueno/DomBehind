@@ -95,16 +95,18 @@
             = EventBuilder.RegisterAttached<JQueryEventObject>("click");
 
         public static Enter: IEventBuilder
-            = EventBuilder.RegisterAttached<JQueryEventObject>("enter", (x: Data.ActionBindingBehavior) => {
-                if (x.Element) {
+            = EventBuilder.RegisterAttached<JQueryEventObject>("enterKeydown", x => {
+                if (x && x.Element) {
                     x.Element.keydown(e => {
                         if (e.which === 13) {
-                            x.Element.trigger("enter");
+                            x.Element.trigger("enterKeydown");
                         }
                     });
                 }
             });
 
+        public static Keydown: IEventBuilder
+            = EventBuilder.RegisterAttached<JQueryEventObject>("keydown");
 
         public static LostFocus: IEventBuilder
             = EventBuilder.RegisterAttached<JQueryEventObject>("focusout");

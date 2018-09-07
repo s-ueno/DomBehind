@@ -1,87 +1,79 @@
-﻿importScripts('/cache-polyfill.js');
-var CACHE_VERSION = 1;
+﻿var CACHE_VERSION = 4;
 var CURRENT_CACHES = {
     prefetch: 'prefetch-cache-v' + CACHE_VERSION
 };
-self.addEventListener('install', function (event) {
-    var now = Date.now();
 
-    var urlsToPrefetch = [
-        '/',
-        'index',
-    ];
+var precacheFiles = [
+    "/"
+];
 
-    console.log('Handling install event. Resources to prefetch:', urlsToPrefetch);
-
-    event.waitUntil(
-        caches.open(CURRENT_CACHES.prefetch).then(function (cache) {
-            var cachePromises = urlsToPrefetch.map(function (urlToPrefetch) {
-                var url = new URL(urlToPrefetch, location.href);
-                url.search += (url.search ? '&' : '?') + 'cache-bust=' + now;
-
-                var request = new Request(url, { mode: 'no-cors' });
-                return fetch(request).then(function (response) {
-                    if (response.status >= 400) {
-                        throw new Error('request for ' + urlToPrefetch +
-                            ' failed with status ' + response.statusText);
-                    }
-
-                    return cache.put(urlToPrefetch, response);
-                }).catch(function (error) {
-                    console.error('Not caching ' + urlToPrefetch + ' due to ' + error);
-                });
-            });
-
-            return Promise.all(cachePromises).then(function () {
-                console.log('Pre-fetching complete.');
-            });
-        }).catch(function (error) {
-            console.error('Pre-fetching failed:', error);
-        })
-    );
+self.addEventListener('install', function (evt) {
+    console.log('The service worker is being installed.');
+    evt.waitUntil(precache().then(function () {
+        console.log('Skip waiting on install');
+        return self.skipWaiting();
+    }));
 });
 
 self.addEventListener('activate', function (event) {
-    var expectedCacheNames = Object.keys(CURRENT_CACHES).map(function (key) {
-        return CURRENT_CACHES[key];
+    console.log('Claiming clients for current page');
+    return self.clients.claim();
+});
+
+self.addEventListener('fetch', function (evt) {
+    var req = evt.request.clone();
+    if (req.method === "GET") {
+        console.log('The service worker is serving the asset.' + evt.request.url);
+
+        evt.respondWith(fromCache(evt.request).catch(fromServer(evt.request)));
+        evt.waitUntil(update(evt.request));
+        // update(evt.request);
+    }
+});
+
+
+function precache() {
+    return caches.open(CURRENT_CACHES.prefetch).then(function (cache) {
+        if (!cache)
+            return Promise.reject('cache open error');
+
+        return cache.addAll(precacheFiles);
     });
+}
 
-    event.waitUntil(
-        caches.keys().then(function (cacheNames) {
-            return Promise.all(
-                cacheNames.map(function (cacheName) {
-                    if (expectedCacheNames.indexOf(cacheName) === -1) {
-                        console.log('Deleting out of date cache:', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
-    );
-});
+function fromCache(request) {
+    return caches.open(CURRENT_CACHES.prefetch).then(function (cache) {
+        if (!cache) {
+            return fromServer(request);
+        }
+        return cache.match(request).then(function (matching) {
+            return matching || Promise.reject('no-match');
+        });
+    });
+}
 
-self.addEventListener('fetch', function (event) {
-    console.log('Handling fetch event for', event.request.url);
+function update(request) {
+    return caches.open(CURRENT_CACHES.prefetch).then(function (cache) {
+        return fetch(request).then(function (response) {
+            return cache.put(request, response);
+        });
+    });
+}
 
-    event.respondWith(
-        caches.match(event.request).then(function (response) {
-            if (response) {
-                console.log('Found response in cache:', response);
 
-                return response;
-            }
+function upsert(request) {
+    return caches.open(CURRENT_CACHES.prefetch).then(function (cache) {
+        if (!cache) {
+            return Promise.reject('Service workers are not supported. It does not work properly in the browser when debugging is running');
+        }
 
-            console.log('No response found in cache. About to fetch from network...');
+        return fetch(request).then(function (response) {
+            cache.put(request, response);
+            return response;
+        });
+    });
+}
 
-            if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
-
-            return fetch(event.request).then(function (response) {
-                console.log('Response from network is:', response);
-                return response;
-            }).catch(function (error) {
-                console.error('Fetching failed:', error);
-                throw error;
-            });
-        })
-    );
-});
+function fromServer(request) {
+    return fetch(request).then(function (response) { return response; });
+}

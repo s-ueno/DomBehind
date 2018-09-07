@@ -47,11 +47,11 @@
         /* list */
         List,
     }
-    export interface IColumnBinding<TRow> extends IColumnBindingOption {
+    export interface IColumnBinding<TRow>
+        extends IColumnBindingOption, IColumnConverter {
+
         advancedSearch?: FieldType;
         renderType?: RenderType;
-
-
     }
     /**
      * シンプルなカスタム表示
@@ -73,6 +73,10 @@
         Age,
         /* トグル */
         Toggle,
+    }
+
+    export interface IColumnConverter {
+        convertTarget?: (x: any) => any;
     }
 
     export interface IColumnBindingOption {
@@ -209,7 +213,7 @@
         public RowStyleBinding: (row: any) => string;
         public CellStyleBinding: (row: any) => string;
         public RowClassBinding: (row: any) => string;
-        protected Column: IColumnBinding<any>[] = [];
+        public Column: IColumnBinding<any>[] = [];
         protected Grid: W2UI.W2Grid;
         protected get IsMultiSelect(): boolean {
             if (this.GridOption && this.GridOption.multiSelect) {
@@ -337,72 +341,7 @@
                             if (grid.records === rows) return;
 
                             $.each(rows, (i, value) => {
-                                // row injection(build bind)
                                 this.RowInjection(value);
-
-                                //// selectableなために必要なw2ui管理列
-                                //value.recid = this.GenerateRecId();
-                                //// 拡張機能用のインスタンスがない場合は確保
-                                //if (!value.w2ui) {
-                                //    value.w2ui = {};
-                                //}
-
-                                //// 行styleバインド
-                                //if (this.RowStyleBinding) {
-                                //    // デフォルトスタイルが指定している場合は、適用する
-                                //    let defaultValue = this.RowStyleBinding(value);
-                                //    if (!String.IsNullOrWhiteSpace(defaultValue)) {
-                                //        value.w2ui.style = defaultValue;
-                                //    }
-
-                                //    // バインドする                                    
-                                //    let observable = Observable.Register(value, LamdaExpression.Path(this.RowStyleBinding));
-                                //    observable.PropertyChanged.Clear();
-                                //    observable.PropertyChanged.AddHandler((ss, ee) => {
-                                //        let id = ss.recid;
-                                //        let style = this.RowStyleBinding(ss);
-                                //        value.w2ui.style = style;
-                                //        this.Grid.refreshRow(id);
-                                //    });
-                                //}
-
-                                //// cellスタイルバインド
-                                //if (this.CellStyleBinding) {
-                                //    // デフォルトスタイルが指定している場合は、適用する
-                                //    let defaultValue = this.CellStyleBinding(value);
-                                //    if (!String.IsNullOrWhiteSpace(defaultValue)) {
-                                //        value.w2ui.style = this.ParseCellStyles(defaultValue);
-                                //    }
-
-                                //    // バインドする                                    
-                                //    let observable = Observable.Register(value, LamdaExpression.Path(this.CellStyleBinding));
-                                //    observable.PropertyChanged.Clear();
-                                //    observable.PropertyChanged.AddHandler((ss, ee) => {
-                                //        let id = ss.recid;
-                                //        let style = this.CellStyleBinding(ss);
-                                //        value.w2ui.style = this.ParseCellStyles(style);
-                                //        this.Grid.refreshRow(id);
-                                //    });
-                                //}
-
-                                //// 行単位で css をバインド
-                                //if (this.RowClassBinding) {
-                                //    // デフォルトスタイルが指定している場合は、適用する
-                                //    let defaultValue = this.RowClassBinding(value);
-                                //    if (!String.IsNullOrWhiteSpace(defaultValue)) {
-                                //        value.w2ui.class = defaultValue;
-                                //    }
-
-                                //    // バインドする                                    
-                                //    let observable = Observable.Register(value, LamdaExpression.Path(this.RowClassBinding));
-                                //    observable.PropertyChanged.Clear();
-                                //    observable.PropertyChanged.AddHandler((ss, ee) => {
-                                //        let id = ss.recid;
-                                //        let style = this.RowClassBinding(ss);
-                                //        value.w2ui.class = style;
-                                //        this.Grid.refreshRow(id);
-                                //    });
-                                //}
                             });
 
                             grid.clear(true);
@@ -448,6 +387,10 @@
         }
 
         public OnSelect(sender, e) {
+            if (!this.GridOption.onSelect) {
+                return;
+            }
+
             let recId = e.recid;
             let obj = this.Grid.get(recId);
 
@@ -697,6 +640,15 @@
                     this.Grid.refreshRow(id);
                 });
             }
+
+            $.each(this.Column, (i, v) => {
+                if (v.convertTarget) {
+                    let filedInjection = Observable.RegisterAttached(value, {
+                        marks: [v.field],
+                        wrapper: x => v.convertTarget(x)
+                    });
+                }
+            });
         }
     }
 
@@ -796,6 +748,9 @@
     }
 
     BindingBehaviorBuilder.prototype.BuildGrid = function (itemSource: (x: any) => any, option?: IGridOption<any>) {
+
+        option = $.extend(true, {}, option);
+
         let me: BindingBehaviorBuilder<any> = this;
         let behavior = me.Add(new W2GridBindingBehavior());
         behavior.NewAdd = x => me.Add(x);

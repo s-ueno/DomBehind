@@ -17,10 +17,10 @@
                 IsGroup: true,
                 Children: [
                     {
-                        Title: "2 pane form", Icon: "fa fa-coffee", AddtionalInfo: "TwoPane/Main"
+                        Title: "2 pane form", Icon: "fa fa-coffee", AddtionalInfo: "Calendar/Index"
                     },
                     {
-                        Title: "3 pane form", Icon: "fa fa-home", AddtionalInfo: ""
+                        Title: "Calendar", Icon: "fa fa-calendar", AddtionalInfo: "Calendar/Index"
                     },
                 ],
             };

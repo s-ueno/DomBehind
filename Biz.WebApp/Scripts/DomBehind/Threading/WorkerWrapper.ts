@@ -9,7 +9,7 @@
         }
         protected /* abstract */ get WorkerScript(): string { return null; }
 
-        public PoolType: PoolType = PoolType.PreLoad;
+        public PoolType: PoolType = PoolType.Reload;
 
         public Do(arg: any): JQueryPromise<any> {
             let d = $.Deferred();

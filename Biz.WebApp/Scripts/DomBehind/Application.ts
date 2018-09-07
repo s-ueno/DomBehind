@@ -9,13 +9,17 @@
         public static Resolve() {
             if (Application._app) return;
 
+            //let me: any = this;
+            //let appFactory = new TypedFactory(me);
+            //let app = appFactory.CreateInstance();
+            //Application._app = <Application>app;
+
             let me: any = this;
-            let appFactory = new TypedFactory(me);
-            let app = appFactory.CreateInstance();
-            Application._app = <Application>app;
-
-
             $(document).ready(function () {
+                let appFactory = new TypedFactory(me);
+                let app = appFactory.CreateInstance();
+                Application._app = <Application>app;
+
                 window.history.pushState(null, "", window.location.href);
                 window.onpopstate = function () {
                     window.history.pushState(null, "", window.location.href);
@@ -28,6 +32,18 @@
         //Back Button in Browser using jquery?
 
         protected /* virtual */ OnBrowserBack(): void { }
+
+        public SafeAction(func: Function, context?: any, ...args: any[]): any {
+            try {
+                if (context) {
+                    return $.proxy(func, context, args);
+                } else {
+                    return func();
+                }
+            } catch (e) {
+                this.UnhandledException(e);
+            }
+        }
 
         public abstract UnhandledException(error: any): void;
 
