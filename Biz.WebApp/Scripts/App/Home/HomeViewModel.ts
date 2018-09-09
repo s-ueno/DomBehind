@@ -29,7 +29,7 @@
                 Password: this.Password
             }).done(x => {
                 if (x && x.AllowSignin) {
-                    this.Navigator.Move('TwoPane/Main');
+                    this.Navigator.Move('Calendar/');
                 } else {
                     this.ShowWarning(`failed to sign in.\n${x.Message}`);
                 }
