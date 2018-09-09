@@ -199,6 +199,8 @@
     <Compile Include="Controllers\AppController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\CalendarController.cs" />
+    <Compile Include="Controllers\Sample1Controller.cs" />
+    <Compile Include="Controllers\Sample2Controller.cs" />
     <Compile Include="Controllers\TwoPaneController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -449,6 +451,8 @@
     <Content Include="Views\TwoPane\Main.cshtml" />
     <Content Include="Views\Shared\_LayoutSPA.cshtml" />
     <Content Include="Views\Calendar\Index.cshtml" />
+    <Content Include="Views\Sample1\Index.cshtml" />
+    <Content Include="Views\Sample2\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -474,6 +478,10 @@
     <TypeScriptCompile Include="Scripts\App\Home\HomeView.ts" />
     <TypeScriptCompile Include="Scripts\App\Home\HomeViewModel.ts" />
     <TypeScriptCompile Include="Scripts\App\Home\WebServiceProxy.ts" />
+    <TypeScriptCompile Include="Scripts\App\Sample1\Sample1View.ts" />
+    <TypeScriptCompile Include="Scripts\App\Sample1\Sample1ViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\App\Sample2\Sample2View.ts" />
+    <TypeScriptCompile Include="Scripts\App\Sample2\Sample2ViewModel.ts" />
     <TypeScriptCompile Include="Scripts\App\Shared\LayoutView.ts" />
     <TypeScriptCompile Include="Scripts\App\Shared\LayoutViewModel.ts" />
     <TypeScriptCompile Include="Scripts\App\Shared\WebServiceProxy.ts" />
