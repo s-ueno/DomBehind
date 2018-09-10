@@ -502,6 +502,7 @@
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\NavbarElement.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\Selector.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\Tab.ts" />
+    <TypeScriptCompile Include="Scripts\DomBehind\Controls\TemplateListView.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\UIElement.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Data\ActionBindingBehavior.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Data\ActionBindingBehaviorBuilder.ts" />

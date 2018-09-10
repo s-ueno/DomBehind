@@ -4352,6 +4352,177 @@ var DomBehind;
     };
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=ListView.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var DomBehind;
+(function (DomBehind) {
+    var TemplateListView = /** @class */ (function (_super) {
+        __extends(TemplateListView, _super);
+        function TemplateListView() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(TemplateListView.prototype, "ItemsSource", {
+            set: function (newValue) {
+                this.RemoveAll();
+                var rowContainer = $("<div class=\"templateRowContainer\"></div>");
+                $.each(newValue.ToArray(), function (i, value) {
+                });
+                // rowを最後に追加
+                this.Element.append(rowContainer);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TemplateListView.prototype.RemoveAll = function () {
+            this.Element.empty();
+        };
+        TemplateListView.prototype.ClearSortMarks = function () {
+            var view = this.Owner.Container;
+            var headeArray = this.Columns.Where(function (x) { return x.header ? true : false; });
+            $.each(headeArray, function (i, each) {
+                var column = view.find(each.header);
+                if (column.length !== 0) {
+                    var span = column.find("span");
+                    if (span.length !== 0) {
+                        span.removeClass();
+                    }
+                }
+            });
+        };
+        TemplateListView.prototype.Ensure = function () {
+            var _this = this;
+            _super.prototype.Ensure.call(this);
+            this.Option = $.extend(true, this.DefaultOption, this.Option);
+            var view = this.Owner.Container;
+            if (this.Option.columnClick) {
+                var headeArray = this.Columns.Where(function (x) { return x.header ? true : false; });
+                $.each(headeArray, function (i, each) {
+                    var column = view.find(each.header);
+                    if (column.length !== 0) {
+                        var span = column.find("span");
+                        if (span.length === 0) {
+                            column.append($("<span></span>"));
+                        }
+                        if (column.is("a") && !column.attr("href")) {
+                            column.attr("href", "javascript:void(0);");
+                        }
+                        column.off("click");
+                        column.on("click", function (e) { return _this.OnColumnClick(e, each.header); });
+                    }
+                });
+            }
+        };
+        TemplateListView.prototype.OnColumnClick = function (e, header) {
+            var _this = this;
+            if (header) {
+                var target = $(e.target);
+                var span = target.find("span");
+                var asc = span.hasClass(this.Option.descClass);
+                if (span.length !== 0) {
+                    this.ClearSortMarks();
+                    span.addClass(asc ? this.Option.ascClass : this.Option.descClass);
+                }
+                var ee_1 = {
+                    selector: header,
+                    sender: this,
+                    target: target,
+                    isAsc: asc,
+                    text: target.text(),
+                    value: target.val(),
+                };
+                DomBehind.Application.Current.SafeAction(function () {
+                    return _this.Option.columnClick(_this.DataContext, ee_1);
+                });
+            }
+        };
+        Object.defineProperty(TemplateListView.prototype, "DefaultOption", {
+            get: function () {
+                return {
+                    template: "",
+                    ascClass: "fa fa-sort-asc",
+                    descClass: "fa fa-sort-desc",
+                };
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TemplateListView.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", function (el) {
+        }, function (el, newValue) {
+            var identity = el.attr("templateListView-identity");
+            var template = window[identity];
+            if (newValue instanceof DomBehind.Data.ListCollectionView) {
+                template.ItemsSource = newValue;
+            }
+            else {
+                template.ItemsSource = new DomBehind.Data.ListCollectionView([]);
+            }
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        return TemplateListView;
+    }(DomBehind.Data.DataBindingBehavior));
+    DomBehind.TemplateListView = TemplateListView;
+    var TemplateListViewBindingBehaviorBuilder = /** @class */ (function (_super) {
+        __extends(TemplateListViewBindingBehaviorBuilder, _super);
+        function TemplateListViewBindingBehaviorBuilder(owner) {
+            return _super.call(this, owner) || this;
+        }
+        TemplateListViewBindingBehaviorBuilder.prototype.BindingColumn = function (selector, exp, option) {
+            var me = this;
+            if (me.CurrentBehavior instanceof TemplateListView) {
+                option = $.extend(true, {}, option);
+                option.templateSelector = selector;
+                option.expression = exp;
+                me.CurrentBehavior.LastOption = option;
+                me.CurrentBehavior.Columns.push(option);
+            }
+            return me;
+        };
+        TemplateListViewBindingBehaviorBuilder.prototype.BindingColumnAction = function (selector, exp, option) {
+            var me = this;
+            if (me.CurrentBehavior instanceof TemplateListView) {
+                option = $.extend(true, {}, option);
+                option.templateSelector = selector;
+                option.expressionAction = exp;
+                me.CurrentBehavior.LastOption = option;
+                me.CurrentBehavior.Columns.push(option);
+            }
+            return me;
+        };
+        TemplateListViewBindingBehaviorBuilder.prototype.BindingRowStyle = function (exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof TemplateListView) {
+                me.CurrentBehavior.RowStyleExpression = exp;
+            }
+            return me;
+        };
+        return TemplateListViewBindingBehaviorBuilder;
+    }(DomBehind.BindingBehaviorBuilder));
+    DomBehind.TemplateListViewBindingBehaviorBuilder = TemplateListViewBindingBehaviorBuilder;
+    DomBehind.BindingBehaviorBuilder.prototype.BuildTemplateItems = function (itemsSource, option) {
+        var me = this;
+        var behavior = me.Add(new TemplateListView());
+        behavior.Owner = me.Owner;
+        behavior.Property = TemplateListView.ItemsSourceProperty;
+        behavior.PInfo = new DomBehind.LamdaExpression(me.Owner.DataContext, itemsSource);
+        behavior.Option = $.extend(true, {}, option);
+        behavior.Columns = new Array();
+        var newMe = new TemplateListViewBindingBehaviorBuilder(me.Owner);
+        newMe.CurrentBehavior = me.CurrentBehavior;
+        newMe.CurrentElement = me.CurrentElement;
+        return newMe;
+    };
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=TemplateListView.js.map
 var DomBehind;
 (function (DomBehind) {
     var Controls;

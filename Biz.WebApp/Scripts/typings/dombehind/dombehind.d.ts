@@ -578,6 +578,58 @@ declare namespace DomBehind.Controls {
 }
 
 declare namespace DomBehind {
+    class Template {
+    }
+}
+
+declare namespace DomBehind {
+    interface ITemplateListViewOption<T> {
+        template: string;
+        columnClick?: (owner: T, e: ITemplateListViewColumnClickEventArgs) => void;
+        ascClass?: string;
+        descClass?: string;
+    }
+    interface ITemplateListViewColumn {
+        templateSelector?: string;
+        header?: string;
+        expression?: (row: any) => any;
+        expressionAction?: (owner: any, row: any) => void;
+        convertTarget?: (value: any) => any;
+    }
+    interface ITemplateListViewColumnClickEventArgs {
+        isAsc?: boolean;
+        text?: string;
+        value?: string;
+        selector?: string;
+        sender?: TemplateListView;
+        target?: any;
+    }
+    class TemplateListView extends Data.DataBindingBehavior {
+        static ItemsSourceProperty: Data.DependencyProperty;
+        Owner: BizView;
+        Option: ITemplateListViewOption<any>;
+        Columns: Array<ITemplateListViewColumn>;
+        LastOption: ITemplateListViewColumn;
+        RowStyleExpression: (row: any) => string;
+        ItemsSource: Data.ListCollectionView;
+        RemoveAll(): void;
+        ClearSortMarks(): void;
+        Ensure(): void;
+        protected OnColumnClick(e: JQueryEventObject, header: string): void;
+        protected readonly DefaultOption: ITemplateListViewOption<any>;
+    }
+    class TemplateListViewBindingBehaviorBuilder<TOwner, TRow> extends BindingBehaviorBuilder<TRow> {
+        constructor(owner: BizView);
+        BindingColumn(selector: string, exp: (x: TRow) => any, option?: ITemplateListViewColumn): TemplateListViewBindingBehaviorBuilder<TOwner, TRow>;
+        BindingColumnAction(selector: string, exp: (x: TOwner, args: TRow) => void, option?: ITemplateListViewColumn): TemplateListViewBindingBehaviorBuilder<TOwner, TRow>;
+        BindingRowStyle(exp: (x: TRow) => string): TemplateListViewBindingBehaviorBuilder<TOwner, TRow>;
+    }
+    interface BindingBehaviorBuilder<T> {
+        BuildTemplateItems<TRow>(itemsSource: (x: T) => any, option: ITemplateListViewOption<T>): TemplateListViewBindingBehaviorBuilder<T, TRow>;
+    }
+}
+
+declare namespace DomBehind {
     class UIElement {
         /**
          * Gets or sets the val attribute of the element
