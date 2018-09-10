@@ -32,7 +32,9 @@
         // Assign View-ViewModel to the above <div id = "Home" ... 
         // Since lambda description in the script tag is not supported by IE, it is declared with the old description method
         // $.BindingAnnotation("#_Layout", () => SIS.App.Shared.LayoutView, () => SIS.App.Shared.LayoutViewModel)
-        $.BindingAnnotation("#_Layout", function () { return Biz.WebApp.Shared.LayoutView; }, function () { return Biz.WebApp.Shared.LayoutViewModel; });
+        $.BindingAnnotation("#_Layout",
+            function () { return Biz.WebApp.Shared.LayoutView; },
+            function () { return Biz.WebApp.Shared.LayoutViewModel; });
     </script>
 </body>
 </html>

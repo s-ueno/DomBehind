@@ -4,17 +4,16 @@
             let builder = this.CreateBindingBuilder<CalendarViewModel>();
 
 
-            //builder.Element("#MyCalendar")
-            //    .BuildCalendar<CurrenderModel>(x => x.CalendarItems, {
-                    
+            builder.Element("#MyCalendar")
+                .BuildCalendar<CurrenderModel>(x => x.CalendarItems, {
 
-            //    })
-            //    .EventBinding({
-            //        id: x => x.Identity,
-            //        title: x => x.Title,
-            //        start: x => x.StartDate,
-            //        end: x => x.EndDate
-            //    });
+
+                })
+                .BindingIdentity(x => x.Identity)
+                .BindingTitle(x => x.Title)
+                .BindingStartDate(x => x.StartDate)
+                .BindingEndDate(x => x.EndDate);
+
 
 
             

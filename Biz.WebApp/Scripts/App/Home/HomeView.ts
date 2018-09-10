@@ -16,7 +16,7 @@
             buider.Element("#PasswordInput")
                 .InputType(DomBehind.InputType.Password)
                 .Binding(UIElement.ValueProperty, x => x.Password)
-                .Required("パスワードは必須だよ！");
+                .Required("Enter the password！");
 
             // Remember me
             buider.Element("#RememberMeCheckbox")

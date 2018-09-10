@@ -6,69 +6,93 @@
 
     <title>@ViewBag.Title</title>
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link rel="manifest" href="~/manifest.json">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
     @Styles.Render("~/bundles/nuget-css")
+    <link href="/Content/custom.css" rel="stylesheet">
     @Styles.Render("~/bundles/app-css")
-
     @Scripts.Render("~/bundles/nuget-js")
     @Scripts.Render("~/bundles/dombehind-js")
     @Scripts.Render("~/bundles/app-js")
 </head>
-<body id="_Layout">
-    @* titlebar *@
-    <div class="ui-layout-north">
-        <nav id="SharedNavbar" class="navbar navbar-fixed-top" role="navigation">
-            <div class="container">
-                <div class="navbar-header">
-                    <a class="navbar-brand" id="AppBrand">
-                        DOM Behind
-                    </a>
-                </div>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a id="ContactButton">CONTACT</a></li>
-                    <li><a id="SignOutButton">SIGN OUT</a></li>
-                </ul>
-            </div>
-        </nav>
-    </div>
 
-    @* side menu *@
-    <div class="ui-layout-west">
-        <div id="SideMenu" style="max-height:90vh">
-            <form class="form-inline">
-                <div>
-                    <label id="LoginUserName">Jane Doe</label>
-                    (
-                    <label id="LoginUserId">EMP-0001</label>
-                    )
+
+<body class="nav-md">
+    <div id="_layout" class="container body">
+        <div class="main_container">
+            <div class="col-md-3 left_col">
+                <div class="left_col scroll-view">
+                    <div class="navbar nav_title" style="border: 0;">
+                        <a class="site_title"><span>Sample App</span></a>
+                    </div>
+                    <div class="clearfix"></div>
+                    <br />
+                    <!-- sidebar menu -->
+                    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                        <div class="menu_section">
+                            <ul class="nav side-menu">
+                                <li>
+                                    <a class="homemenu"><i class="fa fa-home" data-menu-uri="home/index"></i> Calendar </a>
+                                </li>
+                                <li>
+                                    <a class="sample1"><i class="fa fa-history" data-menu-uri="sample1/index"></i> Sample 1 </a>
+                                </li>
+                                <li>
+                                    <a class="sample2"><i class="fa fa-download" data-menu-uri="sample2/index"></i> Sample 2 </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- /sidebar menu -->
+                    <!-- /menu footer buttons -->
+                    <div class="sidebar-footer hidden-small">
+                        <label class="">© 2018</label>
+                    </div>
+                    <!-- /menu footer buttons -->
                 </div>
-            </form>
-            <div id="SharedSidemenu" class="sidemenu-scrollable"></div>
+            </div>
+
+            <!-- top navigation -->
+            <div class="top_nav" style="position:relative;z-index:999">
+                <div class="nav_menu">
+                    <nav>
+                        <div class="nav toggle">
+                            <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                        </div>
+                        <form class="navbar-form center" role="search" onsubmit="return false">
+                            <span class="input-group" style="min-width:calc(100vh - 400px)">
+                                <input type="text" class="form-control search-input" placeholder="Search">
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-default search-input-button">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                            </span>
+                        </form>
+                    </nav>
+                </div>
+            </div>
+            <!-- /top navigation -->
+            <!-- page content -->
+            <div class="right_col main" role="main">
+                @RenderSection("SPAViews", required: false)
+                @RenderBody()
+            </div>
+            <!-- /page content -->
         </div>
     </div>
-
-    @* main content *@
-    <div class="ui-layout-center">
-        @RenderSection("SPAViews", required: false)
-        @RenderBody()
-    </div>
-
-    <div class="ui-layout-east">
-        @RenderSection("SPADetailViews", required: false)
-    </div>
-    <div class="ui-layout-south">
-        @RenderSection("SPAPreviewViews", required: false)
-    </div>
-
-
     <script>
+        $.SetRootUri("@ViewBag.RootUri");
+
         // Assign View-ViewModel to the above <div id = "_Layout" ...
         // Since lambda description in the script tag is not supported by IE, it is declared with the old description method
-        // $.BindingAnnotation("#_Layout", () => Biz.WebApp.Shared.LayoutSPAView, () => Biz.WebApp.Shared.LayoutSPAViewModel)
-        $.BindingAnnotation("#_Layout", function () { return Biz.WebApp.Shared.LayoutSPAView; }, function () { return Biz.WebApp.Shared.LayoutSPAViewModel; });
+        // $.BindingAnnotation("#_Layout", () => DomBehind.RazorTemplate.Shared.LayoutSPAView, () => Biz.WebApp.Shared.LayoutSPAViewModel)
+        $.BindingAnnotation("#_layout",
+            function () { return Biz.WebApp.Shared.LayoutView; },
+            function () { return Biz.WebApp.Shared.LayoutViewModel; });
     </script>
     @RenderSection("Scripts", required: false)
 </body>

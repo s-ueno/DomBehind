@@ -1,13 +1,31 @@
-﻿html {
-    position: relative;
-    min-height: 100%;
-    /*font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Yu Gothic", YuGothic, Verdana, Meiryo, "M+ 1p", sans-serif;*/
+﻿.shared {
 }
 
-body {
-    padding-top: 0px;
-    /* 下部にfotterが必要な場合は、ここにマージンとる */
-    /* padding-bottom: 10px; */
+#_layout {
+    min-height: 100vh;
+}
+
+.player_frame {
+    width: 100%;
+    height: 100%;
+}
+
+.modal-dialog {
+    height: calc(90vh - 20px);
+    width: calc(100% - 10px);
+}
+
+.modal-body {
+    height: calc(100% - 85px);
+    width: 100%;
+}
+
+.main_container {
+    min-height: 100vh;
+}
+
+.main {
+    min-height: 100vh;
 }
 
 :invalid {
@@ -170,11 +188,11 @@ div > .input-field {
 .modal-overlay {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
-    padding-top: 100px; /* Location of the box */
+    padding-top: 25px; /* Location of the box */
     left: 0;
     top: 0;
     width: 100%; /* Full width */
-    height: 120%; /* Full height supported mobile */
+    height: 100%; /* Full height supported mobile */
     overflow: auto; /* Enable scroll if needed */
     background-color: rgb(0,0,0); /* Fallback color */
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
@@ -264,21 +282,6 @@ div > .input-field {
     width: 100%;
 }
 
-.displaySize-90vh {
-    max-height: 90vh;
-}
-
-/*.modal-header {
-    height: 60px;
-}*/
-
-/*.close {
-    opacity: 1;
-}
-    .close:hover {
-        opacity: 0.9;
-    }*/
-
 .modal_close {
     position: relative;
     top: -25px;
@@ -290,15 +293,6 @@ div > .input-field {
 }
 
 
-.footer {
-    position: absolute;
-    min-width: 100%;
-    margin: 10px 20px 0px 0px;
-    bottom: 0px;
-    height: 40px;
-    background-color: #f5f5f5;
-}
-
 /* Set padding to keep content from hitting the edges */
 .body-content {
     padding-left: 0px;
@@ -306,13 +300,6 @@ div > .input-field {
     width: 100%;
     height: 100%;
 }
-
-.fixedNavAnchor {
-    padding-top: 40px;
-}
-
-
-
 
 
 
