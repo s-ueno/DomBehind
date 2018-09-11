@@ -13,6 +13,10 @@
         expression?: (row: any) => any;
         expressionAction?: (owner: any, row: any) => void;
         convertTarget?: (value: any) => any;
+
+        attachedEvent?: IEventBuilder;
+        dependencyProperty?: Data.DependencyProperty;
+        mode?: Data.BindingMode;
     }
 
     export interface ITemplateListViewColumnClickEventArgs {
@@ -48,23 +52,54 @@
         public LastOption: ITemplateListViewColumn;
         public RowStyleExpression: (row: any) => string;
         public set ItemsSource(newValue: Data.ListCollectionView) {
+            let jtemplate = $(document.body).find(this.Option.template);
+            if (jtemplate.length === 0) return;
+
+            let temp: HTMLTemplateElement = (<HTMLTemplateElement>jtemplate[0]);
+            let template = $(temp.content.querySelector("div"));
+            
             this.RemoveAll();
 
-
-
-
+            let dataContext = this.DataContext;
             let rowContainer = $(`<div class="templateRowContainer"></div>`);
-
-
-
             $.each(newValue.ToArray(), (i, value) => {
+                let newRow = template.clone();
 
+                $.each(this.Columns, (k, column) => {
 
+                    let el = newRow.find(column.templateSelector);
+                    if (el.length !== 0) {
+                        // property binding
+                        if (column.expression && column.dependencyProperty) {
+                            // one time
+                            let ret = column.expression(value);
+                            column.dependencyProperty.SetValue(el, ret);
 
+                            // two way
+                            if (column.mode === Data.BindingMode.TwoWay) {
+                                let path = LamdaExpression.Path(column.expression);
+                                let observe = Observable.Register(value, path);
+                                observe.PropertyChanged.AddHandler((sender, d) => {
+                                    if (sender) {
+                                        let v = sender[d.Name];
+                                        column.dependencyProperty.SetValue(el, v);
+                                    }
+                                });
+                            }
+                        }
 
+                        // event binding
+                        if (column.expressionAction && column.attachedEvent) {
+                            let newEvent = column.attachedEvent.Create();
+                            newEvent.AddHandler((sener, e) => {
+                                column.expressionAction(dataContext, value);
+                            });
+                        }
+                    }
+                });
+
+                rowContainer.append(newRow);
             });
-
-            // rowを最後に追加
             this.Element.append(rowContainer);
         }
 
@@ -111,11 +146,18 @@
                     }
                 });
             }
+
+            let identity = this.Element.attr("templateListView-identity");
+            if (!identity) {
+                identity = `id-${NewUid()}`;
+                this.Element.attr("templateListView-identity", identity);
+            }
+            window[identity] = this;
         }
 
         protected OnColumnClick(e: JQueryEventObject, header: string) {
             if (header) {
-                let target = $(e.target);                
+                let target = $(e.target);
                 let span = target.find("span");
                 let asc = span.hasClass(this.Option.descClass);
                 if (span.length !== 0) {
@@ -152,11 +194,19 @@
         }
 
         public BindingColumn(selector: string, exp: (x: TRow) => any, option?: ITemplateListViewColumn): TemplateListViewBindingBehaviorBuilder<TOwner, TRow> {
+            return this.BindingProperty(UIElement.TextProperty, selector, exp, option);
+        }
+        public BindingColumnAction(selector: string, exp: (x: TOwner, args: TRow) => void, option?: ITemplateListViewColumn): TemplateListViewBindingBehaviorBuilder<TOwner, TRow> {
+            return this.BindingEvent(UIElement.Click, selector, exp, option);
+        }
+
+        public BindingProperty(dp: Data.DependencyProperty, selector: string, exp: (x: TRow) => any, option?: ITemplateListViewColumn): TemplateListViewBindingBehaviorBuilder<TOwner, TRow> {
             let me: TemplateListViewBindingBehaviorBuilder<any, any> = this;
             if (me.CurrentBehavior instanceof TemplateListView) {
                 option = $.extend(true, {}, option);
                 option.templateSelector = selector;
                 option.expression = exp;
+                option.dependencyProperty = dp;
 
                 me.CurrentBehavior.LastOption = option;
                 me.CurrentBehavior.Columns.push(option);
@@ -164,12 +214,13 @@
             return me;
         }
 
-        public BindingColumnAction(selector: string, exp: (x: TOwner, args: TRow) => void, option?: ITemplateListViewColumn): TemplateListViewBindingBehaviorBuilder<TOwner, TRow> {
+        public BindingEvent(ev: IEventBuilder, selector: string, exp: (x: TOwner, args: TRow) => void, option?: ITemplateListViewColumn): TemplateListViewBindingBehaviorBuilder<TOwner, TRow> {
             let me: TemplateListViewBindingBehaviorBuilder<any, any> = this;
             if (me.CurrentBehavior instanceof TemplateListView) {
                 option = $.extend(true, {}, option);
                 option.templateSelector = selector;
                 option.expressionAction = exp;
+                option.attachedEvent = ev;
 
                 me.CurrentBehavior.LastOption = option;
                 me.CurrentBehavior.Columns.push(option);

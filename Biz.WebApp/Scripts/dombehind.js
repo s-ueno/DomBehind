@@ -4374,11 +4374,48 @@ var DomBehind;
         }
         Object.defineProperty(TemplateListView.prototype, "ItemsSource", {
             set: function (newValue) {
+                var _this = this;
+                var jtemplate = $(document.body).find(this.Option.template);
+                if (jtemplate.length === 0)
+                    return;
+                var temp = jtemplate[0];
+                var template = $(temp.content.querySelector("div"));
                 this.RemoveAll();
+                var dataContext = this.DataContext;
                 var rowContainer = $("<div class=\"templateRowContainer\"></div>");
                 $.each(newValue.ToArray(), function (i, value) {
+                    var newRow = template.clone();
+                    $.each(_this.Columns, function (k, column) {
+                        var el = newRow.find(column.templateSelector);
+                        if (el.length !== 0) {
+                            // property binding
+                            if (column.expression && column.dependencyProperty) {
+                                // one time
+                                var ret = column.expression(value);
+                                column.dependencyProperty.SetValue(el, ret);
+                                // two way
+                                if (column.mode === DomBehind.Data.BindingMode.TwoWay) {
+                                    var path = DomBehind.LamdaExpression.Path(column.expression);
+                                    var observe = DomBehind.Observable.Register(value, path);
+                                    observe.PropertyChanged.AddHandler(function (sender, d) {
+                                        if (sender) {
+                                            var v = sender[d.Name];
+                                            column.dependencyProperty.SetValue(el, v);
+                                        }
+                                    });
+                                }
+                            }
+                            // event binding
+                            if (column.expressionAction && column.attachedEvent) {
+                                var newEvent = column.attachedEvent.Create();
+                                newEvent.AddHandler(function (sener, e) {
+                                    column.expressionAction(dataContext, value);
+                                });
+                            }
+                        }
+                    });
+                    rowContainer.append(newRow);
                 });
-                // rowを最後に追加
                 this.Element.append(rowContainer);
             },
             enumerable: true,
@@ -4422,6 +4459,12 @@ var DomBehind;
                     }
                 });
             }
+            var identity = this.Element.attr("templateListView-identity");
+            if (!identity) {
+                identity = "id-" + NewUid();
+                this.Element.attr("templateListView-identity", identity);
+            }
+            window[identity] = this;
         };
         TemplateListView.prototype.OnColumnClick = function (e, header) {
             var _this = this;
@@ -4477,22 +4520,30 @@ var DomBehind;
             return _super.call(this, owner) || this;
         }
         TemplateListViewBindingBehaviorBuilder.prototype.BindingColumn = function (selector, exp, option) {
+            return this.BindingProperty(DomBehind.UIElement.TextProperty, selector, exp, option);
+        };
+        TemplateListViewBindingBehaviorBuilder.prototype.BindingColumnAction = function (selector, exp, option) {
+            return this.BindingEvent(DomBehind.UIElement.Click, selector, exp, option);
+        };
+        TemplateListViewBindingBehaviorBuilder.prototype.BindingProperty = function (dp, selector, exp, option) {
             var me = this;
             if (me.CurrentBehavior instanceof TemplateListView) {
                 option = $.extend(true, {}, option);
                 option.templateSelector = selector;
                 option.expression = exp;
+                option.dependencyProperty = dp;
                 me.CurrentBehavior.LastOption = option;
                 me.CurrentBehavior.Columns.push(option);
             }
             return me;
         };
-        TemplateListViewBindingBehaviorBuilder.prototype.BindingColumnAction = function (selector, exp, option) {
+        TemplateListViewBindingBehaviorBuilder.prototype.BindingEvent = function (ev, selector, exp, option) {
             var me = this;
             if (me.CurrentBehavior instanceof TemplateListView) {
                 option = $.extend(true, {}, option);
                 option.templateSelector = selector;
                 option.expressionAction = exp;
+                option.attachedEvent = ev;
                 me.CurrentBehavior.LastOption = option;
                 me.CurrentBehavior.Columns.push(option);
             }

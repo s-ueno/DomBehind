@@ -595,6 +595,9 @@ declare namespace DomBehind {
         expression?: (row: any) => any;
         expressionAction?: (owner: any, row: any) => void;
         convertTarget?: (value: any) => any;
+        attachedEvent?: IEventBuilder;
+        dependencyProperty?: Data.DependencyProperty;
+        mode?: Data.BindingMode;
     }
     interface ITemplateListViewColumnClickEventArgs {
         isAsc?: boolean;
@@ -622,6 +625,8 @@ declare namespace DomBehind {
         constructor(owner: BizView);
         BindingColumn(selector: string, exp: (x: TRow) => any, option?: ITemplateListViewColumn): TemplateListViewBindingBehaviorBuilder<TOwner, TRow>;
         BindingColumnAction(selector: string, exp: (x: TOwner, args: TRow) => void, option?: ITemplateListViewColumn): TemplateListViewBindingBehaviorBuilder<TOwner, TRow>;
+        BindingProperty(dp: Data.DependencyProperty, selector: string, exp: (x: TRow) => any, option?: ITemplateListViewColumn): TemplateListViewBindingBehaviorBuilder<TOwner, TRow>;
+        BindingEvent(ev: IEventBuilder, selector: string, exp: (x: TOwner, args: TRow) => void, option?: ITemplateListViewColumn): TemplateListViewBindingBehaviorBuilder<TOwner, TRow>;
         BindingRowStyle(exp: (x: TRow) => string): TemplateListViewBindingBehaviorBuilder<TOwner, TRow>;
     }
     interface BindingBehaviorBuilder<T> {
