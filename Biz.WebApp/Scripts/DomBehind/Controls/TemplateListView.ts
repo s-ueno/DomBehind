@@ -131,25 +131,23 @@
             this.Option = $.extend(true, this.DefaultOption, this.Option);
 
             let view = this.Owner.Container;
-            if (this.Option.columnClick) {
-                let headeArray = this.Columns.Where(x => x.header ? true : false);
-                $.each(headeArray, (i, each) => {
-                    let column = view.find(each.header);
-                    if (column.length !== 0) {
+            let headeArray = this.Columns.Where(x => x.header ? true : false);
+            $.each(headeArray, (i, each) => {
+                let column = view.find(each.header);
+                if (column.length !== 0) {
 
-                        let span = column.find("span");
-                        if (span.length === 0) {
-                            column.append($("<span></span>"));
-                        }
-
-                        if (column.is("a") && !column.attr("href")) {
-                            column.attr("href", "javascript:void(0);");
-                        }
-                        column.off("click");
-                        column.on("click", e => this.OnColumnClick(e, each.header));
+                    let span = column.find("span");
+                    if (span.length === 0) {
+                        column.append($("<span></span>"));
                     }
-                });
-            }
+
+                    if (column.is("a") && !column.attr("href")) {
+                        column.attr("href", "javascript:void(0);");
+                    }
+                    column.off("click");
+                    column.on("click", e => this.OnColumnClick(e, each.header));
+                }
+            });
 
             let identity = this.Element.attr("templateListView-identity");
             if (!identity) {
@@ -177,8 +175,18 @@
                     text: target.text(),
                     value: target.val(),
                 };
-                Application.Current.SafeAction(() =>
-                    this.Option.columnClick(this.DataContext, ee));
+                if (this.Option.columnClick) {
+                    Application.Current.SafeAction(() =>
+                        this.Option.columnClick(this.DataContext, ee));
+                } else {
+                    let column = this.Columns.FirstOrDefault(x => x.header === header);
+                    let list = this.PInfo.GetValue();
+                    if (column && list instanceof Data.ListCollectionView) {
+                        let exp = LamdaExpression.Path(column.expression);
+                        let sorted = asc ? list.ToArray().OrderBy(x => x[exp]) : list.ToArray().OrderByDecording(x => x[exp]);
+                        this.ItemsSource = this.DataContext[this.PInfo.MemberPath] = new Data.ListCollectionView(sorted);
+                    }
+                }
             }
         }
 

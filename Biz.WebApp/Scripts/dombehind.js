@@ -4446,23 +4446,21 @@ var DomBehind;
             _super.prototype.Ensure.call(this);
             this.Option = $.extend(true, this.DefaultOption, this.Option);
             var view = this.Owner.Container;
-            if (this.Option.columnClick) {
-                var headeArray = this.Columns.Where(function (x) { return x.header ? true : false; });
-                $.each(headeArray, function (i, each) {
-                    var column = view.find(each.header);
-                    if (column.length !== 0) {
-                        var span = column.find("span");
-                        if (span.length === 0) {
-                            column.append($("<span></span>"));
-                        }
-                        if (column.is("a") && !column.attr("href")) {
-                            column.attr("href", "javascript:void(0);");
-                        }
-                        column.off("click");
-                        column.on("click", function (e) { return _this.OnColumnClick(e, each.header); });
+            var headeArray = this.Columns.Where(function (x) { return x.header ? true : false; });
+            $.each(headeArray, function (i, each) {
+                var column = view.find(each.header);
+                if (column.length !== 0) {
+                    var span = column.find("span");
+                    if (span.length === 0) {
+                        column.append($("<span></span>"));
                     }
-                });
-            }
+                    if (column.is("a") && !column.attr("href")) {
+                        column.attr("href", "javascript:void(0);");
+                    }
+                    column.off("click");
+                    column.on("click", function (e) { return _this.OnColumnClick(e, each.header); });
+                }
+            });
             var identity = this.Element.attr("templateListView-identity");
             if (!identity) {
                 identity = "id-" + NewUid();
@@ -4488,9 +4486,20 @@ var DomBehind;
                     text: target.text(),
                     value: target.val(),
                 };
-                DomBehind.Application.Current.SafeAction(function () {
-                    return _this.Option.columnClick(_this.DataContext, ee_1);
-                });
+                if (this.Option.columnClick) {
+                    DomBehind.Application.Current.SafeAction(function () {
+                        return _this.Option.columnClick(_this.DataContext, ee_1);
+                    });
+                }
+                else {
+                    var column = this.Columns.FirstOrDefault(function (x) { return x.header === header; });
+                    var list = this.PInfo.GetValue();
+                    if (column && list instanceof DomBehind.Data.ListCollectionView) {
+                        var exp_1 = DomBehind.LamdaExpression.Path(column.expression);
+                        var sorted = asc ? list.ToArray().OrderBy(function (x) { return x[exp_1]; }) : list.ToArray().OrderByDecording(function (x) { return x[exp_1]; });
+                        this.ItemsSource = this.DataContext[this.PInfo.MemberPath] = new DomBehind.Data.ListCollectionView(sorted);
+                    }
+                }
             }
         };
         Object.defineProperty(TemplateListView.prototype, "DefaultOption", {

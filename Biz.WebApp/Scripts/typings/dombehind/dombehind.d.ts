@@ -578,11 +578,6 @@ declare namespace DomBehind.Controls {
 }
 
 declare namespace DomBehind {
-    class Template {
-    }
-}
-
-declare namespace DomBehind {
     interface ITemplateListViewOption<T> {
         template: string;
         columnClick?: (owner: T, e: ITemplateListViewColumnClickEventArgs) => void;
@@ -1875,47 +1870,6 @@ declare namespace DomBehind {
          *
          */
         BuildSidebar(bindingNodes: (x: T) => any, selectedAction?: (x: T, args: any) => void, useCloseMenu?: boolean): W2SidebarBindingBehaviorBuilder<T>;
-    }
-}
-
-declare namespace DomBehind {
-    interface ISidemenuNode {
-        Title: string;
-        Icon?: string;
-        Image?: string;
-        Badge?: number;
-        Style?: string;
-        IsGroup?: boolean;
-        AllowShowHideGroupNode?: boolean;
-        AddtionalInfo?: any;
-        Selected?: boolean;
-        Expanded?: boolean;
-        IsVisible?: boolean;
-        Enabled?: boolean;
-        OnClick?: Function;
-        Id?: string;
-        Children?: ISidemenuNode[];
-    }
-    class W2SidemenuBindingBehavior extends Data.BindingBehavior {
-        Identity: string;
-        ClickEvent: IEvent;
-        AllowMenuExpand: boolean;
-        static ItemsSource: Data.DependencyProperty;
-        static BuildW2Node(value: ISidemenuNode): any;
-        static RecursiveNode(value: ISidemenuNode[]): any;
-        static FindModel(value: ISidemenuNode[], id: string): any;
-        Ensure(): void;
-    }
-    class W2SidemenuBindingBehaviorBuilder<T> extends BindingBehaviorBuilder<T> {
-        constructor(owner: BizView);
-    }
-    interface BindingBehaviorBuilder<T> {
-        /**
-         * Divタグにw2sidebar機構を組み込みます。
-         * 実装例：
-         *
-         */
-        BuildSidemenu(bindingNodes: (x: T) => any, selectedAction?: (x: T, args: any) => void, useCloseMenu?: boolean): W2SidebarBindingBehaviorBuilder<T>;
     }
 }
 
