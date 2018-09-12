@@ -4407,9 +4407,13 @@ var DomBehind;
                             }
                             // event binding
                             if (column.expressionAction && column.attachedEvent) {
-                                var newEvent = column.attachedEvent.Create();
-                                newEvent.AddHandler(function (sener, e) {
+                                var newEvent_1 = column.attachedEvent.Create();
+                                newEvent_1.AddHandler(function (sener, e) {
                                     column.expressionAction(dataContext, value);
+                                });
+                                el.off(newEvent_1.EventName);
+                                el.on(newEvent_1.EventName, function (e) {
+                                    newEvent_1.Raise(_this, e);
                                 });
                             }
                         }

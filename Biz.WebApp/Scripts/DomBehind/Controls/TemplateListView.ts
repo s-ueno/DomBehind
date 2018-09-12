@@ -57,7 +57,7 @@
 
             let temp: HTMLTemplateElement = (<HTMLTemplateElement>jtemplate[0]);
             let template = $(temp.content.querySelector("div"));
-            
+
             this.RemoveAll();
 
             let dataContext = this.DataContext;
@@ -93,6 +93,10 @@
                             let newEvent = column.attachedEvent.Create();
                             newEvent.AddHandler((sener, e) => {
                                 column.expressionAction(dataContext, value);
+                            });
+                            el.off(newEvent.EventName);
+                            el.on(newEvent.EventName, e => {
+                                newEvent.Raise(this, e);
                             });
                         }
                     }
