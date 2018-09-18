@@ -208,7 +208,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="cache-polyfill.js" />
+    <Content Include="Scripts\DomBehind\Polyfill\cache.js" />
     <Content Include="Content\animate.css" />
     <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
@@ -288,6 +288,7 @@
     <Content Include="Scripts\dombehind.min.js">
       <DependentUpon>dombehind.js</DependentUpon>
     </Content>
+    <Content Include="Scripts\DomBehind\Polyfill\template.js" />
     <Content Include="Scripts\DomBehind\TypeScript.Net\READ ME.txt" />
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -429,6 +430,8 @@
     <Content Include="Scripts\moment-with-locales.min.js" />
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\moment.min.js" />
+    <Content Include="Scripts\signature_pad.js" />
+    <Content Include="Scripts\signature_pad.min.js" />
     <Content Include="Scripts\w2ui-1.4.3.js" />
     <Content Include="Scripts\w2ui-1.5.rc1.js" />
     <Content Include="sw.js" />
@@ -540,6 +543,7 @@
     <TypeScriptCompile Include="Scripts\DomBehind\Navigation\DefaultNavigator.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Navigation\INavigator.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Repository.ts" />
+    <TypeScriptCompile Include="Scripts\DomBehind\SignaturePad\Sign.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Threading\PoolType.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Threading\WorkerPool.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Threading\WorkerWrapper.ts" />
@@ -589,6 +593,7 @@
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\moment\moment.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\signature_pad\signature_pad.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\w2ui\w2ui.d.ts" />
   </ItemGroup>
   <ItemGroup>

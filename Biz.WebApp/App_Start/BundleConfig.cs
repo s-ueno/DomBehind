@@ -111,6 +111,9 @@ namespace Biz.WebApp
 
         public static readonly string[] DomBehind_JS = new string[] {
 #if DEBUG
+      /* DomBehind/Polyfill */
+      /* "~/Scripts/DomBehind/Polyfill/cache.js", */
+      "~/Scripts/DomBehind/Polyfill/template.js",
 
       /* DomBehind/Typescript.Net */
       "~/Scripts/DomBehind/TypeScript.Net/Global.js",

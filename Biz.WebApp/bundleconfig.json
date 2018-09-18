@@ -12,6 +12,10 @@
   {
     "outputFileName": "Scripts/dombehind.js",
     "inputFiles": [
+      /* DomBehind/Polyfill */
+      /* "Scripts/DomBehind/Polyfill/cache.js", */
+      "Scripts/DomBehind/Polyfill/template.js",
+
       /* DomBehind/Typescript.Net */
       "Scripts/DomBehind/TypeScript.Net/Global.js",
       "Scripts/DomBehind/TypeScript.Net/IDisposable.js",
@@ -109,6 +113,9 @@
 
       /* DomBehind/bootstrap-wysiwyg  */
       "Scripts/DomBehind/Bootstrap/Editor.js",
+
+      /* DomBehind/SignaturePad  */
+      "Scripts/DomBehind/SignaturePad/Sign.js",
 
       /* DomBehind/W2UI */
       "Scripts/DomBehind/W2UI/Toolbar.js",

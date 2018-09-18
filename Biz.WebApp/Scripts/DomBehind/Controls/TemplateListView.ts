@@ -55,8 +55,7 @@
             let jtemplate = $(document.body).find(this.Option.template);
             if (jtemplate.length === 0) return;
 
-            let temp: HTMLTemplateElement = (<HTMLTemplateElement>jtemplate[0]);
-            let template = $(temp.content.querySelector("div"));
+            let template = this.FindTemplate(jtemplate);
 
             this.RemoveAll();
 
@@ -105,6 +104,19 @@
                 rowContainer.append(newRow);
             });
             this.Element.append(rowContainer);
+        }
+
+        private FindTemplate(jtemplate: JQuery): JQuery {
+            let support = ("content" in document.createElement("template"));
+            if (support) {
+                let temp: HTMLTemplateElement = (<HTMLTemplateElement>jtemplate[0]);
+                let template = $(temp.content.querySelector("div"));
+                return template;
+            } else {
+                let temp: any = jtemplate[0];
+                let template = $(temp.querySelector("div"));
+                return template;
+            }
         }
 
         public RemoveAll() {

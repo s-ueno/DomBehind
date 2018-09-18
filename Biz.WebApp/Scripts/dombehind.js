@@ -1,3 +1,88 @@
+(function () {
+    var support = ("content" in document.createElement("template"));
+
+    // Set the content property if missing
+    if (!support) {
+        var
+			/**
+			 * Prefer an array to a NodeList
+			 * Otherwise, updating the content property of a node
+			 * will update the NodeList and we'll loose the nested <template>
+			 */
+            templates = Array.prototype.slice.call(document.getElementsByTagName("template")),
+            template, content, fragment, node, i = 0, j;
+
+        // For each <template> element get its content and wrap it in a document fragment
+        while ((template = templates[i++])) {
+            content = template.children;
+            fragment = document.createDocumentFragment();
+
+            for (j = 0; node = content[j]; j++) {
+                fragment.appendChild(node);
+            }
+
+            template.content = fragment;
+        }
+    }
+
+    // Prepare a clone function to allow nested <template> elements
+    function clone() {
+        var
+            templates = this.querySelectorAll("template"),
+            fragments = [],
+            template,
+            i = 0;
+
+        // If the support is OK simply clone and return
+        if (support) {
+            template = this.cloneNode(true);
+            templates = template.content.querySelectorAll("template");
+
+            // Set the clone method for each nested <template> element
+            for (; templates[i]; i++) {
+                templates[i].clone = clone;
+            }
+
+            return template;
+        }
+
+        // Loop through nested <template> to retrieve the content property
+        for (; templates[i]; i++) {
+            fragments.push(templates[i].content);
+        }
+
+        // Now, clone the document fragment
+        template = this.cloneNode(true);
+
+        // Makes sure the clone have a "content" and "clone" properties
+        template.content = this.content;
+        template.clone = clone;
+
+		/**
+		 * Retrieve the nested <template> once again
+		 * Since we just cloned the document fragment,
+		 * the content's property of the nested <template> might be undefined
+		 * We have to re-set it using the fragment array we previously got
+		 */
+        templates = template.querySelectorAll("template");
+
+        // Loop to set the content property of each nested template
+        for (i = 0; templates[i]; i++) {
+            templates[i].content = fragments[i];
+            templates[i].clone = clone; // Makes sure to set the clone method as well
+        }
+
+        return template;
+    }
+
+    templates = document.querySelectorAll("template");
+    i = 0;
+
+    // Pollute the DOM with a "clone" method on each <template> element
+    while ((template = templates[i++])) {
+        template.clone = clone;
+    }
+}());
 // http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
 // https://gist.github.com/jcxplorer/823878
 function NewUid() {
@@ -4378,8 +4463,7 @@ var DomBehind;
                 var jtemplate = $(document.body).find(this.Option.template);
                 if (jtemplate.length === 0)
                     return;
-                var temp = jtemplate[0];
-                var template = $(temp.content.querySelector("div"));
+                var template = this.FindTemplate(jtemplate);
                 this.RemoveAll();
                 var dataContext = this.DataContext;
                 var rowContainer = $("<div class=\"templateRowContainer\"></div>");
@@ -4425,6 +4509,19 @@ var DomBehind;
             enumerable: true,
             configurable: true
         });
+        TemplateListView.prototype.FindTemplate = function (jtemplate) {
+            var support = ("content" in document.createElement("template"));
+            if (support) {
+                var temp = jtemplate[0];
+                var template = $(temp.content.querySelector("div"));
+                return template;
+            }
+            else {
+                var temp = jtemplate[0];
+                var template = $(temp.querySelector("div"));
+                return template;
+            }
+        };
         TemplateListView.prototype.RemoveAll = function () {
             this.Element.empty();
         };
@@ -5328,6 +5425,78 @@ var DomBehind;
     };
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Editor.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var DomBehind;
+(function (DomBehind) {
+    var SignSaveImage;
+    (function (SignSaveImage) {
+        SignSaveImage[SignSaveImage["Png"] = 0] = "Png";
+        SignSaveImage[SignSaveImage["Jpeg"] = 1] = "Jpeg";
+        SignSaveImage[SignSaveImage["Svg"] = 2] = "Svg";
+    })(SignSaveImage = DomBehind.SignSaveImage || (DomBehind.SignSaveImage = {}));
+    var Sign = /** @class */ (function (_super) {
+        __extends(Sign, _super);
+        function Sign() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Sign.prototype.SetOption = function (option) {
+            this.Option = $.extend(true, this.DefaultOption, option);
+        };
+        Object.defineProperty(Sign.prototype, "DefaultOption", {
+            get: function () {
+                return {
+                    image: SignSaveImage.Png,
+                    color: "rgb(255,255,255)",
+                    showClear: true,
+                    clearCaption: " Clear",
+                    clearStyle: "fa fa-remove",
+                    showUndo: true,
+                    undoCaption: " Undo",
+                    undoStyle: "fa fa-undo",
+                    showDownload: true,
+                    downloadCaption: " Download",
+                    downloadStyle: "fa fa-download",
+                    saveCaption: " Save",
+                    saveStyle: "fa fa-save",
+                };
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Sign.prototype.Ensure = function () {
+            this.Identity = "id-" + NewUid();
+            var canvas = $("<canvas id=\"" + this.Identity + "\" class=\"SignCanvas\" style=\"width:100%;height:calc(100% - 30px)\"></canvas>");
+            var container = $("<div style=\"height:30px\"></div>");
+            var div = $("<div class=\"pull-left\"></div>");
+            if (this.Option.showClear) {
+                var clearButton = $("<a class=\"signClear\" style=\"margin:0 4px\" href=\"javascript:void(0);\"><span class=\"" + this.Option.clearStyle + "\"></span> " + this.Option.clearCaption + "</a>");
+                clearButton.on("click", function (e) {
+                });
+            }
+        };
+        return Sign;
+    }(DomBehind.Data.BindingBehavior));
+    DomBehind.Sign = Sign;
+    DomBehind.BindingBehaviorBuilder.prototype.BuildSign = function (option) {
+        var me = this;
+        var behavior = me.Add(new Sign());
+        behavior.SetOption(option);
+        return me;
+    };
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Sign.js.map
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
