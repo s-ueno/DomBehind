@@ -1,0 +1,54 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>DomBehind.Plugin.W2UI</id>
+    <version>1.0.0</version>
+    <title>DOM Behind Plugin W2UI</title>
+    <authors>uEN</authors>
+    <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/s-ueno/DomBehind</projectUrl>
+    <tags>typescript javascript jquery mvvm</tags>
+    <description>
+      Add bind function to "DomBehind" using "W2UI" system function
+    </description>
+    <releaseNotes>
+    </releaseNotes>
+    <dependencies>
+      <dependency id="DomBehind" version="1.0.7"></dependency>
+      <dependency id="jQuery" version="3.1.1"></dependency>
+      <dependency id="jquery.TypeScript.DefinitelyTyped" version="1.5.1"></dependency>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Scripts/w2ui-1.5.rc1.js" target="Content/Scripts/" />
+    <file src="Content/w2ui-1.5.rc1.css" target="Content/Content/" />
+    
+    <file src="Scripts/dombehind.plugin.w2ui.js" target="Content/Scripts/" />
+    <file src="Scripts/typings/dombehind.plugin/dombehind.plugin.w2ui.d.ts" target="Content/Scripts/typings/dombehind.plugin" />
+
+    <file src="locale/az-az.json" target="Content/locale/" />
+    <file src="locale/ba-ba.json" target="Content/locale/" />
+    <file src="locale/bg-bg.json" target="Content/locale/" />
+    <file src="locale/ca-es.json" target="Content/locale/" />
+    <file src="locale/de-de.json" target="Content/locale/" />
+    <file src="locale/en-gb.json" target="Content/locale/" />
+    <file src="locale/en-us.json" target="Content/locale/" />
+    <file src="locale/es-es.json" target="Content/locale/" />
+    <file src="locale/es-mx.json" target="Content/locale/" />
+    <file src="locale/fr-fr.json" target="Content/locale/" />
+    <file src="locale/gl-es.json" target="Content/locale/" />
+    <file src="locale/hr-hr.json" target="Content/locale/" />
+    <file src="locale/hu-hu.json" target="Content/locale/" />
+    <file src="locale/id-id.json" target="Content/locale/" />
+    <file src="locale/it-it.json" target="Content/locale/" />
+    <file src="locale/ja-jp.json" target="Content/locale/" />
+    <file src="locale/ko-kr.json" target="Content/locale/" />
+    <file src="locale/lt-lt.json" target="Content/locale/" />
+    <file src="locale/nl-nl.json" target="Content/locale/" />
+    <file src="locale/no-no.json" target="Content/locale/" />
+    <file src="locale/pl-pl.json" target="Content/locale/" />
+    <file src="locale/pt-br.json" target="Content/locale/" />
+    <file src="locale/ru-ru.json" target="Content/locale/" />
+    <file src="locale/sk-sk.json" target="Content/locale/" />
+  </files>
+</package>

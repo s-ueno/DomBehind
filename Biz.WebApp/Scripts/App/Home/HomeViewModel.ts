@@ -24,7 +24,7 @@
          */
         protected SignInRaw() {
             let svc = new SigninWebService();
-            return svc.ExecuteAjax({
+            return svc.ExecuteAsync({
                 Email: this.Email,
                 Password: this.Password
             }).done(x => {

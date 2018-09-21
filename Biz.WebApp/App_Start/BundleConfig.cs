@@ -51,7 +51,7 @@ namespace Biz.WebApp
                 "~/Content/w2ui-1.5.rc1.css",
 
                 /* 基盤、共通 */
-                "~/Content/dombehind.css"
+                "~/Content/site.css"
         };
 
         public static readonly string[] App_Css = new string[] {
@@ -59,10 +59,6 @@ namespace Biz.WebApp
                 "~/Content/Shared/layout.css",
                 /* Home */
                 "~/Content/Home/home.css",
-                /* TwoPane */
-                "~/Content/TwoPane/twopane.css",
-                /* ThreePane */
-                "~/Content/ThreePane/threepane.css",
         };
 
         public static readonly string[] Nuget_JS = new string[] {

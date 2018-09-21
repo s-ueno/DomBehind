@@ -12,54 +12,18 @@
       MVVM with TypeScript for C # programmer
     </description>
     <releaseNotes>
-・bug fix
+      ・made each module separate as a plug-in
     </releaseNotes>
     <dependencies>
-      <dependency id="jQuery" version="3.1.1"></dependency>
-      <dependency id="jquery.TypeScript.DefinitelyTyped" version="1.5.1"></dependency>
+      <dependency id="jQuery" version="3.3.1"></dependency>
+      <dependency id="jquery.TypeScript.DefinitelyTyped" version="3.1.2"></dependency>
       <dependency id="jQuery.Validation" version="1.13.1"></dependency>
-      <dependency id="jquery.validation.TypeScript.DefinitelyTyped" version="0.4.6"></dependency>      
-      <dependency id="w2ui.TypeScript.DefinitelyTyped" version="0.0.3"></dependency>
+      <dependency id="jquery.validation.TypeScript.DefinitelyTyped" version="0.4.6"></dependency>
     </dependencies>
   </metadata>
   <files>
     <file src="Scripts/dombehind.js" target="Content/Scripts/" />
-    <file src="Scripts/dombehind.min.js" target="Content/Scripts/" />
-    <file src="Scripts/dombehind.min.js.map" target="Content/Scripts/" />
-    <file src="Scripts/dombehind-PlainXMLHttpRequest.ts" target="Content/Scripts/" />
     <file src="Scripts/typings/dombehind/dombehind.d.ts" target="Content/Scripts/typings/dombehind" />
     <file src="Scripts/collections.ts" target="Content/Scripts/" />
-    <file src="Scripts/w2ui-1.5.rc1.js" target="Content/Scripts/" />
-
-    <!--<file src="Content/dombehind.css" target="Content/Content/" />-->
-    <file src="Content/w2ui-1.5.rc1.css" target="Content/Content/" />
-
-    <file src="Scripts/ts-nameof.js" target="Content/Scripts/" />
-    <file src="Scripts/typings/ts-nameof/ts-nameof.d.ts" target="Content/Scripts/typings/ts-nameof" />
-
-    <file src="locale/az-az.json" target="Content/locale/" />
-    <file src="locale/ba-ba.json" target="Content/locale/" />
-    <file src="locale/bg-bg.json" target="Content/locale/" />
-    <file src="locale/ca-es.json" target="Content/locale/" />
-    <file src="locale/de-de.json" target="Content/locale/" />
-    <file src="locale/en-gb.json" target="Content/locale/" />
-    <file src="locale/en-us.json" target="Content/locale/" />
-    <file src="locale/es-es.json" target="Content/locale/" />
-    <file src="locale/es-mx.json" target="Content/locale/" />
-    <file src="locale/fr-fr.json" target="Content/locale/" />
-    <file src="locale/gl-es.json" target="Content/locale/" />
-    <file src="locale/hr-hr.json" target="Content/locale/" />
-    <file src="locale/hu-hu.json" target="Content/locale/" />
-    <file src="locale/id-id.json" target="Content/locale/" />
-    <file src="locale/it-it.json" target="Content/locale/" />
-    <file src="locale/ja-jp.json" target="Content/locale/" />
-    <file src="locale/ko-kr.json" target="Content/locale/" />
-    <file src="locale/lt-lt.json" target="Content/locale/" />
-    <file src="locale/nl-nl.json" target="Content/locale/" />
-    <file src="locale/no-no.json" target="Content/locale/" />
-    <file src="locale/pl-pl.json" target="Content/locale/" />
-    <file src="locale/pt-br.json" target="Content/locale/" />
-    <file src="locale/ru-ru.json" target="Content/locale/" />
-    <file src="locale/sk-sk.json" target="Content/locale/" />
   </files>
 </package>

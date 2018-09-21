@@ -10,7 +10,7 @@
 
     export class CalendarViewModel extends DomBehind.BizViewModel {
 
-        public MyController: DomBehind.Calendar;
+        //public MyController: DomBehind.Calendar;
 
         public CalendarItems: DomBehind.Data.ListCollectionView;
         public Initialize(): void {

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>DomBehind.Plugin.FullCalendar</id>
+    <version>1.0.0</version>
+    <title>DOM Behind Plugin FullCalendar</title>
+    <authors>uEN</authors>
+    <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/s-ueno/DomBehind</projectUrl>
+    <tags>typescript javascript jquery mvvm</tags>
+    <description>
+      Add calendar creation bind function to "DomBehind" using "fullcalendar"
+    </description>
+    <releaseNotes>
+    </releaseNotes>
+    <dependencies>
+      <dependency id="DomBehind" version="1.0.7"></dependency>
+      <dependency id="fullcalendar" version="3.9.0"></dependency>
+      <dependency id="Moment.js" version="2.9.0"></dependency>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Scripts/dombehind.plugin.fullcalendar.js" target="Content/Scripts/" />
+    <file src="Scripts/typings/dombehind.plugin/dombehind.plugin.fullcalendar.d.ts" target="Content/Scripts/typings/dombehind.plugin" />    
+       
+  </files>
+</package>

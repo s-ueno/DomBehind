@@ -9,6 +9,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Biz.Service", "Biz.Service\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Biz.WebApp", "Biz.WebApp\Biz.WebApp.csproj", "{2E6E56A0-4A0E-45E8-8986-C8E2AFA9D7FA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugin", "Plugin", "{9088B3BC-47C5-4EAC-B8A3-2508239A6755}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomBehind.Plugin.SignaturePad", "DomBehind.Plugin.SignaturePad\DomBehind.Plugin.SignaturePad.csproj", "{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomBehind.Plugin.W2UI", "DomBehind.Plugin.W2UI\DomBehind.Plugin.W2UI.csproj", "{2402FAFD-FAC6-498D-B4BE-25103B57F261}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomBehind.Plugin.Bootstrap", "DomBehind.Plugin.Bootstrap\DomBehind.Plugin.Bootstrap.csproj", "{2868DE82-8640-4622-8B85-C7B3AD3D4A40}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomBehind.Plugin.JQueryUI", "DomBehind.Plugin.JQueryUI\DomBehind.Plugin.JQueryUI.csproj", "{166B304A-CE80-4B31-85CA-5BEE98ABAAE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomBehind.Plugin.FullCalendar", "DomBehind.Plugin.FullCalendar\DomBehind.Plugin.FullCalendar.csproj", "{51A1569D-B0CE-46DD-A2BC-57AA49F917F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,9 +39,36 @@ Global
 		{2E6E56A0-4A0E-45E8-8986-C8E2AFA9D7FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E6E56A0-4A0E-45E8-8986-C8E2AFA9D7FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E6E56A0-4A0E-45E8-8986-C8E2AFA9D7FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2402FAFD-FAC6-498D-B4BE-25103B57F261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2402FAFD-FAC6-498D-B4BE-25103B57F261}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2402FAFD-FAC6-498D-B4BE-25103B57F261}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2402FAFD-FAC6-498D-B4BE-25103B57F261}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2868DE82-8640-4622-8B85-C7B3AD3D4A40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2868DE82-8640-4622-8B85-C7B3AD3D4A40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2868DE82-8640-4622-8B85-C7B3AD3D4A40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2868DE82-8640-4622-8B85-C7B3AD3D4A40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{166B304A-CE80-4B31-85CA-5BEE98ABAAE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{166B304A-CE80-4B31-85CA-5BEE98ABAAE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{166B304A-CE80-4B31-85CA-5BEE98ABAAE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{166B304A-CE80-4B31-85CA-5BEE98ABAAE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51A1569D-B0CE-46DD-A2BC-57AA49F917F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51A1569D-B0CE-46DD-A2BC-57AA49F917F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51A1569D-B0CE-46DD-A2BC-57AA49F917F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51A1569D-B0CE-46DD-A2BC-57AA49F917F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF} = {9088B3BC-47C5-4EAC-B8A3-2508239A6755}
+		{2402FAFD-FAC6-498D-B4BE-25103B57F261} = {9088B3BC-47C5-4EAC-B8A3-2508239A6755}
+		{2868DE82-8640-4622-8B85-C7B3AD3D4A40} = {9088B3BC-47C5-4EAC-B8A3-2508239A6755}
+		{166B304A-CE80-4B31-85CA-5BEE98ABAAE7} = {9088B3BC-47C5-4EAC-B8A3-2508239A6755}
+		{51A1569D-B0CE-46DD-A2BC-57AA49F917F0} = {9088B3BC-47C5-4EAC-B8A3-2508239A6755}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {88D7B35B-17E9-443D-8E03-A3327E1620AE}

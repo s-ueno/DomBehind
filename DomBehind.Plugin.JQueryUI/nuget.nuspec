@@ -1,0 +1,28 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>DomBehind.Plugin.JQueryUI</id>
+    <version>1.0.0</version>
+    <title>DOM Behind Plugin JQueryUI</title>
+    <authors>uEN</authors>
+    <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/s-ueno/DomBehind</projectUrl>
+    <tags>typescript javascript jquery mvvm</tags>
+    <description>
+      Add calendar creation bind function to "DomBehind" using "JQueryUI"
+    </description>
+    <releaseNotes>
+    </releaseNotes>
+    <dependencies>
+      <dependency id="DomBehind" version="1.0.7"></dependency>
+      <dependency id="jQuery" version="3.1.1"></dependency>
+      <dependency id="jquery.TypeScript.DefinitelyTyped" version="3.1.2"></dependency>
+      <dependency id="jQuery.UI.Combined" version="1.12.1"></dependency>
+      <dependency id="jqueryui.TypeScript.DefinitelyTyped" version="1.5.1"></dependency>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Scripts/dombehind.plugin.jqueryui.js" target="Content/Scripts/" />
+    <file src="Scripts/typings/dombehind.plugin/dombehind.plugin.jqueryui.d.ts" target="Content/Scripts/typings/dombehind.plugin" />
+  </files>
+</package>

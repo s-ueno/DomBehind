@@ -1,0 +1,25 @@
+﻿[
+  {
+    "outputFileName": "Scripts/domBehind.plugin.w2ui.js",
+    "inputFiles": [
+      "Scripts/DomBehind/DatePicker.js",
+      "Scripts/DomBehind/Dropdown.js",
+      "Scripts/DomBehind/Grid.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "commentMode": "all"
+    },
+    "sourceMap": true
+  },
+  {
+    "inputFiles": [
+      /* 
+        d.tsファイルはロード順序関係ないので、wildcard指定。
+        jsをwildcard指定すると、依存関係無視でBundleするので、実行時エラーとなった。
+      */
+      "Scripts/DomBehind/*.d.ts"
+    ],
+    "outputFileName": "Scripts/typings/dombehind.plugin/dombehind.plugin.w2ui.d.ts"
+  }
+]

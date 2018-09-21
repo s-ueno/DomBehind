@@ -21,10 +21,10 @@
             return <TResponse>promise.responseJSON;
         }
 
-        public ExecuteAjax(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse> {
+        public ExecuteAsync(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse> {
             let d = $.Deferred<TResponse>();
             let p: JQueryAjaxSettings = $.extend(true, this.DefaultPostSetting, option);
-            p.data = request;
+            p.data = JSON.stringify(request);
             p.async = true;
             $.ajax(p).done(x => {
                 d.resolve(x);
@@ -34,10 +34,10 @@
             return d.promise();
         }
 
-        public ExecuteAsync(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse> {
+        public ExecuteAjax(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse> {
             let d = $.Deferred<TResponse>();
             let p: JQueryAjaxSettings = $.extend(true, this.DefaultPostSetting, option);
-            p.data = JSON.stringify(request);
+            p.data = request;
             p.async = true;
             $.ajax(p).done(x => {
                 d.resolve(x);

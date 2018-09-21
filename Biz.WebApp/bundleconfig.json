@@ -1,14 +1,14 @@
 ﻿[
-  {
-    "outputFileName": "Content/dombehind.css",
-    "inputFiles": [
-      "Content/Site.css"
-    ],
-    "minify": {
-      "enabled": true,
-      "commentMode": "all"
-    }
-  },
+  //{
+  //  "outputFileName": "Content/dombehind.css",
+  //  "inputFiles": [
+  //    "Content/Site.css"
+  //  ],
+  //  "minify": {
+  //    "enabled": true,
+  //    "commentMode": "all"
+  //  }
+  //},
   {
     "outputFileName": "Scripts/dombehind.js",
     "inputFiles": [
@@ -104,27 +104,27 @@
       "Scripts/DomBehind/Controls/ListView.js",
       "Scripts/DomBehind/Controls/TemplateListView.js",
 
-      /* DomBehind/JQueryUI */
-      "Scripts/DomBehind/JQueryUI/Tooltip.js",
-      "Scripts/DomBehind/JQueryUI/Selectmenu.js",
+      ///* DomBehind/JQueryUI */
+      //"Scripts/DomBehind/JQueryUI/Tooltip.js",
+      //"Scripts/DomBehind/JQueryUI/Selectmenu.js",
 
-      /* DomBehind/Calendar */
-      "Scripts/DomBehind/Calendar/Calendar.js",
+      ///* DomBehind/Calendar */
+      //"Scripts/DomBehind/Calendar/Calendar.js",
 
-      /* DomBehind/bootstrap-wysiwyg  */
-      "Scripts/DomBehind/Bootstrap/Editor.js",
+      ///* DomBehind/bootstrap-wysiwyg  */
+      //"Scripts/DomBehind/Bootstrap/Editor.js",
 
       /* DomBehind/SignaturePad  */
-      "Scripts/DomBehind/SignaturePad/Sign.js",
+      /* "Scripts/DomBehind/SignaturePad/Sign.js", */
 
-      /* DomBehind/W2UI */
-      "Scripts/DomBehind/W2UI/Toolbar.js",
-      "Scripts/DomBehind/W2UI/Layout.js",
-      "Scripts/DomBehind/W2UI/Sidebar.js",
-      "Scripts/DomBehind/W2UI/Grid.js",
-      "Scripts/DomBehind/W2UI/MessageBox.js",
-      "Scripts/DomBehind/W2UI/Dropdown.js",
-      "Scripts/DomBehind/W2UI/DatePicker.js",
+      ///* DomBehind/W2UI */
+      //"Scripts/DomBehind/W2UI/Toolbar.js",
+      //"Scripts/DomBehind/W2UI/Layout.js",
+      //"Scripts/DomBehind/W2UI/Sidebar.js",
+      //"Scripts/DomBehind/W2UI/Grid.js",
+      //"Scripts/DomBehind/W2UI/MessageBox.js",
+      //"Scripts/DomBehind/W2UI/Dropdown.js",
+      //"Scripts/DomBehind/W2UI/DatePicker.js",
 
       /* DomBehind(MVVM) */
       "Scripts/DomBehind/Application.js",

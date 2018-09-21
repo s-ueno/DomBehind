@@ -216,10 +216,6 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\custom.css" />
-    <Content Include="Content\dombehind.css" />
-    <Content Include="Content\dombehind.min.css">
-      <DependentUpon>dombehind.css</DependentUpon>
-    </Content>
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
     <Content Include="Content\fullcalendar.css" />
@@ -273,8 +269,6 @@
     <Content Include="Content\themes\base\tabs.css" />
     <Content Include="Content\themes\base\theme.css" />
     <Content Include="Content\themes\base\tooltip.css" />
-    <Content Include="Content\ThreePane\threepane.css" />
-    <Content Include="Content\TwoPane\twopane.css" />
     <Content Include="Content\w2ui-1.4.3.css" />
     <Content Include="Content\w2ui-1.5.rc1.css" />
     <Content Include="favicon.ico" />
@@ -451,7 +445,6 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Views\Shared\_LayoutDialog.cshtml" />
-    <Content Include="Views\TwoPane\Main.cshtml" />
     <Content Include="Views\Shared\_LayoutSPA.cshtml" />
     <Content Include="Views\Calendar\Index.cshtml" />
     <Content Include="Views\Sample1\Index.cshtml" />
@@ -493,12 +486,6 @@
     <TypeScriptCompile Include="Scripts\App\Calendar\CalendarViewModel.ts" />
     <TypeScriptCompile Include="Scripts\App\Calendar\Mediator.ts" />
     <TypeScriptCompile Include="Scripts\App\Calendar\WebServiceProxy.ts" />
-    <TypeScriptCompile Include="Scripts\App\TwoPane\DetailViewModel.ts" />
-    <TypeScriptCompile Include="Scripts\App\TwoPane\DetailView.ts" />
-    <TypeScriptCompile Include="Scripts\App\TwoPane\Mediator.ts" />
-    <TypeScriptCompile Include="Scripts\App\TwoPane\MainViewModel.ts" />
-    <TypeScriptCompile Include="Scripts\App\TwoPane\MainView.ts" />
-    <TypeScriptCompile Include="Scripts\App\TwoPane\WebServiceProxy.ts" />
     <TypeScriptCompile Include="Scripts\collections.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Application.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\BindingAnnotation.ts" />

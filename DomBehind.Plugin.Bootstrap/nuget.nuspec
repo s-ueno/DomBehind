@@ -1,0 +1,29 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>DomBehind.Plugin.Bootstrap</id>
+    <version>1.0.0</version>
+    <title>DOM Behind Plugin Bootstrap</title>
+    <authors>uEN</authors>
+    <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/s-ueno/DomBehind</projectUrl>
+    <tags>typescript javascript jquery mvvm</tags>
+    <description>
+      Add bind function to "DomBehind" using "Bootstrap" system function
+    </description>
+    <releaseNotes>
+    </releaseNotes>
+    <dependencies>
+      <dependency id="DomBehind" version="1.0.7"></dependency>
+
+      <dependency id="jQuery" version="3.1.1"></dependency>
+      <dependency id="jquery.TypeScript.DefinitelyTyped" version="1.5.1"></dependency>
+      <dependency id="bootstrap" version="3.0.1"></dependency>
+      <dependency id="Bootstrap.Wysiwyg" version="1.0.4"></dependency>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Scripts/domBehind.plugin.bootstrap.js" target="Content/Scripts/" />
+    <file src="Scripts/typings/dombehind.plugin/dombehind.plugin.bootstrap.d.ts" target="Content/Scripts/typings/dombehind.plugin" />    
+  </files>
+</package>
