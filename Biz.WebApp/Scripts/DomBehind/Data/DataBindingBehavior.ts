@@ -41,7 +41,7 @@
          */
         public UpdateSource(): void {
             if (this.BindingPolicy.Mode === BindingMode.OneWay) return;
-
+            
             if (Object.IsNullOrUndefined(this.Property)) return;
             if (Object.IsNullOrUndefined(this.Property.GetValue)) return;
 

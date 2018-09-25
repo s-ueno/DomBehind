@@ -32,73 +32,65 @@ var DomBehind;
                 return {
                     image: SignSaveImage.Png,
                     color: "rgb(255,255,255)",
-                    showClear: true,
-                    clearCaption: " Clear",
-                    clearStyle: "fa fa-remove",
-                    showUndo: true,
-                    undoCaption: " Undo",
-                    undoStyle: "fa fa-undo",
-                    showDownload: true,
-                    downloadCaption: " Download",
-                    downloadStyle: "fa fa-download",
-                    saveCaption: " Save",
-                    saveStyle: "fa fa-save",
                 };
             },
             enumerable: true,
             configurable: true
         });
         Sign.prototype.Ensure = function () {
-            var _this = this;
-            this.Identity = "id-" + NewUid();
-            var dom = $("<canvas id=\"" + this.Identity + "\" class=\"SignCanvas\" style=\"width:100%;height:calc(100% - 30px)\"></canvas>");
-            var canvas = dom[0];
-            this.SignaturePad = new SignaturePad(canvas);
-            var container = $("<div style=\"height:30px\"></div>");
-            var div = $("<div class=\"pull-right\"></div>");
-            container.append(div);
-            if (this.Option.showClear) {
-                var clearButton = $("<a class=\"signClear\" style=\"margin:0 4px\" href=\"javascript:void(0);\"><span class=\"" + this.Option.clearStyle + "\"></span> " + this.Option.clearCaption + "</a>");
-                clearButton.on("click", function (e) {
-                    _this.SignaturePad.clear();
-                });
-                div.append(clearButton);
+            this.Identity = this.Element.attr("id");
+            if (!this.Identity) {
+                this.Identity = "id-" + NewUid();
+                this.Element.attr("id", this.Identity);
             }
-            if (this.Option.showUndo) {
-                var undoButton = $("<a class=\"signUndo\" style=\"margin:0 4px\" href=\"javascript:void(0);\"><span class=\"" + this.Option.undoStyle + "\"></span> " + this.Option.undoCaption + "</a>");
-                undoButton.on("click", function (e) {
-                });
-                div.append(undoButton);
-            }
-            if (this.Option.saveAction) {
-                var saveButton = $("<a class=\"signSave\" style=\"margin:0 4px\" href=\"javascript:void(0);\"><span class=\"" + this.Option.undoStyle + "\"></span> " + this.Option.undoCaption + "</a>");
-                saveButton.on("click", function (e) {
-                    if (_this.SignaturePad.isEmpty()) {
-                        alert("Please provide a signature first.");
-                    }
-                    else {
-                        var dataURL = _this.SignaturePad.toDataURL();
-                    }
-                });
-                div.append(saveButton);
-            }
-            if (this.Option.showDownload) {
-                var saveButton = $("<a class=\"signDownload\" style=\"margin:0 4px\" href=\"javascript:void(0);\"><span class=\"" + this.Option.saveStyle + "\"></span> " + this.Option.saveCaption + "</a>");
-                saveButton.on("click", function (e) {
-                    if (_this.SignaturePad.isEmpty()) {
-                        alert("Please provide a signature first.");
-                    }
-                    else {
-                        var dataURL = _this.SignaturePad.toDataURL();
-                        var blob = _this.dataURLToBlob(dataURL);
-                    }
-                });
-                div.append(saveButton);
-            }
-            this.Element.append(canvas);
-            this.Element.append(container);
+            window[this.Identity] = this;
+            var dom = $("<canvas class=\"SignCanvas\" style=\"width:100%;height:100%\"></canvas>");
+            this.Element.append(dom);
+            this.Canvas = dom[0];
+            this.SignaturePad = new SignaturePad(this.Canvas);
+            this.Refresh();
+            this.Resize();
         };
-        Sign.prototype.dataURLToBlob = function (dataURL) {
+        Sign.prototype.CreateImageToBlob = function () {
+            return this.CreateImage(true);
+        };
+        Sign.prototype.CreateImageToArray = function () {
+            var array = this.CreateImage(false);
+            return array;
+        };
+        Sign.prototype.CreateImage = function (isBlob) {
+            if (this.SignaturePad.isEmpty())
+                return null;
+            var mine = null;
+            if (this.Option.image === SignSaveImage.Jpeg) {
+                mine = "image/jpeg";
+            }
+            else if (this.Option.image === SignSaveImage.Svg) {
+                mine = "image/svg+xml";
+            }
+            var sig = this.SignaturePad;
+            var uri = sig.toDataURL(mine);
+            if (isBlob)
+                return this.ToBlob(uri);
+            var array = this.ToArray(uri);
+            return [].slice.call(array);
+        };
+        Sign.prototype.Download = function (fileName) {
+            if (this.SignaturePad.isEmpty())
+                return;
+            var mine = null;
+            if (this.Option.image === SignSaveImage.Jpeg) {
+                mine = "image/jpeg";
+            }
+            else if (this.Option.image === SignSaveImage.Svg) {
+                mine = "image/svg+xml";
+            }
+            var sig = this.SignaturePad;
+            var uri = sig.toDataURL(mine);
+            var bytes = this.ToBlob(uri);
+            this.DownloadRaw(fileName, bytes);
+        };
+        Sign.prototype.ToBlob = function (dataURL) {
             var parts = dataURL.split(';base64,');
             var contentType = parts[0].split(":")[1];
             var raw = window.atob(parts[1]);
@@ -109,6 +101,64 @@ var DomBehind;
             }
             return new Blob([uInt8Array], { type: contentType });
         };
+        Sign.prototype.ToArray = function (dataURL) {
+            var parts = dataURL.split(';base64,');
+            var contentType = parts[0].split(":")[1];
+            var raw = window.atob(parts[1]);
+            var rawLength = raw.length;
+            var uInt8Array = new Uint8Array(rawLength);
+            for (var i = 0; i < rawLength; ++i) {
+                uInt8Array[i] = raw.charCodeAt(i);
+            }
+            return uInt8Array;
+        };
+        Sign.prototype.DownloadRaw = function (fileName, bytes) {
+            var newUri = window.URL.createObjectURL(bytes);
+            if (navigator.userAgent.indexOf("Safari") > -1 && navigator.userAgent.indexOf("Chrome") === -1) {
+                window.open(newUri);
+            }
+            else {
+                var a = document.createElement("a");
+                a.style.display = "none";
+                a.href = newUri;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(newUri);
+                a.remove();
+            }
+        };
+        Sign.prototype.Refresh = function () {
+            if (!this.DataContext || this.DataContext._disposed) {
+                return;
+            }
+            var ratio = Math.max(window.devicePixelRatio || 1, 1);
+            this.Canvas.width = this.Canvas.offsetWidth * ratio;
+            this.Canvas.height = this.Canvas.offsetHeight * ratio;
+            this.Canvas.getContext("2d").scale(ratio, ratio);
+            this.SignaturePad.clear();
+        };
+        Sign.prototype.Resize = function () {
+            var _this = this;
+            var timer;
+            $(window).on("resize", function (e) {
+                if (timer !== false) {
+                    clearTimeout(timer);
+                }
+                timer = setTimeout(function () {
+                    _this.Refresh();
+                }, 200);
+            });
+        };
+        Sign.InstanceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("Instance", function (el) {
+            var identity = el.attr("id");
+            if (!identity) {
+                return null;
+            }
+            var me = window[identity];
+            return me;
+        }, function (el, newValue) {
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
         return Sign;
     }(DomBehind.Data.BindingBehavior));
     DomBehind.Sign = Sign;

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>DomBehind</id>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <title>DOM Behind</title>
     <authors>uEN</authors>
     <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
@@ -12,7 +12,7 @@
       MVVM with TypeScript for C # programmer
     </description>
     <releaseNotes>
-      ・made each module separate as a plug-in
+      ・
     </releaseNotes>
     <dependencies>
       <dependency id="jQuery" version="3.3.1"></dependency>
