@@ -94,8 +94,8 @@ declare namespace DomBehind {
 
 declare namespace DomBehind {
     class IndexedDBHelper<T> {
+        constructor(ctor: TypedConstructor<T>, db: string);
         DbName: string;
-        constructor(ctor: TypedConstructor<T>, DbName: string);
         TableName: string;
         List(): JQueryPromise<T[]>;
         Truncate(): JQueryPromise<any>;
@@ -142,6 +142,14 @@ declare namespace DomBehind {
 }
 
 
+
+declare namespace DomBehind {
+    class Camera {
+        static PhotoUriProperty: Data.DependencyProperty;
+        static VideoUriProperty: Data.DependencyProperty;
+        static Ensure(element: JQuery, isPhoto: boolean): void;
+    }
+}
 
 declare namespace DomBehind {
     interface BindingBehaviorBuilder<T> {
@@ -761,6 +769,7 @@ interface String {
     PadLeft(totalWidth: number, paddingChar: string): string;
     PadRight(totalWidth: number, paddingChar: string): string;
     SubString(start: number, length: number): string;
+    UriToBinary(): number[];
 }
 
 
@@ -846,7 +855,8 @@ declare namespace DomBehind {
 declare namespace DomBehind.Data {
     enum BindingMode {
         TwoWay = 0,
-        OneWay = 1
+        OneWay = 1,
+        OneWayToSource = 2
     }
 }
 

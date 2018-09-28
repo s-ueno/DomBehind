@@ -198,24 +198,24 @@ namespace Biz.WebApp
       "~/Scripts/DomBehind/Controls/ListView.js",
       "~/Scripts/DomBehind/Controls/TemplateListView.js",
 
-      /* DomBehind/JQueryUI */
-      "~/Scripts/DomBehind/JQueryUI/Tooltip.js",
-      "~/Scripts/DomBehind/JQueryUI/Selectmenu.js",
+      ///* DomBehind/JQueryUI */
+      //"~/Scripts/DomBehind/JQueryUI/Tooltip.js",
+      //"~/Scripts/DomBehind/JQueryUI/Selectmenu.js",
 
-      /* DomBehind/Calendar */
-      "~/Scripts/DomBehind/Calendar/Calendar.js",
+      ///* DomBehind/Calendar */
+      //"~/Scripts/DomBehind/Calendar/Calendar.js",
 
-      /* DomBehind/bootstrap */
-      "~/Scripts/DomBehind/Bootstrap/Editor.js",
+      ///* DomBehind/bootstrap */
+      //"~/Scripts/DomBehind/Bootstrap/Editor.js",
 
 
-      /* DomBehind/W2UI */
-      "~/Scripts/DomBehind/W2UI/Toolbar.js",
-      "~/Scripts/DomBehind/W2UI/Layout.js",
-      "~/Scripts/DomBehind/W2UI/Sidebar.js",
-      "~/Scripts/DomBehind/W2UI/Grid.js",
-      "~/Scripts/DomBehind/W2UI/MessageBox.js",
-      "~/Scripts/DomBehind/W2UI/Dropdown.js",
+      ///* DomBehind/W2UI */
+      //"~/Scripts/DomBehind/W2UI/Toolbar.js",
+      //"~/Scripts/DomBehind/W2UI/Layout.js",
+      //"~/Scripts/DomBehind/W2UI/Sidebar.js",
+      //"~/Scripts/DomBehind/W2UI/Grid.js",
+      //"~/Scripts/DomBehind/W2UI/MessageBox.js",
+      //"~/Scripts/DomBehind/W2UI/Dropdown.js",
 
       /* DomBehind(MVVM)  */
       "~/Scripts/DomBehind/Application.js",

@@ -3,7 +3,8 @@
     "outputFileName": "Scripts/domBehind.plugin.jqueryui.js",
     "inputFiles": [
       "Scripts/DomBehind/Selectmenu.js",
-      "Scripts/DomBehind/Tooltip.js"
+      "Scripts/DomBehind/Tooltip.js",
+      "Scripts/DomBehind/Suggest.js"
     ],
     "minify": {
       "enabled": true,

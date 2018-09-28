@@ -108,10 +108,13 @@
             //overlay.append(container);
 
             let modal = container.find(".modal-dialog");
-            modal.draggable({
-                handle: ".modal-header",
-                cursor: "move",
-            });
+            // use jquery ui
+            if (modal.draggable) {
+                modal.draggable({
+                    handle: ".modal-header",
+                    cursor: "move",
+                });
+            }
 
             if (setting.Width) {
                 modal.css("width", option.Width);

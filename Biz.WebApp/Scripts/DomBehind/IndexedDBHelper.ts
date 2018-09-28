@@ -1,15 +1,16 @@
 ﻿namespace DomBehind {
 
-
     export class IndexedDBHelper<T> {
-        constructor(ctor: TypedConstructor<T>, public DbName: string) {
+        constructor(ctor: TypedConstructor<T>, db: string) {
             let schema: any = new ctor();
             let name: string = schema.constructor.name;
-            if (name == "Object") {
+            if (name === "Object") {
                 throw Error("dynamic object is not supported");
             }
+            this.DbName = db;
             this.TableName = name;
         }
+        public DbName: string;
         public TableName: string;
 
         public List(): JQueryPromise<T[]> {
@@ -237,9 +238,6 @@
             openRequest.onerror = e => {
             };
         }
-
-
     }
-
-
 }
+

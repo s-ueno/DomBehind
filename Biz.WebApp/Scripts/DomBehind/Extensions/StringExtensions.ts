@@ -28,6 +28,7 @@ interface String {
     PadLeft(totalWidth: number, paddingChar: string): string;
     PadRight(totalWidth: number, paddingChar: string): string;
     SubString(start: number, length: number): string;
+    UriToBinary(): number[];
 }
 
 "Split".ExtendedPrototype(
@@ -154,5 +155,13 @@ interface String {
     function (start: number, length: number) {
         let me: String = this;
         return me.toString().substr(start, length);
+    }
+);
+
+"UriToBinary".ExtendedPrototype(
+    String.prototype,
+    function () {
+        let me: string = this;
+        let s = window.atob(me);
     }
 );

@@ -48,7 +48,7 @@
       /* DomBehind(Base)  */
       "Scripts/DomBehind/TypedFactory.js",
       "Scripts/DomBehind/Repository.js",
-      "Scripts/DomBehind/IndexedDBHelper.js",
+      //
 
       /* DomBehind/Data */
       "Scripts/DomBehind/Data/DependencyProperty.js",
@@ -71,6 +71,12 @@
       "Scripts/DomBehind/Data/ActionPolicy/ValidationExceptionHandlingActionPolicy.js",
       "Scripts/DomBehind/Data/ActionPolicy/WaitingOverlayActionPolicy.js",
       "Scripts/DomBehind/Data/ActionPolicy/SuppressDuplicateActionPolicy.js",
+
+
+
+
+      "Scripts/DomBehind/IndexedDBHelper.js",
+
 
 
 
@@ -103,6 +109,7 @@
       "Scripts/DomBehind/Controls/MessageBox.js",
       "Scripts/DomBehind/Controls/ListView.js",
       "Scripts/DomBehind/Controls/TemplateListView.js",
+      "Scripts/DomBehind/Controls/Camera.js",
 
       ///* DomBehind/JQueryUI */
       //"Scripts/DomBehind/JQueryUI/Tooltip.js",
