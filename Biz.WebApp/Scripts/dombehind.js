@@ -947,6 +947,21 @@ Object.defineProperty(String.prototype, "ExtendedPrototype", {
     });
     return value;
 });
+"Chunk".ExtendedPrototype(Array.prototype, function (size) {
+    var arr = this;
+    if (!size) {
+        size = 1;
+    }
+    return arr.reduce(function (chunks, el, i) {
+        if (i % size === 0) {
+            chunks.push([el]);
+        }
+        else {
+            chunks[chunks.length - 1].push(el);
+        }
+        return chunks;
+    }, []);
+});
 //# sourceMappingURL=EnumerableExtensions.js.map
 Object.IsNullOrUndefined = function (obj) {
     if (obj == null)
@@ -4159,11 +4174,15 @@ var DomBehind;
                 var rowContainer = $("<div class=\"templateRowContainer\"></div>");
                 $.each(newValue.ToArray(), function (i, value) {
                     var newRow = template.clone();
+                    value.__element = newRow;
                     $.each(_this.Columns, function (k, column) {
                         var el = newRow.find(column.templateSelector);
                         if (el.length !== 0) {
                             if (column.expression && column.dependencyProperty) {
                                 var ret = column.expression(value);
+                                if (column.convertTarget) {
+                                    ret = column.convertTarget(ret);
+                                }
                                 column.dependencyProperty.SetValue(el, ret);
                                 if (column.mode === DomBehind.Data.BindingMode.TwoWay) {
                                     var path = DomBehind.LamdaExpression.Path(column.expression);
@@ -4185,6 +4204,9 @@ var DomBehind;
                                 el.on(newEvent_1.EventName, function (e) {
                                     newEvent_1.Raise(_this, e);
                                 });
+                                if (el.is("a") && !el.attr("href")) {
+                                    el.attr("href", "javascript:void(0);");
+                                }
                             }
                         }
                     });
@@ -4370,56 +4392,295 @@ var DomBehind;
     };
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=TemplateListView.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var DomBehind;
 (function (DomBehind) {
-    var Camera = (function () {
-        function Camera() {
+    var FileBrowser = (function (_super) {
+        __extends(FileBrowser, _super);
+        function FileBrowser() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.MaximumNumberOfAjax = 1;
+            return _this;
         }
-        Camera.Ensure = function (element, isPhoto) {
+        FileBrowser.prototype.Ensure = function () {
+            var _this = this;
+            _super.prototype.Ensure.call(this);
+            var element = this.Element;
             element.attr("type", "file");
-            element.attr("accept", "image/*");
-            if (isPhoto) {
-                element.attr("capture", "camera");
+            if (this.AcceptValue) {
+                element.attr("accept", this.AcceptValue);
             }
-            else if (element.attr("capture")) {
-                element.removeAttr("capture");
+            else {
+                element.attr("accept", "image/*");
             }
-            var name = isPhoto ? Camera.PhotoUriProperty.PropertyName : Camera.VideoUriProperty.PropertyName;
+            if (this.AllowMultiFiles) {
+                element.attr("multiple", "multiple");
+            }
             element.change(function (e) {
-                try {
-                    var file = e.target.files[0];
-                    var uri = URL.createObjectURL(file);
-                    element.attr(name, uri);
+                var args = $.extend(true, e, {});
+                var arr = new Array();
+                $.each(e.target.files, function (i, s) {
+                    var uri = URL.createObjectURL(s);
+                    var file = $.extend(true, s, {});
+                    file.uri = uri;
+                    arr.push(file);
+                });
+                _this.Files = args.files = arr;
+                _this.OnTrigger(args);
+            });
+            if (this.InstanceExpression) {
+                this.InstanceExpression.SetValue(this);
+            }
+        };
+        FileBrowser.prototype.UpdateAll = function () {
+            var _this = this;
+            if (!this.Files) {
+                this.OnCompleted({ file: null, response: null });
+                return;
+            }
+            var pooler = new Pooler(this);
+            return pooler.Do().always(function () {
+                _this.OnAlways();
+            });
+        };
+        FileBrowser.prototype.Update = function (file) {
+            var _this = this;
+            var executor = new Executor(this, file);
+            executor.Do();
+            return executor.Pms.always(function () {
+                _this.OnAlways();
+            });
+        };
+        FileBrowser.prototype.OnProgress = function (e) {
+            console.trace(e.file.name + "..." + e.loaded + " / " + e.total + "  " + e.percent + " %");
+            if (this.ProgressExpression) {
+                this.ProgressExpression(this.DataContext, e);
+            }
+        };
+        FileBrowser.prototype.OnCompleted = function (e) {
+            if (e.file) {
+                console.trace(e.file.name + "...complete");
+            }
+            if (this.CompletedExpression) {
+                this.CompletedExpression(this.DataContext, e);
+            }
+        };
+        FileBrowser.prototype.OnError = function (e) {
+            if (e.file) {
+                console.trace("error..." + e.file.name);
+            }
+            if (e.error) {
+                console.error(e.error);
+            }
+            if (this.ErrorExpression) {
+                this.ErrorExpression(this.DataContext, e);
+            }
+        };
+        FileBrowser.prototype.OnAlways = function () {
+            if (this.AlwaysExpression) {
+                this.AlwaysExpression(this.DataContext);
+            }
+        };
+        FileBrowser.SelectedFiles = DomBehind.EventBuilder.RegisterAttached("selectedFiles");
+        return FileBrowser;
+    }(DomBehind.Data.ActionBindingBehavior));
+    DomBehind.FileBrowser = FileBrowser;
+    var Pooler = (function () {
+        function Pooler(FileBrowser) {
+            this.FileBrowser = FileBrowser;
+        }
+        Pooler.prototype.Do = function () {
+            var _this = this;
+            var files = this.FileBrowser.Files;
+            var chunk = parseInt(String(files.length / this.FileBrowser.MaximumNumberOfAjax));
+            if (chunk === 0) {
+                chunk = 1;
+            }
+            var pmslist = new Array();
+            var chunkList = files.Chunk(chunk);
+            $.each(chunkList, function (i, value) {
+                var e = new ChunkFlow(_this.FileBrowser, value);
+                pmslist.push(e.Do());
+            });
+            return $.when(pmslist);
+        };
+        return Pooler;
+    }());
+    var ChunkFlow = (function () {
+        function ChunkFlow(FileBrowser, Queue) {
+            this.FileBrowser = FileBrowser;
+            this.Queue = Queue;
+        }
+        ChunkFlow.prototype.Do = function () {
+            var _this = this;
+            var arr = this.Queue.Select(function (x) { return new Executor(_this.FileBrowser, x); });
+            $.each(arr, function (i, value) {
+                var nextIndex = i + 1;
+                if (nextIndex < arr.length) {
+                    value.Pms.always(function () {
+                        arr[nextIndex].Do();
+                    });
                 }
-                catch (e) {
+            });
+            if (0 < arr.length) {
+                arr[0].Do();
+            }
+            return $.when(arr.Select(function (x) { return x.Pms; }));
+        };
+        return ChunkFlow;
+    }());
+    var Executor = (function () {
+        function Executor(FileBrowser, File) {
+            this.FileBrowser = FileBrowser;
+            this.File = File;
+            this.Dfd = $.Deferred();
+            this.Pms = this.Dfd.promise();
+        }
+        Executor.prototype.Do = function () {
+            var _this = this;
+            var formData = new FormData();
+            formData.append("userfile", this.File);
+            $.ajax({
+                xhr: function () {
+                    var xhr = new XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percent = (evt.loaded / evt.total) * 100;
+                            _this.FileBrowser.OnProgress({
+                                loaded: evt.loaded,
+                                total: evt.total,
+                                percent: percent,
+                                file: _this.File,
+                            });
+                        }
+                    }, false);
+                    xhr.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percent = (evt.loaded / evt.total) * 100;
+                            _this.FileBrowser.OnProgress({
+                                loaded: evt.loaded,
+                                total: evt.total,
+                                percent: percent,
+                                file: _this.File,
+                            });
+                        }
+                    }, false);
+                    return xhr;
+                },
+                type: "POST",
+                url: this.FileBrowser.UploadUri,
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (e) {
+                    _this.FileBrowser.OnCompleted({ response: e, file: _this.File });
+                    _this.Dfd.resolve(e);
+                },
+                error: function (x, status, error) {
+                    _this.FileBrowser.OnError({ file: _this.File, error: error });
+                    _this.Dfd.reject(error);
                 }
             });
         };
-        Camera.PhotoUriProperty = DomBehind.Data.DependencyProperty.RegisterAttached("photoUri", function (el) {
-            return el.attr(Camera.PhotoUriProperty.PropertyName);
-        }, function (el, newValue) {
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWayToSource, function (behavior) {
-            var el = behavior.Element;
-            if (!el.is("input")) {
-                return;
-            }
-            Camera.Ensure(el, false);
-        });
-        Camera.VideoUriProperty = DomBehind.Data.DependencyProperty.RegisterAttached("videoUri", function (el) {
-            return el.attr(Camera.VideoUriProperty.PropertyName);
-        }, function (el, newValue) {
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWayToSource, function (behavior) {
-            var el = behavior.Element;
-            if (!el.is("input")) {
-                return;
-            }
-            Camera.Ensure(el, false);
-        });
-        return Camera;
+        return Executor;
     }());
-    DomBehind.Camera = Camera;
+    var FileBrowserBindingBehaviorBuilder = (function (_super) {
+        __extends(FileBrowserBindingBehaviorBuilder, _super);
+        function FileBrowserBindingBehaviorBuilder(owner) {
+            return _super.call(this, owner) || this;
+        }
+        FileBrowserBindingBehaviorBuilder.prototype.AllowMultiFiles = function () {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.AllowMultiFiles = true;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.AcceptFilter = function (filter) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.AcceptValue = filter;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.UploadUri = function (uri) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.UploadUri = uri;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.BindingUploader = function (exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.InstanceExpression = new DomBehind.LamdaExpression(me.Owner.DataContext, exp);
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.BindingUploaderProgress = function (exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.ProgressExpression = exp;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.BindingUploaderComplete = function (exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.CompletedExpression = exp;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.BindingUploaderError = function (exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.ErrorExpression = exp;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.BindingUploaderAlways = function (exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.AlwaysExpression = exp;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.MaximumNumberOfAjax = function (number) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.MaximumNumberOfAjax = number;
+            }
+            return me;
+        };
+        return FileBrowserBindingBehaviorBuilder;
+    }(DomBehind.Data.ActionBindingBehaviorBuilder));
+    DomBehind.FileBrowserBindingBehaviorBuilder = FileBrowserBindingBehaviorBuilder;
+    DomBehind.BindingBehaviorBuilder.prototype.BuildFileBrowser = function (selectedEvent) {
+        var me = this;
+        var behavior = me.Add(new FileBrowser());
+        behavior.Event = FileBrowser.SelectedFiles.Create();
+        behavior.Action = selectedEvent;
+        behavior.ActionParameterCount = behavior.Action.length;
+        behavior.AllowBubbling = false;
+        var newMe = new FileBrowserBindingBehaviorBuilder(me.Owner);
+        newMe.CurrentBehavior = me.CurrentBehavior;
+        newMe.CurrentElement = me.CurrentElement;
+        return newMe;
+    };
 })(DomBehind || (DomBehind = {}));
-//# sourceMappingURL=Camera.js.map
+//# sourceMappingURL=FileBrowser.js.map
 var DomBehind;
 (function (DomBehind) {
     var Application = (function () {

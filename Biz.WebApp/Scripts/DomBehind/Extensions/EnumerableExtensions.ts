@@ -9,6 +9,7 @@
     GroupBy(selector: (value: T) => any): Array<{ Key: any, Values: Array<T> }>;
     SequenceEqual(target: Array<T>, predicate?: (x1: T, x2: T) => boolean): boolean;
     Sum(selector: (value: T) => number): number;
+    Chunk(size: number): Array<Array<T>>;
 }
 "Where".ExtendedPrototype(
     Array.prototype,
@@ -132,3 +133,21 @@
         return value;
     }
 );
+
+"Chunk".ExtendedPrototype(
+    Array.prototype,
+    function (size: number) {
+        let arr: Array<any> = this;
+        if (!size) {
+            size = 1;
+        }
+        return arr.reduce((chunks, el, i) => {
+            if (i % size === 0) {
+                chunks.push([el])
+            } else {
+                chunks[chunks.length - 1].push(el)
+            }
+            return chunks
+        }, [])
+    }
+)

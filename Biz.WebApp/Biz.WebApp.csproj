@@ -493,7 +493,7 @@
     <TypeScriptCompile Include="Scripts\DomBehind\BizViewModel.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Bootstrap\Editor.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Calendar\Calendar.ts" />
-    <TypeScriptCompile Include="Scripts\DomBehind\Controls\Camera.ts" />
+    <TypeScriptCompile Include="Scripts\DomBehind\Controls\FileBrowser.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\InputElement.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\ListView.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\MessageBox.ts" />

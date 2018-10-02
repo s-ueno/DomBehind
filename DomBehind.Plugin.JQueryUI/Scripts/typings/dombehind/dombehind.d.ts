@@ -94,8 +94,8 @@ declare namespace DomBehind {
 
 declare namespace DomBehind {
     class IndexedDBHelper<T> {
+        constructor(ctor: TypedConstructor<T>, db: string);
         DbName: string;
-        constructor(ctor: TypedConstructor<T>, DbName: string);
         TableName: string;
         List(): JQueryPromise<T[]>;
         Truncate(): JQueryPromise<any>;
@@ -142,6 +142,23 @@ declare namespace DomBehind {
 }
 
 
+
+declare namespace DomBehind {
+    interface ISelectedImageFiles extends JQueryEventObject {
+        files: string[];
+    }
+    class ImageFiles extends Data.ActionBindingBehavior {
+        static SelectedImages: IEventBuilder;
+        Ensure(): void;
+        InstanceExpression: PropertyInfo;
+    }
+    class ImageFilesBindingBehaviorBuilder<T> extends Data.ActionBindingBehaviorBuilder<T> {
+        constructor(owner: BizView);
+    }
+    interface BindingBehaviorBuilder<T> {
+        BuildCamera(selectedEvent?: (x: T, args: ISelectedImageFiles) => void, instance?: (x: T) => any): ImageFilesBindingBehaviorBuilder<T>;
+    }
+}
 
 declare namespace DomBehind {
     interface BindingBehaviorBuilder<T> {
@@ -761,6 +778,7 @@ interface String {
     PadLeft(totalWidth: number, paddingChar: string): string;
     PadRight(totalWidth: number, paddingChar: string): string;
     SubString(start: number, length: number): string;
+    UriToBinary(): number[];
 }
 
 
@@ -846,7 +864,8 @@ declare namespace DomBehind {
 declare namespace DomBehind.Data {
     enum BindingMode {
         TwoWay = 0,
-        OneWay = 1
+        OneWay = 1,
+        OneWayToSource = 2
     }
 }
 
@@ -1208,6 +1227,7 @@ declare namespace DomBehind.Web {
         Timeout: number;
         Execute(request: TRequest): TResponse;
         ExecuteAsync(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
+        ExecuteAjax(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
         protected readonly DefaultPostSetting: JQueryAjaxSettings;
     }
 }

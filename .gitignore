@@ -107,3 +107,5 @@ Temporary Items
 
 /Biz.WebApp/Scripts/dombehind-PlainXMLHttpRequest.js
 /.vscode
+/DomBehind.Plugin.JQueryUI/Scripts/DomBehind/FileUploader.js
+/DomBehind.Plugin.JQueryUI/Scripts/DomBehind/FileUploader.d.ts

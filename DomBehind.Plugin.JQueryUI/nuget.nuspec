@@ -14,11 +14,14 @@
     <releaseNotes>
     </releaseNotes>
     <dependencies>
-      <dependency id="DomBehind" version="1.0.8"></dependency>
+      <dependency id="DomBehind" version="1.0.9"></dependency>
       <dependency id="jQuery" version="3.1.1"></dependency>
       <dependency id="jquery.TypeScript.DefinitelyTyped" version="3.1.2"></dependency>
+      
       <dependency id="jQuery.UI.Combined" version="1.12.1"></dependency>
       <dependency id="jqueryui.TypeScript.DefinitelyTyped" version="1.5.1"></dependency>
+
+      <dependency id="jQuery.FileUpload" version="9.22.0"></dependency>
     </dependencies>
   </metadata>
   <files>

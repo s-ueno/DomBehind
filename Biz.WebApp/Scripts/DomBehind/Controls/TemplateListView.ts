@@ -64,14 +64,21 @@
             $.each(newValue.ToArray(), (i, value) => {
                 let newRow = template.clone();
 
+                // Make a reference to dom
+                value.__element = newRow;
+
                 $.each(this.Columns, (k, column) => {
 
                     let el = newRow.find(column.templateSelector);
                     if (el.length !== 0) {
+
                         // property binding
                         if (column.expression && column.dependencyProperty) {
                             // one time
                             let ret = column.expression(value);
+                            if (column.convertTarget) {
+                                ret = column.convertTarget(ret);
+                            }
                             column.dependencyProperty.SetValue(el, ret);
 
                             // two way
@@ -97,6 +104,11 @@
                             el.on(newEvent.EventName, e => {
                                 newEvent.Raise(this, e);
                             });
+
+                            // 
+                            if (el.is("a") && !el.attr("href")) {
+                                el.attr("href", "javascript:void(0);");
+                            }
                         }
                     }
                 });

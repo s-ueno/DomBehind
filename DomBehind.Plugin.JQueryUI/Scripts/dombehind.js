@@ -725,6 +725,7 @@ var DomBehind;
         (function (BindingMode) {
             BindingMode[BindingMode["TwoWay"] = 0] = "TwoWay";
             BindingMode[BindingMode["OneWay"] = 1] = "OneWay";
+            BindingMode[BindingMode["OneWayToSource"] = 2] = "OneWayToSource";
         })(BindingMode = Data.BindingMode || (Data.BindingMode = {}));
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
@@ -1072,6 +1073,10 @@ var StringSplitOptions;
     var me = this;
     return me.toString().substr(start, length);
 });
+"UriToBinary".ExtendedPrototype(String.prototype, function () {
+    var me = this;
+    var s = window.atob(me);
+});
 //# sourceMappingURL=StringExtensions.js.map
 var z_indexKey = "z_indexKey";
 $.GenerateZIndex = function () {
@@ -1243,226 +1248,6 @@ var DomBehind;
     DomBehind.Repository = Repository;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Repository.js.map
-var DomBehind;
-(function (DomBehind) {
-    var IndexedDBHelper = (function () {
-        function IndexedDBHelper(ctor, DbName) {
-            this.DbName = DbName;
-            var schema = new ctor();
-            var name = schema.constructor.name;
-            if (name == "Object") {
-                throw Error("dynamic object is not supported");
-            }
-            this.TableName = name;
-        }
-        IndexedDBHelper.prototype.List = function () {
-            var _this = this;
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
-                    d.reject();
-                    return;
-                }
-                var trans = x.transaction(_this.TableName, "readwrite");
-                var objectStore = trans.objectStore(_this.TableName);
-                var dbRequest = objectStore.getAll();
-                dbRequest.onsuccess = function (e) {
-                    var result = dbRequest.result;
-                    d.resolve(result);
-                };
-                dbRequest.onerror = function (e) {
-                    d.reject();
-                };
-            }).fail(function () {
-                d.reject();
-            });
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.Truncate = function () {
-            var _this = this;
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
-                    d.reject();
-                    return;
-                }
-                var trans = x.transaction(_this.TableName, "readwrite");
-                var objectStore = trans.objectStore(_this.TableName);
-                var dbRequest = objectStore.clear();
-                dbRequest.onsuccess = function (e) {
-                    d.resolve();
-                };
-                dbRequest.onerror = function (e) {
-                    d.reject();
-                };
-            }).fail(function () {
-                d.reject();
-            });
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.FindRowAsync = function (exp, value) {
-            var d = $.Deferred();
-            this.FindRowsAsync(exp, value).done(function (x) {
-                d.resolve(x.FirstOrDefault());
-            }).fail(function (x) {
-                d.reject(x);
-            });
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.FindRowsAsync = function (exp, value) {
-            var _this = this;
-            var path = DomBehind.LamdaExpression.Path(exp);
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
-                    d.reject();
-                    return;
-                }
-                var trans = x.transaction(_this.TableName, "readwrite");
-                var objectStore = trans.objectStore(_this.TableName);
-                if (objectStore.keyPath === path) {
-                    var dbRequest_1 = objectStore.get(value);
-                    dbRequest_1.onsuccess = function (e) {
-                        var result = [dbRequest_1.result];
-                        d.resolve(result);
-                    };
-                    dbRequest_1.onerror = function (e) {
-                        d.reject(e);
-                    };
-                }
-                else if (objectStore.indexNames.contains(path)) {
-                    _this.FetchCursor(objectStore.index(path), value, d);
-                }
-                else {
-                    x.close();
-                    _this.Upgrade(x.version + 1, function (y) {
-                        var newDb = y.target.result;
-                        var newTrans = y.target.transaction;
-                        var newObjectStore = newTrans.objectStore(_this.TableName);
-                        var indexStore = newObjectStore.createIndex(path, path, { unique: false });
-                        _this.FetchCursor(indexStore, value, d);
-                    });
-                }
-            }).fail(function (x) {
-                d.reject(x);
-            });
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.FetchCursor = function (indexStore, value, d) {
-            var list = new DomBehind.List();
-            var cursorHandler = indexStore.openCursor(value);
-            cursorHandler.onsuccess = function (e) {
-                var cursor = e.target.result;
-                if (cursor) {
-                    var value_1 = cursor.value;
-                    if (!Object.IsNullOrUndefined(value_1)) {
-                        list.add(value_1);
-                    }
-                    cursor.continue();
-                }
-                else {
-                    d.resolve(list.toArray());
-                }
-            };
-            cursorHandler.onerror = function (e) {
-                d.reject(e);
-            };
-        };
-        IndexedDBHelper.prototype.UpsertAsync = function (entity, primaryKey) {
-            var _this = this;
-            var path;
-            if (primaryKey) {
-                path = DomBehind.LamdaExpression.Path(primaryKey);
-            }
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
-                    x.close();
-                    _this.Upgrade(x.version + 1, function (y) {
-                        var newDb = y.target.result;
-                        var newStore;
-                        if (path) {
-                            newStore = newDb.createObjectStore(_this.TableName, { keyPath: path });
-                        }
-                        else {
-                            newStore = newDb.createObjectStore(_this.TableName, { keyPath: "__identity", autoIncrement: true });
-                        }
-                        newStore.transaction.oncomplete = function (e) {
-                            newDb.close();
-                            _this.UpsertAsync(entity, primaryKey).done(function (x) { return d.resolve(); }).fail(function (x) { return d.reject(x); });
-                        };
-                    });
-                    return;
-                }
-                var trans = x.transaction(_this.TableName, "readwrite");
-                var store = trans.objectStore(_this.TableName);
-                store.put(entity);
-                d.resolve();
-            }).fail(function (x) {
-                d.reject(x);
-            });
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.DeleteAsync = function (entity) {
-            var _this = this;
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                var trans = x.transaction(_this.TableName, "readwrite");
-                if (trans.objectStoreNames.contains(_this.TableName)) {
-                    var store = trans.objectStore(_this.TableName);
-                    var identity = entity["" + store.keyPath];
-                    store.delete(identity);
-                    d.resolve();
-                }
-                else {
-                    d.reject("table not found. " + _this.TableName);
-                }
-            }).fail(function (x) {
-                d.reject(x);
-            });
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.Open = function () {
-            var d = $.Deferred();
-            var factory = window.indexedDB;
-            var openRequest = factory.open(this.DbName);
-            openRequest.onsuccess = function (e) {
-                var db = openRequest.result;
-                d.resolve(db);
-                db.close();
-            };
-            openRequest.onblocked = function (e) {
-                d.reject(e);
-            };
-            openRequest.onerror = function (e) {
-                d.reject(e);
-            };
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.Upgrade = function (version, action) {
-            var factory = window.indexedDB;
-            var openRequest = factory.open(this.DbName, version);
-            openRequest.onsuccess = function (e) {
-                var dummy = e;
-            };
-            openRequest.onupgradeneeded = function (e) {
-                var db = e.target.result;
-                action(e);
-                db.close();
-            };
-            openRequest.onerror = function (e) {
-            };
-        };
-        return IndexedDBHelper;
-    }());
-    DomBehind.IndexedDBHelper = IndexedDBHelper;
-})(DomBehind || (DomBehind = {}));
-//# sourceMappingURL=IndexedDBHelper.js.map
 var DomBehind;
 (function (DomBehind) {
     var Data;
@@ -2621,6 +2406,226 @@ var DomBehind;
 //# sourceMappingURL=SuppressDuplicateActionPolicy.js.map
 var DomBehind;
 (function (DomBehind) {
+    var IndexedDBHelper = (function () {
+        function IndexedDBHelper(ctor, db) {
+            var schema = new ctor();
+            var name = schema.constructor.name;
+            if (name === "Object") {
+                throw Error("dynamic object is not supported");
+            }
+            this.DbName = db;
+            this.TableName = name;
+        }
+        IndexedDBHelper.prototype.List = function () {
+            var _this = this;
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    d.reject();
+                    return;
+                }
+                var trans = x.transaction(_this.TableName, "readwrite");
+                var objectStore = trans.objectStore(_this.TableName);
+                var dbRequest = objectStore.getAll();
+                dbRequest.onsuccess = function (e) {
+                    var result = dbRequest.result;
+                    d.resolve(result);
+                };
+                dbRequest.onerror = function (e) {
+                    d.reject();
+                };
+            }).fail(function () {
+                d.reject();
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.Truncate = function () {
+            var _this = this;
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    d.reject();
+                    return;
+                }
+                var trans = x.transaction(_this.TableName, "readwrite");
+                var objectStore = trans.objectStore(_this.TableName);
+                var dbRequest = objectStore.clear();
+                dbRequest.onsuccess = function (e) {
+                    d.resolve();
+                };
+                dbRequest.onerror = function (e) {
+                    d.reject();
+                };
+            }).fail(function () {
+                d.reject();
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.FindRowAsync = function (exp, value) {
+            var d = $.Deferred();
+            this.FindRowsAsync(exp, value).done(function (x) {
+                d.resolve(x.FirstOrDefault());
+            }).fail(function (x) {
+                d.reject(x);
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.FindRowsAsync = function (exp, value) {
+            var _this = this;
+            var path = DomBehind.LamdaExpression.Path(exp);
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    d.reject();
+                    return;
+                }
+                var trans = x.transaction(_this.TableName, "readwrite");
+                var objectStore = trans.objectStore(_this.TableName);
+                if (objectStore.keyPath === path) {
+                    var dbRequest_1 = objectStore.get(value);
+                    dbRequest_1.onsuccess = function (e) {
+                        var result = [dbRequest_1.result];
+                        d.resolve(result);
+                    };
+                    dbRequest_1.onerror = function (e) {
+                        d.reject(e);
+                    };
+                }
+                else if (objectStore.indexNames.contains(path)) {
+                    _this.FetchCursor(objectStore.index(path), value, d);
+                }
+                else {
+                    x.close();
+                    _this.Upgrade(x.version + 1, function (y) {
+                        var newDb = y.target.result;
+                        var newTrans = y.target.transaction;
+                        var newObjectStore = newTrans.objectStore(_this.TableName);
+                        var indexStore = newObjectStore.createIndex(path, path, { unique: false });
+                        _this.FetchCursor(indexStore, value, d);
+                    });
+                }
+            }).fail(function (x) {
+                d.reject(x);
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.FetchCursor = function (indexStore, value, d) {
+            var list = new DomBehind.List();
+            var cursorHandler = indexStore.openCursor(value);
+            cursorHandler.onsuccess = function (e) {
+                var cursor = e.target.result;
+                if (cursor) {
+                    var value_1 = cursor.value;
+                    if (!Object.IsNullOrUndefined(value_1)) {
+                        list.add(value_1);
+                    }
+                    cursor.continue();
+                }
+                else {
+                    d.resolve(list.toArray());
+                }
+            };
+            cursorHandler.onerror = function (e) {
+                d.reject(e);
+            };
+        };
+        IndexedDBHelper.prototype.UpsertAsync = function (entity, primaryKey) {
+            var _this = this;
+            var path;
+            if (primaryKey) {
+                path = DomBehind.LamdaExpression.Path(primaryKey);
+            }
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    x.close();
+                    _this.Upgrade(x.version + 1, function (y) {
+                        var newDb = y.target.result;
+                        var newStore;
+                        if (path) {
+                            newStore = newDb.createObjectStore(_this.TableName, { keyPath: path });
+                        }
+                        else {
+                            newStore = newDb.createObjectStore(_this.TableName, { keyPath: "__identity", autoIncrement: true });
+                        }
+                        newStore.transaction.oncomplete = function (e) {
+                            newDb.close();
+                            _this.UpsertAsync(entity, primaryKey).done(function (x) { return d.resolve(); }).fail(function (x) { return d.reject(x); });
+                        };
+                    });
+                    return;
+                }
+                var trans = x.transaction(_this.TableName, "readwrite");
+                var store = trans.objectStore(_this.TableName);
+                store.put(entity);
+                d.resolve();
+            }).fail(function (x) {
+                d.reject(x);
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.DeleteAsync = function (entity) {
+            var _this = this;
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                var trans = x.transaction(_this.TableName, "readwrite");
+                if (trans.objectStoreNames.contains(_this.TableName)) {
+                    var store = trans.objectStore(_this.TableName);
+                    var identity = entity["" + store.keyPath];
+                    store.delete(identity);
+                    d.resolve();
+                }
+                else {
+                    d.reject("table not found. " + _this.TableName);
+                }
+            }).fail(function (x) {
+                d.reject(x);
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.Open = function () {
+            var d = $.Deferred();
+            var factory = window.indexedDB;
+            var openRequest = factory.open(this.DbName);
+            openRequest.onsuccess = function (e) {
+                var db = openRequest.result;
+                d.resolve(db);
+                db.close();
+            };
+            openRequest.onblocked = function (e) {
+                d.reject(e);
+            };
+            openRequest.onerror = function (e) {
+                d.reject(e);
+            };
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.Upgrade = function (version, action) {
+            var factory = window.indexedDB;
+            var openRequest = factory.open(this.DbName, version);
+            openRequest.onsuccess = function (e) {
+                var dummy = e;
+            };
+            openRequest.onupgradeneeded = function (e) {
+                var db = e.target.result;
+                action(e);
+                db.close();
+            };
+            openRequest.onerror = function (e) {
+            };
+        };
+        return IndexedDBHelper;
+    }());
+    DomBehind.IndexedDBHelper = IndexedDBHelper;
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=IndexedDBHelper.js.map
+var DomBehind;
+(function (DomBehind) {
     var Navigation;
     (function (Navigation) {
         var ModalStartupLocation;
@@ -2724,10 +2729,12 @@ var DomBehind;
                     }
                 }
                 var modal = container.find(".modal-dialog");
-                modal.draggable({
-                    handle: ".modal-header",
-                    cursor: "move",
-                });
+                if (modal.draggable) {
+                    modal.draggable({
+                        handle: ".modal-header",
+                        cursor: "move",
+                    });
+                }
                 if (setting.Width) {
                     modal.css("width", option.Width);
                 }
@@ -3294,6 +3301,18 @@ var DomBehind;
                 var d = $.Deferred();
                 var p = $.extend(true, this.DefaultPostSetting, option);
                 p.data = JSON.stringify(request);
+                p.async = true;
+                $.ajax(p).done(function (x) {
+                    d.resolve(x);
+                }).fail(function (x) {
+                    d.reject(new DomBehind.AjaxException(x));
+                });
+                return d.promise();
+            };
+            WebService.prototype.ExecuteAjax = function (request, option) {
+                var d = $.Deferred();
+                var p = $.extend(true, this.DefaultPostSetting, option);
+                p.data = request;
                 p.async = true;
                 $.ajax(p).done(function (x) {
                     d.resolve(x);
@@ -4351,6 +4370,72 @@ var DomBehind;
     };
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=TemplateListView.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var DomBehind;
+(function (DomBehind) {
+    var ImageFiles = (function (_super) {
+        __extends(ImageFiles, _super);
+        function ImageFiles() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        ImageFiles.prototype.Ensure = function () {
+            var _this = this;
+            if (this.InstanceExpression) {
+                this.InstanceExpression.SetValue(this);
+            }
+            var element = this.Element;
+            element.attr("type", "file");
+            element.attr("accept", "image/*");
+            element.change(function (e) {
+                var args = $.extend(true, e, {});
+                var arr = new Array();
+                $.each(e.target.files, function (i, s) {
+                    var uri = URL.createObjectURL(s);
+                    arr.push(uri);
+                });
+                args.files = arr;
+                _this.OnTrigger(args);
+            });
+        };
+        ImageFiles.SelectedImages = DomBehind.EventBuilder.RegisterAttached("selectedImages");
+        return ImageFiles;
+    }(DomBehind.Data.ActionBindingBehavior));
+    DomBehind.ImageFiles = ImageFiles;
+    var ImageFilesBindingBehaviorBuilder = (function (_super) {
+        __extends(ImageFilesBindingBehaviorBuilder, _super);
+        function ImageFilesBindingBehaviorBuilder(owner) {
+            return _super.call(this, owner) || this;
+        }
+        return ImageFilesBindingBehaviorBuilder;
+    }(DomBehind.Data.ActionBindingBehaviorBuilder));
+    DomBehind.ImageFilesBindingBehaviorBuilder = ImageFilesBindingBehaviorBuilder;
+    DomBehind.BindingBehaviorBuilder.prototype.BuildCamera = function (selectedEvent, instance) {
+        var me = this;
+        var behavior = me.Add(new ImageFiles());
+        behavior.Event = ImageFiles.SelectedImages.Create();
+        behavior.Action = selectedEvent;
+        behavior.ActionParameterCount = behavior.Action.length;
+        behavior.AllowBubbling = false;
+        behavior.InstanceExpression = new DomBehind.LamdaExpression(me.Owner.DataContext, instance);
+        var newMe = new ImageFilesBindingBehaviorBuilder(me.Owner);
+        newMe.CurrentBehavior = me.CurrentBehavior;
+        newMe.CurrentElement = me.CurrentElement;
+        return newMe;
+    };
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=ImageFiles.js.map
 var DomBehind;
 (function (DomBehind) {
     var Application = (function () {
