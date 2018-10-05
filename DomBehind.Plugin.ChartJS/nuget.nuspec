@@ -1,0 +1,26 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>DomBehind.Plugin.ChartJS</id>
+    <version>1.0.0</version>
+    <title>DOM Behind Plugin Chart.js</title>
+    <authors>uEN</authors>
+    <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/s-ueno/DomBehind</projectUrl>
+    <tags>typescript javascript jquery mvvm</tags>
+    <description>
+      Add Chart creation bind function to "DomBehind" using "Chart.js"
+    </description>
+    <releaseNotes>
+    </releaseNotes>
+    <dependencies>
+      <dependency id="DomBehind" version="1.0.8"></dependency>
+      <dependency id="Chart.js" version="2.7.2"></dependency>
+      <dependency id="chart.js.TypeScript.DefinitelyTyped" version="0.1.1"></dependency>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Scripts/dombehind.plugin.chart.js" target="Content/Scripts/" />    
+    <file src="Scripts/typings/dombehind.plugin/dombehind.plugin.chart.d.ts" target="Content/Scripts/typings/dombehind.plugin" />           
+  </files>
+</package>

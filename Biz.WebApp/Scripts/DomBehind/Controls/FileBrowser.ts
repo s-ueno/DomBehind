@@ -28,7 +28,7 @@
 
             let element = this.Element
             element.attr("type", "file");
-
+            element.attr("capture", "camera");
             if (this.AcceptValue) {
                 element.attr("accept", this.AcceptValue);
             } else {
@@ -38,6 +38,7 @@
             if (this.AllowMultiFiles) {
                 element.attr("multiple", "multiple");
             }
+
 
             element.change((e: any) => {
                 let args: ISelectedFiles = $.extend(true, e, {});

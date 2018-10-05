@@ -51,6 +51,7 @@
         public Columns: Array<ITemplateListViewColumn>;
         public LastOption: ITemplateListViewColumn;
         public RowStyleExpression: (row: any) => string;
+        public AlternateStyle: { Selector: string, Css: string };
         public set ItemsSource(newValue: Data.ListCollectionView) {
             let jtemplate = $(document.body).find(this.Option.template);
             if (jtemplate.length === 0) return;
@@ -108,6 +109,16 @@
                             // 
                             if (el.is("a") && !el.attr("href")) {
                                 el.attr("href", "javascript:void(0);");
+                            }
+                        }
+
+                        // alternate style
+                        if (this.AlternateStyle) {
+                            if (i % 2 !== 0) {
+                                let el = newRow.find(this.AlternateStyle.Selector);
+                                if (el.length !== 0) {
+                                    el.addClass(this.AlternateStyle.Css);
+                                }
                             }
                         }
                     }
@@ -271,6 +282,15 @@
             }
             return me;
         }
+
+        public BindingAlternateRowStyle(selector: string, css: string) {
+            let me: TemplateListViewBindingBehaviorBuilder<any, any> = this;
+            if (me.CurrentBehavior instanceof TemplateListView) {
+                me.CurrentBehavior.AlternateStyle = { Selector: selector, Css: css };
+            }
+            return me;
+        }
+
     }
 
     export interface BindingBehaviorBuilder<T> {

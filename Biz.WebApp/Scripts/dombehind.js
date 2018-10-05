@@ -1088,10 +1088,6 @@ var StringSplitOptions;
     var me = this;
     return me.toString().substr(start, length);
 });
-"UriToBinary".ExtendedPrototype(String.prototype, function () {
-    var me = this;
-    var s = window.atob(me);
-});
 //# sourceMappingURL=StringExtensions.js.map
 var z_indexKey = "z_indexKey";
 $.GenerateZIndex = function () {
@@ -4208,6 +4204,14 @@ var DomBehind;
                                     el.attr("href", "javascript:void(0);");
                                 }
                             }
+                            if (_this.AlternateStyle) {
+                                if (i % 2 !== 0) {
+                                    var el_1 = newRow.find(_this.AlternateStyle.Selector);
+                                    if (el_1.length !== 0) {
+                                        el_1.addClass(_this.AlternateStyle.Css);
+                                    }
+                                }
+                            }
                         }
                     });
                     rowContainer.append(newRow);
@@ -4374,6 +4378,13 @@ var DomBehind;
             }
             return me;
         };
+        TemplateListViewBindingBehaviorBuilder.prototype.BindingAlternateRowStyle = function (selector, css) {
+            var me = this;
+            if (me.CurrentBehavior instanceof TemplateListView) {
+                me.CurrentBehavior.AlternateStyle = { Selector: selector, Css: css };
+            }
+            return me;
+        };
         return TemplateListViewBindingBehaviorBuilder;
     }(DomBehind.BindingBehaviorBuilder));
     DomBehind.TemplateListViewBindingBehaviorBuilder = TemplateListViewBindingBehaviorBuilder;
@@ -4419,6 +4430,7 @@ var DomBehind;
             _super.prototype.Ensure.call(this);
             var element = this.Element;
             element.attr("type", "file");
+            element.attr("capture", "camera");
             if (this.AcceptValue) {
                 element.attr("accept", this.AcceptValue);
             }
