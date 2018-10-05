@@ -39,10 +39,16 @@
                     let visible = y ? true : false;
                     if (visible) {
                         x.attr("display", "");
-                        x.show();
+                        try {
+                            x.show();
+                        } catch (e) {
+                        }
                     } else {
                         x.attr("display", "none");
-                        x.hide();
+                        try {
+                            x.hide();
+                        } catch (e) {
+                        }
                     }
                 }, Data.UpdateSourceTrigger.Explicit, Data.BindingMode.TwoWay);
 
