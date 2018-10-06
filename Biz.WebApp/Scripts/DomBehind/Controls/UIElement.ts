@@ -51,6 +51,16 @@
                         }
                     }
                 }, Data.UpdateSourceTrigger.Explicit, Data.BindingMode.TwoWay);
+        public static OpacityProperty: Data.DependencyProperty
+            = Data.DependencyProperty.RegisterAttached("opacity",
+                x => {
+                    // OneWay
+                },
+                (el, newValue) => {
+                    el.css("opacity", newValue);
+                },
+                Data.UpdateSourceTrigger.Explicit,
+                Data.BindingMode.OneWay);
 
         public static PlaceHolderProperty: Data.DependencyProperty
             = Data.DependencyProperty.RegisterAttached("placeholder",
