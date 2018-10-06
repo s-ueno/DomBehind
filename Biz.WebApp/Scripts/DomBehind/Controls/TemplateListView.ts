@@ -68,6 +68,8 @@
                 // Make a reference to dom
                 value.__element = newRow;
 
+
+                let twowayMarks = new Array<{ column: ITemplateListViewColumn, element: JQuery, marks: string }>();
                 $.each(this.Columns, (k, column) => {
 
                     let el = newRow.find(column.templateSelector);
@@ -84,14 +86,17 @@
 
                             // two way
                             if (column.mode === Data.BindingMode.TwoWay) {
+
                                 let path = LamdaExpression.Path(column.expression);
-                                let observe = Observable.Register(value, path);
-                                observe.PropertyChanged.AddHandler((sender, d) => {
-                                    if (sender) {
-                                        let v = sender[d.Name];
-                                        column.dependencyProperty.SetValue(el, v);
-                                    }
-                                });
+                                twowayMarks.push({ column: column, element: el, marks: path });
+
+                                //let observe = Observable.Register(value, path);
+                                //observe.PropertyChanged.AddHandler((sender, d) => {
+                                //    if (sender) {
+                                //        let v = sender[d.Name];
+                                //        column.dependencyProperty.SetValue(el, v);
+                                //    }
+                                //});
                             }
                         }
 
@@ -123,6 +128,23 @@
                         }
                     }
                 });
+
+                if (twowayMarks.length !== 0) {
+                    let observe = Observable.RegisterAttached(value, { marks: twowayMarks.Select(x => x.marks) });
+                    observe.PropertyChanged.AddHandler((sender, d) => {
+                        if (sender) {
+                            let twowayList = twowayMarks.Where(x => x.marks === d.Name);
+                            for (var i = 0; i < twowayList.length; i++) {
+                                let v = sender[d.Name]; /* ループの中で、常にプロパティに再アクセスして、元の値を参照する */
+                                let twoway = twowayList[i];
+                                if (twoway.column.convertTarget) {
+                                    v = twoway.column.convertTarget(v);
+                                }
+                                twoway.column.dependencyProperty.SetValue(twoway.element, v);
+                            }
+                        }
+                    });
+                }
 
                 rowContainer.append(newRow);
             });
