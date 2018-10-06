@@ -85,7 +85,7 @@
 
             this.UpdateTarget();
 
-            this.Container.Raise(UIElement.ViewLoaded);
+            this.Container.Raise(UIElement.Activate);
         }
 
         // #endregion
@@ -107,7 +107,7 @@
         protected CreateBindingBuilder<T extends BizViewModel>(): BindingBehaviorBuilder<T> {
             let builder = new BindingBehaviorBuilder<T>(this);
             builder.Element(this.Container).BindingAction(UIElement.Initialize, vm => vm.Initialize());
-            builder.Element(this.Container).BindingAction(UIElement.ViewLoaded, vm => vm.ViewLoaded());
+            builder.Element(this.Container).BindingAction(UIElement.Activate, vm => vm.Activate());
             return builder;
         }
 

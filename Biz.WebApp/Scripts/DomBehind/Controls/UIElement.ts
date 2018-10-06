@@ -120,8 +120,8 @@
         public static Initialize: IEventBuilder
             = EventBuilder.RegisterAttached<any>("initialize");
 
-        public static ViewLoaded: IEventBuilder
-            = EventBuilder.RegisterAttached<JQueryEventObject>("viewLoaded");
+        public static Activate: IEventBuilder
+            = EventBuilder.RegisterAttached<JQueryEventObject>("activate");
 
         public static ModalClosing: IEventBuilder
             = EventBuilder.RegisterAttached<JQueryEventObject>("modalClosing");

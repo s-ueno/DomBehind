@@ -59,9 +59,9 @@
         public abstract Initialize(): void;
 
         /**
-         * inherit if necessary ViewLoaded method.
+         * inherit if necessary View Activate method.
          */
-        public ViewLoaded(): void { }
+        public Activate(): void { }
 
         // #endregion 
 
