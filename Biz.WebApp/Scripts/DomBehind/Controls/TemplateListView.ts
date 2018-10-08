@@ -12,7 +12,7 @@
         header?: string,
         expression?: (row: any) => any;
         expressionAction?: (owner: any, row: any) => void;
-        convertTarget?: (value: any) => any;
+        convertTarget?: (value: any, element?: any) => any;
 
         attachedEvent?: IEventBuilder;
         dependencyProperty?: Data.DependencyProperty;
@@ -80,7 +80,7 @@
                             // one time
                             let ret = column.expression(value);
                             if (column.convertTarget) {
-                                ret = column.convertTarget(ret);
+                                ret = column.convertTarget(ret, el);
                             }
                             column.dependencyProperty.SetValue(el, ret);
 
@@ -138,7 +138,7 @@
                                 let v = sender[d.Name]; /* ループの中で、常にプロパティに再アクセスして、元の値を参照する */
                                 let twoway = twowayList[i];
                                 if (twoway.column.convertTarget) {
-                                    v = twoway.column.convertTarget(v);
+                                    v = twoway.column.convertTarget(v, twoway.element);
                                 }
                                 twoway.column.dependencyProperty.SetValue(twoway.element, v);
                             }
