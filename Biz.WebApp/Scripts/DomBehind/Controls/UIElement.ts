@@ -17,6 +17,9 @@
             = Data.DependencyProperty.RegisterAttached("src",
                 x => x.attr("src"), (x, y) => x.attr("src", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
 
+        public static HrefProperty: Data.DependencyProperty
+            = Data.DependencyProperty.RegisterAttached("href",
+                x => x.attr("href"), (x, y) => x.attr("href", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
 
 
         public static IsEnabledProperty: Data.DependencyProperty
