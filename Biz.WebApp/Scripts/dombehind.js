@@ -3360,6 +3360,7 @@ var DomBehind;
         UIElement.ValueProperty = DomBehind.Data.DependencyProperty.RegisterAttached("val", function (x) { return x.val(); }, function (x, y) { return x.val(y); }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
         UIElement.TextProperty = DomBehind.Data.DependencyProperty.RegisterAttached("text", function (x) { return x.text(); }, function (x, y) { return x.text(y); }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
         UIElement.SrcProperty = DomBehind.Data.DependencyProperty.RegisterAttached("src", function (x) { return x.attr("src"); }, function (x, y) { return x.attr("src", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        UIElement.HrefProperty = DomBehind.Data.DependencyProperty.RegisterAttached("href", function (x) { return x.attr("href"); }, function (x, y) { return x.attr("href", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("enabled", null, function (x, y) {
             var disabled = y === false ? true : false;
             if (disabled === true) {
@@ -3375,13 +3376,25 @@ var DomBehind;
             var visible = y ? true : false;
             if (visible) {
                 x.attr("display", "");
-                x.show();
+                try {
+                    x.show();
+                }
+                catch (e) {
+                }
             }
             else {
                 x.attr("display", "none");
-                x.hide();
+                try {
+                    x.hide();
+                }
+                catch (e) {
+                }
             }
         }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
+        UIElement.OpacityProperty = DomBehind.Data.DependencyProperty.RegisterAttached("opacity", function (x) {
+        }, function (el, newValue) {
+            el.css("opacity", newValue);
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.PlaceHolderProperty = DomBehind.Data.DependencyProperty.RegisterAttached("placeholder", null, function (x, y) { return x.attr("placeholder", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.IsCheckedProperty = DomBehind.Data.DependencyProperty.RegisterAttached("checked", function (x) { return x.get(0).checked; }, function (x, y) { return x.get(0).checked = y; }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
         UIElement.MaxLengthProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("maxlength", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
@@ -3414,7 +3427,7 @@ var DomBehind;
         UIElement.Keydown = DomBehind.EventBuilder.RegisterAttached("keydown");
         UIElement.LostFocus = DomBehind.EventBuilder.RegisterAttached("focusout");
         UIElement.Initialize = DomBehind.EventBuilder.RegisterAttached("initialize");
-        UIElement.ViewLoaded = DomBehind.EventBuilder.RegisterAttached("viewLoaded");
+        UIElement.Activate = DomBehind.EventBuilder.RegisterAttached("activate");
         UIElement.ModalClosing = DomBehind.EventBuilder.RegisterAttached("modalClosing");
         return UIElement;
     }());
@@ -4171,24 +4184,19 @@ var DomBehind;
                 $.each(newValue.ToArray(), function (i, value) {
                     var newRow = template.clone();
                     value.__element = newRow;
+                    var twowayMarks = new Array();
                     $.each(_this.Columns, function (k, column) {
                         var el = newRow.find(column.templateSelector);
                         if (el.length !== 0) {
                             if (column.expression && column.dependencyProperty) {
                                 var ret = column.expression(value);
                                 if (column.convertTarget) {
-                                    ret = column.convertTarget(ret);
+                                    ret = column.convertTarget(ret, el);
                                 }
                                 column.dependencyProperty.SetValue(el, ret);
                                 if (column.mode === DomBehind.Data.BindingMode.TwoWay) {
                                     var path = DomBehind.LamdaExpression.Path(column.expression);
-                                    var observe = DomBehind.Observable.Register(value, path);
-                                    observe.PropertyChanged.AddHandler(function (sender, d) {
-                                        if (sender) {
-                                            var v = sender[d.Name];
-                                            column.dependencyProperty.SetValue(el, v);
-                                        }
-                                    });
+                                    twowayMarks.push({ column: column, element: el, marks: path });
                                 }
                             }
                             if (column.expressionAction && column.attachedEvent) {
@@ -4214,6 +4222,22 @@ var DomBehind;
                             }
                         }
                     });
+                    if (twowayMarks.length !== 0) {
+                        var observe = DomBehind.Observable.RegisterAttached(value, { marks: twowayMarks.Select(function (x) { return x.marks; }) });
+                        observe.PropertyChanged.AddHandler(function (sender, d) {
+                            if (sender) {
+                                var twowayList = twowayMarks.Where(function (x) { return x.marks === d.Name; });
+                                for (var i = 0; i < twowayList.length; i++) {
+                                    var v = sender[d.Name];
+                                    var twoway = twowayList[i];
+                                    if (twoway.column.convertTarget) {
+                                        v = twoway.column.convertTarget(v, twoway.element);
+                                    }
+                                    twoway.column.dependencyProperty.SetValue(twoway.element, v);
+                                }
+                            }
+                        });
+                    }
                     rowContainer.append(newRow);
                 });
                 this.Element.append(rowContainer);
@@ -4817,7 +4841,7 @@ var DomBehind;
                 this.Container.Raise(DomBehind.UIElement.Initialize);
             }
             this.UpdateTarget();
-            this.Container.Raise(DomBehind.UIElement.ViewLoaded);
+            this.Container.Raise(DomBehind.UIElement.Activate);
         };
         BizView.prototype.UnSubscribe = function () {
         };
@@ -4826,7 +4850,7 @@ var DomBehind;
         BizView.prototype.CreateBindingBuilder = function () {
             var builder = new DomBehind.BindingBehaviorBuilder(this);
             builder.Element(this.Container).BindingAction(DomBehind.UIElement.Initialize, function (vm) { return vm.Initialize(); });
-            builder.Element(this.Container).BindingAction(DomBehind.UIElement.ViewLoaded, function (vm) { return vm.ViewLoaded(); });
+            builder.Element(this.Container).BindingAction(DomBehind.UIElement.Activate, function (vm) { return vm.Activate(); });
             return builder;
         };
         BizView.prototype.UpdateTarget = function (mark) {
@@ -4943,7 +4967,7 @@ var DomBehind;
         });
         BizViewModel.prototype.OnViewChanged = function () {
         };
-        BizViewModel.prototype.ViewLoaded = function () { };
+        BizViewModel.prototype.Activate = function () { };
         BizViewModel.prototype.UpdateTarget = function (mark) {
             if (this.View) {
                 this.View.UpdateTarget(mark);

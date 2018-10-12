@@ -4,7 +4,8 @@
     "inputFiles": [
       "Scripts/DomBehind/DatePicker.js",
       "Scripts/DomBehind/Dropdown.js",
-      "Scripts/DomBehind/Grid.js"
+      "Scripts/DomBehind/Grid.js",
+      "Scripts/DomBehind/Popup.js"
     ],
     "minify": {
       "enabled": true,

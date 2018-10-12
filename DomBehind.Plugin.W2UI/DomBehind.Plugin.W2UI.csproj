@@ -130,6 +130,7 @@
     <TypeScriptCompile Include="Scripts\DomBehind\DatePicker.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Dropdown.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Grid.ts" />
+    <TypeScriptCompile Include="Scripts\DomBehind\Popup.ts" />
     <TypeScriptCompile Include="Scripts\typings\dombehind\dombehind.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
