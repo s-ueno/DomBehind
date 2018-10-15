@@ -737,26 +737,85 @@ var DomBehind;
             _this.Bindings = new DomBehind.List();
             return _this;
         }
-        TemplatePopup.prototype.Ensure = function () {
+        Object.defineProperty(TemplatePopup.prototype, "CurrentElement", {
+            get: function () {
+                return this._currentElement;
+            },
+            set: function (newValue) {
+                if (this._currentElement === newValue)
+                    return;
+                if (this._currentElement) {
+                    this.Unsubscribe(this._currentElement);
+                }
+                this._currentElement = newValue;
+                if (newValue) {
+                    this.Subscribe(newValue);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TemplatePopup.prototype.Unsubscribe = function (value) {
+            if (!this.Bindings)
+                return;
+            $.each(this.Bindings.toArray(), function (i, each) {
+                var binding = each.Binding;
+                binding.Element.off();
+                if (binding instanceof DomBehind.Data.ActionBindingBehavior) {
+                    binding.Event.Clear();
+                }
+            });
+        };
+        TemplatePopup.prototype.Subscribe = function (value) {
+            if (!this.Bindings)
+                return;
+            $.each(this.Bindings.toArray(), function (i, each) {
+                var binding = each.Binding;
+                var selector = each.Selector;
+                var el = value.find(selector);
+                if (el) {
+                    binding.Element = el;
+                    binding.Ensure();
+                }
+            });
+        };
+        TemplatePopup.prototype.Close = function () {
+            w2popup.close();
         };
         TemplatePopup.prototype.Show = function () {
             var template = this.Element;
             var div = this.FindTemplate(template);
-            var newElement = div.clone();
+            this.CurrentElement = div.clone();
+            if (!this.CurrentElement)
+                return;
+            this.UpdateTarget();
+            var option = $.extend(true, {}, this.Option);
+            option.body = this.CurrentElement;
+            if (this.TitleExpression) {
+                option.title = this.TitleExpression.GetValue();
+            }
+            w2popup.open(option);
         };
         TemplatePopup.prototype.UpdateTarget = function () {
             if (!this.Bindings)
                 return;
-            $.each(this.Bindings, function (i, value) {
-                if (value instanceof DomBehind.Data.DataBindingBehavior) {
-                    value.UpdateTarget();
+            $.each(this.Bindings.toArray(), function (i, value) {
+                if (value.Binding instanceof DomBehind.Data.DataBindingBehavior) {
+                    value.Binding.UpdateTarget();
                 }
             });
         };
         TemplatePopup.prototype.UpdateSource = function () {
+            if (!this.Bindings)
+                return;
+            $.each(this.Bindings.toArray(), function (i, value) {
+                if (value.Binding instanceof DomBehind.Data.DataBindingBehavior) {
+                    value.Binding.UpdateSource();
+                }
+            });
         };
-        TemplatePopup.prototype.AddBinding = function (binding) {
-            this.Bindings.add(binding);
+        TemplatePopup.prototype.AddBinding = function (binding, selector) {
+            this.Bindings.add({ Binding: binding, Selector: selector });
             return binding;
         };
         TemplatePopup.prototype.FindTemplate = function (jtemplate) {
@@ -780,12 +839,18 @@ var DomBehind;
         function PopupTemplateBindingBuilder() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        PopupTemplateBindingBuilder.prototype.Element = function (value) {
+            var me = this;
+            me.CurrentSelector = value;
+            return me;
+        };
         PopupTemplateBindingBuilder.prototype.Binding = function (property, bindingExpression, mode, updateTrigger) {
             var me = this;
             if (me.CurrentBehavior instanceof TemplatePopup) {
                 var bkBehavior = me.CurrentBehavior;
                 var bkElement = me.CurrentElement;
-                var behavior = me.CurrentBehavior.AddBinding(new DomBehind.Data.DataBindingBehavior());
+                var behavior = me.CurrentBehavior.AddBinding(new DomBehind.Data.DataBindingBehavior(), me.CurrentSelector);
+                behavior.DataContext = me.CurrentBehavior.DataContext;
                 behavior.Property = property;
                 behavior.PInfo = new DomBehind.LamdaExpression(this.Owner.DataContext, bindingExpression);
                 behavior.BindingPolicy.Trigger = !Object.IsNullOrUndefined(updateTrigger) ? updateTrigger : property.UpdateSourceTrigger;
@@ -799,7 +864,8 @@ var DomBehind;
             if (allowBubbling === void 0) { allowBubbling = false; }
             var me = this;
             if (me.CurrentBehavior instanceof TemplatePopup) {
-                var newBehavior = me.CurrentBehavior.AddBinding(new DomBehind.Data.ActionBindingBehavior());
+                var newBehavior = me.CurrentBehavior.AddBinding(new DomBehind.Data.ActionBindingBehavior(), me.CurrentSelector);
+                newBehavior.DataContext = me.CurrentBehavior.DataContext;
                 newBehavior.Event = event.Create();
                 newBehavior.Action = action;
                 newBehavior.ActionParameterCount = action.length;
@@ -807,13 +873,21 @@ var DomBehind;
             }
             return me;
         };
+        PopupTemplateBindingBuilder.prototype.BindingPopupTitle = function (exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof TemplatePopup) {
+                me.CurrentBehavior.TitleExpression = new DomBehind.LamdaExpression(me.CurrentBehavior.DataContext, exp);
+            }
+            return me;
+        };
         return PopupTemplateBindingBuilder;
     }(DomBehind.Data.DataBindingBehaviorBuilder));
     DomBehind.PopupTemplateBindingBuilder = PopupTemplateBindingBuilder;
-    DomBehind.BindingBehaviorBuilder.prototype.BuildTemplatePopup = function (controller) {
+    DomBehind.BindingBehaviorBuilder.prototype.BuildTemplatePopup = function (controller, option) {
         var me = this;
         var behavior = me.Add(new TemplatePopup());
         behavior.Element = me.CurrentElement;
+        behavior.Option = option;
         var exp = new DomBehind.LamdaExpression(me.Owner.DataContext, controller);
         exp.SetValue(behavior);
         var newMe = new PopupTemplateBindingBuilder(me.Owner);

@@ -8,10 +8,10 @@ interface W2confirm {
 }
 declare var w2confirm: W2confirm;
 
-function ShowW2alert(message: string, title: string, okCallback: Function) {
+function ShowW2alert(message: string, title?: string, okCallback?: Function) {
     return w2alert(message, title, okCallback);
 }
-function ShowW2confirm(message: string, title: string, okCallback: Function, cancelCallback: Function) {
+function ShowW2confirm(message: string, title?: string, okCallback?: Function, cancelCallback?: Function) {
     return w2confirm(message, title, okCallback).no(() => {
         if (cancelCallback)
             cancelCallback();
@@ -22,54 +22,111 @@ namespace DomBehind {
 
     export interface IPopupController {
         Show();
+        Close();
+    }
+
+    export interface IPopupOption {
+        width?: number;
+        height?: number;
+
+        title?: string;
     }
 
     export class TemplatePopup
         extends Data.DataBindingBehavior
         implements IPopupController {
 
+        public Option: IPopupOption;
+        public TitleExpression: LamdaExpression;
 
-        //public DataBindings: List<{ exp: LamdaExpression, mode?: Data.BindingMode, updateTrigger?: Data.UpdateSourceTrigger }>
-        //    = new List<{ exp: LamdaExpression, mode?: Data.BindingMode, updateTrigger?: Data.UpdateSourceTrigger }>();
-        //public EventBindings: List<LamdaExpression> = new List<LamdaExpression>();
+        private _currentElement: JQuery;
+        protected get CurrentElement(): JQuery {
+            return this._currentElement;
+        }
+        protected set CurrentElement(newValue: JQuery) {
+            if (this._currentElement === newValue) return;
 
-        protected CurrentElement: JQuery;
-        protected Bindings = new List<Data.BindingBehavior>();
+            if (this._currentElement) {
+                this.Unsubscribe(this._currentElement);
+            }
 
-        Ensure(): void {
+            this._currentElement = newValue;
 
+            if (newValue) {
+                this.Subscribe(newValue);
+            }
+        }
+        protected Unsubscribe(value: JQuery) {
+            if (!this.Bindings) return;
+
+            $.each(this.Bindings.toArray(), (i, each) => {
+                let binding: Data.BindingBehavior = each.Binding;
+                binding.Element.off();
+                if (binding instanceof Data.ActionBindingBehavior) {
+                    binding.Event.Clear();
+                }
+            });
+        }
+        protected Subscribe(value: JQuery) {
+            if (!this.Bindings) return;
+
+            $.each(this.Bindings.toArray(), (i, each) => {
+                let binding: Data.BindingBehavior = each.Binding;
+                let selector: string = each.Selector;
+
+                let el = value.find(selector);
+                if (el) {
+                    binding.Element = el;
+                    binding.Ensure();
+                }
+            });
+        }
+
+        protected Bindings = new List<{ Binding: Data.BindingBehavior, Selector: string }>();
+
+        public Close() {
+            w2popup.close();
         }
 
         public Show() {
             let template = this.Element;
             let div = this.FindTemplate(template);
-            let newElement = div.clone();
 
+            this.CurrentElement = div.clone();
 
+            if (!this.CurrentElement) return;
 
+            this.UpdateTarget();
 
+            let option: any = $.extend(true, {}, this.Option);
+            option.body = this.CurrentElement;
 
+            if (this.TitleExpression) {
+                option.title = this.TitleExpression.GetValue();
+            }
+            w2popup.open(option);
         }
-
 
         public /* override */  UpdateTarget() {
             if (!this.Bindings) return;
-            $.each(this.Bindings, (i, value) => {
-
-                if (value instanceof Data.DataBindingBehavior) {
-                    
-                    value.UpdateTarget();
+            $.each(this.Bindings.toArray(), (i, value) => {
+                if (value.Binding instanceof Data.DataBindingBehavior) {
+                    value.Binding.UpdateTarget();
                 }
             });
         }
 
         public /* override */ UpdateSource() {
-
+            if (!this.Bindings) return;
+            $.each(this.Bindings.toArray(), (i, value) => {
+                if (value.Binding instanceof Data.DataBindingBehavior) {
+                    value.Binding.UpdateSource();
+                }
+            });
         }
 
-
-        public AddBinding<T extends Data.BindingBehavior>(binding: T): T {
-            this.Bindings.add(binding);
+        public AddBinding<T extends Data.BindingBehavior>(binding: T, selector: string): T {
+            this.Bindings.add({ Binding: binding, Selector: selector });
             return binding;
         }
 
@@ -89,7 +146,15 @@ namespace DomBehind {
 
     export class PopupTemplateBindingBuilder<T> extends Data.DataBindingBehaviorBuilder<T> {
 
-        public Binding<P>(property: Data.DependencyProperty,
+
+        public Element(value: any): PopupTemplateBindingBuilder<T> {
+            let me: PopupTemplateBindingBuilder<any> = this;
+            me.CurrentSelector = value;
+            return me;
+        }
+
+        public Binding<P>(
+            property: Data.DependencyProperty,
             bindingExpression: (x: T) => P,
             mode?: Data.BindingMode,
             updateTrigger?: Data.UpdateSourceTrigger
@@ -101,7 +166,8 @@ namespace DomBehind {
                 let bkBehavior = me.CurrentBehavior;
                 let bkElement = me.CurrentElement;
 
-                let behavior = me.CurrentBehavior.AddBinding(new Data.DataBindingBehavior());
+                let behavior = me.CurrentBehavior.AddBinding(new Data.DataBindingBehavior(), me.CurrentSelector);
+                behavior.DataContext = me.CurrentBehavior.DataContext;
                 behavior.Property = property;
                 behavior.PInfo = new LamdaExpression(this.Owner.DataContext, bindingExpression);
                 behavior.BindingPolicy.Trigger = !Object.IsNullOrUndefined(updateTrigger) ? updateTrigger : property.UpdateSourceTrigger;
@@ -117,7 +183,8 @@ namespace DomBehind {
         public BindingAction(event: IEventBuilder, action: (x: T, args: any) => void, allowBubbling: boolean = false): PopupTemplateBindingBuilder<T> {
             let me: PopupTemplateBindingBuilder<any> = this;
             if (me.CurrentBehavior instanceof TemplatePopup) {
-                let newBehavior = me.CurrentBehavior.AddBinding(new Data.ActionBindingBehavior());
+                let newBehavior = me.CurrentBehavior.AddBinding(new Data.ActionBindingBehavior(), me.CurrentSelector);
+                newBehavior.DataContext = me.CurrentBehavior.DataContext;
                 newBehavior.Event = event.Create();
                 newBehavior.Action = action;
                 newBehavior.ActionParameterCount = action.length;
@@ -125,17 +192,26 @@ namespace DomBehind {
             }
             return me;
         }
+
+        public BindingPopupTitle(exp: (vm: T) => string): PopupTemplateBindingBuilder<T> {
+            let me: PopupTemplateBindingBuilder<any> = this;
+            if (me.CurrentBehavior instanceof TemplatePopup) {
+                me.CurrentBehavior.TitleExpression = new LamdaExpression(me.CurrentBehavior.DataContext, exp);
+            }
+            return me;
+        }
     }
 
     export interface BindingBehaviorBuilder<T> {
-        BuildTemplatePopup(controller: (vm: T) => IPopupController): PopupTemplateBindingBuilder<T>;
+        BuildTemplatePopup(controller: (vm: T) => IPopupController, option?: IPopupOption): PopupTemplateBindingBuilder<T>;
     }
 
-    BindingBehaviorBuilder.prototype.BuildTemplatePopup = function (controller: (vm: any) => IPopupController) {
+    BindingBehaviorBuilder.prototype.BuildTemplatePopup = function (controller: (vm: any) => IPopupController, option?: IPopupOption) {
         let me: BindingBehaviorBuilder<any> = this;
 
         let behavior = me.Add(new TemplatePopup());
         behavior.Element = me.CurrentElement;
+        behavior.Option = option;
 
         // コントローラーの設定
         let exp = new LamdaExpression(me.Owner.DataContext, controller);
