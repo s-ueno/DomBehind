@@ -109,6 +109,7 @@
       "Scripts/DomBehind/Controls/ListView.js",
       "Scripts/DomBehind/Controls/TemplateListView.js",
       "Scripts/DomBehind/Controls/FileBrowser.js",
+      "Scripts/DomBehind/Controls/Breadbrumb.js",
 
       ///* DomBehind/JQueryUI */
       //"Scripts/DomBehind/JQueryUI/Tooltip.js",

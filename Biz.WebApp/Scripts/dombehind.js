@@ -1088,6 +1088,15 @@ var StringSplitOptions;
     var me = this;
     return me.toString().substr(start, length);
 });
+"StartsWith".ExtendedPrototype(String.prototype, function (s) {
+    var me = this;
+    if (!String.prototype.startsWith) {
+        return this.substr(0, s.length) === s;
+    }
+    else {
+        return me.startsWith(s);
+    }
+});
 //# sourceMappingURL=StringExtensions.js.map
 var z_indexKey = "z_indexKey";
 $.GenerateZIndex = function () {
@@ -1147,6 +1156,10 @@ $.GetRootUri = function () {
     return $.GetLocalStorage("RootUri");
 };
 $.AbsoluteUri = function (uri) {
+    if (uri.toLowerCase().StartsWith("http://"))
+        return uri;
+    if (uri.toLowerCase().StartsWith("https://"))
+        return uri;
     var rootUri = $.GetLocalStorage("RootUri", "");
     return "" + rootUri + uri;
 };
@@ -4719,6 +4732,98 @@ var DomBehind;
 //# sourceMappingURL=FileBrowser.js.map
 var DomBehind;
 (function (DomBehind) {
+    var Breadbrumb = (function () {
+        function Breadbrumb(Selector) {
+            this.Selector = Selector;
+        }
+        Breadbrumb.prototype.Parse = function (newUri, title) {
+            if (!newUri.toLowerCase().StartsWith("http://") &&
+                !newUri.toLowerCase().StartsWith("https://")) {
+                newUri = $.AbsoluteUri(newUri);
+            }
+            var arr = newUri.Split("?");
+            var queryString = "";
+            if (1 < arr.length) {
+                queryString = arr[1];
+            }
+            var newQueryStrings = this.SplitQueryString(queryString);
+            var currentUri = location.href;
+            var oldArr = currentUri.Split("?");
+            queryString = "";
+            if (1 < oldArr.length) {
+                queryString = oldArr[1];
+            }
+            var oldQueryStrings = this.SplitQueryString(queryString);
+            var stack = new Array();
+            var json = oldQueryStrings.FirstOrDefault(function (x) { return x.Key === "b"; });
+            if (json) {
+                stack = JSON.parse(decodeURIComponent(json.Value));
+            }
+            stack.push({ Uri: newUri, Title: title });
+            newQueryStrings.push({ Key: "b", Value: encodeURIComponent(JSON.stringify(stack)) });
+            var newQuery = newQueryStrings.Select(function (x) { return x.Key + "=" + x.Value; }).join("&");
+            if (!String.IsNullOrWhiteSpace(newQuery)) {
+                return arr[0] + "?" + newQuery;
+            }
+            return arr[0];
+        };
+        Breadbrumb.prototype.SplitQueryString = function (s) {
+            if (!String.IsNullOrWhiteSpace(s)) {
+                var dec = $('<div/>').html(s).text();
+                var array = dec.Split("&", StringSplitOptions.RemoveEmptyEntries);
+                var result_1 = [];
+                $.each(array, function (i, value) {
+                    var split = value.Split("=", StringSplitOptions.None);
+                    if (split.length == 2) {
+                        result_1.push({ Key: split[0], Value: split[1] });
+                    }
+                });
+                return result_1;
+            }
+            return new Array();
+        };
+        Breadbrumb.prototype.Update = function () {
+            var el = $(this.Selector);
+            if (el.length === 0)
+                return;
+            el.empty();
+            var uri = location.href;
+            var arr = uri.Split("?");
+            var queryString = "";
+            if (1 < arr.length) {
+                queryString = arr[1];
+            }
+            if (String.IsNullOrWhiteSpace(queryString)) {
+                return;
+            }
+            var dic = this.SplitQueryString(queryString);
+            var json = dic.FirstOrDefault(function (x) { return x.Key === "b"; });
+            if (!json) {
+                return;
+            }
+            var stack = JSON.parse(decodeURIComponent(json.Value));
+            if (!stack) {
+                return;
+            }
+            var aList = new DomBehind.List();
+            $.each(stack, function (i, value) {
+                if (i === (stack.length - 1)) {
+                    aList.add("<a>" + value.Title + "</a>");
+                }
+                else {
+                    aList.add("<a href=\"" + value.Uri + "\">" + value.Title + "</a>");
+                }
+            });
+            var html = aList.toArray().join(" > ");
+            el.append(html);
+        };
+        return Breadbrumb;
+    }());
+    DomBehind.Breadbrumb = Breadbrumb;
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Breadbrumb.js.map
+var DomBehind;
+(function (DomBehind) {
     var Application = (function () {
         function Application() {
             this._navigator = new DomBehind.Navigation.DefaultNavigator();
@@ -5132,6 +5237,13 @@ var DomBehind;
         }
         Locator.Push = function (ins) {
             Locator._container.push(ins);
+        };
+        Locator.ToArray = function () {
+            var array = [];
+            $.each(Locator._container, function (i, each) {
+                array.push(each);
+            });
+            return array;
         };
         Locator.List = function (typeT, predicate) {
             var array = [];

@@ -6,6 +6,15 @@
         public static Push(ins: any) {
             Locator._container.push(ins);
         }
+
+        public static ToArray(): any[] {
+            let array: any[] = [];
+            $.each(Locator._container, (i, each) => {
+                array.push(each);
+            });
+            return array;
+        }
+
         public static List<T>(typeT: new (...params: any[]) => T, predicate?: (obj: T) => boolean): T[] {
             let array: T[] = [];
             $.each(Locator._container, (i, each) => {

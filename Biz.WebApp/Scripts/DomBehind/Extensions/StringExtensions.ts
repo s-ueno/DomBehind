@@ -28,6 +28,7 @@ interface String {
     PadLeft(totalWidth: number, paddingChar: string): string;
     PadRight(totalWidth: number, paddingChar: string): string;
     SubString(start: number, length: number): string;
+    StartsWith(s: string): boolean;
 }
 
 "Split".ExtendedPrototype(
@@ -157,3 +158,14 @@ interface String {
     }
 );
 
+"StartsWith".ExtendedPrototype(
+    String.prototype,
+    function (s: string) {
+        let me: any = this;
+        if (!(<any>String.prototype).startsWith) {
+            return this.substr(0, s.length) === s;
+        } else {
+            return me.startsWith(s);
+        }
+    }
+)

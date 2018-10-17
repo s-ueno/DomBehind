@@ -65,7 +65,7 @@ declare namespace DomBehind {
         protected OnViewChanged(): void;
         Initialized: boolean;
         abstract Initialize(): void;
-        ViewLoaded(): void;
+        Activate(): void;
         UpdateTarget(mark?: string): void;
         UpdateSource(mark?: string): void;
         Validate(mark?: string): boolean;
@@ -113,6 +113,7 @@ declare namespace DomBehind {
     class Locator {
         private static _container;
         static Push(ins: any): void;
+        static ToArray(): any[];
         static List<T>(typeT: new (...params: any[]) => T, predicate?: (obj: T) => boolean): T[];
         static First<T>(typeT: new (...params: any[]) => T, predicate?: (obj: T) => boolean): T;
         static Remove<T>(typeT: new (...params: any[]) => T, predicate?: (obj: T) => boolean): void;
@@ -142,6 +143,19 @@ declare namespace DomBehind {
 }
 
 
+
+declare namespace DomBehind {
+    class Breadbrumb {
+        Selector: string;
+        constructor(Selector: string);
+        Parse(newUri: string, title: string): string;
+        protected SplitQueryString(s: string): Array<{
+            Key: string;
+            Value: string;
+        }>;
+        Update(): void;
+    }
+}
 
 declare namespace DomBehind {
     interface IFileInfo {
@@ -448,7 +462,7 @@ declare namespace DomBehind {
         header?: string;
         expression?: (row: any) => any;
         expressionAction?: (owner: any, row: any) => void;
-        convertTarget?: (value: any) => any;
+        convertTarget?: (value: any, element?: any) => any;
         attachedEvent?: IEventBuilder;
         dependencyProperty?: Data.DependencyProperty;
         mode?: Data.BindingMode;
@@ -499,8 +513,10 @@ declare namespace DomBehind {
         static ValueProperty: Data.DependencyProperty;
         static TextProperty: Data.DependencyProperty;
         static SrcProperty: Data.DependencyProperty;
+        static HrefProperty: Data.DependencyProperty;
         static IsEnabledProperty: Data.DependencyProperty;
         static IsVisibleProperty: Data.DependencyProperty;
+        static OpacityProperty: Data.DependencyProperty;
         static PlaceHolderProperty: Data.DependencyProperty;
         static IsCheckedProperty: Data.DependencyProperty;
         static MaxLengthProperty: Data.DependencyProperty;
@@ -512,7 +528,7 @@ declare namespace DomBehind {
         static Keydown: IEventBuilder;
         static LostFocus: IEventBuilder;
         static Initialize: IEventBuilder;
-        static ViewLoaded: IEventBuilder;
+        static Activate: IEventBuilder;
         static ModalClosing: IEventBuilder;
     }
 }
@@ -840,6 +856,7 @@ interface String {
     PadLeft(totalWidth: number, paddingChar: string): string;
     PadRight(totalWidth: number, paddingChar: string): string;
     SubString(start: number, length: number): string;
+    StartsWith(s: string): boolean;
 }
 
 

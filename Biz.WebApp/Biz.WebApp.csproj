@@ -499,6 +499,7 @@
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\MessageBox.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\NavbarElement.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\Selector.ts" />
+    <TypeScriptCompile Include="Scripts\DomBehind\Controls\Breadbrumb.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\Tab.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\TemplateListView.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\UIElement.ts" />

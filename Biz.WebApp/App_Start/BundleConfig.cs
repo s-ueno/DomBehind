@@ -197,6 +197,7 @@ namespace Biz.WebApp
       "~/Scripts/DomBehind/Controls/MessageBox.js",
       "~/Scripts/DomBehind/Controls/ListView.js",
       "~/Scripts/DomBehind/Controls/TemplateListView.js",
+      "~/Scripts/DomBehind/Controls/Breadbrumb.js",
 
       ///* DomBehind/JQueryUI */
       //"~/Scripts/DomBehind/JQueryUI/Tooltip.js",

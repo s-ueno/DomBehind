@@ -85,8 +85,10 @@ $.GetRootUri = function () {
 }
 
 $.AbsoluteUri = function (uri: string): string {
-    let rootUri = $.GetLocalStorage("RootUri", "");
+    if (uri.toLowerCase().StartsWith("http://")) return uri;
+    if (uri.toLowerCase().StartsWith("https://")) return uri;
 
+    let rootUri = $.GetLocalStorage("RootUri", "");
     return `${rootUri}${uri}`;
 };
 
