@@ -6,7 +6,7 @@
         constructor(public Selector: string) {
         }
 
-        public Parse(newUri: string, title: string) {
+        public Parse(newUri: string, title: string, isRoot?: boolean): string {
             if (!newUri.toLowerCase().StartsWith("http://") &&
                 !newUri.toLowerCase().StartsWith("https://")) {
                 newUri = $.AbsoluteUri(newUri);
@@ -17,35 +17,61 @@
             if (1 < arr.length) {
                 queryString = arr[1];
             }
-            let newQueryStrings = this.SplitQueryString(queryString);
+            let newQueryStrings = Breadbrumb.SplitQueryString(queryString);
 
 
             let currentUri = location.href;
+            if (isRoot) {
+                currentUri = currentUri.Split("?")[0];
+            }
+
             let oldArr = currentUri.Split("?");
             queryString = "";
             if (1 < oldArr.length) {
                 queryString = oldArr[1];
             }
-            let oldQueryStrings = this.SplitQueryString(queryString);
+            let oldQueryStrings = Breadbrumb.SplitQueryString(queryString);
 
 
             let stack = new Array<{ Uri: string, Title: string }>();
             let json = oldQueryStrings.FirstOrDefault(x => x.Key === "b");
             if (json) {
-                stack = JSON.parse(decodeURIComponent(json.Value));
+                stack = this.ToDecompress(json.Value);
+                // stack = JSON.parse(decodeURIComponent(json.Value));
+            }
+            if (stack.Any()) {
+                stack.LastOrDefault().Uri = currentUri;
             }
             stack.push({ Uri: newUri, Title: title });
 
-            newQueryStrings.push({ Key: "b", Value: encodeURIComponent(JSON.stringify(stack)) });
+            newQueryStrings.push({ Key: "b", Value: this.ToCompress(stack) });
+            // newQueryStrings.push({ Key: "b", Value: encodeURIComponent(JSON.stringify(stack)) });
 
             let newQuery = newQueryStrings.Select(x => `${x.Key}=${x.Value}`).join("&");
+            let result: string = arr[0];
             if (!String.IsNullOrWhiteSpace(newQuery)) {
-                return `${arr[0]}?${newQuery}`;
+                result = `${arr[0]}?${newQuery}`;
             }
-            return arr[0];
+
+            if (0 < stack.length) {
+                stack.LastOrDefault().Uri = result;
+            }
+
+            return result;
         }
 
-        protected SplitQueryString(s: string): Array<{ Key: string, Value: string }> {
+        protected ToCompress(input: any): string {
+            let json = JSON.stringify(input);
+            let comp = LZString.compressToBase64(json);
+            return encodeURIComponent(comp);
+        }
+        protected ToDecompress(input: string) {
+            let dec = decodeURIComponent(input);
+            let json = LZString.decompressFromBase64(dec);
+            return JSON.parse(json);
+        }
+
+        protected static SplitQueryString(s: string): Array<{ Key: string, Value: string }> {
             if (!String.IsNullOrWhiteSpace(s)) {
                 let dec = $('<div/>').html(s).text();
 
@@ -81,13 +107,14 @@
                 return;
             }
 
-            let dic = this.SplitQueryString(queryString);
+            let dic = Breadbrumb.SplitQueryString(queryString);
             let json = dic.FirstOrDefault(x => x.Key === "b");
             if (!json) {
                 return;
             }
 
-            let stack: Array<{ Uri: string, Title: string }> = JSON.parse(decodeURIComponent(json.Value));
+            // let stack: Array<{ Uri: string, Title: string }> = JSON.parse(decodeURIComponent(json.Value));
+            let stack: Array<{ Uri: string, Title: string }> = this.ToDecompress(json.Value);
             if (!stack) {
                 return;
             }

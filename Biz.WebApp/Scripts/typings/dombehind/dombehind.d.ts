@@ -148,8 +148,10 @@ declare namespace DomBehind {
     class Breadbrumb {
         Selector: string;
         constructor(Selector: string);
-        Parse(newUri: string, title: string): string;
-        protected SplitQueryString(s: string): Array<{
+        Parse(newUri: string, title: string, isRoot?: boolean): string;
+        protected ToCompress(input: any): string;
+        protected ToDecompress(input: string): any;
+        protected static SplitQueryString(s: string): Array<{
             Key: string;
             Value: string;
         }>;
