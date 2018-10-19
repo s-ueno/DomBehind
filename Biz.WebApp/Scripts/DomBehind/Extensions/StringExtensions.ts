@@ -28,7 +28,9 @@ interface String {
     PadLeft(totalWidth: number, paddingChar: string): string;
     PadRight(totalWidth: number, paddingChar: string): string;
     SubString(start: number, length: number): string;
+    Contains(s: string): boolean;
     StartsWith(s: string): boolean;
+    EndsWith(s: string): boolean;
 }
 
 "Split".ExtendedPrototype(
@@ -158,6 +160,18 @@ interface String {
     }
 );
 
+"Contains".ExtendedPrototype(
+    String.prototype,
+    function (search: string) {
+        let me: string = this;
+        if (search.length > me.length) {
+            return false;
+        } else {
+            return me.indexOf(search, 0) !== -1;
+        }
+    }
+)
+
 "StartsWith".ExtendedPrototype(
     String.prototype,
     function (s: string) {
@@ -166,6 +180,18 @@ interface String {
             return this.substr(0, s.length) === s;
         } else {
             return me.startsWith(s);
+        }
+    }
+)
+
+"EndsWith".ExtendedPrototype(
+    String.prototype,
+    function (s: string) {
+        let me: any = this;
+        if (!(<any>String.prototype).endsWith) {
+            return me.indexOf(s, this.length - s.length) !== -1;
+        } else {
+            return me.endsWith(s);
         }
     }
 )
