@@ -5491,17 +5491,23 @@ var DomBehind;
             if (!stack) {
                 return;
             }
-            var aList = new DomBehind.List();
+            var aList = new Array();
             $.each(stack, function (i, value) {
                 if (i === (stack.length - 1)) {
-                    aList.add("<a>" + value.Title + "</a>");
+                    aList.push($("<a>" + value.Title + "</a>"));
                 }
                 else {
-                    aList.add("<a href=\"" + value.Uri + "\">" + value.Title + "</a>");
+                    var a = $("<a href=\"javascript:void(0);\">" + value.Title + "</a>");
+                    a.click(function (e) {
+                        location.replace(value.Uri);
+                    });
+                    aList.push(a);
                 }
+                aList.push($("<span> > </span>"));
             });
-            var html = aList.toArray().join(" > ");
-            el.append(html);
+            for (var i = 0; i < aList.length - 1; i++) {
+                el.append(aList[i]);
+            }
         };
         return Breadbrumb;
     }());

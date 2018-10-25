@@ -119,17 +119,24 @@
                 return;
             }
 
-            let aList = new List<string>();
+            let aList = new Array<JQuery>();
             $.each(stack, (i, value) => {
                 if (i === (stack.length - 1)) {
-                    aList.add(`<a>${value.Title}</a>`);
-                } else {
-                    aList.add(`<a href="${value.Uri}">${value.Title}</a>`);
+                    aList.push($(`<a>${value.Title}</a>`));
+                } else {                    
+                    let a = $(`<a href="javascript:void(0);">${value.Title}</a>`);
+                    a.click(e => {
+                        location.replace(value.Uri);
+                    });
+                    aList.push(a);
                 }
-
+                aList.push($(`<span> > </span>`));
             });
-            let html = aList.toArray().join(" > ");
-            el.append(html);
+
+            
+            for (var i = 0; i < aList.length - 1; i++) {
+                el.append(aList[i]);
+            }
         }
 
     }
