@@ -149,6 +149,14 @@
                 rowContainer.append(newRow);
             });
             this.Element.append(rowContainer);
+
+
+            newValue.PropertyChanged.Clear();
+            newValue.PropertyChanged.AddHandler((sender, e) => {
+                if (!e.Name) {
+                    this.ItemsSource = sender;
+                }
+            });
         }
 
         private FindTemplate(jtemplate: JQuery): JQuery {

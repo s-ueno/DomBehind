@@ -26,6 +26,26 @@
         }
         private _title: string;
 
+        public get IsVisible(): boolean {
+            let view = this.View;
+            if (!view) return undefined;
+
+            let container = view.Container;
+            if (!container) return undefined;
+
+            return container.css("display") !== "none";
+        }
+        public set IsVisible(value: boolean) {
+            let view = this.View;
+            if (!view) return;
+
+            let container = view.Container;
+            if (!container) return;
+
+            container.css("display", value ? "display" : "none");
+        }
+
+
         // #region View Property
 
         public get View(): BizView {
