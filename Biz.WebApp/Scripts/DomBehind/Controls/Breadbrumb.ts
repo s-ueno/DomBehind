@@ -123,7 +123,7 @@
             $.each(stack, (i, value) => {
                 if (i === (stack.length - 1)) {
                     aList.push($(`<a>${value.Title}</a>`));
-                } else {                    
+                } else {
                     let a = $(`<a href="javascript:void(0);">${value.Title}</a>`);
                     a.click(e => {
                         location.replace(value.Uri);
@@ -133,10 +133,21 @@
                 aList.push($(`<span> > </span>`));
             });
 
-            
+
             for (var i = 0; i < aList.length - 1; i++) {
                 el.append(aList[i]);
             }
+        }
+
+        public Pop() {
+            let el = $(this.Selector);
+            if (el.length === 0) return;
+
+            let aList = el.find("a");
+            if (aList.length < 2) return;
+
+            $(aList[aList.length - 1]).click();
+
         }
 
     }

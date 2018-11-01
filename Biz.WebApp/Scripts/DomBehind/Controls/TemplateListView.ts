@@ -73,6 +73,14 @@
                 $.each(this.Columns, (k, column) => {
 
                     let el = newRow.find(column.templateSelector);
+                    if (el.length === 0) {
+                        if (column.templateSelector.StartsWith(".")) {
+                            let selector = column.templateSelector.SubString(1, column.templateSelector.length - 1);
+                            if (newRow.hasClass(selector)) {
+                                el = newRow;
+                            }
+                        }
+                    }
                     if (el.length !== 0) {
 
                         // property binding
@@ -248,8 +256,14 @@
                     let list = this.PInfo.GetValue();
                     if (column && list instanceof Data.ListCollectionView) {
                         let exp = LamdaExpression.Path(column.expression);
+
+                        let filter = list.Filter;
+                        list.Filter = null;
                         let sorted = asc ? list.ToArray().OrderBy(x => x[exp]) : list.ToArray().OrderByDecording(x => x[exp]);
-                        this.ItemsSource = this.DataContext[this.PInfo.MemberPath] = new Data.ListCollectionView(sorted);
+
+                        let newList = new Data.ListCollectionView(sorted);
+                        newList.Filter = filter;
+                        this.ItemsSource = this.DataContext[this.PInfo.MemberPath] = newList;
                     }
                 }
             }
@@ -334,6 +348,8 @@
         behavior.Owner = me.Owner;
         behavior.Property = TemplateListView.ItemsSourceProperty;
         behavior.PInfo = new LamdaExpression(me.Owner.DataContext, itemsSource);
+        behavior.BindingPolicy.Mode = TemplateListView.ItemsSourceProperty.BindingMode;
+
         behavior.Option = $.extend(true, {}, option);
         behavior.Columns = new Array<ITemplateListViewColumn>();
 
@@ -342,5 +358,4 @@
         newMe.CurrentElement = me.CurrentElement;
         return newMe;
     }
-
 }

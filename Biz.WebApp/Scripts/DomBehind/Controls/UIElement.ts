@@ -87,6 +87,10 @@
             = Data.DependencyProperty.RegisterAttached("maxlength",
                 null, (x, y) => x.attr("min", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
 
+        public static BackgroundColorProperty: Data.DependencyProperty
+            = Data.DependencyProperty.RegisterAttached("background-color",
+                null, (x, y) => x.css("background-color", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
+
 
         public static HtmlSource: Data.DependencyProperty
             = Data.DependencyProperty.RegisterAttached("htmlSource",
