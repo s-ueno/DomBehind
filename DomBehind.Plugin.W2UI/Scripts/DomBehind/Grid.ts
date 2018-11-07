@@ -46,6 +46,14 @@
         Color,
         /* list */
         List,
+        /* combo */
+        Combo,
+        /* check */
+        Check,
+        /* checkbox */
+        Checkbox,
+        /* select */
+        Select,
     }
     export interface IColumnBinding<TRow>
         extends IColumnBindingOption, IColumnConverter {
@@ -520,6 +528,18 @@
                 case FieldType.List:
                     result = "list";
                     break;
+                case FieldType.Combo:
+                    result = "combo";
+                    break;
+                case FieldType.Check:
+                    result = "check";
+                    break;
+                case FieldType.Checkbox:
+                    result = "checkbox";
+                    break;
+                case FieldType.Select:
+                    result = "select";
+                    break;
             }
             return result;
         }
@@ -631,7 +651,9 @@
                 }
 
                 // build bind
-                let observable = Observable.Register(value, LamdaExpression.Path(this.RowClassBinding));
+
+                let expPath = this.ParseExpressionPath(this.RowClassBinding);
+                let observable = Observable.Register(value, expPath);
                 observable.PropertyChanged.Clear();
                 observable.PropertyChanged.AddHandler((ss, ee) => {
                     let id = ss.recid;
@@ -639,6 +661,8 @@
                     value.w2ui.class = style;
                     this.Grid.refreshRow(id);
                 });
+                
+
             }
 
             $.each(this.Column, (i, v) => {
@@ -649,6 +673,16 @@
                     });
                 }
             });
+        }
+
+        private ParseExpressionPath(exp: any): string {
+            let result: any = null;
+            try {
+                result = LamdaExpression.Path(exp);
+            } catch (e) {
+                console.trace(e);
+            }
+            return result;
         }
     }
 
