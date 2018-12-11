@@ -49,7 +49,11 @@ declare namespace DomBehind {
         Alphanumeric = 9,
         Time = 10,
         Color = 11,
-        List = 12
+        List = 12,
+        Combo = 13,
+        Check = 14,
+        Checkbox = 15,
+        Select = 16
     }
     interface IColumnBinding<TRow> extends IColumnBindingOption, IColumnConverter {
         advancedSearch?: FieldType;
@@ -63,7 +67,8 @@ declare namespace DomBehind {
         Time = 5,
         Date = 6,
         Age = 7,
-        Toggle = 8
+        Toggle = 8,
+        CheckBox = 9
     }
     interface IColumnConverter {
         convertTarget?: (x: any) => any;
@@ -126,6 +131,7 @@ declare namespace DomBehind {
         static RenderTypeToString(type: RenderType): string;
         private ParseCellStyles;
         private RowInjection;
+        private ParseExpressionPath;
     }
     class W2GridBindingBehaviorBuilder<T> extends BindingBehaviorBuilder<T> {
         constructor(owner: BizView);

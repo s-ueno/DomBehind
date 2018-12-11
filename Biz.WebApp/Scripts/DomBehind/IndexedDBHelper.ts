@@ -19,7 +19,7 @@
 
             db.done(x => {
                 if (!x.objectStoreNames.contains(this.TableName)) {
-                    d.reject();
+                    d.resolve([]);
                     return;
                 }
                 let trans = x.transaction(this.TableName, "readwrite");
@@ -137,7 +137,7 @@
             };
         }
 
-        public UpsertAsync(entity: T, primaryKey?: (obj: T) => string | number): JQueryPromise<any> {
+        public UpsertAsync(entity: T | Array<T>, primaryKey?: (obj: T) => string | number): JQueryPromise<any> {
             let path: string;
             if (primaryKey) {
                 path = LamdaExpression.Path(primaryKey);
@@ -168,13 +168,23 @@
 
                 let trans = x.transaction(this.TableName, "readwrite");
                 let store = trans.objectStore(this.TableName);
-                store.put(entity);
+
+                if (entity instanceof Array) {
+                    $.each(entity, (i, value) => {
+                        store.put(value);
+                    });
+                } else {
+                    store.put(entity);
+                }
+
                 d.resolve();
             }).fail(x => {
                 d.reject(x);
             });
             return d.promise();
         }
+
+
 
         public DeleteAsync(entity: T): JQueryPromise<any> {
             let d = $.Deferred<any>();

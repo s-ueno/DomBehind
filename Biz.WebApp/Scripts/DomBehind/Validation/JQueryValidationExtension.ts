@@ -70,7 +70,9 @@ namespace DomBehind {
         if (container.length == 0) {
             container = container.closest("form");
         }
-        if (container.length == 0) return;
+        if (container.length == 0) {
+            console.trace("Validation using setCustomValidity must be enclosed in a form tag.");
+        }
 
         // name 属性、classに一意なIDを付与する
         $.each(me.BindingBehaviors.ListDataBindingBehavior(), (i, behavior) => {

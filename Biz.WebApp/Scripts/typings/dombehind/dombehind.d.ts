@@ -65,7 +65,7 @@ declare namespace DomBehind {
         private _view;
         protected OnViewChanged(): void;
         Initialized: boolean;
-        abstract Initialize(): void;
+        abstract Initialize(): any;
         Activate(): void;
         UpdateTarget(mark?: string): void;
         UpdateSource(mark?: string): void;
@@ -103,7 +103,7 @@ declare namespace DomBehind {
         FindRowAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T>;
         FindRowsAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T[]>;
         protected FetchCursor(indexStore: IDBIndex, value: string | number, d: JQueryDeferred<any>): void;
-        UpsertAsync(entity: T, primaryKey?: (obj: T) => string | number): JQueryPromise<any>;
+        UpsertAsync(entity: T | Array<T>, primaryKey?: (obj: T) => string | number): JQueryPromise<any>;
         DeleteAsync(entity: T): JQueryPromise<any>;
         protected Open(): JQueryPromise<IDBDatabase>;
         protected Upgrade(version: number, action: (db: any) => void): void;
@@ -527,6 +527,8 @@ declare namespace DomBehind {
         static MaxNumericProperty: Data.DependencyProperty;
         static MinNumericProperty: Data.DependencyProperty;
         static BackgroundColorProperty: Data.DependencyProperty;
+        static BackgroundImageProperty: Data.DependencyProperty;
+        static ClassProperty: Data.DependencyProperty;
         static HtmlSource: Data.DependencyProperty;
         static Click: IEventBuilder;
         static Enter: IEventBuilder;
@@ -830,7 +832,7 @@ interface JQuery {
     SetCustomError(errorMessage: string): void;
     ClearCustomError(): void;
     CheckValidity(allChildren?: boolean): void;
-    Raise(event: DomBehind.IEventBuilder): void;
+    Raise(event: DomBehind.IEventBuilder): JQueryEventObject;
 }
 
 interface ObjectConstructor {
@@ -1310,9 +1312,9 @@ declare namespace DomBehind.Web {
     abstract class WebService<TRequest, TResponse> {
         protected abstract readonly Url: string;
         Timeout: number;
-        Execute(request: TRequest): TResponse;
-        ExecuteAsync(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
-        ExecuteAjax(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
+        Execute(request?: TRequest): TResponse;
+        ExecuteAsync(request?: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
+        ExecuteAjax(request?: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
         protected readonly DefaultPostSetting: JQueryAjaxSettings;
     }
 }

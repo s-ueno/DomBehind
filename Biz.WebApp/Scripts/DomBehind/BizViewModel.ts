@@ -76,12 +76,12 @@
         /**
          * must inherits Initialize method.
          */
-        public abstract Initialize(): void;
+        public abstract Initialize();
 
         /**
          * inherit if necessary View Activate method.
          */
-        public Activate(): void { }
+        public Activate() { }
 
         // #endregion 
 

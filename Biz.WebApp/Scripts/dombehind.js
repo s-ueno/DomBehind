@@ -1907,7 +1907,9 @@ $.fn.CheckValidity = function () {
 };
 $.fn.Raise = function (event) {
     var me = this;
-    me.trigger(event.EventName);
+    var e = $.Event(event.EventName);
+    me.trigger(e);
+    return e;
 };
 //# sourceMappingURL=JQueryExtensions.js.map
 var DomBehind;
@@ -3130,7 +3132,7 @@ var DomBehind;
             var db = this.Open();
             db.done(function (x) {
                 if (!x.objectStoreNames.contains(_this.TableName)) {
-                    d.reject();
+                    d.resolve([]);
                     return;
                 }
                 var trans = x.transaction(_this.TableName, "readwrite");
@@ -3269,7 +3271,14 @@ var DomBehind;
                 }
                 var trans = x.transaction(_this.TableName, "readwrite");
                 var store = trans.objectStore(_this.TableName);
-                store.put(entity);
+                if (entity instanceof Array) {
+                    $.each(entity, function (i, value) {
+                        store.put(value);
+                    });
+                }
+                else {
+                    store.put(entity);
+                }
                 d.resolve();
             }).fail(function (x) {
                 d.reject(x);
@@ -4098,6 +4107,8 @@ var DomBehind;
         UIElement.MaxNumericProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("max", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.MinNumericProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("min", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.BackgroundColorProperty = DomBehind.Data.DependencyProperty.RegisterAttached("background-color", null, function (x, y) { return x.css("background-color", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        UIElement.BackgroundImageProperty = DomBehind.Data.DependencyProperty.RegisterAttached("background-image", null, function (x, y) { return x.css("background-image", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        UIElement.ClassProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", function (x) { return x.attr("class"); }, function (x, y) { return x.attr("class", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
         UIElement.HtmlSource = DomBehind.Data.DependencyProperty.RegisterAttached("htmlSource", null, function (x, y) {
             var p = {
                 url: y,
@@ -5665,6 +5676,7 @@ var DomBehind;
         };
         BizView.prototype.ViewLoaded = function (responseText, textStatus, XMLHttpRequest) { };
         BizView.prototype.Ensure = function () {
+            var _this = this;
             if (!this.DataContext)
                 return;
             var viewModel = this.DataContext;
@@ -5680,12 +5692,22 @@ var DomBehind;
             if (this.DependencyValidateSetup) {
                 this.DependencyValidateSetup();
             }
+            var e = null;
             if (!viewModel.Initialized) {
                 viewModel.Initialized = true;
-                this.Container.Raise(DomBehind.UIElement.Initialize);
+                e = this.Container.Raise(DomBehind.UIElement.Initialize);
             }
-            this.UpdateTarget();
-            this.Container.Raise(DomBehind.UIElement.Activate);
+            var activate = function () {
+                _this.UpdateTarget();
+                _this.Container.Raise(DomBehind.UIElement.Activate);
+            };
+            if (e && Object.IsPromise(e.result)) {
+                var pms = e.result;
+                pms.always(function () { return activate(); });
+            }
+            else {
+                activate();
+            }
         };
         BizView.prototype.UnSubscribe = function () {
         };
@@ -6097,8 +6119,9 @@ var DomBehind;
         if (container.length == 0) {
             container = container.closest("form");
         }
-        if (container.length == 0)
-            return;
+        if (container.length == 0) {
+            console.trace("Validation using setCustomValidity must be enclosed in a form tag.");
+        }
         $.each(me.BindingBehaviors.ListDataBindingBehavior(), function (i, behavior) {
             $.each(behavior.BindingPolicy.Validators.toArray(), function (k, validator) {
                 var el = behavior.Element;

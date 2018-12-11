@@ -78,14 +78,23 @@
                 this.DependencyValidateSetup();
             }
 
+            let e: JQueryEventObject = null;
             if (!viewModel.Initialized) {
                 viewModel.Initialized = true;
-                this.Container.Raise(UIElement.Initialize);
+                e = this.Container.Raise(UIElement.Initialize);
             }
 
-            this.UpdateTarget();
+            let activate = () => {
+                this.UpdateTarget();
+                this.Container.Raise(UIElement.Activate);
+            };
 
-            this.Container.Raise(UIElement.Activate);
+            if (e && Object.IsPromise(e.result)) {
+                let pms = <JQueryPromise<any>>e.result;
+                pms.always(() => activate());
+            } else {
+                activate();
+            }
         }
 
         // #endregion

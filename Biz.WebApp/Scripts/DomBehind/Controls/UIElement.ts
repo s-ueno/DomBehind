@@ -91,6 +91,14 @@
             = Data.DependencyProperty.RegisterAttached("background-color",
                 null, (x, y) => x.css("background-color", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
 
+        public static BackgroundImageProperty: Data.DependencyProperty
+            = Data.DependencyProperty.RegisterAttached("background-image",
+                null, (x, y) => x.css("background-image", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
+
+        public static ClassProperty: Data.DependencyProperty
+            = Data.DependencyProperty.RegisterAttached("",
+                x => x.attr("class"), (x, y) => x.attr("class", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.TwoWay);
+
 
         public static HtmlSource: Data.DependencyProperty
             = Data.DependencyProperty.RegisterAttached("htmlSource",

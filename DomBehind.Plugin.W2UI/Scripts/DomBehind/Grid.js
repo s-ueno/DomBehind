@@ -27,6 +27,10 @@ var DomBehind;
         FieldType[FieldType["Time"] = 10] = "Time";
         FieldType[FieldType["Color"] = 11] = "Color";
         FieldType[FieldType["List"] = 12] = "List";
+        FieldType[FieldType["Combo"] = 13] = "Combo";
+        FieldType[FieldType["Check"] = 14] = "Check";
+        FieldType[FieldType["Checkbox"] = 15] = "Checkbox";
+        FieldType[FieldType["Select"] = 16] = "Select";
     })(FieldType = DomBehind.FieldType || (DomBehind.FieldType = {}));
     var RenderType;
     (function (RenderType) {
@@ -38,6 +42,7 @@ var DomBehind;
         RenderType[RenderType["Date"] = 6] = "Date";
         RenderType[RenderType["Age"] = 7] = "Age";
         RenderType[RenderType["Toggle"] = 8] = "Toggle";
+        RenderType[RenderType["CheckBox"] = 9] = "CheckBox";
     })(RenderType = DomBehind.RenderType || (DomBehind.RenderType = {}));
     var EditableWrapper = (function () {
         function EditableWrapper(Owner) {
@@ -118,9 +123,16 @@ var DomBehind;
                 id = NewUid();
                 this.Element.attr('id', id);
             }
+            var readOnly = new Array();
             $.each(this.Column, function (i, each) {
                 if (each.renderType) {
-                    each.render = W2GridBindingBehavior.RenderTypeToString(each.renderType);
+                    if (each.renderType === RenderType.CheckBox) {
+                        each.editable = $.extend(true, each.editable, { fieldType: FieldType.Checkbox });
+                        readOnly.push(each);
+                    }
+                    else {
+                        each.render = W2GridBindingBehavior.RenderTypeToString(each.renderType);
+                    }
                 }
                 if (each.editable) {
                     each.editable = $.extend(true, new EditableWrapper(_this.DataContext), each.editable);
@@ -134,6 +146,19 @@ var DomBehind;
                 },
                 multiSelect: false,
                 keyboard: true,
+            };
+            w2GridOption.onChange = function (e) {
+                if (!_this.Grid)
+                    return;
+                var columnId = e.column;
+                var column = _this.Grid.columns[columnId];
+                if (column) {
+                    var field_1 = column.field;
+                    var caption_1 = column.caption;
+                    if (readOnly.Any(function (x) { return x.field === field_1 && x.caption === caption_1; })) {
+                        e.preventDefault();
+                    }
+                }
             };
             w2GridOption.onDblClick = function (e) { return _this.OnDoubleClick(_this.DataContext, e); };
             if (this.GridOption.footerOption) {
@@ -341,6 +366,18 @@ var DomBehind;
                 case FieldType.List:
                     result = "list";
                     break;
+                case FieldType.Combo:
+                    result = "combo";
+                    break;
+                case FieldType.Check:
+                    result = "check";
+                    break;
+                case FieldType.Checkbox:
+                    result = "checkbox";
+                    break;
+                case FieldType.Select:
+                    result = "select";
+                    break;
             }
             return result;
         };
@@ -432,7 +469,8 @@ var DomBehind;
                 if (!String.IsNullOrWhiteSpace(defaultValue)) {
                     value.w2ui.class = defaultValue;
                 }
-                var observable = DomBehind.Observable.Register(value, DomBehind.LamdaExpression.Path(this.RowClassBinding));
+                var expPath = this.ParseExpressionPath(this.RowClassBinding);
+                var observable = DomBehind.Observable.Register(value, expPath);
                 observable.PropertyChanged.Clear();
                 observable.PropertyChanged.AddHandler(function (ss, ee) {
                     var id = ss.recid;
@@ -449,6 +487,16 @@ var DomBehind;
                     });
                 }
             });
+        };
+        W2GridBindingBehavior.prototype.ParseExpressionPath = function (exp) {
+            var result = null;
+            try {
+                result = DomBehind.LamdaExpression.Path(exp);
+            }
+            catch (e) {
+                console.trace(e);
+            }
+            return result;
         };
         W2GridBindingBehavior.Refresh = new DomBehind.TypedEvent();
         W2GridBindingBehavior.IsSpinningProperty = DomBehind.Data.DependencyProperty.RegisterAttached("w2ui.isSpinning", function (el) {

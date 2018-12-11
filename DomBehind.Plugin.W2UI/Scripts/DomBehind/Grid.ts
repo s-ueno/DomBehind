@@ -81,6 +81,9 @@
         Age,
         /* トグル */
         Toggle,
+
+        /* チェックボックス */
+        CheckBox
     }
 
     export interface IColumnConverter {
@@ -262,9 +265,17 @@
                 this.Element.attr('id', id);
             }
 
+            let readOnly = new Array<IColumnBinding<any>>();
             $.each(this.Column, (i, each) => {
                 if (each.renderType) {
-                    each.render = W2GridBindingBehavior.RenderTypeToString(each.renderType);
+                    if (each.renderType === RenderType.CheckBox) {
+                        each.editable = $.extend(true, each.editable, { fieldType: FieldType.Checkbox })
+
+                        readOnly.push(each);
+                    } else {
+                        each.render = W2GridBindingBehavior.RenderTypeToString(each.renderType);
+                    }
+
                 }
                 if (each.editable) {
                     each.editable = $.extend(true, new EditableWrapper(this.DataContext), each.editable);
@@ -281,6 +292,19 @@
                 keyboard: true,
             };
 
+            w2GridOption.onChange = e => {
+                if (!this.Grid) return;
+
+                let columnId = e.column;
+                let column: any = this.Grid.columns[columnId];
+                if (column) {
+                    let field = column.field;
+                    let caption = column.caption;
+                    if (readOnly.Any(x => x.field === field && x.caption === caption)) {
+                        e.preventDefault();
+                    }
+                }
+            };
 
             w2GridOption.onDblClick = e => this.OnDoubleClick(this.DataContext, e);
             if (this.GridOption.footerOption) {
@@ -335,6 +359,7 @@
             // hack
 
             this.Grid = this.Element.w2grid(w2GridOption);
+
             let dp = Data.DependencyProperty.RegisterAttached("itemsSource",
                 el => {
 
@@ -661,7 +686,7 @@
                     value.w2ui.class = style;
                     this.Grid.refreshRow(id);
                 });
-                
+
 
             }
 

@@ -6,7 +6,7 @@
 
         public Timeout: number = 1000 * 30;
 
-        public Execute(request: TRequest): TResponse {
+        public Execute(request?: TRequest): TResponse {
             let ex: Exception;
             let option: JQueryAjaxSettings = this.DefaultPostSetting;
             option.data = request;
@@ -21,7 +21,7 @@
             return <TResponse>promise.responseJSON;
         }
 
-        public ExecuteAsync(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse> {
+        public ExecuteAsync(request?: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse> {
             let d = $.Deferred<TResponse>();
             let p: JQueryAjaxSettings = $.extend(true, this.DefaultPostSetting, option);
             p.data = JSON.stringify(request);
@@ -34,7 +34,7 @@
             return d.promise();
         }
 
-        public ExecuteAjax(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse> {
+        public ExecuteAjax(request?: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse> {
             let d = $.Deferred<TResponse>();
             let p: JQueryAjaxSettings = $.extend(true, this.DefaultPostSetting, option);
             p.data = request;

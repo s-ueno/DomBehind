@@ -109,7 +109,7 @@ interface JQuery {
     ClearCustomError(): void;
     CheckValidity(allChildren?: boolean): void;
 
-    Raise(event: DomBehind.IEventBuilder): void;
+    Raise(event: DomBehind.IEventBuilder): JQueryEventObject;
 }
 
 $.fn.ValidityState = function () {
@@ -161,8 +161,10 @@ $.fn.CheckValidity = function () {
     }
 };
 
-$.fn.Raise = function (event: DomBehind.IEventBuilder) {
+$.fn.Raise = function (event: DomBehind.IEventBuilder): JQueryEventObject {
     let me: any = this;
-    me.trigger(event.EventName);
+    let e = $.Event(event.EventName);
+    me.trigger(e);
+    return e;
 };
 
