@@ -5451,11 +5451,26 @@ var DomBehind;
         function Breadbrumb(Selector) {
             this.Selector = Selector;
         }
+        Object.defineProperty(Breadbrumb, "AllowSessionStorage", {
+            get: function () {
+                return $.GetLocalStorage("Breadbrumb.AllowSessionStorage", true);
+            },
+            set: function (value) {
+                $.SetLocalStorage("Breadbrumb.AllowSessionStorage", value);
+            },
+            enumerable: true,
+            configurable: true
+        });
         Breadbrumb.prototype.Parse = function (newUri, title, isRoot) {
             if (!newUri.toLowerCase().StartsWith("http://") &&
                 !newUri.toLowerCase().StartsWith("https://")) {
                 newUri = $.AbsoluteUri(newUri);
             }
+            if (Breadbrumb.AllowSessionStorage)
+                return this.ParseSessionStorage(newUri, isRoot, title);
+            return this.ParseRestUri(newUri, isRoot, title);
+        };
+        Breadbrumb.prototype.ParseRestUri = function (newUri, isRoot, title) {
             var arr = newUri.Split("?");
             var queryString = "";
             if (1 < arr.length) {
@@ -5492,6 +5507,55 @@ var DomBehind;
             }
             return result;
         };
+        Breadbrumb.prototype.ParseSessionStorage = function (newUri, isRoot, title) {
+            var arr = newUri.Split("?");
+            var queryString = "";
+            if (1 < arr.length) {
+                queryString = arr[1];
+            }
+            var newQueryStrings = Breadbrumb.SplitQueryString(queryString);
+            var currentUri = location.href;
+            if (isRoot) {
+                currentUri = currentUri.Split("?")[0];
+            }
+            var oldArr = currentUri.Split("?");
+            queryString = "";
+            if (1 < oldArr.length) {
+                queryString = oldArr[1];
+            }
+            var oldQueryStrings = Breadbrumb.SplitQueryString(queryString);
+            var stack = new Array();
+            var idKeyValue = oldQueryStrings.FirstOrDefault(function (x) { return x.Key === "b"; });
+            var oldId = "";
+            var newId = NewUid();
+            if (idKeyValue) {
+                oldId = idKeyValue.Value;
+            }
+            else {
+                oldId = NewUid();
+            }
+            var json = Breadbrumb.GetSessionStorage(oldId);
+            if (json) {
+                stack = this.ToDecompress(json);
+            }
+            if (stack.Any()) {
+                stack.LastOrDefault().Uri = currentUri;
+            }
+            stack.push({ Uri: newUri, Title: title });
+            Breadbrumb.SetSessionStorage(newId, this.ToCompress(stack));
+            if (!newQueryStrings.Any(function (x) { return x.Key === "b"; })) {
+                newQueryStrings.push({ Key: "b", Value: newId });
+            }
+            var newQuery = newQueryStrings.Select(function (x) { return x.Key + "=" + x.Value; }).join("&");
+            var result = arr[0];
+            if (!String.IsNullOrWhiteSpace(newQuery)) {
+                result = arr[0] + "?" + newQuery;
+            }
+            if (0 < stack.length) {
+                stack.LastOrDefault().Uri = result;
+            }
+            return result;
+        };
         Breadbrumb.prototype.ToCompress = function (input) {
             var json = JSON.stringify(input);
             var comp = LZString.compressToBase64(json);
@@ -5517,6 +5581,12 @@ var DomBehind;
             }
             return new Array();
         };
+        Breadbrumb.GetSessionStorage = function (id) {
+            return $.GetSessionStorage(id, "");
+        };
+        Breadbrumb.SetSessionStorage = function (id, value) {
+            $.SetSessionStorage(id, value);
+        };
         Breadbrumb.prototype.Update = function () {
             var el = $(this.Selector);
             if (el.length === 0)
@@ -5532,11 +5602,11 @@ var DomBehind;
                 return;
             }
             var dic = Breadbrumb.SplitQueryString(queryString);
-            var json = dic.FirstOrDefault(function (x) { return x.Key === "b"; });
-            if (!json) {
+            var id = dic.FirstOrDefault(function (x) { return x.Key === "b"; });
+            if (!id) {
                 return;
             }
-            var stack = this.ToDecompress(json.Value);
+            var stack = this.BuildStack(id.Value);
             if (!stack) {
                 return;
             }
@@ -5557,6 +5627,12 @@ var DomBehind;
             for (var i = 0; i < aList.length - 1; i++) {
                 el.append(aList[i]);
             }
+        };
+        Breadbrumb.prototype.BuildStack = function (s) {
+            if (Breadbrumb.AllowSessionStorage) {
+                s = Breadbrumb.GetSessionStorage(s);
+            }
+            return this.ToDecompress(s);
         };
         Breadbrumb.prototype.Pop = function () {
             var el = $(this.Selector);

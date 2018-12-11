@@ -2,16 +2,30 @@
 
 
     export class Breadbrumb {
-
         constructor(public Selector: string) {
         }
 
+        public static get AllowSessionStorage(): boolean {
+            return $.GetLocalStorage("Breadbrumb.AllowSessionStorage", true);
+        }
+        public static set AllowSessionStorage(value: boolean) {
+            $.SetLocalStorage("Breadbrumb.AllowSessionStorage", value);
+        }
+
         public Parse(newUri: string, title: string, isRoot?: boolean): string {
+
             if (!newUri.toLowerCase().StartsWith("http://") &&
                 !newUri.toLowerCase().StartsWith("https://")) {
                 newUri = $.AbsoluteUri(newUri);
             }
 
+            if (Breadbrumb.AllowSessionStorage)
+                return this.ParseSessionStorage(newUri, isRoot, title);
+
+            return this.ParseRestUri(newUri, isRoot, title);
+        }
+
+        protected ParseRestUri(newUri: string, isRoot: boolean, title: string) {
             let arr = newUri.Split("?");
             let queryString = "";
             if (1 < arr.length) {
@@ -37,7 +51,6 @@
             let json = oldQueryStrings.FirstOrDefault(x => x.Key === "b");
             if (json) {
                 stack = this.ToDecompress(json.Value);
-                // stack = JSON.parse(decodeURIComponent(json.Value));
             }
             if (stack.Any()) {
                 stack.LastOrDefault().Uri = currentUri;
@@ -45,7 +58,6 @@
             stack.push({ Uri: newUri, Title: title });
 
             newQueryStrings.push({ Key: "b", Value: this.ToCompress(stack) });
-            // newQueryStrings.push({ Key: "b", Value: encodeURIComponent(JSON.stringify(stack)) });
 
             let newQuery = newQueryStrings.Select(x => `${x.Key}=${x.Value}`).join("&");
             let result: string = arr[0];
@@ -59,6 +71,61 @@
 
             return result;
         }
+
+        protected ParseSessionStorage(newUri: string, isRoot: boolean, title: string) {
+            let arr = newUri.Split("?");
+            let queryString = "";
+            if (1 < arr.length) {
+                queryString = arr[1];
+            }
+            let newQueryStrings = Breadbrumb.SplitQueryString(queryString);
+            let currentUri = location.href;
+            if (isRoot) {
+                currentUri = currentUri.Split("?")[0];
+            }
+            let oldArr = currentUri.Split("?");
+            queryString = "";
+            if (1 < oldArr.length) {
+                queryString = oldArr[1];
+            }
+            let oldQueryStrings = Breadbrumb.SplitQueryString(queryString);
+            let stack = new Array<{
+                Uri: string;
+                Title: string;
+            }>();
+            let idKeyValue = oldQueryStrings.FirstOrDefault(x => x.Key === "b");
+            let oldId = "";
+            let newId = NewUid();
+            if (idKeyValue) {
+                oldId = idKeyValue.Value;
+            }
+            else {
+                oldId = NewUid();
+            }
+            let json = Breadbrumb.GetSessionStorage(oldId);
+            if (json) {
+                stack = this.ToDecompress(json);
+            }
+            if (stack.Any()) {
+                stack.LastOrDefault().Uri = currentUri;
+            }
+            stack.push({ Uri: newUri, Title: title });
+            Breadbrumb.SetSessionStorage(newId, this.ToCompress(stack));
+            if (!newQueryStrings.Any(x => x.Key === "b")) {
+                newQueryStrings.push({ Key: "b", Value: newId });
+            }
+            let newQuery = newQueryStrings.Select(x => `${x.Key}=${x.Value}`).join("&");
+            let result: string = arr[0];
+            if (!String.IsNullOrWhiteSpace(newQuery)) {
+                result = `${arr[0]}?${newQuery}`;
+            }
+            if (0 < stack.length) {
+                stack.LastOrDefault().Uri = result;
+            }
+            return result;
+        }
+
+
 
         protected ToCompress(input: any): string {
             let json = JSON.stringify(input);
@@ -89,6 +156,12 @@
             return new Array<any>();
         }
 
+        protected static GetSessionStorage(id: string): string {
+            return $.GetSessionStorage(id, "");
+        }
+        protected static SetSessionStorage(id: string, value: string) {
+            $.SetSessionStorage(id, value);
+        }
 
         public Update() {
             let el = $(this.Selector);
@@ -108,13 +181,13 @@
             }
 
             let dic = Breadbrumb.SplitQueryString(queryString);
-            let json = dic.FirstOrDefault(x => x.Key === "b");
-            if (!json) {
+            let id = dic.FirstOrDefault(x => x.Key === "b");
+            if (!id) {
                 return;
             }
 
             // let stack: Array<{ Uri: string, Title: string }> = JSON.parse(decodeURIComponent(json.Value));
-            let stack: Array<{ Uri: string, Title: string }> = this.ToDecompress(json.Value);
+            let stack: Array<{ Uri: string, Title: string }> = this.BuildStack(id.Value);
             if (!stack) {
                 return;
             }
@@ -133,10 +206,16 @@
                 aList.push($(`<span> > </span>`));
             });
 
-
             for (var i = 0; i < aList.length - 1; i++) {
                 el.append(aList[i]);
             }
+        }
+
+        protected BuildStack(s: string) {
+            if (Breadbrumb.AllowSessionStorage) {
+                s = Breadbrumb.GetSessionStorage(s);
+            }
+            return this.ToDecompress(s);
         }
 
         public Pop() {
