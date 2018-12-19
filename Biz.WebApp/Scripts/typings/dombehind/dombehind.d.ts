@@ -533,6 +533,7 @@ declare namespace DomBehind {
         static MaxNumericProperty: Data.DependencyProperty;
         static MinNumericProperty: Data.DependencyProperty;
         static BackgroundColorProperty: Data.DependencyProperty;
+        static ColorProperty: Data.DependencyProperty;
         static BackgroundImageProperty: Data.DependencyProperty;
         static ClassProperty: Data.DependencyProperty;
         static HtmlSource: Data.DependencyProperty;

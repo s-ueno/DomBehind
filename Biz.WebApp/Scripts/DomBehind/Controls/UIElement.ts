@@ -90,6 +90,12 @@
         public static BackgroundColorProperty: Data.DependencyProperty
             = Data.DependencyProperty.RegisterAttached("background-color",
                 null, (x, y) => x.css("background-color", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
+        public static ColorProperty: Data.DependencyProperty
+            = Data.DependencyProperty.RegisterAttached("color",
+                null, (x, y) => x.css("color", y), Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
+
+
+
 
         public static BackgroundImageProperty: Data.DependencyProperty
             = Data.DependencyProperty.RegisterAttached("background-image",

@@ -39,14 +39,32 @@
     Array.prototype,
     function (selector: (value: any) => any) {
         let me: Array<any> = this;
-        return me.sort((x, y) => selector(x) - selector(y));
+        return me.sort((x, y) => {
+            let xx = selector(x);
+            let yy = selector(y);
+
+            if (typeof xx === 'string' &&
+                typeof yy === 'string') {
+                return yy === xx ? 0 : yy < xx ? 1 : -1;
+            }
+            return xx - yy;
+        });
     }
 );
 "OrderByDecording".ExtendedPrototype(
     Array.prototype,
     function (selector: (value: any) => any) {
         let me: Array<any> = this;
-        return me.sort((x, y) => selector(y) - selector(x));
+        return me.sort((x, y) => {
+            let xx = selector(x);
+            let yy = selector(y);
+
+            if (typeof xx === 'string' &&
+                typeof yy === 'string') {
+                return yy === xx ? 0 : xx < yy ? 1 : -1;
+            }
+            return yy - xx;
+        });
     }
 );
 "FirstOrDefault".ExtendedPrototype(

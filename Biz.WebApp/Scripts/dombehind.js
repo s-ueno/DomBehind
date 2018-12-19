@@ -1545,11 +1545,27 @@ Object.defineProperty(String.prototype, "ExtendedPrototype", {
 });
 "OrderBy".ExtendedPrototype(Array.prototype, function (selector) {
     var me = this;
-    return me.sort(function (x, y) { return selector(x) - selector(y); });
+    return me.sort(function (x, y) {
+        var xx = selector(x);
+        var yy = selector(y);
+        if (typeof xx === 'string' &&
+            typeof yy === 'string') {
+            return yy === xx ? 0 : yy < xx ? 1 : -1;
+        }
+        return xx - yy;
+    });
 });
 "OrderByDecording".ExtendedPrototype(Array.prototype, function (selector) {
     var me = this;
-    return me.sort(function (x, y) { return selector(y) - selector(x); });
+    return me.sort(function (x, y) {
+        var xx = selector(x);
+        var yy = selector(y);
+        if (typeof xx === 'string' &&
+            typeof yy === 'string') {
+            return yy === xx ? 0 : xx < yy ? 1 : -1;
+        }
+        return yy - xx;
+    });
 });
 "FirstOrDefault".ExtendedPrototype(Array.prototype, function (predicate) {
     var me = this;
@@ -4107,6 +4123,7 @@ var DomBehind;
         UIElement.MaxNumericProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("max", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.MinNumericProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("min", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.BackgroundColorProperty = DomBehind.Data.DependencyProperty.RegisterAttached("background-color", null, function (x, y) { return x.css("background-color", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        UIElement.ColorProperty = DomBehind.Data.DependencyProperty.RegisterAttached("color", null, function (x, y) { return x.css("color", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.BackgroundImageProperty = DomBehind.Data.DependencyProperty.RegisterAttached("background-image", null, function (x, y) { return x.css("background-image", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.ClassProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", function (x) { return x.attr("class"); }, function (x, y) { return x.attr("class", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
         UIElement.HtmlSource = DomBehind.Data.DependencyProperty.RegisterAttached("htmlSource", null, function (x, y) {
