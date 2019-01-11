@@ -6,7 +6,7 @@
         }
 
         public static get AllowLocalStorage(): boolean {
-            return $.GetLocalStorage("Breadbrumb.AllowLocalStorage", true);
+            return $.GetLocalStorage<boolean>("Breadbrumb.AllowLocalStorage", true);
         }
         public static set AllowLocalStorage(value: boolean) {
             $.SetLocalStorage("Breadbrumb.AllowLocalStorage", value);
