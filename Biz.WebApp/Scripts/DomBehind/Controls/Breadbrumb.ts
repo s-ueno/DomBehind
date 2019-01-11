@@ -5,11 +5,11 @@
         constructor(public Selector: string) {
         }
 
-        public static get AllowSessionStorage(): boolean {
-            return $.GetLocalStorage("Breadbrumb.AllowSessionStorage", true);
+        public static get AllowLocalStorage(): boolean {
+            return $.GetLocalStorage("Breadbrumb.AllowLocalStorage", true);
         }
-        public static set AllowSessionStorage(value: boolean) {
-            $.SetLocalStorage("Breadbrumb.AllowSessionStorage", value);
+        public static set AllowLocalStorage(value: boolean) {
+            $.SetLocalStorage("Breadbrumb.AllowLocalStorage", value);
         }
 
         public Parse(newUri: string, title: string, isRoot?: boolean): string {
@@ -19,7 +19,7 @@
                 newUri = $.AbsoluteUri(newUri);
             }
 
-            if (Breadbrumb.AllowSessionStorage)
+            if (Breadbrumb.AllowLocalStorage)
                 return this.ParseSessionStorage(newUri, isRoot, title);
 
             return this.ParseRestUri(newUri, isRoot, title);
@@ -53,7 +53,11 @@
                 stack = this.ToDecompress(json.Value);
             }
             if (stack.Any()) {
-                stack.LastOrDefault().Uri = currentUri;
+                if (oldQueryStrings.Any()) {
+                    stack.LastOrDefault().Uri = `${currentUri}&isPop=true`;
+                } else {
+                    stack.LastOrDefault().Uri = `${currentUri}?isPop=true`;
+                }
             }
             stack.push({ Uri: newUri, Title: title });
 
@@ -102,15 +106,19 @@
             else {
                 oldId = NewUid();
             }
-            let json = Breadbrumb.GetSessionStorage(oldId);
+            let json = Breadbrumb.GetLocalStorage(oldId);
             if (json) {
                 stack = this.ToDecompress(json);
             }
             if (stack.Any()) {
-                stack.LastOrDefault().Uri = currentUri;
+                if (oldQueryStrings.Any()) {
+                    stack.LastOrDefault().Uri = `${currentUri}&isPop=true`;
+                } else {
+                    stack.LastOrDefault().Uri = `${currentUri}?isPop=true`;
+                }
             }
             stack.push({ Uri: newUri, Title: title });
-            Breadbrumb.SetSessionStorage(newId, this.ToCompress(stack));
+            Breadbrumb.SetLocalStorage(newId, this.ToCompress(stack));
             if (!newQueryStrings.Any(x => x.Key === "b")) {
                 newQueryStrings.push({ Key: "b", Value: newId });
             }
@@ -156,11 +164,11 @@
             return new Array<any>();
         }
 
-        protected static GetSessionStorage(id: string): string {
-            return $.GetSessionStorage(id, "");
+        protected static GetLocalStorage(id: string): string {
+            return $.GetLocalStorage(id, "");
         }
-        protected static SetSessionStorage(id: string, value: string) {
-            $.SetSessionStorage(id, value);
+        protected static SetLocalStorage(id: string, value: string) {
+            $.SetLocalStorage(id, value);
         }
 
         public Update() {
@@ -212,8 +220,8 @@
         }
 
         protected BuildStack(s: string) {
-            if (Breadbrumb.AllowSessionStorage) {
-                s = Breadbrumb.GetSessionStorage(s);
+            if (Breadbrumb.AllowLocalStorage) {
+                s = Breadbrumb.GetLocalStorage(s);
             }
             return this.ToDecompress(s);
         }

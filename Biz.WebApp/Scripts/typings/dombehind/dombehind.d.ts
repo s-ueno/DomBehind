@@ -48,6 +48,7 @@ declare namespace DomBehind {
         UpdateTarget(mark?: string): void;
         UpdateSource(mark?: string): void;
         Validate(mark?: string): boolean;
+        RemoveValidator(mark?: string): void;
         ClearValidator(mark?: string): void;
         Dispose(): void;
         protected _disposed: boolean;
@@ -70,8 +71,11 @@ declare namespace DomBehind {
         UpdateTarget(mark?: string): void;
         UpdateSource(mark?: string): void;
         Validate(mark?: string): boolean;
-        protected WaitingOverlay(func: Function, image?: string): void;
-        protected SafeAction(func: Function, ...policies: Data.ActionPolicy[]): void;
+        ClearValidation(mark?: string): void;
+        protected LastErrors(mark?: string): string[];
+        protected ThrownValidate(mark?: string): void;
+        protected WaitingOverlay(func: Function, image?: string): any;
+        protected SafeAction(func: Function, ...policies: Data.ActionPolicy[]): any;
         Catch(ex: Data.ActionPolicyExceptionEventArgs): void;
         protected readonly Navigator: Navigation.INavigator;
         IsEnabled: boolean;
@@ -149,7 +153,7 @@ declare namespace DomBehind {
     class Breadbrumb {
         Selector: string;
         constructor(Selector: string);
-        static AllowSessionStorage: boolean;
+        static AllowLocalStorage: boolean;
         Parse(newUri: string, title: string, isRoot?: boolean): string;
         protected ParseRestUri(newUri: string, isRoot: boolean, title: string): string;
         protected ParseSessionStorage(newUri: string, isRoot: boolean, title: string): string;
@@ -159,8 +163,8 @@ declare namespace DomBehind {
             Key: string;
             Value: string;
         }>;
-        protected static GetSessionStorage(id: string): string;
-        protected static SetSessionStorage(id: string, value: string): void;
+        protected static GetLocalStorage(id: string): string;
+        protected static SetLocalStorage(id: string, value: string): void;
         Update(): void;
         protected BuildStack(s: string): any;
         Pop(): void;
@@ -955,6 +959,18 @@ declare namespace DomBehind {
     }
 }
 
+declare namespace DomBehind {
+    class ApplicationException extends Exception {
+        Message?: string;
+        constructor(Message?: string);
+        ToString(): string;
+    }
+    class ApplicationAggregateException extends Exception {
+        exceptions: Exception[];
+        constructor(exceptions: Exception[]);
+    }
+}
+
 declare namespace DomBehind.Data {
     enum BindingMode {
         TwoWay = 0,
@@ -1284,6 +1300,8 @@ declare namespace DomBehind.Validation {
         OnValidationg(): void;
         Apply(): void;
         RemoveValidation(): void;
+        private static readonly _ignoreMarks;
+        ClearValidation(): void;
         AddValidation(): void;
         Validate(value: any): boolean;
         protected ValidationMessage(validity: ValidityState): string;
@@ -1294,6 +1312,7 @@ declare namespace DomBehind.Validation {
 
 declare namespace DomBehind.Validation {
     class ValidatorCollection extends collections.LinkedList<Validator> implements IDisposable {
+        RemoveValidator(): void;
         ClearValidator(): void;
         ApplyValidator(): void;
         Validate(): boolean;

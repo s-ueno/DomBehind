@@ -61,6 +61,18 @@
             }
             this.Behavior.Element.ClearCustomError();
         }
+
+        private static readonly _ignoreMarks: string[] = [
+            "maxlength"
+        ];
+        public /* virtual */ ClearValidation(): void {
+            if (!String.IsNullOrWhiteSpace(this.Attribute) &&
+                Validator._ignoreMarks.Any(x => x !== this.Attribute)) {
+
+                this.Behavior.Element.removeAttr(this.Attribute);
+            }
+            this.Behavior.Element.ClearCustomError();
+        }
         public /* virtual */ AddValidation(): void {
             this.RemoveValidation();
 

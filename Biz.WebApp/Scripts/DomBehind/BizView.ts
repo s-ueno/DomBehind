@@ -151,14 +151,14 @@
         public Validate(mark?: string): boolean {
             let result = true;
             if (this.BindingBehaviors) {
-                this.ClearValidator(mark);
+                this.RemoveValidator(mark);
                 $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), (i, behavior) => {
                     if (!behavior.BindingPolicy.Validators.Validate()) {
                         result = false;
                     }
                 });
                 if (result) {
-                    this.ClearValidator(mark);
+                    this.RemoveValidator(mark);
                 }
             }
 
@@ -167,6 +167,18 @@
                 this.DependencyValidate(mark);
             }
             return result;
+        }
+
+        public RemoveValidator(mark?: string): void {
+            $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), (i, value) => {
+                value.BindingPolicy.Validators.RemoveValidator();
+            });
+            this.Container.ClearCustomError();
+
+            // サードパーティやNugetライブラリ拡張用
+            if (this.DependencyValidateClear) {
+                this.DependencyValidateClear(mark);
+            }
         }
 
         public ClearValidator(mark?: string): void {

@@ -907,6 +907,45 @@ var DomBehind;
     })(Validation = DomBehind.Validation || (DomBehind.Validation = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=ValidationException.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var DomBehind;
+(function (DomBehind) {
+    var ApplicationException = (function (_super) {
+        __extends(ApplicationException, _super);
+        function ApplicationException(Message) {
+            var _this = _super.call(this) || this;
+            _this.Message = Message;
+            _this = _super.call(this, Message) || this;
+            return _this;
+        }
+        ApplicationException.prototype.ToString = function () { return this.Message; };
+        return ApplicationException;
+    }(DomBehind.Exception));
+    DomBehind.ApplicationException = ApplicationException;
+    var ApplicationAggregateException = (function (_super) {
+        __extends(ApplicationAggregateException, _super);
+        function ApplicationAggregateException(exceptions) {
+            var _this = _super.call(this) || this;
+            _this.exceptions = exceptions;
+            return _this;
+        }
+        return ApplicationAggregateException;
+    }(DomBehind.Exception));
+    DomBehind.ApplicationAggregateException = ApplicationAggregateException;
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=ApplicationException.js.map
 var DomBehind;
 (function (DomBehind) {
     var TypedEvent = (function () {
@@ -2662,9 +2701,9 @@ var DomBehind;
                     if (!Object.IsPromise(result)) {
                         this.Done();
                         this.Always();
+                        return result;
                     }
                     else {
-                        var exception = void 0;
                         var p = result;
                         p.done(function () {
                             _this.Done();
@@ -3575,6 +3614,14 @@ var DomBehind;
                 }
                 this.Behavior.Element.ClearCustomError();
             };
+            Validator.prototype.ClearValidation = function () {
+                var _this = this;
+                if (!String.IsNullOrWhiteSpace(this.Attribute) &&
+                    Validator._ignoreMarks.Any(function (x) { return x !== _this.Attribute; })) {
+                    this.Behavior.Element.removeAttr(this.Attribute);
+                }
+                this.Behavior.Element.ClearCustomError();
+            };
             Validator.prototype.AddValidation = function () {
                 this.RemoveValidation();
                 if (!String.IsNullOrWhiteSpace(this.Attribute)) {
@@ -3602,6 +3649,9 @@ var DomBehind;
                 }
                 this._disposed = true;
             };
+            Validator._ignoreMarks = [
+                "maxlength"
+            ];
             return Validator;
         }());
         Validation.Validator = Validator;
@@ -3632,8 +3682,11 @@ var DomBehind;
                 _this._disposed = false;
                 return _this;
             }
-            ValidatorCollection.prototype.ClearValidator = function () {
+            ValidatorCollection.prototype.RemoveValidator = function () {
                 $.each(this.toArray(), function (i, x) { return x.RemoveValidation(); });
+            };
+            ValidatorCollection.prototype.ClearValidator = function () {
+                $.each(this.toArray(), function (i, x) { return x.ClearValidation(); });
             };
             ValidatorCollection.prototype.ApplyValidator = function () {
                 $.each(this.toArray(), function (i, x) { return x.Apply(); });
@@ -5468,12 +5521,12 @@ var DomBehind;
         function Breadbrumb(Selector) {
             this.Selector = Selector;
         }
-        Object.defineProperty(Breadbrumb, "AllowSessionStorage", {
+        Object.defineProperty(Breadbrumb, "AllowLocalStorage", {
             get: function () {
-                return $.GetLocalStorage("Breadbrumb.AllowSessionStorage", true);
+                return $.GetLocalStorage("Breadbrumb.AllowLocalStorage", true);
             },
             set: function (value) {
-                $.SetLocalStorage("Breadbrumb.AllowSessionStorage", value);
+                $.SetLocalStorage("Breadbrumb.AllowLocalStorage", value);
             },
             enumerable: true,
             configurable: true
@@ -5483,7 +5536,7 @@ var DomBehind;
                 !newUri.toLowerCase().StartsWith("https://")) {
                 newUri = $.AbsoluteUri(newUri);
             }
-            if (Breadbrumb.AllowSessionStorage)
+            if (Breadbrumb.AllowLocalStorage)
                 return this.ParseSessionStorage(newUri, isRoot, title);
             return this.ParseRestUri(newUri, isRoot, title);
         };
@@ -5510,7 +5563,12 @@ var DomBehind;
                 stack = this.ToDecompress(json.Value);
             }
             if (stack.Any()) {
-                stack.LastOrDefault().Uri = currentUri;
+                if (oldQueryStrings.Any()) {
+                    stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                }
+                else {
+                    stack.LastOrDefault().Uri = currentUri + "?isPop=true";
+                }
             }
             stack.push({ Uri: newUri, Title: title });
             newQueryStrings.push({ Key: "b", Value: this.ToCompress(stack) });
@@ -5551,15 +5609,20 @@ var DomBehind;
             else {
                 oldId = NewUid();
             }
-            var json = Breadbrumb.GetSessionStorage(oldId);
+            var json = Breadbrumb.GetLocalStorage(oldId);
             if (json) {
                 stack = this.ToDecompress(json);
             }
             if (stack.Any()) {
-                stack.LastOrDefault().Uri = currentUri;
+                if (oldQueryStrings.Any()) {
+                    stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                }
+                else {
+                    stack.LastOrDefault().Uri = currentUri + "?isPop=true";
+                }
             }
             stack.push({ Uri: newUri, Title: title });
-            Breadbrumb.SetSessionStorage(newId, this.ToCompress(stack));
+            Breadbrumb.SetLocalStorage(newId, this.ToCompress(stack));
             if (!newQueryStrings.Any(function (x) { return x.Key === "b"; })) {
                 newQueryStrings.push({ Key: "b", Value: newId });
             }
@@ -5598,11 +5661,11 @@ var DomBehind;
             }
             return new Array();
         };
-        Breadbrumb.GetSessionStorage = function (id) {
-            return $.GetSessionStorage(id, "");
+        Breadbrumb.GetLocalStorage = function (id) {
+            return $.GetLocalStorage(id, "");
         };
-        Breadbrumb.SetSessionStorage = function (id, value) {
-            $.SetSessionStorage(id, value);
+        Breadbrumb.SetLocalStorage = function (id, value) {
+            $.SetLocalStorage(id, value);
         };
         Breadbrumb.prototype.Update = function () {
             var el = $(this.Selector);
@@ -5646,8 +5709,8 @@ var DomBehind;
             }
         };
         Breadbrumb.prototype.BuildStack = function (s) {
-            if (Breadbrumb.AllowSessionStorage) {
-                s = Breadbrumb.GetSessionStorage(s);
+            if (Breadbrumb.AllowLocalStorage) {
+                s = Breadbrumb.GetLocalStorage(s);
             }
             return this.ToDecompress(s);
         };
@@ -5823,20 +5886,29 @@ var DomBehind;
         BizView.prototype.Validate = function (mark) {
             var result = true;
             if (this.BindingBehaviors) {
-                this.ClearValidator(mark);
+                this.RemoveValidator(mark);
                 $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), function (i, behavior) {
                     if (!behavior.BindingPolicy.Validators.Validate()) {
                         result = false;
                     }
                 });
                 if (result) {
-                    this.ClearValidator(mark);
+                    this.RemoveValidator(mark);
                 }
             }
             if (this.DependencyValidate) {
                 this.DependencyValidate(mark);
             }
             return result;
+        };
+        BizView.prototype.RemoveValidator = function (mark) {
+            $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), function (i, value) {
+                value.BindingPolicy.Validators.RemoveValidator();
+            });
+            this.Container.ClearCustomError();
+            if (this.DependencyValidateClear) {
+                this.DependencyValidateClear(mark);
+            }
         };
         BizView.prototype.ClearValidator = function (mark) {
             $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), function (i, value) {
@@ -5966,12 +6038,36 @@ var DomBehind;
             }
             return result;
         };
+        BizViewModel.prototype.ClearValidation = function (mark) {
+            this.View.ClearValidator(mark);
+        };
+        BizViewModel.prototype.LastErrors = function (mark) {
+            var result = [];
+            $.each(this.View.BindingBehaviors.ListDataBindingBehavior(mark), function (i, behavior) {
+                if (behavior.BindingPolicy &&
+                    behavior.BindingPolicy.Validators) {
+                    $.each(behavior.BindingPolicy.Validators.toArray(), function (x, v) {
+                        if (v.HasError && v.Message) {
+                            result.push(v.Message);
+                        }
+                    });
+                }
+            });
+            return result;
+        };
+        BizViewModel.prototype.ThrownValidate = function (mark) {
+            var result = this.Validate(mark);
+            if (result)
+                return;
+            var lastErrors = this.LastErrors(mark).Select(function (x) { return new DomBehind.ApplicationException(x); });
+            throw new DomBehind.ApplicationAggregateException(lastErrors);
+        };
         BizViewModel.prototype.WaitingOverlay = function (func, image) {
             var overlayPolocy = new DomBehind.Data.WindowWaitingOverlayActionPolicy();
             if (image) {
                 overlayPolocy.Option.Image = image;
             }
-            this.SafeAction(func, overlayPolocy);
+            return this.SafeAction(func, overlayPolocy);
         };
         BizViewModel.prototype.SafeAction = function (func) {
             var policies = [];
@@ -5984,7 +6080,7 @@ var DomBehind;
                 $.each(policies, function (i, value) { return list.push(value); });
             }
             var invoker = behavior.CreateActionInvoker(list);
-            invoker.Do(func);
+            return invoker.Do(func);
         };
         BizViewModel.prototype.Catch = function (ex) {
             if (ex.Data instanceof DomBehind.AjaxException) {

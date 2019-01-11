@@ -28,6 +28,7 @@
       "Scripts/DomBehind/TypeScript.Net/Exception.js",
       "Scripts/DomBehind/TypeScript.Net/AjaxException.js",
       "Scripts/DomBehind/TypeScript.Net/ValidationException.js",
+      "Scripts/DomBehind/TypeScript.Net/ApplicationException.js",
       "Scripts/DomBehind/TypeScript.Net/EventBuilder.js",
       "Scripts/DomBehind/TypeScript.Net/INotifyPropertyChanged.js",
       "Scripts/DomBehind/TypeScript.Net/INotifyPropertyChanging.js",

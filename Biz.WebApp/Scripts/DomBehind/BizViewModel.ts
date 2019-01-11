@@ -119,25 +119,53 @@
             return result;
         }
 
+        public ClearValidation(mark?: string) {
+            this.View.ClearValidator(mark);
+        }
+
+        protected LastErrors(mark?: string): string[] {
+            let result = [];
+            $.each(this.View.BindingBehaviors.ListDataBindingBehavior(mark), (i, behavior) => {
+                if (behavior.BindingPolicy &&
+                    behavior.BindingPolicy.Validators) {
+
+                    $.each(behavior.BindingPolicy.Validators.toArray(), (x, v) => {
+                        if (v.HasError && v.Message) {
+                            result.push(v.Message);
+                        }
+                    })
+                }
+            });
+            return result;
+        }
+
+        protected ThrownValidate(mark?: string) {
+            let result = this.Validate(mark);
+            if (result) return;
+
+            let lastErrors = this.LastErrors(mark).Select(x => new ApplicationException(x));
+            throw new ApplicationAggregateException(lastErrors);
+        }
+
         // #endregion
 
         // #region 
 
-        protected WaitingOverlay(func: Function, image?: string): void {
+        protected WaitingOverlay(func: Function, image?: string) {
             var overlayPolocy = new Data.WindowWaitingOverlayActionPolicy();
             if (image) {
                 overlayPolocy.Option.Image = image;
             }
-            this.SafeAction(func, overlayPolocy);
+            return this.SafeAction(func, overlayPolocy);
         }
-        protected SafeAction(func: Function, ...policies: Data.ActionPolicy[]): void {
+        protected SafeAction(func: Function, ...policies: Data.ActionPolicy[]) {
             var behavior = new Data.ActionBindingBehavior();
             var list: Data.ActionPolicy[] = [new Data.ExceptionHandlingActionPolicy()];
             if (policies) {
                 $.each(policies, (i, value) => list.push(value));
             }
             var invoker = behavior.CreateActionInvoker(list);
-            invoker.Do(func);
+            return invoker.Do(func);
         }
 
         // #endregion

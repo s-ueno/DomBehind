@@ -5,8 +5,12 @@
         extends collections.LinkedList<Validator>
         implements IDisposable {
 
-        public ClearValidator(): void {
+        public RemoveValidator(): void {
             $.each(this.toArray(), (i, x) => x.RemoveValidation());
+        }
+
+        public ClearValidator(): void {
+            $.each(this.toArray(), (i, x) => x.ClearValidation());
         }
 
         public ApplyValidator(): void {

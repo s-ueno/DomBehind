@@ -540,6 +540,7 @@
     <TypeScriptCompile Include="Scripts\DomBehind\Threading\WorkerWrapper.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\TypedFactory.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\TypeScript.Net\AjaxException.ts" />
+    <TypeScriptCompile Include="Scripts\DomBehind\TypeScript.Net\ApplicationException.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\TypeScript.Net\BindingMode.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\TypeScript.Net\CancelEventArgs.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\TypeScript.Net\CollectionChangedEventArgs.ts" />

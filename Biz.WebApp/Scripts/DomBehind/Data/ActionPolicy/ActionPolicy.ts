@@ -39,9 +39,8 @@
                 if (!Object.IsPromise(result)) {
                     this.Done();
                     this.Always();
+                    return result;
                 } else {
-
-                    let exception: Exception;
                     let p: JQueryPromise<any> = result;
                     p.done(() => {
                         this.Done();
