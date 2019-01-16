@@ -3174,7 +3174,10 @@ var DomBehind;
     var IndexedDBHelper = (function () {
         function IndexedDBHelper(ctor, db) {
             var schema = new ctor();
-            var name = schema.constructor.name;
+            var name = schema.toString();
+            if (name === "[object Object]") {
+                name = schema.constructor.name;
+            }
             if (name === "Object") {
                 throw Error("dynamic object is not supported");
             }

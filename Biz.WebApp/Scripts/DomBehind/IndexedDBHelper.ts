@@ -3,7 +3,12 @@
     export class IndexedDBHelper<T> {
         constructor(ctor: TypedConstructor<T>, db: string) {
             let schema: any = new ctor();
-            let name: string = schema.constructor.name;
+
+            let name: string = schema.toString();
+            if (name === "[object Object]") {
+                name = schema.constructor.name;
+            }
+
             if (name === "Object") {
                 throw Error("dynamic object is not supported");
             }
