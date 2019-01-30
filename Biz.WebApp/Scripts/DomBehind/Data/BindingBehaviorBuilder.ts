@@ -174,13 +174,17 @@
 
     }
 
-    class SimpleConverter implements DomBehind.IValueConverter {
+    export class SimpleConverter implements DomBehind.IValueConverter {
         Convert(value: any) {
+            if (!this.ConvertHandler) return value;
+
             return this.ConvertHandler(value);
         }
         public ConvertHandler: (x: any) => any;
 
         ConvertBack(value: any) {
+            if (!this.ConvertBackHandler) return value;
+
             return this.ConvertBackHandler(value);
         }
         public ConvertBackHandler: (x: any) => any;

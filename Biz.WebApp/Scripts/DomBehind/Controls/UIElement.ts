@@ -72,7 +72,14 @@
         public static IsCheckedProperty: Data.DependencyProperty
             = Data.DependencyProperty.RegisterAttached("checked",
                 x => (<HTMLInputElement>x.get(0)).checked,
-                (x, y) => (<HTMLInputElement>x.get(0)).checked = y,
+                (x, y) => {
+                    let el = (<HTMLInputElement>x.get(0));
+                    el.checked = y;
+
+                    if (el.hasAttribute("readonly")) {
+                        el.onclick = e => false;
+                    }
+                },
                 Data.UpdateSourceTrigger.LostForcus, Data.BindingMode.TwoWay);
 
         public static MaxLengthProperty: Data.DependencyProperty

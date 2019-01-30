@@ -33,9 +33,18 @@
                 if (option) {
                     this.Wrapper = option.wrapper;
                     if (option.marks) {
-                        if (option.marks.Any(x => x === name)) {
-                            this.Recurcive(source, name, null);
-                        }
+                        $.each(option.marks, (i, value) => {
+                            let buff = value.Split(".");
+                            $.each(buff, (k, each) => {
+                                this.Recurcive(source, name, null);
+                            });
+                        });
+
+
+                        //if (option.marks.Any(x => x === name)) {
+                        //    this.Recurcive(source, name, null);
+                        //}
+
                     } else {
                         this.Recurcive(source, name, null);
                     }

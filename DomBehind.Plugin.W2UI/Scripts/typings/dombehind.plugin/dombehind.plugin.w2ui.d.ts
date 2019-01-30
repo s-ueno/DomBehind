@@ -159,6 +159,7 @@ declare function ShowW2confirm(message: string, title?: string, okCallback?: Fun
 declare namespace DomBehind {
     interface IPopupController {
         Show(): any;
+        Message(): any;
         Close(): any;
     }
     interface IPopupOption {
@@ -177,8 +178,11 @@ declare namespace DomBehind {
             Binding: Data.BindingBehavior;
             Selector: string;
         }>;
+        readonly LastBinding: Data.BindingBehavior;
         Close(): void;
         Show(): void;
+        Message(): void;
+        protected CreateOption(): any;
         UpdateTarget(): void;
         UpdateSource(): void;
         AddBinding<T extends Data.BindingBehavior>(binding: T, selector: string): T;
@@ -187,6 +191,8 @@ declare namespace DomBehind {
     class PopupTemplateBindingBuilder<T> extends Data.DataBindingBehaviorBuilder<T> {
         Element(value: any): PopupTemplateBindingBuilder<T>;
         Binding<P>(property: Data.DependencyProperty, bindingExpression: (x: T) => P, mode?: Data.BindingMode, updateTrigger?: Data.UpdateSourceTrigger): PopupTemplateBindingBuilder<T>;
+        ConvertTarget(exp: (x: any) => any): PopupTemplateBindingBuilder<T>;
+        ConvertSource(exp: (x: any) => any): PopupTemplateBindingBuilder<T>;
         BindingAction(event: IEventBuilder, action: (x: T, args: any) => void): PopupTemplateBindingBuilder<T>;
         BindingPopupTitle(exp: (vm: T) => string): PopupTemplateBindingBuilder<T>;
     }

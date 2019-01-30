@@ -17,6 +17,8 @@
         attachedEvent?: IEventBuilder;
         dependencyProperty?: Data.DependencyProperty;
         mode?: Data.BindingMode;
+
+        allowBubbling?: boolean
     }
 
     export interface ITemplateListViewColumnClickEventArgs {
@@ -117,6 +119,11 @@
                             el.off(newEvent.EventName);
                             el.on(newEvent.EventName, e => {
                                 newEvent.Raise(this, e);
+                                if (!column.allowBubbling) {
+                                    if (e.stopPropagation) {
+                                        e.stopPropagation();
+                                    }
+                                }
                             });
 
                             // 

@@ -1464,6 +1464,7 @@ var DomBehind;
 (function (DomBehind) {
     var Observable = (function () {
         function Observable(source, option) {
+            var _this = this;
             this.source = source;
             this.PropertyChanging = new DomBehind.TypedEvent();
             this.PropertyChanged = new DomBehind.TypedEvent();
@@ -1477,9 +1478,12 @@ var DomBehind;
                 if (option) {
                     this_1.Wrapper = option.wrapper;
                     if (option.marks) {
-                        if (option.marks.Any(function (x) { return x === name_1; })) {
-                            this_1.Recurcive(source, name_1, null);
-                        }
+                        $.each(option.marks, function (i, value) {
+                            var buff = value.Split(".");
+                            $.each(buff, function (k, each) {
+                                _this.Recurcive(source, name_1, null);
+                            });
+                        });
                     }
                     else {
                         this_1.Recurcive(source, name_1, null);
@@ -2165,7 +2169,8 @@ var DomBehind;
             Object.defineProperty(DataBindingBehavior.prototype, "ValueCore", {
                 get: function () {
                     var value = this.Property.GetValue(this.Element);
-                    if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter)) {
+                    if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter) &&
+                        !Object.IsNullOrUndefined(this.BindingPolicy.Converter.ConvertBack)) {
                         value = this.BindingPolicy.Converter.ConvertBack(value);
                     }
                     return value;
@@ -2196,8 +2201,10 @@ var DomBehind;
                 if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter)) {
                     value = this.BindingPolicy.Converter.Convert(value);
                 }
-                this.Property.SetValue(this.Element, value, this);
-                this.UpdateTargetEvent.Raise(this, value);
+                if (this.Element) {
+                    this.Property.SetValue(this.Element, value, this);
+                    this.UpdateTargetEvent.Raise(this, value);
+                }
             };
             DataBindingBehavior.prototype.Ensure = function () {
                 var _this = this;
@@ -2570,13 +2577,18 @@ var DomBehind;
         function SimpleConverter() {
         }
         SimpleConverter.prototype.Convert = function (value) {
+            if (!this.ConvertHandler)
+                return value;
             return this.ConvertHandler(value);
         };
         SimpleConverter.prototype.ConvertBack = function (value) {
+            if (!this.ConvertBackHandler)
+                return value;
             return this.ConvertBackHandler(value);
         };
         return SimpleConverter;
     }());
+    DomBehind.SimpleConverter = SimpleConverter;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=BindingBehaviorBuilder.js.map
 var __extends = (this && this.__extends) || (function () {
@@ -3214,7 +3226,7 @@ var DomBehind;
             var db = this.Open();
             db.done(function (x) {
                 if (!x.objectStoreNames.contains(_this.TableName)) {
-                    d.reject();
+                    d.resolve([]);
                     return;
                 }
                 var trans = x.transaction(_this.TableName, "readwrite");
@@ -3247,7 +3259,7 @@ var DomBehind;
             var db = this.Open();
             db.done(function (x) {
                 if (!x.objectStoreNames.contains(_this.TableName)) {
-                    d.reject();
+                    d.resolve([]);
                     return;
                 }
                 var trans = x.transaction(_this.TableName, "readwrite");
@@ -3348,15 +3360,28 @@ var DomBehind;
             var d = $.Deferred();
             var db = this.Open();
             db.done(function (x) {
-                var trans = x.transaction(_this.TableName, "readwrite");
-                if (trans.objectStoreNames.contains(_this.TableName)) {
-                    var store = trans.objectStore(_this.TableName);
-                    var identity = entity["" + store.keyPath];
-                    store.delete(identity);
+                if (!x.objectStoreNames.contains(_this.TableName)) {
                     d.resolve();
                 }
                 else {
-                    d.reject("table not found. " + _this.TableName);
+                    var trans = x.transaction(_this.TableName, "readwrite");
+                    if (trans.objectStoreNames.contains(_this.TableName)) {
+                        var store_1 = trans.objectStore(_this.TableName);
+                        if (entity instanceof Array) {
+                            $.each(entity, function (i, value) {
+                                var id = value["" + store_1.keyPath];
+                                store_1.delete(id);
+                            });
+                        }
+                        else {
+                            var identity = entity["" + store_1.keyPath];
+                            store_1.delete(identity);
+                        }
+                        d.resolve();
+                    }
+                    else {
+                        d.reject("table not found. " + _this.TableName);
+                    }
                 }
             }).fail(function (x) {
                 d.reject(x);
@@ -4174,7 +4199,13 @@ var DomBehind;
             el.css("opacity", newValue);
         }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.PlaceHolderProperty = DomBehind.Data.DependencyProperty.RegisterAttached("placeholder", null, function (x, y) { return x.attr("placeholder", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.IsCheckedProperty = DomBehind.Data.DependencyProperty.RegisterAttached("checked", function (x) { return x.get(0).checked; }, function (x, y) { return x.get(0).checked = y; }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
+        UIElement.IsCheckedProperty = DomBehind.Data.DependencyProperty.RegisterAttached("checked", function (x) { return x.get(0).checked; }, function (x, y) {
+            var el = x.get(0);
+            el.checked = y;
+            if (el.hasAttribute("readonly")) {
+                el.onclick = function (e) { return false; };
+            }
+        }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
         UIElement.MaxLengthProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("maxlength", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.MaxNumericProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("max", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.MinNumericProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("min", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
@@ -4997,6 +5028,11 @@ var DomBehind;
                                 el.off(newEvent_1.EventName);
                                 el.on(newEvent_1.EventName, function (e) {
                                     newEvent_1.Raise(_this, e);
+                                    if (!column.allowBubbling) {
+                                        if (e.stopPropagation) {
+                                            e.stopPropagation();
+                                        }
+                                    }
                                 });
                                 if (el.is("a") && !el.attr("href")) {
                                     el.attr("href", "javascript:void(0);");
@@ -5717,14 +5753,16 @@ var DomBehind;
             }
             return this.ToDecompress(s);
         };
-        Breadbrumb.prototype.Pop = function () {
+        Breadbrumb.prototype.Pop = function (count) {
+            if (count === void 0) { count = 1; }
             var el = $(this.Selector);
             if (el.length === 0)
                 return;
             var aList = el.find("a");
-            if (aList.length < 2)
+            var back = ++count;
+            if (aList.length <= back)
                 return;
-            $(aList[aList.length - 1]).click();
+            aList[aList.length - back].click();
         };
         return Breadbrumb;
     }());

@@ -362,7 +362,21 @@
 
             let dp = Data.DependencyProperty.RegisterAttached("itemsSource",
                 el => {
-
+                    // UpdateSourceで選択状態を更新する
+                    if (this.ListCollectionView && this.Grid) {
+                        // 選択状態を解除
+                        this.ListCollectionView.Current = null;
+                        let selections = this.Grid.getSelection();
+                        if (selections && selections.length == 1) {
+                            let id = selections[0];
+                            let obj = this.ListCollectionView.ToArray().FirstOrDefault(x => x.recid === id);
+                            if (obj) {
+                                this.ListCollectionView.Select(obj);
+                            }
+                        }
+                    }
+                    // 
+                    return this.ListCollectionView;
                 }, (el: JQuery, newValue: any) => {
                     if (newValue instanceof Data.ListCollectionView) {
                         this.ListCollectionView = newValue;
@@ -396,7 +410,8 @@
                         }
 
                     }
-                }
+                },
+                Data.UpdateSourceTrigger.Explicit
             );
             let itemSource: Data.DataBindingBehavior = this.NewAdd(new Data.DataBindingBehavior());
             itemSource.Property = dp;
@@ -657,13 +672,15 @@
 
                 // build bind
                 let observable = Observable.Register(value, LamdaExpression.Path(this.CellStyleBinding));
-                observable.PropertyChanged.Clear();
-                observable.PropertyChanged.AddHandler((ss, ee) => {
-                    let id = ss.recid;
-                    let style = this.CellStyleBinding(ss);
-                    value.w2ui.style = this.ParseCellStyles(style);
-                    this.Grid.refreshRow(id);
-                });
+                if (!Object.IsNullOrUndefined(observable)) {
+                    observable.PropertyChanged.Clear();
+                    observable.PropertyChanged.AddHandler((ss, ee) => {
+                        let id = ss.recid;
+                        let style = this.CellStyleBinding(ss);
+                        value.w2ui.style = this.ParseCellStyles(style);
+                        this.Grid.refreshRow(id);
+                    });
+                }
             }
 
 
@@ -676,18 +693,17 @@
                 }
 
                 // build bind
-
                 let expPath = this.ParseExpressionPath(this.RowClassBinding);
-                let observable = Observable.Register(value, expPath);
-                observable.PropertyChanged.Clear();
-                observable.PropertyChanged.AddHandler((ss, ee) => {
-                    let id = ss.recid;
-                    let style = this.RowClassBinding(ss);
-                    value.w2ui.class = style;
-                    this.Grid.refreshRow(id);
-                });
-
-
+                if (!Object.IsNullOrUndefined(expPath)) {
+                    let observable = Observable.Register(value, expPath);
+                    observable.PropertyChanged.Clear();
+                    observable.PropertyChanged.AddHandler((ss, ee) => {
+                        let id = ss.recid;
+                        let style = this.RowClassBinding(ss);
+                        value.w2ui.class = style;
+                        this.Grid.refreshRow(id);
+                    });
+                }
             }
 
             $.each(this.Column, (i, v) => {

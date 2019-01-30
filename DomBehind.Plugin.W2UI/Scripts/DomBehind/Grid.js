@@ -202,11 +202,23 @@ var DomBehind;
             }
             this.Grid = this.Element.w2grid(w2GridOption);
             var dp = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", function (el) {
+                if (_this.ListCollectionView && _this.Grid) {
+                    _this.ListCollectionView.Current = null;
+                    var selections = _this.Grid.getSelection();
+                    if (selections && selections.length == 1) {
+                        var id_1 = selections[0];
+                        var obj = _this.ListCollectionView.ToArray().FirstOrDefault(function (x) { return x.recid === id_1; });
+                        if (obj) {
+                            _this.ListCollectionView.Select(obj);
+                        }
+                    }
+                }
+                return _this.ListCollectionView;
             }, function (el, newValue) {
                 if (newValue instanceof DomBehind.Data.ListCollectionView) {
                     _this.ListCollectionView = newValue;
-                    var id_1 = el.attr("id");
-                    var grid = w2ui[id_1];
+                    var id_2 = el.attr("id");
+                    var grid = w2ui[id_2];
                     if (grid) {
                         var rows = newValue.ToArray();
                         if (grid.records === rows)
@@ -220,14 +232,14 @@ var DomBehind;
                         grid.refresh();
                         grid.onClick = function (ee) {
                             _this.OnSelect(_this.DataContext, ee);
-                            var gridFocus = $("#grid_" + id_1 + "_focus");
+                            var gridFocus = $("#grid_" + id_2 + "_focus");
                             gridFocus.focus();
                         };
                         newValue.PropertyChanged.RemoveHandler(_this.OnCurrentChanged);
                         newValue.PropertyChanged.AddHandler(_this.OnCurrentChanged);
                     }
                 }
-            });
+            }, DomBehind.Data.UpdateSourceTrigger.Explicit);
             var itemSource = this.NewAdd(new DomBehind.Data.DataBindingBehavior());
             itemSource.Property = dp;
             itemSource.PInfo = this.ItemsSource;
@@ -456,13 +468,15 @@ var DomBehind;
                     value.w2ui.style = this.ParseCellStyles(defaultValue);
                 }
                 var observable = DomBehind.Observable.Register(value, DomBehind.LamdaExpression.Path(this.CellStyleBinding));
-                observable.PropertyChanged.Clear();
-                observable.PropertyChanged.AddHandler(function (ss, ee) {
-                    var id = ss.recid;
-                    var style = _this.CellStyleBinding(ss);
-                    value.w2ui.style = _this.ParseCellStyles(style);
-                    _this.Grid.refreshRow(id);
-                });
+                if (!Object.IsNullOrUndefined(observable)) {
+                    observable.PropertyChanged.Clear();
+                    observable.PropertyChanged.AddHandler(function (ss, ee) {
+                        var id = ss.recid;
+                        var style = _this.CellStyleBinding(ss);
+                        value.w2ui.style = _this.ParseCellStyles(style);
+                        _this.Grid.refreshRow(id);
+                    });
+                }
             }
             if (this.RowClassBinding) {
                 var defaultValue = this.RowClassBinding(value);
@@ -470,14 +484,16 @@ var DomBehind;
                     value.w2ui.class = defaultValue;
                 }
                 var expPath = this.ParseExpressionPath(this.RowClassBinding);
-                var observable = DomBehind.Observable.Register(value, expPath);
-                observable.PropertyChanged.Clear();
-                observable.PropertyChanged.AddHandler(function (ss, ee) {
-                    var id = ss.recid;
-                    var style = _this.RowClassBinding(ss);
-                    value.w2ui.class = style;
-                    _this.Grid.refreshRow(id);
-                });
+                if (!Object.IsNullOrUndefined(expPath)) {
+                    var observable = DomBehind.Observable.Register(value, expPath);
+                    observable.PropertyChanged.Clear();
+                    observable.PropertyChanged.AddHandler(function (ss, ee) {
+                        var id = ss.recid;
+                        var style = _this.RowClassBinding(ss);
+                        value.w2ui.class = style;
+                        _this.Grid.refreshRow(id);
+                    });
+                }
             }
             $.each(this.Column, function (i, v) {
                 if (v.convertTarget) {

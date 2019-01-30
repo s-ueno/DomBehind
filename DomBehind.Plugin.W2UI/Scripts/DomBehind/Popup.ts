@@ -22,6 +22,7 @@ namespace DomBehind {
 
     export interface IPopupController {
         Show();
+        Message();
         Close();
     }
 
@@ -84,11 +85,27 @@ namespace DomBehind {
 
         protected Bindings = new List<{ Binding: Data.BindingBehavior, Selector: string }>();
 
+        public get LastBinding(): Data.BindingBehavior {
+            let b = this.Bindings.last();
+            return b ? b.Binding : null;
+        }
+
         public Close() {
             w2popup.close();
         }
 
         public Show() {
+            let option = this.CreateOption();
+
+            w2popup.open(option);
+        }
+        public Message() {
+            let option = this.CreateOption();
+
+            w2popup.message(option);
+        }
+
+        protected CreateOption() {
             let template = this.Element;
             let div = this.FindTemplate(template);
 
@@ -104,7 +121,7 @@ namespace DomBehind {
             if (this.TitleExpression) {
                 option.title = this.TitleExpression.GetValue();
             }
-            w2popup.open(option);
+            return option;
         }
 
         public /* override */  UpdateTarget() {
@@ -175,6 +192,37 @@ namespace DomBehind {
 
                 me.CurrentBehavior = bkBehavior;
                 me.CurrentElement = bkElement;
+            }
+            return me;
+        }
+
+        public /* override */ ConvertTarget(exp: (x: any) => any): PopupTemplateBindingBuilder<T> {
+            let me: PopupTemplateBindingBuilder<any> = this;
+            if (me.CurrentBehavior instanceof TemplatePopup) {
+                let lastBehavior = me.CurrentBehavior.LastBinding;
+                if (lastBehavior) {
+                    if (lastBehavior.BindingPolicy.Converter) {
+                        throw new Exception("Another 'IValueConverter' has already been assigned.");
+                    }
+                    let conv = new DomBehind.SimpleConverter();
+                    conv.ConvertHandler = exp;
+                    lastBehavior.BindingPolicy.Converter = conv;
+                }
+            }
+            return me;
+        }
+        public /* override */ ConvertSource(exp: (x: any) => any): PopupTemplateBindingBuilder<T> {
+            let me: PopupTemplateBindingBuilder<any> = this;
+            if (me.CurrentBehavior instanceof TemplatePopup) {
+                let lastBehavior = me.CurrentBehavior.LastBinding;
+                if (lastBehavior) {
+                    if (lastBehavior.BindingPolicy.Converter) {
+                        throw new Exception("Another 'IValueConverter' has already been assigned.");
+                    }
+                    let conv = new DomBehind.SimpleConverter();
+                    conv.ConvertBackHandler = exp;
+                    lastBehavior.BindingPolicy.Converter = conv;
+                }
             }
             return me;
         }

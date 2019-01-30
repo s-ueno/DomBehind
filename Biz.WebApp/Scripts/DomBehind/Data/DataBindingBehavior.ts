@@ -29,7 +29,8 @@
          */
         public get ValueCore(): any {
             let value = this.Property.GetValue(this.Element);
-            if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter)) {
+            if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter) &&
+                !Object.IsNullOrUndefined(this.BindingPolicy.Converter.ConvertBack)) {
                 value = this.BindingPolicy.Converter.ConvertBack(value);
             }
             return value;
@@ -41,7 +42,7 @@
          */
         public UpdateSource(): void {
             if (this.BindingPolicy.Mode === BindingMode.OneWay) return;
-            
+
             if (Object.IsNullOrUndefined(this.Property)) return;
             if (Object.IsNullOrUndefined(this.Property.GetValue)) return;
 
@@ -66,8 +67,12 @@
             if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter)) {
                 value = this.BindingPolicy.Converter.Convert(value);
             }
-            this.Property.SetValue(this.Element, value, this);
-            this.UpdateTargetEvent.Raise(this, value);
+
+            if (this.Element) {
+                this.Property.SetValue(this.Element, value, this);
+                this.UpdateTargetEvent.Raise(this, value);
+            }
+
         }
 
         // #endregion

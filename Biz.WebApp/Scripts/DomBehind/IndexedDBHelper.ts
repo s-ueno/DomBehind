@@ -52,7 +52,7 @@
 
             db.done(x => {
                 if (!x.objectStoreNames.contains(this.TableName)) {
-                    d.reject();
+                    d.resolve([]);
                     return;
                 }
                 let trans = x.transaction(this.TableName, "readwrite");
@@ -87,7 +87,7 @@
 
             db.done(x => {
                 if (!x.objectStoreNames.contains(this.TableName)) {
-                    d.reject();
+                    d.resolve([]);
                     return;
                 }
 
@@ -191,21 +191,32 @@
 
 
 
-        public DeleteAsync(entity: T): JQueryPromise<any> {
+        public DeleteAsync(entity: T | Array<T>): JQueryPromise<any> {
             let d = $.Deferred<any>();
             let db = this.Open();
 
             db.done(x => {
-                let trans = x.transaction(this.TableName, "readwrite");
-                if (trans.objectStoreNames.contains(this.TableName)) {
-                    let store = trans.objectStore(this.TableName);
-
-                    let identity = entity[`${store.keyPath}`];
-                    store.delete(identity);
-
+                if (!x.objectStoreNames.contains(this.TableName)) {
                     d.resolve();
                 } else {
-                    d.reject(`table not found. ${this.TableName}`);
+                    let trans = x.transaction(this.TableName, "readwrite");
+                    if (trans.objectStoreNames.contains(this.TableName)) {
+                        let store = trans.objectStore(this.TableName);
+
+                        if (entity instanceof Array) {
+                            $.each(entity, (i, value) => {
+                                let id = value[`${store.keyPath}`];
+                                store.delete(id);
+                            });
+                        } else {
+                            let identity = entity[`${store.keyPath}`];
+                            store.delete(identity);
+                        }
+
+                        d.resolve();
+                    } else {
+                        d.reject(`table not found. ${this.TableName}`);
+                    }
                 }
             }).fail(x => {
                 d.reject(x);

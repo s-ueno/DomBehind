@@ -226,15 +226,16 @@
             return this.ToDecompress(s);
         }
 
-        public Pop() {
+        public Pop(count: number = 1) {
             let el = $(this.Selector);
             if (el.length === 0) return;
 
             let aList = el.find("a");
-            if (aList.length < 2) return;
 
-            $(aList[aList.length - 1]).click();
+            let back = ++count;
+            if (aList.length <= back) return;
 
+            aList[aList.length - back].click();
         }
 
     }
