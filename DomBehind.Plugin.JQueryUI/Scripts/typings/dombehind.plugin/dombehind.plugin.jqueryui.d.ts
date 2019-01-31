@@ -1,5 +1,15 @@
+declare namespace DomBehind {
+    class FileUploader extends Data.BindingBehavior {
+        constructor();
+        Ensure(): void;
+    }
+    interface ImageFilesBindingBehaviorBuilder<T> {
+    }
+}
+
 declare namespace DomBehind.Controls {
     class Selectmenu {
+        static IsEnabledProperty: Data.DependencyProperty;
         static ItemsSourceProperty: Data.DependencyProperty;
         static Register(behavior: Data.DataBindingBehavior): void;
         static Rebuild(el: JQuery, list: Data.ListCollectionView): boolean;

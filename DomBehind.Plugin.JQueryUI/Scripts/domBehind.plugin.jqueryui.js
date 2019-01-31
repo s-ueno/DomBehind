@@ -69,6 +69,17 @@ var DomBehind;
                     Selectmenu.UpdateCurrent(el, sender);
                 }
             };
+            Selectmenu.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("_disabled", function (el) {
+            }, function (el, newValue) {
+                if (Object.IsNullOrUndefined(el))
+                    return;
+                try {
+                    el.selectmenu("option", "disabled", newValue === false);
+                }
+                catch (e) {
+                    el.attr("_disabled", "true");
+                }
+            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
             Selectmenu.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", function (el) {
             }, function (el, newValue) {
                 if (newValue instanceof DomBehind.Data.ListCollectionView) {
@@ -78,14 +89,31 @@ var DomBehind;
                     if (!sm_1) {
                         sm_1 = newValue.__widget = new Selectmenu();
                     }
+                    var disabled = false;
+                    if (el.attr("_disabled") === "true") {
+                        disabled = true;
+                    }
                     var option = {
                         change: function (e) {
                             var recId = el.val();
                             sm_1._engaged = true;
                             try {
                                 if (sm_1.Items) {
-                                    var current = sm_1.Items.ToArray().FirstOrDefault(function (x) { return x.recid === recId; });
-                                    sm_1.Items.Select(current);
+                                    if (Object.IsNullOrUndefined(recId) || recId === "undefined") {
+                                        var selectedText = el.find(":selected").text();
+                                        var e_1 = new DomBehind.CancelEventArgs(false);
+                                        sm_1.Items.CurrentChanging.Raise(sm_1.Items, e_1);
+                                        if (!e_1.Cancel) {
+                                            sm_1.Items.Begin();
+                                            sm_1.Items.Current = selectedText;
+                                            sm_1.Items.End();
+                                            sm_1.Items.CurrentChanged.Raise(sm_1.Items, new DomBehind.PropertyChangedEventArgs("Current"));
+                                        }
+                                    }
+                                    else {
+                                        var current = sm_1.Items.ToArray().FirstOrDefault(function (x) { return x.recid === recId; });
+                                        sm_1.Items.Select(current);
+                                    }
                                 }
                             }
                             finally {
@@ -96,6 +124,9 @@ var DomBehind;
                             "ui-selectmenu-menu": "jqueryui-highlight"
                         }
                     };
+                    if (disabled) {
+                        option.disabled = true;
+                    }
                     sm_1.Element = el.selectmenu(option);
                     sm_1.Element.selectmenu("refresh");
                     sm_1.Items = newValue;

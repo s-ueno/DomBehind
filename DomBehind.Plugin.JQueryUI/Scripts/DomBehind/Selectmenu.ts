@@ -2,6 +2,25 @@
 
     export class Selectmenu {
 
+        public static IsEnabledProperty =
+            Data.DependencyProperty.RegisterAttached("_disabled",
+                el => {
+                    // oneway
+                },
+                (el, newValue) => {
+                    if (Object.IsNullOrUndefined(el)) return;
+
+                    try {
+                        el.selectmenu("option", "disabled", newValue === false);
+                    } catch (e) {
+                        // selectmenu before initilize
+                        el.attr("_disabled", "true");
+                    }
+                },
+                Data.UpdateSourceTrigger.Explicit,
+                Data.BindingMode.OneWay
+            );
+
 
         public static ItemsSourceProperty =
             Data.DependencyProperty.RegisterAttached("itemsSource",
@@ -18,14 +37,36 @@
                             sm = (<any>newValue).__widget = new Selectmenu();
                         }
 
+                        let disabled = false;
+                        if (el.attr("_disabled") === "true") {
+                            disabled = true;
+                        }
+
                         let option: any = {
                             change: e => {
                                 let recId = el.val();
                                 sm._engaged = true;
                                 try {
                                     if (sm.Items) {
-                                        let current = sm.Items.ToArray().FirstOrDefault(x => x.recid === recId);
-                                        sm.Items.Select(current);
+
+                                        // IDがない　＝　文字配列直バインドでも、カレント変更通知イベントを飛ばす
+                                        if (Object.IsNullOrUndefined(recId) || recId === "undefined") {
+                                            // 文字を取得
+                                            let selectedText = el.find(":selected").text();
+
+                                            let e = new CancelEventArgs(false);
+                                            sm.Items.CurrentChanging.Raise(sm.Items, e);
+                                            // キャンセルしない
+                                            if (!e.Cancel) {
+                                                sm.Items.Begin();
+                                                sm.Items.Current = selectedText;
+                                                sm.Items.End();
+                                                sm.Items.CurrentChanged.Raise(sm.Items, new PropertyChangedEventArgs("Current"));
+                                            }
+                                        } else {
+                                            let current = sm.Items.ToArray().FirstOrDefault(x => x.recid === recId);
+                                            sm.Items.Select(current);
+                                        }
                                     }
                                 } finally {
                                     sm._engaged = false;
@@ -35,6 +76,11 @@
                                 "ui-selectmenu-menu": "jqueryui-highlight"
                             }
                         };
+
+                        // ドロップダウン構築前にdisable設定ある場合
+                        if (disabled) {
+                            option.disabled = true;
+                        }
 
                         sm.Element = el.selectmenu(option);
                         sm.Element.selectmenu("refresh");
@@ -129,6 +175,4 @@
             }
         }
     }
-
-
 }
