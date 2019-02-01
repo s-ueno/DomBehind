@@ -61,6 +61,7 @@
       <SubType>Designer</SubType>
     </Content>
     <None Include="packages.config" />
+    <Content Include="Scripts\dombehind.js" />
     <Content Include="Scripts\domBehind.plugin.chart.js" />
     <Content Include="Scripts\domBehind.plugin.chart.min.js">
       <DependentUpon>domBehind.plugin.chart.js</DependentUpon>
@@ -71,7 +72,6 @@
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\Chart.js" />
     <Content Include="Scripts\Chart.min.js" />
-    <Content Include="Scripts\dombehind.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.js" />

@@ -48,6 +48,7 @@ declare namespace DomBehind {
         UpdateTarget(mark?: string): void;
         UpdateSource(mark?: string): void;
         Validate(mark?: string): boolean;
+        RemoveValidator(mark?: string): void;
         ClearValidator(mark?: string): void;
         Dispose(): void;
         protected _disposed: boolean;
@@ -60,17 +61,21 @@ declare namespace DomBehind {
         protected NotifyEvent<TEvent>(event: TypedEvent<TEvent>, args: TEvent): void;
         Title: string;
         private _title;
+        IsVisible: boolean;
         View: BizView;
         private _view;
         protected OnViewChanged(): void;
         Initialized: boolean;
-        abstract Initialize(): void;
-        ViewLoaded(): void;
+        abstract Initialize(): any;
+        Activate(): void;
         UpdateTarget(mark?: string): void;
         UpdateSource(mark?: string): void;
         Validate(mark?: string): boolean;
-        protected WaitingOverlay(func: Function, image?: string): void;
-        protected SafeAction(func: Function, ...policies: Data.ActionPolicy[]): void;
+        ClearValidation(mark?: string): void;
+        protected LastErrors(mark?: string): string[];
+        protected ThrownValidate(mark?: string): void;
+        protected WaitingOverlay(func: Function, image?: string): any;
+        protected SafeAction(func: Function, ...policies: Data.ActionPolicy[]): any;
         Catch(ex: Data.ActionPolicyExceptionEventArgs): void;
         protected readonly Navigator: Navigation.INavigator;
         IsEnabled: boolean;
@@ -102,8 +107,8 @@ declare namespace DomBehind {
         FindRowAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T>;
         FindRowsAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T[]>;
         protected FetchCursor(indexStore: IDBIndex, value: string | number, d: JQueryDeferred<any>): void;
-        UpsertAsync(entity: T, primaryKey?: (obj: T) => string | number): JQueryPromise<any>;
-        DeleteAsync(entity: T): JQueryPromise<any>;
+        UpsertAsync(entity: T | Array<T>, primaryKey?: (obj: T) => string | number): JQueryPromise<any>;
+        DeleteAsync(entity: T | Array<T>): JQueryPromise<any>;
         protected Open(): JQueryPromise<IDBDatabase>;
         protected Upgrade(version: number, action: (db: any) => void): void;
     }
@@ -113,6 +118,7 @@ declare namespace DomBehind {
     class Locator {
         private static _container;
         static Push(ins: any): void;
+        static ToArray(): any[];
         static List<T>(typeT: new (...params: any[]) => T, predicate?: (obj: T) => boolean): T[];
         static First<T>(typeT: new (...params: any[]) => T, predicate?: (obj: T) => boolean): T;
         static Remove<T>(typeT: new (...params: any[]) => T, predicate?: (obj: T) => boolean): void;
@@ -144,19 +150,97 @@ declare namespace DomBehind {
 
 
 declare namespace DomBehind {
-    interface ISelectedImageFiles extends JQueryEventObject {
-        files: string[];
+    class Breadbrumb {
+        Selector: string;
+        constructor(Selector: string);
+        static AllowLocalStorage: boolean;
+        Parse(newUri: string, title: string, isRoot?: boolean): string;
+        protected ParseRestUri(newUri: string, isRoot: boolean, title: string): string;
+        protected ParseSessionStorage(newUri: string, isRoot: boolean, title: string): string;
+        protected ToCompress(input: any): string;
+        protected ToDecompress(input: string): any;
+        protected static SplitQueryString(s: string): Array<{
+            Key: string;
+            Value: string;
+        }>;
+        protected static GetLocalStorage(id: string): string;
+        protected static SetLocalStorage(id: string, value: string): void;
+        Update(): void;
+        protected BuildStack(s: string): any;
+        Pop(count?: number): void;
     }
-    class ImageFiles extends Data.ActionBindingBehavior {
-        static SelectedImages: IEventBuilder;
+}
+
+declare namespace DomBehind {
+    interface IFileInfo {
+        name: string;
+        size: number;
+        type: string;
+        uri: string;
+    }
+    interface ISelectedFiles extends JQueryEventObject {
+        files: IFileInfo[];
+    }
+    interface IFileUploader {
+        UpdateAll(): any;
+        Update(file: IFileInfo): any;
+    }
+    class FileBrowser extends Data.ActionBindingBehavior implements IFileUploader {
+        static SelectedFiles: IEventBuilder;
         Ensure(): void;
-        InstanceExpression: PropertyInfo;
+        Files: Array<IFileInfo>;
+        AllowMultiFiles: boolean;
+        AcceptValue: string;
+        InstanceExpression: LamdaExpression;
+        UploadUri: string;
+        ProgressExpression: Function;
+        CompletedExpression: Function;
+        ErrorExpression: Function;
+        AlwaysExpression: Function;
+        MaximumNumberOfAjax: number;
+        UpdateAll(): JQueryPromise<JQueryPromise<any>[]>;
+        Update(file: IFileInfo): JQueryPromise<any>;
+        OnProgress(e: {
+            loaded: number;
+            total: number;
+            percent: number;
+            file: IFileInfo;
+        }): void;
+        OnCompleted(e: {
+            response: any;
+            file: IFileInfo;
+        }): void;
+        OnError(e: {
+            file: IFileInfo;
+            error: any;
+        }): void;
+        OnAlways(): void;
     }
-    class ImageFilesBindingBehaviorBuilder<T> extends Data.ActionBindingBehaviorBuilder<T> {
+    class FileBrowserBindingBehaviorBuilder<T> extends Data.ActionBindingBehaviorBuilder<T> {
         constructor(owner: BizView);
+        AllowMultiFiles(): FileBrowserBindingBehaviorBuilder<T>;
+        AcceptFilter(filter: string): FileBrowserBindingBehaviorBuilder<T>;
+        UploadUri(uri: string): FileBrowserBindingBehaviorBuilder<T>;
+        BindingUploader(exp: (owner: T) => IFileUploader): FileBrowserBindingBehaviorBuilder<T>;
+        BindingUploaderProgress(exp: (owner: T, e: {
+            loaded: number;
+            total: number;
+            percent: number;
+            file: IFileInfo;
+        }) => void): FileBrowserBindingBehaviorBuilder<T>;
+        BindingUploaderComplete(exp: (owner: T, e: {
+            response: any;
+            file: IFileInfo;
+        }) => void): FileBrowserBindingBehaviorBuilder<any>;
+        BindingUploaderError(exp: (owner: T, e: {
+            file: IFileInfo;
+            error: any;
+        }) => void): FileBrowserBindingBehaviorBuilder<any>;
+        BindingUploaderAlways(exp: (owner: T) => void): FileBrowserBindingBehaviorBuilder<any>;
+        MaximumNumberOfAjax(number: number): FileBrowserBindingBehaviorBuilder<T>;
     }
     interface BindingBehaviorBuilder<T> {
-        BuildCamera(selectedEvent?: (x: T, args: ISelectedImageFiles) => void, instance?: (x: T) => any): ImageFilesBindingBehaviorBuilder<T>;
+        BuildFileBrowser(selectedEvent?: (x: T, args: ISelectedFiles) => void): FileBrowserBindingBehaviorBuilder<T>;
     }
 }
 
@@ -376,11 +460,6 @@ declare namespace DomBehind.Controls {
 }
 
 declare namespace DomBehind {
-    class Template {
-    }
-}
-
-declare namespace DomBehind {
     interface ITemplateListViewOption<T> {
         template: string;
         columnClick?: (owner: T, e: ITemplateListViewColumnClickEventArgs) => void;
@@ -392,10 +471,11 @@ declare namespace DomBehind {
         header?: string;
         expression?: (row: any) => any;
         expressionAction?: (owner: any, row: any) => void;
-        convertTarget?: (value: any) => any;
+        convertTarget?: (value: any, element?: any) => any;
         attachedEvent?: IEventBuilder;
         dependencyProperty?: Data.DependencyProperty;
         mode?: Data.BindingMode;
+        allowBubbling?: boolean;
     }
     interface ITemplateListViewColumnClickEventArgs {
         isAsc?: boolean;
@@ -412,6 +492,10 @@ declare namespace DomBehind {
         Columns: Array<ITemplateListViewColumn>;
         LastOption: ITemplateListViewColumn;
         RowStyleExpression: (row: any) => string;
+        AlternateStyle: {
+            Selector: string;
+            Css: string;
+        };
         ItemsSource: Data.ListCollectionView;
         private FindTemplate;
         RemoveAll(): void;
@@ -427,6 +511,7 @@ declare namespace DomBehind {
         BindingProperty(dp: Data.DependencyProperty, selector: string, exp: (x: TRow) => any, option?: ITemplateListViewColumn): TemplateListViewBindingBehaviorBuilder<TOwner, TRow>;
         BindingEvent(ev: IEventBuilder, selector: string, exp: (x: TOwner, args: TRow) => void, option?: ITemplateListViewColumn): TemplateListViewBindingBehaviorBuilder<TOwner, TRow>;
         BindingRowStyle(exp: (x: TRow) => string): TemplateListViewBindingBehaviorBuilder<TOwner, TRow>;
+        BindingAlternateRowStyle(selector: string, css: string): TemplateListViewBindingBehaviorBuilder<any, any>;
     }
     interface BindingBehaviorBuilder<T> {
         BuildTemplateItems<TRow>(itemsSource: (x: T) => any, option: ITemplateListViewOption<T>): TemplateListViewBindingBehaviorBuilder<T, TRow>;
@@ -438,20 +523,26 @@ declare namespace DomBehind {
         static ValueProperty: Data.DependencyProperty;
         static TextProperty: Data.DependencyProperty;
         static SrcProperty: Data.DependencyProperty;
+        static HrefProperty: Data.DependencyProperty;
         static IsEnabledProperty: Data.DependencyProperty;
         static IsVisibleProperty: Data.DependencyProperty;
+        static OpacityProperty: Data.DependencyProperty;
         static PlaceHolderProperty: Data.DependencyProperty;
         static IsCheckedProperty: Data.DependencyProperty;
         static MaxLengthProperty: Data.DependencyProperty;
         static MaxNumericProperty: Data.DependencyProperty;
         static MinNumericProperty: Data.DependencyProperty;
+        static BackgroundColorProperty: Data.DependencyProperty;
+        static ColorProperty: Data.DependencyProperty;
+        static BackgroundImageProperty: Data.DependencyProperty;
+        static ClassProperty: Data.DependencyProperty;
         static HtmlSource: Data.DependencyProperty;
         static Click: IEventBuilder;
         static Enter: IEventBuilder;
         static Keydown: IEventBuilder;
         static LostFocus: IEventBuilder;
         static Initialize: IEventBuilder;
-        static ViewLoaded: IEventBuilder;
+        static Activate: IEventBuilder;
         static ModalClosing: IEventBuilder;
     }
 }
@@ -513,6 +604,12 @@ declare namespace DomBehind {
         BindingAction(event: IEventBuilder, action: (x: T) => any): BindingBehaviorBuilder<T>;
         BindingAction(event: IEventBuilder, action: (x: T, args: any) => void): BindingBehaviorBuilder<T>;
         Add<TBehavior extends Data.BindingBehavior>(behavior: TBehavior): TBehavior;
+    }
+    class SimpleConverter implements DomBehind.IValueConverter {
+        Convert(value: any): any;
+        ConvertHandler: (x: any) => any;
+        ConvertBack(value: any): any;
+        ConvertBackHandler: (x: any) => any;
     }
 }
 
@@ -723,6 +820,7 @@ interface Array<T> {
     }>;
     SequenceEqual(target: Array<T>, predicate?: (x1: T, x2: T) => boolean): boolean;
     Sum(selector: (value: T) => number): number;
+    Chunk(size: number): Array<Array<T>>;
 }
 
 interface JQueryStatic {
@@ -747,7 +845,7 @@ interface JQuery {
     SetCustomError(errorMessage: string): void;
     ClearCustomError(): void;
     CheckValidity(allChildren?: boolean): void;
-    Raise(event: DomBehind.IEventBuilder): void;
+    Raise(event: DomBehind.IEventBuilder): JQueryEventObject;
 }
 
 interface ObjectConstructor {
@@ -778,7 +876,9 @@ interface String {
     PadLeft(totalWidth: number, paddingChar: string): string;
     PadRight(totalWidth: number, paddingChar: string): string;
     SubString(start: number, length: number): string;
-    UriToBinary(): number[];
+    Contains(s: string): boolean;
+    StartsWith(s: string): boolean;
+    EndsWith(s: string): boolean;
 }
 
 
@@ -858,6 +958,18 @@ declare namespace DomBehind {
         readonly ErrorStatus: number;
         readonly ErrorTitle: string;
         ToString(): string;
+    }
+}
+
+declare namespace DomBehind {
+    class ApplicationException extends Exception {
+        Message?: string;
+        constructor(Message?: string);
+        ToString(): string;
+    }
+    class ApplicationAggregateException extends Exception {
+        exceptions: Exception[];
+        constructor(exceptions: Exception[]);
     }
 }
 
@@ -1190,6 +1302,8 @@ declare namespace DomBehind.Validation {
         OnValidationg(): void;
         Apply(): void;
         RemoveValidation(): void;
+        private static readonly _ignoreMarks;
+        ClearValidation(): void;
         AddValidation(): void;
         Validate(value: any): boolean;
         protected ValidationMessage(validity: ValidityState): string;
@@ -1200,6 +1314,7 @@ declare namespace DomBehind.Validation {
 
 declare namespace DomBehind.Validation {
     class ValidatorCollection extends collections.LinkedList<Validator> implements IDisposable {
+        RemoveValidator(): void;
         ClearValidator(): void;
         ApplyValidator(): void;
         Validate(): boolean;
@@ -1225,9 +1340,9 @@ declare namespace DomBehind.Web {
     abstract class WebService<TRequest, TResponse> {
         protected abstract readonly Url: string;
         Timeout: number;
-        Execute(request: TRequest): TResponse;
-        ExecuteAsync(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
-        ExecuteAjax(request: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
+        Execute(request?: TRequest): TResponse;
+        ExecuteAsync(request?: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
+        ExecuteAjax(request?: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
         protected readonly DefaultPostSetting: JQueryAjaxSettings;
     }
 }

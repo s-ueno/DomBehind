@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>DomBehind</id>
-    <version>1.0.51</version>
+    <version>1.0.52</version>
     <title>DOM Behind</title>
     <authors>uEN</authors>
     <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/s-ueno/DomBehind</projectUrl>
     <tags>typescript javascript jquery mvvm</tags>
     <description>
-      MVVM with TypeScript for C # programmer
+      This is a component oriented programming approach when building a front end with JavaScript, TypeScript
     </description>
     <releaseNotes>
       ・

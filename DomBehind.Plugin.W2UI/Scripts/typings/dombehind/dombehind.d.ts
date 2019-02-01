@@ -108,7 +108,7 @@ declare namespace DomBehind {
         FindRowsAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T[]>;
         protected FetchCursor(indexStore: IDBIndex, value: string | number, d: JQueryDeferred<any>): void;
         UpsertAsync(entity: T | Array<T>, primaryKey?: (obj: T) => string | number): JQueryPromise<any>;
-        DeleteAsync(entity: T): JQueryPromise<any>;
+        DeleteAsync(entity: T | Array<T>): JQueryPromise<any>;
         protected Open(): JQueryPromise<IDBDatabase>;
         protected Upgrade(version: number, action: (db: any) => void): void;
     }
@@ -167,7 +167,7 @@ declare namespace DomBehind {
         protected static SetLocalStorage(id: string, value: string): void;
         Update(): void;
         protected BuildStack(s: string): any;
-        Pop(): void;
+        Pop(count?: number): void;
     }
 }
 
@@ -456,11 +456,6 @@ declare namespace DomBehind.Controls {
             protected PropertyChangedSafeHandle: (sender: any, e: PropertyChangedEventArgs) => void;
             protected OnRecievePropertyChanged(e: PropertyChangedEventArgs): void;
         }
-    }
-}
-
-declare namespace DomBehind {
-    class Template {
     }
 }
 

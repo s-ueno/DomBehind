@@ -460,11 +460,6 @@ declare namespace DomBehind.Controls {
 }
 
 declare namespace DomBehind {
-    class Template {
-    }
-}
-
-declare namespace DomBehind {
     interface ITemplateListViewOption<T> {
         template: string;
         columnClick?: (owner: T, e: ITemplateListViewColumnClickEventArgs) => void;

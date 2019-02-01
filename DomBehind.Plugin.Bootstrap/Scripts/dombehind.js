@@ -1,88 +1,1249 @@
+// Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
+// This work is free. You can redistribute it and/or modify it
+// under the terms of the WTFPL, Version 2
+// For more information see LICENSE.txt or http://www.wtfpl.net/
+//
+// For more information, the home page:
+// http://pieroxy.net/blog/pages/lz-string/testing.html
+//
+// LZ-based compression algorithm, version 1.3.3
+var LZString = {
+  
+  
+  // private property
+  _keyStr : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+  _f : String.fromCharCode,
+  
+  compressToBase64 : function (input) {
+    if (input == null) return "";
+    var output = "";
+    var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+    var i = 0;
+    
+    input = LZString.compress(input);
+    
+    while (i < input.length*2) {
+      
+      if (i%2==0) {
+        chr1 = input.charCodeAt(i/2) >> 8;
+        chr2 = input.charCodeAt(i/2) & 255;
+        if (i/2+1 < input.length) 
+          chr3 = input.charCodeAt(i/2+1) >> 8;
+        else 
+          chr3 = NaN;
+      } else {
+        chr1 = input.charCodeAt((i-1)/2) & 255;
+        if ((i+1)/2 < input.length) {
+          chr2 = input.charCodeAt((i+1)/2) >> 8;
+          chr3 = input.charCodeAt((i+1)/2) & 255;
+        } else 
+          chr2=chr3=NaN;
+      }
+      i+=3;
+      
+      enc1 = chr1 >> 2;
+      enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+      enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+      enc4 = chr3 & 63;
+      
+      if (isNaN(chr2)) {
+        enc3 = enc4 = 64;
+      } else if (isNaN(chr3)) {
+        enc4 = 64;
+      }
+      
+      output = output +
+        LZString._keyStr.charAt(enc1) + LZString._keyStr.charAt(enc2) +
+          LZString._keyStr.charAt(enc3) + LZString._keyStr.charAt(enc4);
+      
+    }
+    
+    return output;
+  },
+  
+  decompressFromBase64 : function (input) {
+    if (input == null) return "";
+    var output = "",
+        ol = 0, 
+        output_,
+        chr1, chr2, chr3,
+        enc1, enc2, enc3, enc4,
+        i = 0, f=LZString._f;
+    
+    input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+    
+    while (i < input.length) {
+      
+      enc1 = LZString._keyStr.indexOf(input.charAt(i++));
+      enc2 = LZString._keyStr.indexOf(input.charAt(i++));
+      enc3 = LZString._keyStr.indexOf(input.charAt(i++));
+      enc4 = LZString._keyStr.indexOf(input.charAt(i++));
+      
+      chr1 = (enc1 << 2) | (enc2 >> 4);
+      chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+      chr3 = ((enc3 & 3) << 6) | enc4;
+      
+      if (ol%2==0) {
+        output_ = chr1 << 8;
+        
+        if (enc3 != 64) {
+          output += f(output_ | chr2);
+        }
+        if (enc4 != 64) {
+          output_ = chr3 << 8;
+        }
+      } else {
+        output = output + f(output_ | chr1);
+        
+        if (enc3 != 64) {
+          output_ = chr2 << 8;
+        }
+        if (enc4 != 64) {
+          output += f(output_ | chr3);
+        }
+      }
+      ol+=3;
+    }
+    
+    return LZString.decompress(output);
+    
+  },
+
+  compressToUTF16 : function (input) {
+    if (input == null) return "";
+    var output = "",
+        i,c,
+        current,
+        status = 0,
+        f = LZString._f;
+    
+    input = LZString.compress(input);
+    
+    for (i=0 ; i<input.length ; i++) {
+      c = input.charCodeAt(i);
+      switch (status++) {
+        case 0:
+          output += f((c >> 1)+32);
+          current = (c & 1) << 14;
+          break;
+        case 1:
+          output += f((current + (c >> 2))+32);
+          current = (c & 3) << 13;
+          break;
+        case 2:
+          output += f((current + (c >> 3))+32);
+          current = (c & 7) << 12;
+          break;
+        case 3:
+          output += f((current + (c >> 4))+32);
+          current = (c & 15) << 11;
+          break;
+        case 4:
+          output += f((current + (c >> 5))+32);
+          current = (c & 31) << 10;
+          break;
+        case 5:
+          output += f((current + (c >> 6))+32);
+          current = (c & 63) << 9;
+          break;
+        case 6:
+          output += f((current + (c >> 7))+32);
+          current = (c & 127) << 8;
+          break;
+        case 7:
+          output += f((current + (c >> 8))+32);
+          current = (c & 255) << 7;
+          break;
+        case 8:
+          output += f((current + (c >> 9))+32);
+          current = (c & 511) << 6;
+          break;
+        case 9:
+          output += f((current + (c >> 10))+32);
+          current = (c & 1023) << 5;
+          break;
+        case 10:
+          output += f((current + (c >> 11))+32);
+          current = (c & 2047) << 4;
+          break;
+        case 11:
+          output += f((current + (c >> 12))+32);
+          current = (c & 4095) << 3;
+          break;
+        case 12:
+          output += f((current + (c >> 13))+32);
+          current = (c & 8191) << 2;
+          break;
+        case 13:
+          output += f((current + (c >> 14))+32);
+          current = (c & 16383) << 1;
+          break;
+        case 14:
+          output += f((current + (c >> 15))+32, (c & 32767)+32);
+          status = 0;
+          break;
+      }
+    }
+    
+    return output + f(current + 32);
+  },
+  
+
+  decompressFromUTF16 : function (input) {
+    if (input == null) return "";
+    var output = "",
+        current,c,
+        status=0,
+        i = 0,
+        f = LZString._f;
+    
+    while (i < input.length) {
+      c = input.charCodeAt(i) - 32;
+      
+      switch (status++) {
+        case 0:
+          current = c << 1;
+          break;
+        case 1:
+          output += f(current | (c >> 14));
+          current = (c&16383) << 2;
+          break;
+        case 2:
+          output += f(current | (c >> 13));
+          current = (c&8191) << 3;
+          break;
+        case 3:
+          output += f(current | (c >> 12));
+          current = (c&4095) << 4;
+          break;
+        case 4:
+          output += f(current | (c >> 11));
+          current = (c&2047) << 5;
+          break;
+        case 5:
+          output += f(current | (c >> 10));
+          current = (c&1023) << 6;
+          break;
+        case 6:
+          output += f(current | (c >> 9));
+          current = (c&511) << 7;
+          break;
+        case 7:
+          output += f(current | (c >> 8));
+          current = (c&255) << 8;
+          break;
+        case 8:
+          output += f(current | (c >> 7));
+          current = (c&127) << 9;
+          break;
+        case 9:
+          output += f(current | (c >> 6));
+          current = (c&63) << 10;
+          break;
+        case 10:
+          output += f(current | (c >> 5));
+          current = (c&31) << 11;
+          break;
+        case 11:
+          output += f(current | (c >> 4));
+          current = (c&15) << 12;
+          break;
+        case 12:
+          output += f(current | (c >> 3));
+          current = (c&7) << 13;
+          break;
+        case 13:
+          output += f(current | (c >> 2));
+          current = (c&3) << 14;
+          break;
+        case 14:
+          output += f(current | (c >> 1));
+          current = (c&1) << 15;
+          break;
+        case 15:
+          output += f(current | c);
+          status=0;
+          break;
+      }
+      
+      
+      i++;
+    }
+    
+    return LZString.decompress(output);
+    //return output;
+    
+  },
+
+
+  
+  compress: function (uncompressed) {
+    if (uncompressed == null) return "";
+    var i, value,
+        context_dictionary= {},
+        context_dictionaryToCreate= {},
+        context_c="",
+        context_wc="",
+        context_w="",
+        context_enlargeIn= 2, // Compensate for the first entry which should not count
+        context_dictSize= 3,
+        context_numBits= 2,
+        context_data_string="", 
+        context_data_val=0, 
+        context_data_position=0,
+        ii,
+        f=LZString._f;
+    
+    for (ii = 0; ii < uncompressed.length; ii += 1) {
+      context_c = uncompressed.charAt(ii);
+      if (!Object.prototype.hasOwnProperty.call(context_dictionary,context_c)) {
+        context_dictionary[context_c] = context_dictSize++;
+        context_dictionaryToCreate[context_c] = true;
+      }
+      
+      context_wc = context_w + context_c;
+      if (Object.prototype.hasOwnProperty.call(context_dictionary,context_wc)) {
+        context_w = context_wc;
+      } else {
+        if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)) {
+          if (context_w.charCodeAt(0)<256) {
+            for (i=0 ; i<context_numBits ; i++) {
+              context_data_val = (context_data_val << 1);
+              if (context_data_position == 15) {
+                context_data_position = 0;
+                context_data_string += f(context_data_val);
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+            }
+            value = context_w.charCodeAt(0);
+            for (i=0 ; i<8 ; i++) {
+              context_data_val = (context_data_val << 1) | (value&1);
+              if (context_data_position == 15) {
+                context_data_position = 0;
+                context_data_string += f(context_data_val);
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = value >> 1;
+            }
+          } else {
+            value = 1;
+            for (i=0 ; i<context_numBits ; i++) {
+              context_data_val = (context_data_val << 1) | value;
+              if (context_data_position == 15) {
+                context_data_position = 0;
+                context_data_string += f(context_data_val);
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = 0;
+            }
+            value = context_w.charCodeAt(0);
+            for (i=0 ; i<16 ; i++) {
+              context_data_val = (context_data_val << 1) | (value&1);
+              if (context_data_position == 15) {
+                context_data_position = 0;
+                context_data_string += f(context_data_val);
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = value >> 1;
+            }
+          }
+          context_enlargeIn--;
+          if (context_enlargeIn == 0) {
+            context_enlargeIn = Math.pow(2, context_numBits);
+            context_numBits++;
+          }
+          delete context_dictionaryToCreate[context_w];
+        } else {
+          value = context_dictionary[context_w];
+          for (i=0 ; i<context_numBits ; i++) {
+            context_data_val = (context_data_val << 1) | (value&1);
+            if (context_data_position == 15) {
+              context_data_position = 0;
+              context_data_string += f(context_data_val);
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+          
+          
+        }
+        context_enlargeIn--;
+        if (context_enlargeIn == 0) {
+          context_enlargeIn = Math.pow(2, context_numBits);
+          context_numBits++;
+        }
+        // Add wc to the dictionary.
+        context_dictionary[context_wc] = context_dictSize++;
+        context_w = String(context_c);
+      }
+    }
+    
+    // Output the code for w.
+    if (context_w !== "") {
+      if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)) {
+        if (context_w.charCodeAt(0)<256) {
+          for (i=0 ; i<context_numBits ; i++) {
+            context_data_val = (context_data_val << 1);
+            if (context_data_position == 15) {
+              context_data_position = 0;
+              context_data_string += f(context_data_val);
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+          }
+          value = context_w.charCodeAt(0);
+          for (i=0 ; i<8 ; i++) {
+            context_data_val = (context_data_val << 1) | (value&1);
+            if (context_data_position == 15) {
+              context_data_position = 0;
+              context_data_string += f(context_data_val);
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+        } else {
+          value = 1;
+          for (i=0 ; i<context_numBits ; i++) {
+            context_data_val = (context_data_val << 1) | value;
+            if (context_data_position == 15) {
+              context_data_position = 0;
+              context_data_string += f(context_data_val);
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = 0;
+          }
+          value = context_w.charCodeAt(0);
+          for (i=0 ; i<16 ; i++) {
+            context_data_val = (context_data_val << 1) | (value&1);
+            if (context_data_position == 15) {
+              context_data_position = 0;
+              context_data_string += f(context_data_val);
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+        }
+        context_enlargeIn--;
+        if (context_enlargeIn == 0) {
+          context_enlargeIn = Math.pow(2, context_numBits);
+          context_numBits++;
+        }
+        delete context_dictionaryToCreate[context_w];
+      } else {
+        value = context_dictionary[context_w];
+        for (i=0 ; i<context_numBits ; i++) {
+          context_data_val = (context_data_val << 1) | (value&1);
+          if (context_data_position == 15) {
+            context_data_position = 0;
+            context_data_string += f(context_data_val);
+            context_data_val = 0;
+          } else {
+            context_data_position++;
+          }
+          value = value >> 1;
+        }
+        
+        
+      }
+      context_enlargeIn--;
+      if (context_enlargeIn == 0) {
+        context_enlargeIn = Math.pow(2, context_numBits);
+        context_numBits++;
+      }
+    }
+    
+    // Mark the end of the stream
+    value = 2;
+    for (i=0 ; i<context_numBits ; i++) {
+      context_data_val = (context_data_val << 1) | (value&1);
+      if (context_data_position == 15) {
+        context_data_position = 0;
+        context_data_string += f(context_data_val);
+        context_data_val = 0;
+      } else {
+        context_data_position++;
+      }
+      value = value >> 1;
+    }
+    
+    // Flush the last char
+    while (true) {
+      context_data_val = (context_data_val << 1);
+      if (context_data_position == 15) {
+        context_data_string += f(context_data_val);
+        break;
+      }
+      else context_data_position++;
+    }
+    return context_data_string;
+  },
+  
+  decompress: function (compressed) {
+    if (compressed == null) return "";
+    if (compressed == "") return null;
+    var dictionary = [],
+        next,
+        enlargeIn = 4,
+        dictSize = 4,
+        numBits = 3,
+        entry = "",
+        result = "",
+        i,
+        w,
+        bits, resb, maxpower, power,
+        c,
+        f = LZString._f,
+        data = {string:compressed, val:compressed.charCodeAt(0), position:32768, index:1};
+    
+    for (i = 0; i < 3; i += 1) {
+      dictionary[i] = i;
+    }
+    
+    bits = 0;
+    maxpower = Math.pow(2,2);
+    power=1;
+    while (power!=maxpower) {
+      resb = data.val & data.position;
+      data.position >>= 1;
+      if (data.position == 0) {
+        data.position = 32768;
+        data.val = data.string.charCodeAt(data.index++);
+      }
+      bits |= (resb>0 ? 1 : 0) * power;
+      power <<= 1;
+    }
+    
+    switch (next = bits) {
+      case 0: 
+          bits = 0;
+          maxpower = Math.pow(2,8);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = 32768;
+              data.val = data.string.charCodeAt(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+        c = f(bits);
+        break;
+      case 1: 
+          bits = 0;
+          maxpower = Math.pow(2,16);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = 32768;
+              data.val = data.string.charCodeAt(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+        c = f(bits);
+        break;
+      case 2: 
+        return "";
+    }
+    dictionary[3] = c;
+    w = result = c;
+    while (true) {
+      if (data.index > data.string.length) {
+        return "";
+      }
+      
+      bits = 0;
+      maxpower = Math.pow(2,numBits);
+      power=1;
+      while (power!=maxpower) {
+        resb = data.val & data.position;
+        data.position >>= 1;
+        if (data.position == 0) {
+          data.position = 32768;
+          data.val = data.string.charCodeAt(data.index++);
+        }
+        bits |= (resb>0 ? 1 : 0) * power;
+        power <<= 1;
+      }
+
+      switch (c = bits) {
+        case 0: 
+          bits = 0;
+          maxpower = Math.pow(2,8);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = 32768;
+              data.val = data.string.charCodeAt(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+
+          dictionary[dictSize++] = f(bits);
+          c = dictSize-1;
+          enlargeIn--;
+          break;
+        case 1: 
+          bits = 0;
+          maxpower = Math.pow(2,16);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = 32768;
+              data.val = data.string.charCodeAt(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+          dictionary[dictSize++] = f(bits);
+          c = dictSize-1;
+          enlargeIn--;
+          break;
+        case 2: 
+          return result;
+      }
+      
+      if (enlargeIn == 0) {
+        enlargeIn = Math.pow(2, numBits);
+        numBits++;
+      }
+      
+      if (dictionary[c]) {
+        entry = dictionary[c];
+      } else {
+        if (c === dictSize) {
+          entry = w + w.charAt(0);
+        } else {
+          return null;
+        }
+      }
+      result += entry;
+      
+      // Add w+entry[0] to the dictionary.
+      dictionary[dictSize++] = w + entry.charAt(0);
+      enlargeIn--;
+      
+      w = entry;
+      
+      if (enlargeIn == 0) {
+        enlargeIn = Math.pow(2, numBits);
+        numBits++;
+      }
+      
+    }
+  }
+};
+
+if( typeof module !== 'undefined' && module != null ) {
+  module.exports = LZString
+}
+
+/**
+ * @license
+ * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+ * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+ * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+ * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+ * Code distributed by Google as part of the polymer project is also
+ * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ */
+
+// minimal template polyfill
 (function () {
-    var support = ("content" in document.createElement("template"));
+    'use strict';
 
-    // Set the content property if missing
-    if (!support) {
-        var
-			/**
-			 * Prefer an array to a NodeList
-			 * Otherwise, updating the content property of a node
-			 * will update the NodeList and we'll loose the nested <template>
-			 */
-            templates = Array.prototype.slice.call(document.getElementsByTagName("template")),
-            template, content, fragment, node, i = 0, j;
+    var needsTemplate = (typeof HTMLTemplateElement === 'undefined');
+    var brokenDocFragment = !(document.createDocumentFragment().cloneNode() instanceof DocumentFragment);
+    var needsDocFrag = false;
 
-        // For each <template> element get its content and wrap it in a document fragment
-        while ((template = templates[i++])) {
-            content = template.children;
-            fragment = document.createDocumentFragment();
+    // NOTE: Replace DocumentFragment to work around IE11 bug that
+    // causes children of a document fragment modified while
+    // there is a mutation observer to not have a parentNode, or
+    // have a broken parentNode (!?!)
+    if (/Trident/.test(navigator.userAgent)) {
+        (function () {
 
-            for (j = 0; node = content[j]; j++) {
-                fragment.appendChild(node);
+            needsDocFrag = true;
+
+            var origCloneNode = Node.prototype.cloneNode;
+            Node.prototype.cloneNode = function cloneNode(deep) {
+                var newDom = origCloneNode.call(this, deep);
+                if (this instanceof DocumentFragment) {
+                    newDom.__proto__ = DocumentFragment.prototype;
+                }
+                return newDom;
+            };
+
+            // IE's DocumentFragment querySelector code doesn't work when
+            // called on an element instance
+            DocumentFragment.prototype.querySelectorAll = HTMLElement.prototype.querySelectorAll;
+            DocumentFragment.prototype.querySelector = HTMLElement.prototype.querySelector;
+
+            Object.defineProperties(DocumentFragment.prototype, {
+                'nodeType': {
+                    get: function () {
+                        return Node.DOCUMENT_FRAGMENT_NODE;
+                    },
+                    configurable: true
+                },
+
+                'localName': {
+                    get: function () {
+                        return undefined;
+                    },
+                    configurable: true
+                },
+
+                'nodeName': {
+                    get: function () {
+                        return '#document-fragment';
+                    },
+                    configurable: true
+                }
+            });
+
+            var origInsertBefore = Node.prototype.insertBefore;
+            function insertBefore(newNode, refNode) {
+                if (newNode instanceof DocumentFragment) {
+                    var child;
+                    while ((child = newNode.firstChild)) {
+                        origInsertBefore.call(this, child, refNode);
+                    }
+                } else {
+                    origInsertBefore.call(this, newNode, refNode);
+                }
+                return newNode;
             }
+            Node.prototype.insertBefore = insertBefore;
 
-            template.content = fragment;
+            var origAppendChild = Node.prototype.appendChild;
+            Node.prototype.appendChild = function appendChild(child) {
+                if (child instanceof DocumentFragment) {
+                    insertBefore.call(this, child, null);
+                } else {
+                    origAppendChild.call(this, child);
+                }
+                return child;
+            };
+
+            var origRemoveChild = Node.prototype.removeChild;
+            var origReplaceChild = Node.prototype.replaceChild;
+            Node.prototype.replaceChild = function replaceChild(newChild, oldChild) {
+                if (newChild instanceof DocumentFragment) {
+                    insertBefore.call(this, newChild, oldChild);
+                    origRemoveChild.call(this, oldChild);
+                } else {
+                    origReplaceChild.call(this, newChild, oldChild);
+                }
+                return oldChild;
+            };
+
+            Document.prototype.createDocumentFragment = function createDocumentFragment() {
+                var frag = this.createElement('df');
+                frag.__proto__ = DocumentFragment.prototype;
+                return frag;
+            };
+
+            var origImportNode = Document.prototype.importNode;
+            Document.prototype.importNode = function importNode(impNode, deep) {
+                deep = deep || false;
+                var newNode = origImportNode.call(this, impNode, deep);
+                if (impNode instanceof DocumentFragment) {
+                    newNode.__proto__ = DocumentFragment.prototype;
+                }
+                return newNode;
+            };
+        })();
+    }
+
+    // NOTE: we rely on this cloneNode not causing element upgrade.
+    // This means this polyfill must load before the CE polyfill and
+    // this would need to be re-worked if a browser supports native CE
+    // but not <template>.
+    var capturedCloneNode = Node.prototype.cloneNode;
+    var capturedCreateElement = Document.prototype.createElement;
+    var capturedImportNode = Document.prototype.importNode;
+    var capturedRemoveChild = Node.prototype.removeChild;
+    var capturedAppendChild = Node.prototype.appendChild;
+    var capturedReplaceChild = Node.prototype.replaceChild;
+    var capturedParseFromString = DOMParser.prototype.parseFromString;
+    var capturedHTMLElementInnerHTML = Object.getOwnPropertyDescriptor(window.HTMLElement.prototype, 'innerHTML') || {
+        get: function () {
+            return this.innerHTML;
+        },
+        set: function (text) {
+            this.innerHTML = text;
+        }
+    };
+    var capturedChildNodes = Object.getOwnPropertyDescriptor(window.Node.prototype, 'childNodes') || {
+        get: function () {
+            return this.childNodes;
+        }
+    };
+
+    var elementQuerySelectorAll = Element.prototype.querySelectorAll;
+    var docQuerySelectorAll = Document.prototype.querySelectorAll;
+    var fragQuerySelectorAll = DocumentFragment.prototype.querySelectorAll;
+
+    var scriptSelector = 'script:not([type]),script[type="application/javascript"],script[type="text/javascript"]';
+
+    function QSA(node, selector) {
+        // IE 11 throws a SyntaxError with `scriptSelector` if the node has no children due to the `:not([type])` syntax
+        if (!node.childNodes.length) {
+            return [];
+        }
+        switch (node.nodeType) {
+            case Node.DOCUMENT_NODE:
+                return docQuerySelectorAll.call(node, selector);
+            case Node.DOCUMENT_FRAGMENT_NODE:
+                return fragQuerySelectorAll.call(node, selector);
+            default:
+                return elementQuerySelectorAll.call(node, selector);
         }
     }
 
-    // Prepare a clone function to allow nested <template> elements
-    function clone() {
-        var
-            templates = this.querySelectorAll("template"),
-            fragments = [],
-            template,
-            i = 0;
+    // returns true if nested templates cannot be cloned (they cannot be on
+    // some impl's like Safari 8 and Edge)
+    // OR if cloning a document fragment does not result in a document fragment
+    var needsCloning = (function () {
+        if (!needsTemplate) {
+            var t = document.createElement('template');
+            var t2 = document.createElement('template');
+            t2.content.appendChild(document.createElement('div'));
+            t.content.appendChild(t2);
+            var clone = t.cloneNode(true);
+            return (clone.content.childNodes.length === 0 || clone.content.firstChild.content.childNodes.length === 0
+                || brokenDocFragment);
+        }
+    })();
 
-        // If the support is OK simply clone and return
-        if (support) {
-            template = this.cloneNode(true);
-            templates = template.content.querySelectorAll("template");
+    var TEMPLATE_TAG = 'template';
+    var PolyfilledHTMLTemplateElement = function () { };
 
-            // Set the clone method for each nested <template> element
-            for (; templates[i]; i++) {
-                templates[i].clone = clone;
+    if (needsTemplate) {
+
+        var contentDoc = document.implementation.createHTMLDocument('template');
+        var canDecorate = true;
+
+        var templateStyle = document.createElement('style');
+        templateStyle.textContent = TEMPLATE_TAG + '{display:none;}';
+
+        var head = document.head;
+        head.insertBefore(templateStyle, head.firstElementChild);
+
+        /**
+          Provides a minimal shim for the <template> element.
+        */
+        PolyfilledHTMLTemplateElement.prototype = Object.create(HTMLElement.prototype);
+
+
+        // if elements do not have `innerHTML` on instances, then
+        // templates can be patched by swizzling their prototypes.
+        var canProtoPatch =
+            !(document.createElement('div').hasOwnProperty('innerHTML'));
+
+        /*
+          The `decorate` method moves element children to the template's `content`.
+          NOTE: there is no support for dynamically adding elements to templates.
+        */
+        PolyfilledHTMLTemplateElement.decorate = function (template) {
+            // if the template is decorated or not in HTML namespace, return fast
+            if (template.content ||
+                template.namespaceURI !== document.documentElement.namespaceURI) {
+                return;
             }
+            template.content = contentDoc.createDocumentFragment();
+            var child;
+            while ((child = template.firstChild)) {
+                capturedAppendChild.call(template.content, child);
+            }
+            // NOTE: prefer prototype patching for performance and
+            // because on some browsers (IE11), re-defining `innerHTML`
+            // can result in intermittent errors.
+            if (canProtoPatch) {
+                template.__proto__ = PolyfilledHTMLTemplateElement.prototype;
+            } else {
+                template.cloneNode = function (deep) {
+                    return PolyfilledHTMLTemplateElement._cloneNode(this, deep);
+                };
+                // add innerHTML to template, if possible
+                // Note: this throws on Safari 7
+                if (canDecorate) {
+                    try {
+                        defineInnerHTML(template);
+                        defineOuterHTML(template);
+                    } catch (err) {
+                        canDecorate = false;
+                    }
+                }
+            }
+            // bootstrap recursively
+            PolyfilledHTMLTemplateElement.bootstrap(template.content);
+        };
 
-            return template;
-        }
+        // Taken from https://github.com/jquery/jquery/blob/73d7e6259c63ac45f42c6593da8c2796c6ce9281/src/manipulation/wrapMap.js
+        var topLevelWrappingMap = {
+            'option': ['select'],
+            'thead': ['table'],
+            'col': ['colgroup', 'table'],
+            'tr': ['tbody', 'table'],
+            'th': ['tr', 'tbody', 'table'],
+            'td': ['tr', 'tbody', 'table']
+        };
 
-        // Loop through nested <template> to retrieve the content property
-        for (; templates[i]; i++) {
-            fragments.push(templates[i].content);
-        }
+        var getTagName = function (text) {
+            // Taken from https://github.com/jquery/jquery/blob/73d7e6259c63ac45f42c6593da8c2796c6ce9281/src/manipulation/var/rtagName.js
+            return (/<([a-z][^/\0>\x20\t\r\n\f]+)/i.exec(text) || ['', ''])[1].toLowerCase();
+        };
 
-        // Now, clone the document fragment
-        template = this.cloneNode(true);
+        var defineInnerHTML = function defineInnerHTML(obj) {
+            Object.defineProperty(obj, 'innerHTML', {
+                get: function () {
+                    return getInnerHTML(this);
+                },
+                set: function (text) {
+                    // For IE11, wrap the text in the correct (table) context
+                    var wrap = topLevelWrappingMap[getTagName(text)];
+                    if (wrap) {
+                        for (var i = 0; i < wrap.length; i++) {
+                            text = '<' + wrap[i] + '>' + text + '</' + wrap[i] + '>';
+                        }
+                    }
+                    contentDoc.body.innerHTML = text;
+                    PolyfilledHTMLTemplateElement.bootstrap(contentDoc);
+                    while (this.content.firstChild) {
+                        capturedRemoveChild.call(this.content, this.content.firstChild);
+                    }
+                    var body = contentDoc.body;
+                    // If we had wrapped, get back to the original node
+                    if (wrap) {
+                        for (var j = 0; j < wrap.length; j++) {
+                            body = body.lastChild;
+                        }
+                    }
+                    while (body.firstChild) {
+                        capturedAppendChild.call(this.content, body.firstChild);
+                    }
+                },
+                configurable: true
+            });
+        };
 
-        // Makes sure the clone have a "content" and "clone" properties
-        template.content = this.content;
-        template.clone = clone;
+        var defineOuterHTML = function defineOuterHTML(obj) {
+            Object.defineProperty(obj, 'outerHTML', {
+                get: function () {
+                    return '<' + TEMPLATE_TAG + '>' + this.innerHTML + '</' + TEMPLATE_TAG + '>';
+                },
+                set: function (innerHTML) {
+                    if (this.parentNode) {
+                        contentDoc.body.innerHTML = innerHTML;
+                        var docFrag = this.ownerDocument.createDocumentFragment();
+                        while (contentDoc.body.firstChild) {
+                            capturedAppendChild.call(docFrag, contentDoc.body.firstChild);
+                        }
+                        capturedReplaceChild.call(this.parentNode, docFrag, this);
+                    } else {
+                        throw new Error("Failed to set the 'outerHTML' property on 'Element': This element has no parent node.");
+                    }
+                },
+                configurable: true
+            });
+        };
 
-		/**
-		 * Retrieve the nested <template> once again
-		 * Since we just cloned the document fragment,
-		 * the content's property of the nested <template> might be undefined
-		 * We have to re-set it using the fragment array we previously got
-		 */
-        templates = template.querySelectorAll("template");
+        defineInnerHTML(PolyfilledHTMLTemplateElement.prototype);
+        defineOuterHTML(PolyfilledHTMLTemplateElement.prototype);
 
-        // Loop to set the content property of each nested template
-        for (i = 0; templates[i]; i++) {
-            templates[i].content = fragments[i];
-            templates[i].clone = clone; // Makes sure to set the clone method as well
-        }
+        /*
+          The `bootstrap` method is called automatically and "fixes" all
+          <template> elements in the document referenced by the `doc` argument.
+        */
+        PolyfilledHTMLTemplateElement.bootstrap = function bootstrap(doc) {
+            var templates = QSA(doc, TEMPLATE_TAG);
+            for (var i = 0, l = templates.length, t; (i < l) && (t = templates[i]); i++) {
+                PolyfilledHTMLTemplateElement.decorate(t);
+            }
+        };
 
-        return template;
+        // auto-bootstrapping for main document
+        document.addEventListener('DOMContentLoaded', function () {
+            PolyfilledHTMLTemplateElement.bootstrap(document);
+        });
+
+        // Patch document.createElement to ensure newly created templates have content
+        Document.prototype.createElement = function createElement() {
+            var el = capturedCreateElement.apply(this, arguments);
+            if (el.localName === 'template') {
+                PolyfilledHTMLTemplateElement.decorate(el);
+            }
+            return el;
+        };
+
+        DOMParser.prototype.parseFromString = function () {
+            var el = capturedParseFromString.apply(this, arguments);
+            PolyfilledHTMLTemplateElement.bootstrap(el);
+            return el;
+        };
+
+        Object.defineProperty(HTMLElement.prototype, 'innerHTML', {
+            get: function () {
+                return getInnerHTML(this);
+            },
+            set: function (text) {
+                capturedHTMLElementInnerHTML.set.call(this, text);
+                PolyfilledHTMLTemplateElement.bootstrap(this);
+            },
+            configurable: true,
+            enumerable: true
+        });
+
+        // http://www.whatwg.org/specs/web-apps/current-work/multipage/the-end.html#escapingString
+        var escapeAttrRegExp = /[&\u00A0"]/g;
+        var escapeDataRegExp = /[&\u00A0<>]/g;
+
+        var escapeReplace = function (c) {
+            switch (c) {
+                case '&':
+                    return '&amp;';
+                case '<':
+                    return '&lt;';
+                case '>':
+                    return '&gt;';
+                case '"':
+                    return '&quot;';
+                case '\u00A0':
+                    return '&nbsp;';
+            }
+        };
+
+        var escapeAttr = function (s) {
+            return s.replace(escapeAttrRegExp, escapeReplace);
+        };
+
+        var escapeData = function (s) {
+            return s.replace(escapeDataRegExp, escapeReplace);
+        };
+
+        var makeSet = function (arr) {
+            var set = {};
+            for (var i = 0; i < arr.length; i++) {
+                set[arr[i]] = true;
+            }
+            return set;
+        };
+
+        // http://www.whatwg.org/specs/web-apps/current-work/#void-elements
+        var voidElements = makeSet([
+            'area',
+            'base',
+            'br',
+            'col',
+            'command',
+            'embed',
+            'hr',
+            'img',
+            'input',
+            'keygen',
+            'link',
+            'meta',
+            'param',
+            'source',
+            'track',
+            'wbr'
+        ]);
+
+        var plaintextParents = makeSet([
+            'style',
+            'script',
+            'xmp',
+            'iframe',
+            'noembed',
+            'noframes',
+            'plaintext',
+            'noscript'
+        ]);
+
+        var getOuterHTML = function (node, parentNode, callback) {
+            switch (node.nodeType) {
+                case Node.ELEMENT_NODE: {
+                    var tagName = node.localName;
+                    var s = '<' + tagName;
+                    var attrs = node.attributes;
+                    for (var i = 0, attr; (attr = attrs[i]); i++) {
+                        s += ' ' + attr.name + '="' + escapeAttr(attr.value) + '"';
+                    }
+                    s += '>';
+                    if (voidElements[tagName]) {
+                        return s;
+                    }
+                    return s + getInnerHTML(node, callback) + '</' + tagName + '>';
+                }
+                case Node.TEXT_NODE: {
+                    var data = /** @type {Text} */ (node).data;
+                    if (parentNode && plaintextParents[parentNode.localName]) {
+                        return data;
+                    }
+                    return escapeData(data);
+                }
+                case Node.COMMENT_NODE: {
+                    return '<!--' + /** @type {Comment} */ (node).data + '-->';
+                }
+                default: {
+                    window.console.error(node);
+                    throw new Error('not implemented');
+                }
+            }
+        };
+
+        var getInnerHTML = function (node, callback) {
+            if (node.localName === 'template') {
+                node =  /** @type {HTMLTemplateElement} */ (node).content;
+            }
+            var s = '';
+            var c$ = callback ? callback(node) : capturedChildNodes.get.call(node);
+            for (var i = 0, l = c$.length, child; (i < l) && (child = c$[i]); i++) {
+                s += getOuterHTML(child, node, callback);
+            }
+            return s;
+        };
+
     }
 
-    templates = document.querySelectorAll("template");
-    i = 0;
+    // make cloning/importing work!
+    if (needsTemplate || needsCloning) {
 
-    // Pollute the DOM with a "clone" method on each <template> element
-    while ((template = templates[i++])) {
-        template.clone = clone;
+        PolyfilledHTMLTemplateElement._cloneNode = function _cloneNode(template, deep) {
+            var clone = capturedCloneNode.call(template, false);
+            // NOTE: decorate doesn't auto-fix children because they are already
+            // decorated so they need special clone fixup.
+            if (this.decorate) {
+                this.decorate(clone);
+            }
+            if (deep) {
+                // NOTE: use native clone node to make sure CE's wrapped
+                // cloneNode does not cause elements to upgrade.
+                capturedAppendChild.call(clone.content, capturedCloneNode.call(template.content, true));
+                // now ensure nested templates are cloned correctly.
+                fixClonedDom(clone.content, template.content);
+            }
+            return clone;
+        };
+
+        // Given a source and cloned subtree, find <template>'s in the cloned
+        // subtree and replace them with cloned <template>'s from source.
+        // We must do this because only the source templates have proper .content.
+        var fixClonedDom = function fixClonedDom(clone, source) {
+            // do nothing if cloned node is not an element
+            if (!source.querySelectorAll) return;
+            // these two lists should be coincident
+            var s$ = QSA(source, TEMPLATE_TAG);
+            if (s$.length === 0) {
+                return;
+            }
+            var t$ = QSA(clone, TEMPLATE_TAG);
+            for (var i = 0, l = t$.length, t, s; i < l; i++) {
+                s = s$[i];
+                t = t$[i];
+                if (PolyfilledHTMLTemplateElement && PolyfilledHTMLTemplateElement.decorate) {
+                    PolyfilledHTMLTemplateElement.decorate(s);
+                }
+                capturedReplaceChild.call(t.parentNode, cloneNode.call(s, true), t);
+            }
+        };
+
+        // make sure scripts inside of a cloned template are executable
+        var fixClonedScripts = function fixClonedScripts(fragment) {
+            var scripts = QSA(fragment, scriptSelector);
+            for (var ns, s, i = 0; i < scripts.length; i++) {
+                s = scripts[i];
+                ns = capturedCreateElement.call(document, 'script');
+                ns.textContent = s.textContent;
+                var attrs = s.attributes;
+                for (var ai = 0, a; ai < attrs.length; ai++) {
+                    a = attrs[ai];
+                    ns.setAttribute(a.name, a.value);
+                }
+                capturedReplaceChild.call(s.parentNode, ns, s);
+            }
+        };
+
+        // override all cloning to fix the cloned subtree to contain properly
+        // cloned templates.
+        var cloneNode = Node.prototype.cloneNode = function cloneNode(deep) {
+            var dom;
+            // workaround for Edge bug cloning documentFragments
+            // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/8619646/
+            if (!needsDocFrag && brokenDocFragment && this instanceof DocumentFragment) {
+                if (!deep) {
+                    return this.ownerDocument.createDocumentFragment();
+                } else {
+                    dom = importNode.call(this.ownerDocument, this, true);
+                }
+            } else if (this.nodeType === Node.ELEMENT_NODE &&
+                this.localName === TEMPLATE_TAG &&
+                this.namespaceURI === document.documentElement.namespaceURI) {
+                dom = PolyfilledHTMLTemplateElement._cloneNode(this, deep);
+            } else {
+                dom = capturedCloneNode.call(this, deep);
+            }
+            // template.content is cloned iff `deep`.
+            if (deep) {
+                fixClonedDom(dom, this);
+            }
+            return dom;
+        };
+
+        // NOTE: we are cloning instead of importing <template>'s.
+        // However, the ownerDocument of the cloned template will be correct!
+        // This is because the native import node creates the right document owned
+        // subtree and `fixClonedDom` inserts cloned templates into this subtree,
+        // thus updating the owner doc.
+        var importNode = Document.prototype.importNode = function importNode(element, deep) {
+            deep = deep || false;
+            if (element.localName === TEMPLATE_TAG) {
+                return PolyfilledHTMLTemplateElement._cloneNode(element, deep);
+            } else {
+                var dom = capturedImportNode.call(this, element, deep);
+                if (deep) {
+                    fixClonedDom(dom, element);
+                    fixClonedScripts(dom);
+                }
+                return dom;
+            }
+        };
     }
-}());
+
+    if (needsTemplate) {
+        window.HTMLTemplateElement = PolyfilledHTMLTemplateElement;
+    }
+
+})();
+
 function NewUid() {
     var uuid = "", i, random;
     for (i = 0; i < 32; i++) {
@@ -241,6 +1402,45 @@ var DomBehind;
     })(Validation = DomBehind.Validation || (DomBehind.Validation = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=ValidationException.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var DomBehind;
+(function (DomBehind) {
+    var ApplicationException = (function (_super) {
+        __extends(ApplicationException, _super);
+        function ApplicationException(Message) {
+            var _this = _super.call(this) || this;
+            _this.Message = Message;
+            _this = _super.call(this, Message) || this;
+            return _this;
+        }
+        ApplicationException.prototype.ToString = function () { return this.Message; };
+        return ApplicationException;
+    }(DomBehind.Exception));
+    DomBehind.ApplicationException = ApplicationException;
+    var ApplicationAggregateException = (function (_super) {
+        __extends(ApplicationAggregateException, _super);
+        function ApplicationAggregateException(exceptions) {
+            var _this = _super.call(this) || this;
+            _this.exceptions = exceptions;
+            return _this;
+        }
+        return ApplicationAggregateException;
+    }(DomBehind.Exception));
+    DomBehind.ApplicationAggregateException = ApplicationAggregateException;
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=ApplicationException.js.map
 var DomBehind;
 (function (DomBehind) {
     var TypedEvent = (function () {
@@ -725,6 +1925,7 @@ var DomBehind;
         (function (BindingMode) {
             BindingMode[BindingMode["TwoWay"] = 0] = "TwoWay";
             BindingMode[BindingMode["OneWay"] = 1] = "OneWay";
+            BindingMode[BindingMode["OneWayToSource"] = 2] = "OneWayToSource";
         })(BindingMode = Data.BindingMode || (Data.BindingMode = {}));
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
@@ -758,6 +1959,7 @@ var DomBehind;
 (function (DomBehind) {
     var Observable = (function () {
         function Observable(source, option) {
+            var _this = this;
             this.source = source;
             this.PropertyChanging = new DomBehind.TypedEvent();
             this.PropertyChanged = new DomBehind.TypedEvent();
@@ -771,9 +1973,12 @@ var DomBehind;
                 if (option) {
                     this_1.Wrapper = option.wrapper;
                     if (option.marks) {
-                        if (option.marks.Any(function (x) { return x === name_1; })) {
-                            this_1.Recurcive(source, name_1, null);
-                        }
+                        $.each(option.marks, function (i, value) {
+                            var buff = value.Split(".");
+                            $.each(buff, function (k, each) {
+                                _this.Recurcive(source, name_1, null);
+                            });
+                        });
                     }
                     else {
                         this_1.Recurcive(source, name_1, null);
@@ -878,11 +2083,27 @@ Object.defineProperty(String.prototype, "ExtendedPrototype", {
 });
 "OrderBy".ExtendedPrototype(Array.prototype, function (selector) {
     var me = this;
-    return me.sort(function (x, y) { return selector(x) - selector(y); });
+    return me.sort(function (x, y) {
+        var xx = selector(x);
+        var yy = selector(y);
+        if (typeof xx === 'string' &&
+            typeof yy === 'string') {
+            return yy === xx ? 0 : yy < xx ? 1 : -1;
+        }
+        return xx - yy;
+    });
 });
 "OrderByDecording".ExtendedPrototype(Array.prototype, function (selector) {
     var me = this;
-    return me.sort(function (x, y) { return selector(y) - selector(x); });
+    return me.sort(function (x, y) {
+        var xx = selector(x);
+        var yy = selector(y);
+        if (typeof xx === 'string' &&
+            typeof yy === 'string') {
+            return yy === xx ? 0 : xx < yy ? 1 : -1;
+        }
+        return yy - xx;
+    });
 });
 "FirstOrDefault".ExtendedPrototype(Array.prototype, function (predicate) {
     var me = this;
@@ -945,6 +2166,21 @@ Object.defineProperty(String.prototype, "ExtendedPrototype", {
         value += selector(x);
     });
     return value;
+});
+"Chunk".ExtendedPrototype(Array.prototype, function (size) {
+    var arr = this;
+    if (!size) {
+        size = 1;
+    }
+    return arr.reduce(function (chunks, el, i) {
+        if (i % size === 0) {
+            chunks.push([el]);
+        }
+        else {
+            chunks[chunks.length - 1].push(el);
+        }
+        return chunks;
+    }, []);
 });
 //# sourceMappingURL=EnumerableExtensions.js.map
 Object.IsNullOrUndefined = function (obj) {
@@ -1072,6 +2308,33 @@ var StringSplitOptions;
     var me = this;
     return me.toString().substr(start, length);
 });
+"Contains".ExtendedPrototype(String.prototype, function (search) {
+    var me = this;
+    if (search.length > me.length) {
+        return false;
+    }
+    else {
+        return me.indexOf(search, 0) !== -1;
+    }
+});
+"StartsWith".ExtendedPrototype(String.prototype, function (s) {
+    var me = this;
+    if (!String.prototype.startsWith) {
+        return this.substr(0, s.length) === s;
+    }
+    else {
+        return me.startsWith(s);
+    }
+});
+"EndsWith".ExtendedPrototype(String.prototype, function (s) {
+    var me = this;
+    if (!String.prototype.endsWith) {
+        return me.indexOf(s, this.length - s.length) !== -1;
+    }
+    else {
+        return me.endsWith(s);
+    }
+});
 //# sourceMappingURL=StringExtensions.js.map
 var z_indexKey = "z_indexKey";
 $.GenerateZIndex = function () {
@@ -1131,6 +2394,10 @@ $.GetRootUri = function () {
     return $.GetLocalStorage("RootUri");
 };
 $.AbsoluteUri = function (uri) {
+    if (uri.toLowerCase().StartsWith("http://"))
+        return uri;
+    if (uri.toLowerCase().StartsWith("https://"))
+        return uri;
     var rootUri = $.GetLocalStorage("RootUri", "");
     return "" + rootUri + uri;
 };
@@ -1194,7 +2461,9 @@ $.fn.CheckValidity = function () {
 };
 $.fn.Raise = function (event) {
     var me = this;
-    me.trigger(event.EventName);
+    var e = $.Event(event.EventName);
+    me.trigger(e);
+    return e;
 };
 //# sourceMappingURL=JQueryExtensions.js.map
 var DomBehind;
@@ -1243,226 +2512,6 @@ var DomBehind;
     DomBehind.Repository = Repository;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Repository.js.map
-var DomBehind;
-(function (DomBehind) {
-    var IndexedDBHelper = (function () {
-        function IndexedDBHelper(ctor, DbName) {
-            this.DbName = DbName;
-            var schema = new ctor();
-            var name = schema.constructor.name;
-            if (name == "Object") {
-                throw Error("dynamic object is not supported");
-            }
-            this.TableName = name;
-        }
-        IndexedDBHelper.prototype.List = function () {
-            var _this = this;
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
-                    d.reject();
-                    return;
-                }
-                var trans = x.transaction(_this.TableName, "readwrite");
-                var objectStore = trans.objectStore(_this.TableName);
-                var dbRequest = objectStore.getAll();
-                dbRequest.onsuccess = function (e) {
-                    var result = dbRequest.result;
-                    d.resolve(result);
-                };
-                dbRequest.onerror = function (e) {
-                    d.reject();
-                };
-            }).fail(function () {
-                d.reject();
-            });
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.Truncate = function () {
-            var _this = this;
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
-                    d.reject();
-                    return;
-                }
-                var trans = x.transaction(_this.TableName, "readwrite");
-                var objectStore = trans.objectStore(_this.TableName);
-                var dbRequest = objectStore.clear();
-                dbRequest.onsuccess = function (e) {
-                    d.resolve();
-                };
-                dbRequest.onerror = function (e) {
-                    d.reject();
-                };
-            }).fail(function () {
-                d.reject();
-            });
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.FindRowAsync = function (exp, value) {
-            var d = $.Deferred();
-            this.FindRowsAsync(exp, value).done(function (x) {
-                d.resolve(x.FirstOrDefault());
-            }).fail(function (x) {
-                d.reject(x);
-            });
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.FindRowsAsync = function (exp, value) {
-            var _this = this;
-            var path = DomBehind.LamdaExpression.Path(exp);
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
-                    d.reject();
-                    return;
-                }
-                var trans = x.transaction(_this.TableName, "readwrite");
-                var objectStore = trans.objectStore(_this.TableName);
-                if (objectStore.keyPath === path) {
-                    var dbRequest_1 = objectStore.get(value);
-                    dbRequest_1.onsuccess = function (e) {
-                        var result = [dbRequest_1.result];
-                        d.resolve(result);
-                    };
-                    dbRequest_1.onerror = function (e) {
-                        d.reject(e);
-                    };
-                }
-                else if (objectStore.indexNames.contains(path)) {
-                    _this.FetchCursor(objectStore.index(path), value, d);
-                }
-                else {
-                    x.close();
-                    _this.Upgrade(x.version + 1, function (y) {
-                        var newDb = y.target.result;
-                        var newTrans = y.target.transaction;
-                        var newObjectStore = newTrans.objectStore(_this.TableName);
-                        var indexStore = newObjectStore.createIndex(path, path, { unique: false });
-                        _this.FetchCursor(indexStore, value, d);
-                    });
-                }
-            }).fail(function (x) {
-                d.reject(x);
-            });
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.FetchCursor = function (indexStore, value, d) {
-            var list = new DomBehind.List();
-            var cursorHandler = indexStore.openCursor(value);
-            cursorHandler.onsuccess = function (e) {
-                var cursor = e.target.result;
-                if (cursor) {
-                    var value_1 = cursor.value;
-                    if (!Object.IsNullOrUndefined(value_1)) {
-                        list.add(value_1);
-                    }
-                    cursor.continue();
-                }
-                else {
-                    d.resolve(list.toArray());
-                }
-            };
-            cursorHandler.onerror = function (e) {
-                d.reject(e);
-            };
-        };
-        IndexedDBHelper.prototype.UpsertAsync = function (entity, primaryKey) {
-            var _this = this;
-            var path;
-            if (primaryKey) {
-                path = DomBehind.LamdaExpression.Path(primaryKey);
-            }
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
-                    x.close();
-                    _this.Upgrade(x.version + 1, function (y) {
-                        var newDb = y.target.result;
-                        var newStore;
-                        if (path) {
-                            newStore = newDb.createObjectStore(_this.TableName, { keyPath: path });
-                        }
-                        else {
-                            newStore = newDb.createObjectStore(_this.TableName, { keyPath: "__identity", autoIncrement: true });
-                        }
-                        newStore.transaction.oncomplete = function (e) {
-                            newDb.close();
-                            _this.UpsertAsync(entity, primaryKey).done(function (x) { return d.resolve(); }).fail(function (x) { return d.reject(x); });
-                        };
-                    });
-                    return;
-                }
-                var trans = x.transaction(_this.TableName, "readwrite");
-                var store = trans.objectStore(_this.TableName);
-                store.put(entity);
-                d.resolve();
-            }).fail(function (x) {
-                d.reject(x);
-            });
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.DeleteAsync = function (entity) {
-            var _this = this;
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                var trans = x.transaction(_this.TableName, "readwrite");
-                if (trans.objectStoreNames.contains(_this.TableName)) {
-                    var store = trans.objectStore(_this.TableName);
-                    var identity = entity["" + store.keyPath];
-                    store.delete(identity);
-                    d.resolve();
-                }
-                else {
-                    d.reject("table not found. " + _this.TableName);
-                }
-            }).fail(function (x) {
-                d.reject(x);
-            });
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.Open = function () {
-            var d = $.Deferred();
-            var factory = window.indexedDB;
-            var openRequest = factory.open(this.DbName);
-            openRequest.onsuccess = function (e) {
-                var db = openRequest.result;
-                d.resolve(db);
-                db.close();
-            };
-            openRequest.onblocked = function (e) {
-                d.reject(e);
-            };
-            openRequest.onerror = function (e) {
-                d.reject(e);
-            };
-            return d.promise();
-        };
-        IndexedDBHelper.prototype.Upgrade = function (version, action) {
-            var factory = window.indexedDB;
-            var openRequest = factory.open(this.DbName, version);
-            openRequest.onsuccess = function (e) {
-                var dummy = e;
-            };
-            openRequest.onupgradeneeded = function (e) {
-                var db = e.target.result;
-                action(e);
-                db.close();
-            };
-            openRequest.onerror = function (e) {
-            };
-        };
-        return IndexedDBHelper;
-    }());
-    DomBehind.IndexedDBHelper = IndexedDBHelper;
-})(DomBehind || (DomBehind = {}));
-//# sourceMappingURL=IndexedDBHelper.js.map
 var DomBehind;
 (function (DomBehind) {
     var Data;
@@ -1615,7 +2664,8 @@ var DomBehind;
             Object.defineProperty(DataBindingBehavior.prototype, "ValueCore", {
                 get: function () {
                     var value = this.Property.GetValue(this.Element);
-                    if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter)) {
+                    if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter) &&
+                        !Object.IsNullOrUndefined(this.BindingPolicy.Converter.ConvertBack)) {
                         value = this.BindingPolicy.Converter.ConvertBack(value);
                     }
                     return value;
@@ -1646,8 +2696,10 @@ var DomBehind;
                 if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter)) {
                     value = this.BindingPolicy.Converter.Convert(value);
                 }
-                this.Property.SetValue(this.Element, value, this);
-                this.UpdateTargetEvent.Raise(this, value);
+                if (this.Element) {
+                    this.Property.SetValue(this.Element, value, this);
+                    this.UpdateTargetEvent.Raise(this, value);
+                }
             };
             DataBindingBehavior.prototype.Ensure = function () {
                 var _this = this;
@@ -2020,13 +3072,18 @@ var DomBehind;
         function SimpleConverter() {
         }
         SimpleConverter.prototype.Convert = function (value) {
+            if (!this.ConvertHandler)
+                return value;
             return this.ConvertHandler(value);
         };
         SimpleConverter.prototype.ConvertBack = function (value) {
+            if (!this.ConvertBackHandler)
+                return value;
             return this.ConvertBackHandler(value);
         };
         return SimpleConverter;
     }());
+    DomBehind.SimpleConverter = SimpleConverter;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=BindingBehaviorBuilder.js.map
 var __extends = (this && this.__extends) || (function () {
@@ -2151,9 +3208,9 @@ var DomBehind;
                     if (!Object.IsPromise(result)) {
                         this.Done();
                         this.Always();
+                        return result;
                     }
                     else {
-                        var exception = void 0;
                         var p = result;
                         p.done(function () {
                             _this.Done();
@@ -2621,6 +3678,249 @@ var DomBehind;
 //# sourceMappingURL=SuppressDuplicateActionPolicy.js.map
 var DomBehind;
 (function (DomBehind) {
+    var IndexedDBHelper = (function () {
+        function IndexedDBHelper(ctor, db) {
+            var schema = new ctor();
+            var name = schema.toString();
+            if (name === "[object Object]") {
+                name = schema.constructor.name;
+            }
+            if (name === "Object") {
+                throw Error("dynamic object is not supported");
+            }
+            this.DbName = db;
+            this.TableName = name;
+        }
+        IndexedDBHelper.prototype.List = function () {
+            var _this = this;
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    d.resolve([]);
+                    return;
+                }
+                var trans = x.transaction(_this.TableName, "readwrite");
+                var objectStore = trans.objectStore(_this.TableName);
+                var dbRequest = objectStore.getAll();
+                dbRequest.onsuccess = function (e) {
+                    var result = dbRequest.result;
+                    d.resolve(result);
+                };
+                dbRequest.onerror = function (e) {
+                    d.reject();
+                };
+            }).fail(function () {
+                d.reject();
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.Truncate = function () {
+            var _this = this;
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    d.resolve([]);
+                    return;
+                }
+                var trans = x.transaction(_this.TableName, "readwrite");
+                var objectStore = trans.objectStore(_this.TableName);
+                var dbRequest = objectStore.clear();
+                dbRequest.onsuccess = function (e) {
+                    d.resolve();
+                };
+                dbRequest.onerror = function (e) {
+                    d.reject();
+                };
+            }).fail(function () {
+                d.reject();
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.FindRowAsync = function (exp, value) {
+            var d = $.Deferred();
+            this.FindRowsAsync(exp, value).done(function (x) {
+                d.resolve(x.FirstOrDefault());
+            }).fail(function (x) {
+                d.reject(x);
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.FindRowsAsync = function (exp, value) {
+            var _this = this;
+            var path = DomBehind.LamdaExpression.Path(exp);
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    d.resolve([]);
+                    return;
+                }
+                var trans = x.transaction(_this.TableName, "readwrite");
+                var objectStore = trans.objectStore(_this.TableName);
+                if (objectStore.keyPath === path) {
+                    var dbRequest_1 = objectStore.get(value);
+                    dbRequest_1.onsuccess = function (e) {
+                        var result = [dbRequest_1.result];
+                        d.resolve(result);
+                    };
+                    dbRequest_1.onerror = function (e) {
+                        d.reject(e);
+                    };
+                }
+                else if (objectStore.indexNames.contains(path)) {
+                    _this.FetchCursor(objectStore.index(path), value, d);
+                }
+                else {
+                    x.close();
+                    _this.Upgrade(x.version + 1, function (y) {
+                        var newDb = y.target.result;
+                        var newTrans = y.target.transaction;
+                        var newObjectStore = newTrans.objectStore(_this.TableName);
+                        var indexStore = newObjectStore.createIndex(path, path, { unique: false });
+                        _this.FetchCursor(indexStore, value, d);
+                    });
+                }
+            }).fail(function (x) {
+                d.reject(x);
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.FetchCursor = function (indexStore, value, d) {
+            var list = new DomBehind.List();
+            var cursorHandler = indexStore.openCursor(value);
+            cursorHandler.onsuccess = function (e) {
+                var cursor = e.target.result;
+                if (cursor) {
+                    var value_1 = cursor.value;
+                    if (!Object.IsNullOrUndefined(value_1)) {
+                        list.add(value_1);
+                    }
+                    cursor.continue();
+                }
+                else {
+                    d.resolve(list.toArray());
+                }
+            };
+            cursorHandler.onerror = function (e) {
+                d.reject(e);
+            };
+        };
+        IndexedDBHelper.prototype.UpsertAsync = function (entity, primaryKey) {
+            var _this = this;
+            var path;
+            if (primaryKey) {
+                path = DomBehind.LamdaExpression.Path(primaryKey);
+            }
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    x.close();
+                    _this.Upgrade(x.version + 1, function (y) {
+                        var newDb = y.target.result;
+                        var newStore;
+                        if (path) {
+                            newStore = newDb.createObjectStore(_this.TableName, { keyPath: path });
+                        }
+                        else {
+                            newStore = newDb.createObjectStore(_this.TableName, { keyPath: "__identity", autoIncrement: true });
+                        }
+                        newStore.transaction.oncomplete = function (e) {
+                            newDb.close();
+                            _this.UpsertAsync(entity, primaryKey).done(function (x) { return d.resolve(); }).fail(function (x) { return d.reject(x); });
+                        };
+                    });
+                    return;
+                }
+                var trans = x.transaction(_this.TableName, "readwrite");
+                var store = trans.objectStore(_this.TableName);
+                if (entity instanceof Array) {
+                    $.each(entity, function (i, value) {
+                        store.put(value);
+                    });
+                }
+                else {
+                    store.put(entity);
+                }
+                d.resolve();
+            }).fail(function (x) {
+                d.reject(x);
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.DeleteAsync = function (entity) {
+            var _this = this;
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    d.resolve();
+                }
+                else {
+                    var trans = x.transaction(_this.TableName, "readwrite");
+                    if (trans.objectStoreNames.contains(_this.TableName)) {
+                        var store_1 = trans.objectStore(_this.TableName);
+                        if (entity instanceof Array) {
+                            $.each(entity, function (i, value) {
+                                var id = value["" + store_1.keyPath];
+                                store_1.delete(id);
+                            });
+                        }
+                        else {
+                            var identity = entity["" + store_1.keyPath];
+                            store_1.delete(identity);
+                        }
+                        d.resolve();
+                    }
+                    else {
+                        d.reject("table not found. " + _this.TableName);
+                    }
+                }
+            }).fail(function (x) {
+                d.reject(x);
+            });
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.Open = function () {
+            var d = $.Deferred();
+            var factory = window.indexedDB;
+            var openRequest = factory.open(this.DbName);
+            openRequest.onsuccess = function (e) {
+                var db = openRequest.result;
+                d.resolve(db);
+                db.close();
+            };
+            openRequest.onblocked = function (e) {
+                d.reject(e);
+            };
+            openRequest.onerror = function (e) {
+                d.reject(e);
+            };
+            return d.promise();
+        };
+        IndexedDBHelper.prototype.Upgrade = function (version, action) {
+            var factory = window.indexedDB;
+            var openRequest = factory.open(this.DbName, version);
+            openRequest.onsuccess = function (e) {
+                var dummy = e;
+            };
+            openRequest.onupgradeneeded = function (e) {
+                var db = e.target.result;
+                action(e);
+                db.close();
+            };
+            openRequest.onerror = function (e) {
+            };
+        };
+        return IndexedDBHelper;
+    }());
+    DomBehind.IndexedDBHelper = IndexedDBHelper;
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=IndexedDBHelper.js.map
+var DomBehind;
+(function (DomBehind) {
     var Navigation;
     (function (Navigation) {
         var ModalStartupLocation;
@@ -2724,10 +4024,12 @@ var DomBehind;
                     }
                 }
                 var modal = container.find(".modal-dialog");
-                modal.draggable({
-                    handle: ".modal-header",
-                    cursor: "move",
-                });
+                if (modal.draggable) {
+                    modal.draggable({
+                        handle: ".modal-header",
+                        cursor: "move",
+                    });
+                }
                 if (setting.Width) {
                     modal.css("width", option.Width);
                 }
@@ -2835,6 +4137,14 @@ var DomBehind;
                 }
                 this.Behavior.Element.ClearCustomError();
             };
+            Validator.prototype.ClearValidation = function () {
+                var _this = this;
+                if (!String.IsNullOrWhiteSpace(this.Attribute) &&
+                    Validator._ignoreMarks.Any(function (x) { return x !== _this.Attribute; })) {
+                    this.Behavior.Element.removeAttr(this.Attribute);
+                }
+                this.Behavior.Element.ClearCustomError();
+            };
             Validator.prototype.AddValidation = function () {
                 this.RemoveValidation();
                 if (!String.IsNullOrWhiteSpace(this.Attribute)) {
@@ -2862,6 +4172,9 @@ var DomBehind;
                 }
                 this._disposed = true;
             };
+            Validator._ignoreMarks = [
+                "maxlength"
+            ];
             return Validator;
         }());
         Validation.Validator = Validator;
@@ -2892,8 +4205,11 @@ var DomBehind;
                 _this._disposed = false;
                 return _this;
             }
-            ValidatorCollection.prototype.ClearValidator = function () {
+            ValidatorCollection.prototype.RemoveValidator = function () {
                 $.each(this.toArray(), function (i, x) { return x.RemoveValidation(); });
+            };
+            ValidatorCollection.prototype.ClearValidator = function () {
+                $.each(this.toArray(), function (i, x) { return x.ClearValidation(); });
             };
             ValidatorCollection.prototype.ApplyValidator = function () {
                 $.each(this.toArray(), function (i, x) { return x.Apply(); });
@@ -3302,6 +4618,18 @@ var DomBehind;
                 });
                 return d.promise();
             };
+            WebService.prototype.ExecuteAjax = function (request, option) {
+                var d = $.Deferred();
+                var p = $.extend(true, this.DefaultPostSetting, option);
+                p.data = request;
+                p.async = true;
+                $.ajax(p).done(function (x) {
+                    d.resolve(x);
+                }).fail(function (x) {
+                    d.reject(new DomBehind.AjaxException(x));
+                });
+                return d.promise();
+            };
             Object.defineProperty(WebService.prototype, "DefaultPostSetting", {
                 get: function () {
                     return {
@@ -3330,6 +4658,7 @@ var DomBehind;
         UIElement.ValueProperty = DomBehind.Data.DependencyProperty.RegisterAttached("val", function (x) { return x.val(); }, function (x, y) { return x.val(y); }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
         UIElement.TextProperty = DomBehind.Data.DependencyProperty.RegisterAttached("text", function (x) { return x.text(); }, function (x, y) { return x.text(y); }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
         UIElement.SrcProperty = DomBehind.Data.DependencyProperty.RegisterAttached("src", function (x) { return x.attr("src"); }, function (x, y) { return x.attr("src", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        UIElement.HrefProperty = DomBehind.Data.DependencyProperty.RegisterAttached("href", function (x) { return x.attr("href"); }, function (x, y) { return x.attr("href", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("enabled", null, function (x, y) {
             var disabled = y === false ? true : false;
             if (disabled === true) {
@@ -3345,18 +4674,40 @@ var DomBehind;
             var visible = y ? true : false;
             if (visible) {
                 x.attr("display", "");
-                x.show();
+                try {
+                    x.show();
+                }
+                catch (e) {
+                }
             }
             else {
                 x.attr("display", "none");
-                x.hide();
+                try {
+                    x.hide();
+                }
+                catch (e) {
+                }
             }
         }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
+        UIElement.OpacityProperty = DomBehind.Data.DependencyProperty.RegisterAttached("opacity", function (x) {
+        }, function (el, newValue) {
+            el.css("opacity", newValue);
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.PlaceHolderProperty = DomBehind.Data.DependencyProperty.RegisterAttached("placeholder", null, function (x, y) { return x.attr("placeholder", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.IsCheckedProperty = DomBehind.Data.DependencyProperty.RegisterAttached("checked", function (x) { return x.get(0).checked; }, function (x, y) { return x.get(0).checked = y; }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
+        UIElement.IsCheckedProperty = DomBehind.Data.DependencyProperty.RegisterAttached("checked", function (x) { return x.get(0).checked; }, function (x, y) {
+            var el = x.get(0);
+            el.checked = y;
+            if (el.hasAttribute("readonly")) {
+                el.onclick = function (e) { return false; };
+            }
+        }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
         UIElement.MaxLengthProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("maxlength", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.MaxNumericProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("max", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.MinNumericProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("min", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        UIElement.BackgroundColorProperty = DomBehind.Data.DependencyProperty.RegisterAttached("background-color", null, function (x, y) { return x.css("background-color", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        UIElement.ColorProperty = DomBehind.Data.DependencyProperty.RegisterAttached("color", null, function (x, y) { return x.css("color", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        UIElement.BackgroundImageProperty = DomBehind.Data.DependencyProperty.RegisterAttached("background-image", null, function (x, y) { return x.css("background-image", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        UIElement.ClassProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", function (x) { return x.attr("class"); }, function (x, y) { return x.attr("class", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
         UIElement.HtmlSource = DomBehind.Data.DependencyProperty.RegisterAttached("htmlSource", null, function (x, y) {
             var p = {
                 url: y,
@@ -3384,7 +4735,7 @@ var DomBehind;
         UIElement.Keydown = DomBehind.EventBuilder.RegisterAttached("keydown");
         UIElement.LostFocus = DomBehind.EventBuilder.RegisterAttached("focusout");
         UIElement.Initialize = DomBehind.EventBuilder.RegisterAttached("initialize");
-        UIElement.ViewLoaded = DomBehind.EventBuilder.RegisterAttached("viewLoaded");
+        UIElement.Activate = DomBehind.EventBuilder.RegisterAttached("activate");
         UIElement.ModalClosing = DomBehind.EventBuilder.RegisterAttached("modalClosing");
         return UIElement;
     }());
@@ -4140,21 +5491,28 @@ var DomBehind;
                 var rowContainer = $("<div class=\"templateRowContainer\"></div>");
                 $.each(newValue.ToArray(), function (i, value) {
                     var newRow = template.clone();
+                    value.__element = newRow;
+                    var twowayMarks = new Array();
                     $.each(_this.Columns, function (k, column) {
                         var el = newRow.find(column.templateSelector);
+                        if (el.length === 0) {
+                            if (column.templateSelector.StartsWith(".")) {
+                                var selector = column.templateSelector.SubString(1, column.templateSelector.length - 1);
+                                if (newRow.hasClass(selector)) {
+                                    el = newRow;
+                                }
+                            }
+                        }
                         if (el.length !== 0) {
                             if (column.expression && column.dependencyProperty) {
                                 var ret = column.expression(value);
+                                if (column.convertTarget) {
+                                    ret = column.convertTarget(ret, el);
+                                }
                                 column.dependencyProperty.SetValue(el, ret);
                                 if (column.mode === DomBehind.Data.BindingMode.TwoWay) {
                                     var path = DomBehind.LamdaExpression.Path(column.expression);
-                                    var observe = DomBehind.Observable.Register(value, path);
-                                    observe.PropertyChanged.AddHandler(function (sender, d) {
-                                        if (sender) {
-                                            var v = sender[d.Name];
-                                            column.dependencyProperty.SetValue(el, v);
-                                        }
-                                    });
+                                    twowayMarks.push({ column: column, element: el, marks: path });
                                 }
                             }
                             if (column.expressionAction && column.attachedEvent) {
@@ -4165,13 +5523,51 @@ var DomBehind;
                                 el.off(newEvent_1.EventName);
                                 el.on(newEvent_1.EventName, function (e) {
                                     newEvent_1.Raise(_this, e);
+                                    if (!column.allowBubbling) {
+                                        if (e.stopPropagation) {
+                                            e.stopPropagation();
+                                        }
+                                    }
                                 });
+                                if (el.is("a") && !el.attr("href")) {
+                                    el.attr("href", "javascript:void(0);");
+                                }
+                            }
+                            if (_this.AlternateStyle) {
+                                if (i % 2 !== 0) {
+                                    var el_1 = newRow.find(_this.AlternateStyle.Selector);
+                                    if (el_1.length !== 0) {
+                                        el_1.addClass(_this.AlternateStyle.Css);
+                                    }
+                                }
                             }
                         }
                     });
+                    if (twowayMarks.length !== 0) {
+                        var observe = DomBehind.Observable.RegisterAttached(value, { marks: twowayMarks.Select(function (x) { return x.marks; }) });
+                        observe.PropertyChanged.AddHandler(function (sender, d) {
+                            if (sender) {
+                                var twowayList = twowayMarks.Where(function (x) { return x.marks === d.Name; });
+                                for (var i = 0; i < twowayList.length; i++) {
+                                    var v = sender[d.Name];
+                                    var twoway = twowayList[i];
+                                    if (twoway.column.convertTarget) {
+                                        v = twoway.column.convertTarget(v, twoway.element);
+                                    }
+                                    twoway.column.dependencyProperty.SetValue(twoway.element, v);
+                                }
+                            }
+                        });
+                    }
                     rowContainer.append(newRow);
                 });
                 this.Element.append(rowContainer);
+                newValue.PropertyChanged.Clear();
+                newValue.PropertyChanged.AddHandler(function (sender, e) {
+                    if (!e.Name) {
+                        _this.ItemsSource = sender;
+                    }
+                });
             },
             enumerable: true,
             configurable: true
@@ -4260,8 +5656,12 @@ var DomBehind;
                     var list = this.PInfo.GetValue();
                     if (column && list instanceof DomBehind.Data.ListCollectionView) {
                         var exp_1 = DomBehind.LamdaExpression.Path(column.expression);
+                        var filter = list.Filter;
+                        list.Filter = null;
                         var sorted = asc ? list.ToArray().OrderBy(function (x) { return x[exp_1]; }) : list.ToArray().OrderByDecording(function (x) { return x[exp_1]; });
-                        this.ItemsSource = this.DataContext[this.PInfo.MemberPath] = new DomBehind.Data.ListCollectionView(sorted);
+                        var newList = new DomBehind.Data.ListCollectionView(sorted);
+                        newList.Filter = filter;
+                        this.ItemsSource = this.DataContext[this.PInfo.MemberPath] = newList;
                     }
                 }
             }
@@ -4333,6 +5733,13 @@ var DomBehind;
             }
             return me;
         };
+        TemplateListViewBindingBehaviorBuilder.prototype.BindingAlternateRowStyle = function (selector, css) {
+            var me = this;
+            if (me.CurrentBehavior instanceof TemplateListView) {
+                me.CurrentBehavior.AlternateStyle = { Selector: selector, Css: css };
+            }
+            return me;
+        };
         return TemplateListViewBindingBehaviorBuilder;
     }(DomBehind.BindingBehaviorBuilder));
     DomBehind.TemplateListViewBindingBehaviorBuilder = TemplateListViewBindingBehaviorBuilder;
@@ -4342,6 +5749,7 @@ var DomBehind;
         behavior.Owner = me.Owner;
         behavior.Property = TemplateListView.ItemsSourceProperty;
         behavior.PInfo = new DomBehind.LamdaExpression(me.Owner.DataContext, itemsSource);
+        behavior.BindingPolicy.Mode = TemplateListView.ItemsSourceProperty.BindingMode;
         behavior.Option = $.extend(true, {}, option);
         behavior.Columns = new Array();
         var newMe = new TemplateListViewBindingBehaviorBuilder(me.Owner);
@@ -4351,6 +5759,511 @@ var DomBehind;
     };
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=TemplateListView.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var DomBehind;
+(function (DomBehind) {
+    var FileBrowser = (function (_super) {
+        __extends(FileBrowser, _super);
+        function FileBrowser() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.MaximumNumberOfAjax = 1;
+            return _this;
+        }
+        FileBrowser.prototype.Ensure = function () {
+            var _this = this;
+            _super.prototype.Ensure.call(this);
+            var element = this.Element;
+            element.attr("type", "file");
+            element.attr("capture", "camera");
+            if (this.AcceptValue) {
+                element.attr("accept", this.AcceptValue);
+            }
+            else {
+                element.attr("accept", "image/*");
+            }
+            if (this.AllowMultiFiles) {
+                element.attr("multiple", "multiple");
+            }
+            element.change(function (e) {
+                var args = $.extend(true, e, {});
+                var arr = new Array();
+                $.each(e.target.files, function (i, s) {
+                    var uri = URL.createObjectURL(s);
+                    var file = $.extend(true, s, {});
+                    file.uri = uri;
+                    arr.push(file);
+                });
+                _this.Files = args.files = arr;
+                _this.OnTrigger(args);
+            });
+            if (this.InstanceExpression) {
+                this.InstanceExpression.SetValue(this);
+            }
+        };
+        FileBrowser.prototype.UpdateAll = function () {
+            var _this = this;
+            if (!this.Files) {
+                this.OnCompleted({ file: null, response: null });
+                return;
+            }
+            var pooler = new Pooler(this);
+            return pooler.Do().always(function () {
+                _this.OnAlways();
+            });
+        };
+        FileBrowser.prototype.Update = function (file) {
+            var _this = this;
+            var executor = new Executor(this, file);
+            executor.Do();
+            return executor.Pms.always(function () {
+                _this.OnAlways();
+            });
+        };
+        FileBrowser.prototype.OnProgress = function (e) {
+            console.trace(e.file.name + "..." + e.loaded + " / " + e.total + "  " + e.percent + " %");
+            if (this.ProgressExpression) {
+                this.ProgressExpression(this.DataContext, e);
+            }
+        };
+        FileBrowser.prototype.OnCompleted = function (e) {
+            if (e.file) {
+                console.trace(e.file.name + "...complete");
+            }
+            if (this.CompletedExpression) {
+                this.CompletedExpression(this.DataContext, e);
+            }
+        };
+        FileBrowser.prototype.OnError = function (e) {
+            if (e.file) {
+                console.trace("error..." + e.file.name);
+            }
+            if (e.error) {
+                console.error(e.error);
+            }
+            if (this.ErrorExpression) {
+                this.ErrorExpression(this.DataContext, e);
+            }
+        };
+        FileBrowser.prototype.OnAlways = function () {
+            if (this.AlwaysExpression) {
+                this.AlwaysExpression(this.DataContext);
+            }
+        };
+        FileBrowser.SelectedFiles = DomBehind.EventBuilder.RegisterAttached("selectedFiles");
+        return FileBrowser;
+    }(DomBehind.Data.ActionBindingBehavior));
+    DomBehind.FileBrowser = FileBrowser;
+    var Pooler = (function () {
+        function Pooler(FileBrowser) {
+            this.FileBrowser = FileBrowser;
+        }
+        Pooler.prototype.Do = function () {
+            var _this = this;
+            var files = this.FileBrowser.Files;
+            var chunk = parseInt(String(files.length / this.FileBrowser.MaximumNumberOfAjax));
+            if (chunk === 0) {
+                chunk = 1;
+            }
+            var pmslist = new Array();
+            var chunkList = files.Chunk(chunk);
+            $.each(chunkList, function (i, value) {
+                var e = new ChunkFlow(_this.FileBrowser, value);
+                pmslist.push(e.Do());
+            });
+            return $.when(pmslist);
+        };
+        return Pooler;
+    }());
+    var ChunkFlow = (function () {
+        function ChunkFlow(FileBrowser, Queue) {
+            this.FileBrowser = FileBrowser;
+            this.Queue = Queue;
+        }
+        ChunkFlow.prototype.Do = function () {
+            var _this = this;
+            var arr = this.Queue.Select(function (x) { return new Executor(_this.FileBrowser, x); });
+            $.each(arr, function (i, value) {
+                var nextIndex = i + 1;
+                if (nextIndex < arr.length) {
+                    value.Pms.always(function () {
+                        arr[nextIndex].Do();
+                    });
+                }
+            });
+            if (0 < arr.length) {
+                arr[0].Do();
+            }
+            return $.when(arr.Select(function (x) { return x.Pms; }));
+        };
+        return ChunkFlow;
+    }());
+    var Executor = (function () {
+        function Executor(FileBrowser, File) {
+            this.FileBrowser = FileBrowser;
+            this.File = File;
+            this.Dfd = $.Deferred();
+            this.Pms = this.Dfd.promise();
+        }
+        Executor.prototype.Do = function () {
+            var _this = this;
+            var formData = new FormData();
+            formData.append("userfile", this.File);
+            $.ajax({
+                xhr: function () {
+                    var xhr = new XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percent = (evt.loaded / evt.total) * 100;
+                            _this.FileBrowser.OnProgress({
+                                loaded: evt.loaded,
+                                total: evt.total,
+                                percent: percent,
+                                file: _this.File,
+                            });
+                        }
+                    }, false);
+                    xhr.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percent = (evt.loaded / evt.total) * 100;
+                            _this.FileBrowser.OnProgress({
+                                loaded: evt.loaded,
+                                total: evt.total,
+                                percent: percent,
+                                file: _this.File,
+                            });
+                        }
+                    }, false);
+                    return xhr;
+                },
+                type: "POST",
+                url: this.FileBrowser.UploadUri,
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (e) {
+                    _this.FileBrowser.OnCompleted({ response: e, file: _this.File });
+                    _this.Dfd.resolve(e);
+                },
+                error: function (x, status, error) {
+                    _this.FileBrowser.OnError({ file: _this.File, error: error });
+                    _this.Dfd.reject(error);
+                }
+            });
+        };
+        return Executor;
+    }());
+    var FileBrowserBindingBehaviorBuilder = (function (_super) {
+        __extends(FileBrowserBindingBehaviorBuilder, _super);
+        function FileBrowserBindingBehaviorBuilder(owner) {
+            return _super.call(this, owner) || this;
+        }
+        FileBrowserBindingBehaviorBuilder.prototype.AllowMultiFiles = function () {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.AllowMultiFiles = true;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.AcceptFilter = function (filter) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.AcceptValue = filter;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.UploadUri = function (uri) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.UploadUri = uri;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.BindingUploader = function (exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.InstanceExpression = new DomBehind.LamdaExpression(me.Owner.DataContext, exp);
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.BindingUploaderProgress = function (exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.ProgressExpression = exp;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.BindingUploaderComplete = function (exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.CompletedExpression = exp;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.BindingUploaderError = function (exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.ErrorExpression = exp;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.BindingUploaderAlways = function (exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.AlwaysExpression = exp;
+            }
+            return me;
+        };
+        FileBrowserBindingBehaviorBuilder.prototype.MaximumNumberOfAjax = function (number) {
+            var me = this;
+            if (me.CurrentBehavior instanceof FileBrowser) {
+                me.CurrentBehavior.MaximumNumberOfAjax = number;
+            }
+            return me;
+        };
+        return FileBrowserBindingBehaviorBuilder;
+    }(DomBehind.Data.ActionBindingBehaviorBuilder));
+    DomBehind.FileBrowserBindingBehaviorBuilder = FileBrowserBindingBehaviorBuilder;
+    DomBehind.BindingBehaviorBuilder.prototype.BuildFileBrowser = function (selectedEvent) {
+        var me = this;
+        var behavior = me.Add(new FileBrowser());
+        behavior.Event = FileBrowser.SelectedFiles.Create();
+        behavior.Action = selectedEvent;
+        behavior.ActionParameterCount = behavior.Action.length;
+        behavior.AllowBubbling = false;
+        var newMe = new FileBrowserBindingBehaviorBuilder(me.Owner);
+        newMe.CurrentBehavior = me.CurrentBehavior;
+        newMe.CurrentElement = me.CurrentElement;
+        return newMe;
+    };
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=FileBrowser.js.map
+var DomBehind;
+(function (DomBehind) {
+    var Breadbrumb = (function () {
+        function Breadbrumb(Selector) {
+            this.Selector = Selector;
+        }
+        Object.defineProperty(Breadbrumb, "AllowLocalStorage", {
+            get: function () {
+                return $.GetLocalStorage("Breadbrumb.AllowLocalStorage", true);
+            },
+            set: function (value) {
+                $.SetLocalStorage("Breadbrumb.AllowLocalStorage", value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Breadbrumb.prototype.Parse = function (newUri, title, isRoot) {
+            if (!newUri.toLowerCase().StartsWith("http://") &&
+                !newUri.toLowerCase().StartsWith("https://")) {
+                newUri = $.AbsoluteUri(newUri);
+            }
+            if (Breadbrumb.AllowLocalStorage)
+                return this.ParseSessionStorage(newUri, isRoot, title);
+            return this.ParseRestUri(newUri, isRoot, title);
+        };
+        Breadbrumb.prototype.ParseRestUri = function (newUri, isRoot, title) {
+            var arr = newUri.Split("?");
+            var queryString = "";
+            if (1 < arr.length) {
+                queryString = arr[1];
+            }
+            var newQueryStrings = Breadbrumb.SplitQueryString(queryString);
+            var currentUri = location.href;
+            if (isRoot) {
+                currentUri = currentUri.Split("?")[0];
+            }
+            var oldArr = currentUri.Split("?");
+            queryString = "";
+            if (1 < oldArr.length) {
+                queryString = oldArr[1];
+            }
+            var oldQueryStrings = Breadbrumb.SplitQueryString(queryString);
+            var stack = new Array();
+            var json = oldQueryStrings.FirstOrDefault(function (x) { return x.Key === "b"; });
+            if (json) {
+                stack = this.ToDecompress(json.Value);
+            }
+            if (stack.Any()) {
+                if (oldQueryStrings.Any()) {
+                    stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                }
+                else {
+                    stack.LastOrDefault().Uri = currentUri + "?isPop=true";
+                }
+            }
+            stack.push({ Uri: newUri, Title: title });
+            newQueryStrings.push({ Key: "b", Value: this.ToCompress(stack) });
+            var newQuery = newQueryStrings.Select(function (x) { return x.Key + "=" + x.Value; }).join("&");
+            var result = arr[0];
+            if (!String.IsNullOrWhiteSpace(newQuery)) {
+                result = arr[0] + "?" + newQuery;
+            }
+            if (0 < stack.length) {
+                stack.LastOrDefault().Uri = result;
+            }
+            return result;
+        };
+        Breadbrumb.prototype.ParseSessionStorage = function (newUri, isRoot, title) {
+            var arr = newUri.Split("?");
+            var queryString = "";
+            if (1 < arr.length) {
+                queryString = arr[1];
+            }
+            var newQueryStrings = Breadbrumb.SplitQueryString(queryString);
+            var currentUri = location.href;
+            if (isRoot) {
+                currentUri = currentUri.Split("?")[0];
+            }
+            var oldArr = currentUri.Split("?");
+            queryString = "";
+            if (1 < oldArr.length) {
+                queryString = oldArr[1];
+            }
+            var oldQueryStrings = Breadbrumb.SplitQueryString(queryString);
+            var stack = new Array();
+            var idKeyValue = oldQueryStrings.FirstOrDefault(function (x) { return x.Key === "b"; });
+            var oldId = "";
+            var newId = NewUid();
+            if (idKeyValue) {
+                oldId = idKeyValue.Value;
+            }
+            else {
+                oldId = NewUid();
+            }
+            var json = Breadbrumb.GetLocalStorage(oldId);
+            if (json) {
+                stack = this.ToDecompress(json);
+            }
+            if (stack.Any()) {
+                if (oldQueryStrings.Any()) {
+                    stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                }
+                else {
+                    stack.LastOrDefault().Uri = currentUri + "?isPop=true";
+                }
+            }
+            stack.push({ Uri: newUri, Title: title });
+            Breadbrumb.SetLocalStorage(newId, this.ToCompress(stack));
+            if (!newQueryStrings.Any(function (x) { return x.Key === "b"; })) {
+                newQueryStrings.push({ Key: "b", Value: newId });
+            }
+            var newQuery = newQueryStrings.Select(function (x) { return x.Key + "=" + x.Value; }).join("&");
+            var result = arr[0];
+            if (!String.IsNullOrWhiteSpace(newQuery)) {
+                result = arr[0] + "?" + newQuery;
+            }
+            if (0 < stack.length) {
+                stack.LastOrDefault().Uri = result;
+            }
+            return result;
+        };
+        Breadbrumb.prototype.ToCompress = function (input) {
+            var json = JSON.stringify(input);
+            var comp = LZString.compressToBase64(json);
+            return encodeURIComponent(comp);
+        };
+        Breadbrumb.prototype.ToDecompress = function (input) {
+            var dec = decodeURIComponent(input);
+            var json = LZString.decompressFromBase64(dec);
+            return JSON.parse(json);
+        };
+        Breadbrumb.SplitQueryString = function (s) {
+            if (!String.IsNullOrWhiteSpace(s)) {
+                var dec = $('<div/>').html(s).text();
+                var array = dec.Split("&", StringSplitOptions.RemoveEmptyEntries);
+                var result_1 = [];
+                $.each(array, function (i, value) {
+                    var split = value.Split("=", StringSplitOptions.None);
+                    if (split.length == 2) {
+                        result_1.push({ Key: split[0], Value: split[1] });
+                    }
+                });
+                return result_1;
+            }
+            return new Array();
+        };
+        Breadbrumb.GetLocalStorage = function (id) {
+            return $.GetLocalStorage(id, "");
+        };
+        Breadbrumb.SetLocalStorage = function (id, value) {
+            $.SetLocalStorage(id, value);
+        };
+        Breadbrumb.prototype.Update = function () {
+            var el = $(this.Selector);
+            if (el.length === 0)
+                return;
+            el.empty();
+            var uri = location.href;
+            var arr = uri.Split("?");
+            var queryString = "";
+            if (1 < arr.length) {
+                queryString = arr[1];
+            }
+            if (String.IsNullOrWhiteSpace(queryString)) {
+                return;
+            }
+            var dic = Breadbrumb.SplitQueryString(queryString);
+            var id = dic.FirstOrDefault(function (x) { return x.Key === "b"; });
+            if (!id) {
+                return;
+            }
+            var stack = this.BuildStack(id.Value);
+            if (!stack) {
+                return;
+            }
+            var aList = new Array();
+            $.each(stack, function (i, value) {
+                if (i === (stack.length - 1)) {
+                    aList.push($("<a>" + value.Title + "</a>"));
+                }
+                else {
+                    var a = $("<a href=\"javascript:void(0);\">" + value.Title + "</a>");
+                    a.click(function (e) {
+                        location.replace(value.Uri);
+                    });
+                    aList.push(a);
+                }
+                aList.push($("<span> > </span>"));
+            });
+            for (var i = 0; i < aList.length - 1; i++) {
+                el.append(aList[i]);
+            }
+        };
+        Breadbrumb.prototype.BuildStack = function (s) {
+            if (Breadbrumb.AllowLocalStorage) {
+                s = Breadbrumb.GetLocalStorage(s);
+            }
+            return this.ToDecompress(s);
+        };
+        Breadbrumb.prototype.Pop = function (count) {
+            if (count === void 0) { count = 1; }
+            var el = $(this.Selector);
+            if (el.length === 0)
+                return;
+            var aList = el.find("a");
+            var back = ++count;
+            if (aList.length <= back)
+                return;
+            aList[aList.length - back].click();
+        };
+        return Breadbrumb;
+    }());
+    DomBehind.Breadbrumb = Breadbrumb;
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Breadbrumb.js.map
 var DomBehind;
 (function (DomBehind) {
     var Application = (function () {
@@ -4455,6 +6368,7 @@ var DomBehind;
         };
         BizView.prototype.ViewLoaded = function (responseText, textStatus, XMLHttpRequest) { };
         BizView.prototype.Ensure = function () {
+            var _this = this;
             if (!this.DataContext)
                 return;
             var viewModel = this.DataContext;
@@ -4470,12 +6384,22 @@ var DomBehind;
             if (this.DependencyValidateSetup) {
                 this.DependencyValidateSetup();
             }
+            var e = null;
             if (!viewModel.Initialized) {
                 viewModel.Initialized = true;
-                this.Container.Raise(DomBehind.UIElement.Initialize);
+                e = this.Container.Raise(DomBehind.UIElement.Initialize);
             }
-            this.UpdateTarget();
-            this.Container.Raise(DomBehind.UIElement.ViewLoaded);
+            var activate = function () {
+                _this.UpdateTarget();
+                _this.Container.Raise(DomBehind.UIElement.Activate);
+            };
+            if (e && Object.IsPromise(e.result)) {
+                var pms = e.result;
+                pms.always(function () { return activate(); });
+            }
+            else {
+                activate();
+            }
         };
         BizView.prototype.UnSubscribe = function () {
         };
@@ -4484,7 +6408,7 @@ var DomBehind;
         BizView.prototype.CreateBindingBuilder = function () {
             var builder = new DomBehind.BindingBehaviorBuilder(this);
             builder.Element(this.Container).BindingAction(DomBehind.UIElement.Initialize, function (vm) { return vm.Initialize(); });
-            builder.Element(this.Container).BindingAction(DomBehind.UIElement.ViewLoaded, function (vm) { return vm.ViewLoaded(); });
+            builder.Element(this.Container).BindingAction(DomBehind.UIElement.Activate, function (vm) { return vm.Activate(); });
             return builder;
         };
         BizView.prototype.UpdateTarget = function (mark) {
@@ -4498,20 +6422,29 @@ var DomBehind;
         BizView.prototype.Validate = function (mark) {
             var result = true;
             if (this.BindingBehaviors) {
-                this.ClearValidator(mark);
+                this.RemoveValidator(mark);
                 $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), function (i, behavior) {
                     if (!behavior.BindingPolicy.Validators.Validate()) {
                         result = false;
                     }
                 });
                 if (result) {
-                    this.ClearValidator(mark);
+                    this.RemoveValidator(mark);
                 }
             }
             if (this.DependencyValidate) {
                 this.DependencyValidate(mark);
             }
             return result;
+        };
+        BizView.prototype.RemoveValidator = function (mark) {
+            $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), function (i, value) {
+                value.BindingPolicy.Validators.RemoveValidator();
+            });
+            this.Container.ClearCustomError();
+            if (this.DependencyValidateClear) {
+                this.DependencyValidateClear(mark);
+            }
         };
         BizView.prototype.ClearValidator = function (mark) {
             $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), function (i, value) {
@@ -4586,6 +6519,28 @@ var DomBehind;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(BizViewModel.prototype, "IsVisible", {
+            get: function () {
+                var view = this.View;
+                if (!view)
+                    return undefined;
+                var container = view.Container;
+                if (!container)
+                    return undefined;
+                return container.css("display") !== "none";
+            },
+            set: function (value) {
+                var view = this.View;
+                if (!view)
+                    return;
+                var container = view.Container;
+                if (!container)
+                    return;
+                container.css("display", value ? "display" : "none");
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(BizViewModel.prototype, "View", {
             get: function () {
                 return this._view;
@@ -4601,7 +6556,7 @@ var DomBehind;
         });
         BizViewModel.prototype.OnViewChanged = function () {
         };
-        BizViewModel.prototype.ViewLoaded = function () { };
+        BizViewModel.prototype.Activate = function () { };
         BizViewModel.prototype.UpdateTarget = function (mark) {
             if (this.View) {
                 this.View.UpdateTarget(mark);
@@ -4619,12 +6574,36 @@ var DomBehind;
             }
             return result;
         };
+        BizViewModel.prototype.ClearValidation = function (mark) {
+            this.View.ClearValidator(mark);
+        };
+        BizViewModel.prototype.LastErrors = function (mark) {
+            var result = [];
+            $.each(this.View.BindingBehaviors.ListDataBindingBehavior(mark), function (i, behavior) {
+                if (behavior.BindingPolicy &&
+                    behavior.BindingPolicy.Validators) {
+                    $.each(behavior.BindingPolicy.Validators.toArray(), function (x, v) {
+                        if (v.HasError && v.Message) {
+                            result.push(v.Message);
+                        }
+                    });
+                }
+            });
+            return result;
+        };
+        BizViewModel.prototype.ThrownValidate = function (mark) {
+            var result = this.Validate(mark);
+            if (result)
+                return;
+            var lastErrors = this.LastErrors(mark).Select(function (x) { return new DomBehind.ApplicationException(x); });
+            throw new DomBehind.ApplicationAggregateException(lastErrors);
+        };
         BizViewModel.prototype.WaitingOverlay = function (func, image) {
             var overlayPolocy = new DomBehind.Data.WindowWaitingOverlayActionPolicy();
             if (image) {
                 overlayPolocy.Option.Image = image;
             }
-            this.SafeAction(func, overlayPolocy);
+            return this.SafeAction(func, overlayPolocy);
         };
         BizViewModel.prototype.SafeAction = function (func) {
             var policies = [];
@@ -4637,7 +6616,7 @@ var DomBehind;
                 $.each(policies, function (i, value) { return list.push(value); });
             }
             var invoker = behavior.CreateActionInvoker(list);
-            invoker.Do(func);
+            return invoker.Do(func);
         };
         BizViewModel.prototype.Catch = function (ex) {
             if (ex.Data instanceof DomBehind.AjaxException) {
@@ -4767,6 +6746,13 @@ var DomBehind;
         Locator.Push = function (ins) {
             Locator._container.push(ins);
         };
+        Locator.ToArray = function () {
+            var array = [];
+            $.each(Locator._container, function (i, each) {
+                array.push(each);
+            });
+            return array;
+        };
         Locator.List = function (typeT, predicate) {
             var array = [];
             $.each(Locator._container, function (i, each) {
@@ -4858,8 +6844,9 @@ var DomBehind;
         if (container.length == 0) {
             container = container.closest("form");
         }
-        if (container.length == 0)
-            return;
+        if (container.length == 0) {
+            console.trace("Validation using setCustomValidity must be enclosed in a form tag.");
+        }
         $.each(me.BindingBehaviors.ListDataBindingBehavior(), function (i, behavior) {
             $.each(behavior.BindingPolicy.Validators.toArray(), function (k, validator) {
                 var el = behavior.Element;

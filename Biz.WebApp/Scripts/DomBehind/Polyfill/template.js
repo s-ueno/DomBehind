@@ -128,26 +128,14 @@
     var capturedReplaceChild = Node.prototype.replaceChild;
     var capturedParseFromString = DOMParser.prototype.parseFromString;
     var capturedHTMLElementInnerHTML = Object.getOwnPropertyDescriptor(window.HTMLElement.prototype, 'innerHTML') || {
-        /**
-         * @this {!HTMLElement}
-         * @return {string}
-         */
         get: function () {
             return this.innerHTML;
         },
-        /**
-         * @this {!HTMLElement}
-         * @param {string}
-         */
         set: function (text) {
             this.innerHTML = text;
         }
     };
     var capturedChildNodes = Object.getOwnPropertyDescriptor(window.Node.prototype, 'childNodes') || {
-        /**
-         * @this {!Node}
-         * @return {!NodeList}
-         */
         get: function () {
             return this.childNodes;
         }
@@ -214,7 +202,7 @@
         var canProtoPatch =
             !(document.createElement('div').hasOwnProperty('innerHTML'));
 
-        /**
+        /*
           The `decorate` method moves element children to the template's `content`.
           NOTE: there is no support for dynamically adding elements to templates.
         */
@@ -325,7 +313,7 @@
         defineInnerHTML(PolyfilledHTMLTemplateElement.prototype);
         defineOuterHTML(PolyfilledHTMLTemplateElement.prototype);
 
-        /**
+        /*
           The `bootstrap` method is called automatically and "fixes" all
           <template> elements in the document referenced by the `doc` argument.
         */
@@ -434,11 +422,6 @@
             'noscript'
         ]);
 
-        /**
-         * @param {Node} node
-         * @param {Node} parentNode
-         * @param {Function=} callback
-         */
         var getOuterHTML = function (node, parentNode, callback) {
             switch (node.nodeType) {
                 case Node.ELEMENT_NODE: {
@@ -471,10 +454,6 @@
             }
         };
 
-        /**
-         * @param {Node} node
-         * @param {Function=} callback
-         */
         var getInnerHTML = function (node, callback) {
             if (node.localName === 'template') {
                 node =  /** @type {HTMLTemplateElement} */ (node).content;
@@ -561,7 +540,7 @@
                 }
             } else if (this.nodeType === Node.ELEMENT_NODE &&
                 this.localName === TEMPLATE_TAG &&
-                this.namespaceURI == document.documentElement.namespaceURI) {
+                this.namespaceURI === document.documentElement.namespaceURI) {
                 dom = PolyfilledHTMLTemplateElement._cloneNode(this, deep);
             } else {
                 dom = capturedCloneNode.call(this, deep);
