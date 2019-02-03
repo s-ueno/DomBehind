@@ -21,7 +21,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TypeScriptToolsVersion>3.0</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
     <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -93,7 +93,6 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Scripts\collections.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\ChartBehavior.ts" />
     <TypeScriptCompile Include="Scripts\typings\chart.js\index.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\dombehind\dombehind.d.ts" />

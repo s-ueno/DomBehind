@@ -21,7 +21,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TypeScriptToolsVersion>3.0</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
     <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -131,9 +131,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="index.html" />
-    <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery-ui-1.12.1.js" />
     <Content Include="Scripts\jquery-ui-1.12.1.min.js" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Web.config" />
@@ -145,7 +145,6 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Scripts\collections.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\FileUploader.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Selectmenu.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Suggest.ts" />

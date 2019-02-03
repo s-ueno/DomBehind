@@ -1,0 +1,11 @@
+﻿.Net Frameworkの中でもあったら便利という機能を作り、ここに集める。
+
+
+実際にTypeScript.NET というライブラリもあるが、あまりに大きすぎてWebで使えない。
+https://github.com/electricessence/TypeScript.NET
+Bundle/Minifyしたとしてもデカイ。
+
+
+
+
+

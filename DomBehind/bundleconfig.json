@@ -1,0 +1,155 @@
+﻿[
+  {
+    "outputFileName": "Scripts/dombehind.js",
+    "inputFiles": [
+      /* 必須 */
+      "Scripts/lz-string-1.3.3.js",
+      "Scripts/collections.js",
+
+      /* DomBehind/Polyfill */
+      /* "Scripts/DomBehind/Polyfill/cache.js", */
+      "Scripts/DomBehind/Polyfill/template.js",
+
+      /* DomBehind/Typescript.Net */
+      "Scripts/DomBehind/TypeScript.Net/Global.js",
+      "Scripts/DomBehind/TypeScript.Net/IDisposable.js",
+      "Scripts/DomBehind/TypeScript.Net/EventArgs.js",
+      "Scripts/DomBehind/TypeScript.Net/CancelEventArgs.js",
+      "Scripts/DomBehind/TypeScript.Net/CollectionChangedEventArgs.js",
+      "Scripts/DomBehind/TypeScript.Net/Exception.js",
+      "Scripts/DomBehind/TypeScript.Net/AjaxException.js",
+      "Scripts/DomBehind/TypeScript.Net/ValidationException.js",
+      "Scripts/DomBehind/TypeScript.Net/ApplicationException.js",
+      "Scripts/DomBehind/TypeScript.Net/EventBuilder.js",
+      "Scripts/DomBehind/TypeScript.Net/INotifyPropertyChanged.js",
+      "Scripts/DomBehind/TypeScript.Net/INotifyPropertyChanging.js",
+      "Scripts/DomBehind/TypeScript.Net/NotifiableImp.js",
+      "Scripts/DomBehind/TypeScript.Net/IValueConverter.js",
+      "Scripts/DomBehind/TypeScript.Net/PropertyInfo.js",
+      "Scripts/DomBehind/TypeScript.Net/ListCollectionView.js",
+      "Scripts/DomBehind/TypeScript.Net/UpdateSourceTrigger.js",
+      "Scripts/DomBehind/TypeScript.Net/BindingMode.js",
+      "Scripts/DomBehind/TypeScript.Net/List.js",
+      "Scripts/DomBehind/TypeScript.Net/Observable.js",
+      "Scripts/DomBehind/TypeScript.Net/IDisplayMemberPath.js",
+
+      /* DomBehind/Extensions */
+      "Scripts/DomBehind/Extensions/PropertyDescriptorExtensions.js",
+      "Scripts/DomBehind/Extensions/EnumerableExtensions.js",
+      "Scripts/DomBehind/Extensions/ObjectExtensions.js",
+      "Scripts/DomBehind/Extensions/StringExtensions.js",
+      "Scripts/DomBehind/Extensions/JQueryExtensions.js",
+
+      /* DomBehind(Base)  */
+      "Scripts/DomBehind/TypedFactory.js",
+      "Scripts/DomBehind/Repository.js",
+      //
+
+      /* DomBehind/Data */
+      "Scripts/DomBehind/Data/DependencyProperty.js",
+
+      "Scripts/DomBehind/Data/BindingPolicy.js",
+      "Scripts/DomBehind/Data/BindingBehavior.js",
+      "Scripts/DomBehind/Data/DataBindingBehavior.js",
+      "Scripts/DomBehind/Data/ActionBindingBehavior.js",
+      "Scripts/DomBehind/Data/ViewViewModelBindingBehavior.js",
+      "Scripts/DomBehind/Data/BindingBehaviorCollection.js",
+
+      "Scripts/DomBehind/Data/BindingBehaviorBuilder.js",
+      "Scripts/DomBehind/Data/DataBindingBehaviorBuilder.js",
+      "Scripts/DomBehind/Data/ActionBindingBehaviorBuilder.js",
+
+      "Scripts/DomBehind/Data/ActionPolicy/ActionPolicy.js",
+      "Scripts/DomBehind/Data/ActionPolicy/ActionPolicyExceptionEventArgs.js",
+      "Scripts/DomBehind/Data/ActionPolicy/IExceptionHandling.js",
+      "Scripts/DomBehind/Data/ActionPolicy/ExceptionHandlingActionPolicy.js",
+      "Scripts/DomBehind/Data/ActionPolicy/ValidationExceptionHandlingActionPolicy.js",
+      "Scripts/DomBehind/Data/ActionPolicy/WaitingOverlayActionPolicy.js",
+      "Scripts/DomBehind/Data/ActionPolicy/SuppressDuplicateActionPolicy.js",
+
+
+
+      "Scripts/DomBehind/IndexedDBHelper.js",
+
+
+
+
+      /* DomBehind/Navigation */
+      "Scripts/DomBehind/Navigation/INavigator.js",
+      "Scripts/DomBehind/Navigation/DefaultNavigator.js",
+
+      /* DomBehind/Validation */
+      "Scripts/DomBehind/Validation/Validator.js",
+      "Scripts/DomBehind/Validation/ValidatorCollection.js",
+      "Scripts/DomBehind/Validation/MaxLengthValidator.js",
+      "Scripts/DomBehind/Validation/RegexValidator.js",
+      "Scripts/DomBehind/Validation/RequiredValidator.js",
+
+      /* DomBehind/Threading */
+      "Scripts/DomBehind/Threading/PoolType.js",
+      "Scripts/DomBehind/Threading/WorkerPool.js",
+      "Scripts/DomBehind/Threading/WorkerWrapper.js",
+
+      /* DomBehind/Web */
+      "Scripts/DomBehind/Web/PlainXMLHttpRequestWorker.js",
+      "Scripts/DomBehind/Web/WebService.js",
+
+      /* DomBehind/Controls */
+      "Scripts/DomBehind/Controls/UIElement.js",
+      "Scripts/DomBehind/Controls/InputElement.js",
+      "Scripts/DomBehind/Controls/NavbarElement.js",
+      "Scripts/DomBehind/Controls/Selector.js",
+      "Scripts/DomBehind/Controls/Tab.js",
+      "Scripts/DomBehind/Controls/MessageBox.js",
+      "Scripts/DomBehind/Controls/ListView.js",
+      "Scripts/DomBehind/Controls/TemplateListView.js",
+      "Scripts/DomBehind/Controls/FileBrowser.js",
+      "Scripts/DomBehind/Controls/Breadbrumb.js",
+
+      ///* DomBehind/JQueryUI */
+      //"Scripts/DomBehind/JQueryUI/Tooltip.js",
+      //"Scripts/DomBehind/JQueryUI/Selectmenu.js",
+
+      ///* DomBehind/Calendar */
+      //"Scripts/DomBehind/Calendar/Calendar.js",
+
+      ///* DomBehind/bootstrap-wysiwyg  */
+      //"Scripts/DomBehind/Bootstrap/Editor.js",
+
+      /* DomBehind/SignaturePad  */
+      /* "Scripts/DomBehind/SignaturePad/Sign.js", */
+
+      ///* DomBehind/W2UI */
+      //"Scripts/DomBehind/W2UI/Toolbar.js",
+      //"Scripts/DomBehind/W2UI/Layout.js",
+      //"Scripts/DomBehind/W2UI/Sidebar.js",
+      //"Scripts/DomBehind/W2UI/Grid.js",
+      //"Scripts/DomBehind/W2UI/MessageBox.js",
+      //"Scripts/DomBehind/W2UI/Dropdown.js",
+      //"Scripts/DomBehind/W2UI/DatePicker.js",
+
+      /* DomBehind(MVVM) */
+      "Scripts/DomBehind/Application.js",
+      "Scripts/DomBehind/BizView.js",
+      "Scripts/DomBehind/BizViewModel.js",
+      "Scripts/DomBehind/BindingAnnotation.js",
+      "Scripts/DomBehind/Locator.js",
+
+
+      /* JQuery Extension */
+      "Scripts/DomBehind/Validation/JQueryValidationExtension.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "commentMode": "all"
+    },
+    "sourceMap": true
+  },
+  {
+    "inputFiles": [
+      "Scripts/collections.d.ts",
+      "Scripts/DomBehind/**/*.d.ts"
+    ],
+    "outputFileName": "Scripts/typings/dombehind/dombehind.d.ts"
+  }
+]

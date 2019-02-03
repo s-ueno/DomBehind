@@ -21,7 +21,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TypeScriptToolsVersion>3.0</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
     <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -194,7 +194,6 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Scripts\collections.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Calendar.ts" />
     <TypeScriptCompile Include="Scripts\typings\dombehind\dombehind.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\fullCalendar\fullCalendar.d.ts" />

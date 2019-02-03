@@ -4524,7 +4524,7 @@ var DomBehind;
                                 errorMessage = value.text;
                             }
                             if (value instanceof Comment) {
-                                stackTrace = value.text;
+                                stackTrace = value.textContent;
                             }
                         });
                     }

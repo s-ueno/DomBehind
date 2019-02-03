@@ -23,7 +23,7 @@ declare namespace DomBehind {
         private _items;
         ItemsSource: Data.ListCollectionView;
         protected ReBuildChart(): void;
-        protected ParseType(): "bar" | "line";
+        protected ParseType(): "line" | "bar";
         protected Labels(): string[];
         protected DataSets(): ChartDataSets[];
         protected ParseScales(): ChartScales;
