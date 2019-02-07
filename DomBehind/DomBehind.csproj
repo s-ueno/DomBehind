@@ -61,6 +61,7 @@
       <SubType>Designer</SubType>
     </Content>
     <None Include="packages.config" />
+    <Content Include="Scripts\clientdetection.js" />
     <Content Include="Scripts\dombehind.min.js.map">
       <DependentUpon>dombehind.min.js</DependentUpon>
     </Content>

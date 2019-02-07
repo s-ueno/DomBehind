@@ -18,6 +18,18 @@
     SetRootUri(uri: string): void;
     GetRootUri(): string;
     AbsoluteUri(uri: string): string;
+
+    ClientDetection(): {
+        OS?: string,
+        OSVersion?: string,
+        Browser?: string,
+        BrowserMajorVersion?: string,
+        IsMobile?: boolean,
+        FlashVersion?: string,
+        AllowCookies?: boolean,
+        Screen?: string,
+        UserAgent?: string
+    };
 }
 
 
@@ -100,6 +112,10 @@ $.GetWindowDynamic = function (key: string, defaultValue?: any) {
 $.SetWindowDynamic = function (key: string, value: any) {
     let newKey: string = `${w_dynamicPrefix}.${key}`;
     window[newKey] = value;
+}
+
+$.ClientDetection = function () {
+    return (<any>window)._clientDetection;
 }
 
 interface JQuery {

@@ -11,6 +11,17 @@ interface JQueryStatic {
     SetRootUri(uri: string): void;
     GetRootUri(): string;
     AbsoluteUri(uri: string): string;
+    ClientDetection(): {
+        OS?: string;
+        OSVersion?: string;
+        Browser?: string;
+        BrowserMajorVersion?: string;
+        IsMobile?: boolean;
+        FlashVersion?: string;
+        AllowCookies?: boolean;
+        Screen?: string;
+        UserAgent?: string;
+    };
 }
 declare const z_indexKey: string;
 declare const w_dynamicPrefix: string;

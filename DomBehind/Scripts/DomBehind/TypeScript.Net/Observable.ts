@@ -5,7 +5,7 @@
             return new Observable(target, { marks: marks });
         }
         public static RegisterAttached<T>(target: T, option?: {
-            wrapper?: (value: any) => any
+            wrapper?: (value: any, name?: string) => any
             marks?: string[],
         }): Observable<T> {
             return new Observable(target, option);
@@ -15,12 +15,12 @@
 
         public PropertyChanging: TypedEvent<PropertyChangingEventArgs> = new TypedEvent<PropertyChangingEventArgs>();
         public PropertyChanged: TypedEvent<PropertyChangedEventArgs> = new TypedEvent<PropertyChangedEventArgs>();
-        protected Wrapper: (value: any) => any;
+        protected Wrapper: (value: any, name: string) => any;
 
         // #endregion
 
         constructor(protected source: T, option?: {
-            wrapper?: (value: any) => any
+            wrapper?: (value: any, name?: string) => any
             marks?: string[],
         }) {
             if (source == null) return;
@@ -80,7 +80,7 @@
             return {
                 get: function () {
                     if (wrapper)
-                        return wrapper(value);
+                        return wrapper(value, notifibleName);
                     return value;
                 },
                 set: function (v) {

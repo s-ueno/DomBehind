@@ -2,9 +2,10 @@
   {
     "outputFileName": "Scripts/dombehind.js",
     "inputFiles": [
-      /* 必須 */
+      /* 外部ライブラリ */
       "Scripts/lz-string-1.3.3.js",
       "Scripts/collections.js",
+      "Scripts/clientdetection.js",
 
       /* DomBehind/Polyfill */
       /* "Scripts/DomBehind/Polyfill/cache.js", */
