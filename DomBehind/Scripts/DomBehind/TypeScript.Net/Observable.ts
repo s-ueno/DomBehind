@@ -35,16 +35,17 @@
                     if (option.marks) {
                         $.each(option.marks, (i, value) => {
                             let buff = value.Split(".");
+                            let parentName: string = "";
                             $.each(buff, (k, each) => {
-                                this.Recurcive(source, name, null);
+                                this.Recurcive(source, each, parentName);
+
+                                if (parentName) {
+                                    parentName = `${parentName}.${each}`
+                                } else {
+                                    parentName = each;
+                                }
                             });
                         });
-
-
-                        //if (option.marks.Any(x => x === name)) {
-                        //    this.Recurcive(source, name, null);
-                        //}
-
                     } else {
                         this.Recurcive(source, name, null);
                     }

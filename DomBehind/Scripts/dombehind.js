@@ -3521,31 +3521,34 @@ var DomBehind;
             if (source == null)
                 return;
             var keys = Object.keys(source);
-            var _loop_1 = function () {
+            for (var i = 0; i < keys.length; i++) {
                 var name_1 = keys[i];
                 if (String.IsNullOrWhiteSpace(name_1))
-                    return "continue";
+                    continue;
                 if (option) {
-                    this_1.Wrapper = option.wrapper;
+                    this.Wrapper = option.wrapper;
                     if (option.marks) {
                         $.each(option.marks, function (i, value) {
                             var buff = value.Split(".");
+                            var parentName = "";
                             $.each(buff, function (k, each) {
-                                _this.Recurcive(source, name_1, null);
+                                _this.Recurcive(source, each, parentName);
+                                if (parentName) {
+                                    parentName = parentName + "." + each;
+                                }
+                                else {
+                                    parentName = each;
+                                }
                             });
                         });
                     }
                     else {
-                        this_1.Recurcive(source, name_1, null);
+                        this.Recurcive(source, name_1, null);
                     }
                 }
                 else {
-                    this_1.Recurcive(source, name_1, null);
+                    this.Recurcive(source, name_1, null);
                 }
-            };
-            var this_1 = this;
-            for (var i = 0; i < keys.length; i++) {
-                _loop_1();
             }
         }
         Observable.Register = function (target) {
