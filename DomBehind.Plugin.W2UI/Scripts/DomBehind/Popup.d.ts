@@ -47,6 +47,7 @@ declare namespace DomBehind {
         ConvertSource(exp: (x: any) => any): PopupTemplateBindingBuilder<T>;
         BindingAction(event: IEventBuilder, action: (x: T, args: any) => void): PopupTemplateBindingBuilder<T>;
         BindingPopupTitle(exp: (vm: T) => string): PopupTemplateBindingBuilder<T>;
+        AddValidator<T extends Validation.Validator>(validator: T): T;
     }
     interface BindingBehaviorBuilder<T> {
         BuildTemplatePopup(controller: (vm: T) => IPopupController, option?: IPopupOption): PopupTemplateBindingBuilder<T>;

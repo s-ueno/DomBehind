@@ -248,6 +248,19 @@ namespace DomBehind {
             }
             return me;
         }
+
+        public /* override */ AddValidator<T extends Validation.Validator>(validator: T): T {
+            let me: PopupTemplateBindingBuilder<any> = this;
+            if (me.CurrentBehavior instanceof TemplatePopup) {
+                let childBehavior = me.CurrentBehavior.LastBinding;
+                if (childBehavior instanceof Data.DataBindingBehavior) {
+                    validator.Behavior = childBehavior;
+                    // validator.Behavior.BindingPolicy.Validators.add(validator);
+                    me.CurrentBehavior.BindingPolicy.Validators.add(validator);
+                }
+            }
+            return validator;
+        }
     }
 
     export interface BindingBehaviorBuilder<T> {

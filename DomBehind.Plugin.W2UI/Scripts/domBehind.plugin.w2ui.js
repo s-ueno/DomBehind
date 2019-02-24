@@ -990,6 +990,17 @@ var DomBehind;
             }
             return me;
         };
+        PopupTemplateBindingBuilder.prototype.AddValidator = function (validator) {
+            var me = this;
+            if (me.CurrentBehavior instanceof TemplatePopup) {
+                var childBehavior = me.CurrentBehavior.LastBinding;
+                if (childBehavior instanceof DomBehind.Data.DataBindingBehavior) {
+                    validator.Behavior = childBehavior;
+                    me.CurrentBehavior.BindingPolicy.Validators.add(validator);
+                }
+            }
+            return validator;
+        };
         return PopupTemplateBindingBuilder;
     }(DomBehind.Data.DataBindingBehaviorBuilder));
     DomBehind.PopupTemplateBindingBuilder = PopupTemplateBindingBuilder;
