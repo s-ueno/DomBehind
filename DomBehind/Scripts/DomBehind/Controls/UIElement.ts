@@ -33,6 +33,20 @@
                         x.removeAttr("disabled");
                         x.removeClass("disabled");
                     }
+
+                    // 
+                    if (x.is('input[type=radio]') ||
+                        x.is('input[type=checkbox]')) {
+                        let parent = x.closest("label");
+                        if (parent) {
+                            if (disabled) {
+                                parent.addClass("disablecheck");
+                            } else {
+                                parent.removeClass("disablecheck");
+                            }
+                        }
+                    }
+
                 }, Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
 
         public static IsVisibleProperty: Data.DependencyProperty

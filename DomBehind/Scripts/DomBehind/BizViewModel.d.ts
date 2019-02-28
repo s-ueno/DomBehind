@@ -17,8 +17,8 @@ declare namespace DomBehind {
         ClearValidation(mark?: string): void;
         protected LastErrors(mark?: string): string[];
         protected ThrownValidate(mark?: string): void;
-        protected WaitingOverlay(func: Function, image?: string): any;
-        protected SafeAction(func: Function, ...policies: Data.ActionPolicy[]): any;
+        protected WaitingOverlay(func: Function, handled?: boolean, image?: string): any;
+        protected SafeAction(func: Function, handled?: boolean, ...policies: Data.ActionPolicy[]): any;
         Catch(ex: Data.ActionPolicyExceptionEventArgs): void;
         protected readonly Navigator: Navigation.INavigator;
         IsEnabled: boolean;

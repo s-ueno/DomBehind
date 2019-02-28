@@ -100,8 +100,8 @@ $.AbsoluteUri = function (uri: string): string {
     if (uri.toLowerCase().StartsWith("http://")) return uri;
     if (uri.toLowerCase().StartsWith("https://")) return uri;
 
-    let rootUri = $.GetLocalStorage("RootUri", "");
-    return `${rootUri}${uri}`;
+    // let rootUri = $.GetLocalStorage("RootUri", "");
+    return `${location.origin}/${uri}`;
 };
 
 const w_dynamicPrefix: string = "__Framework";

@@ -151,16 +151,20 @@
 
         // #region 
 
-        protected WaitingOverlay(func: Function, image?: string) {
+        protected WaitingOverlay(func: Function, handled?: boolean, image?: string) {
             var overlayPolocy = new Data.WindowWaitingOverlayActionPolicy();
             if (image) {
                 overlayPolocy.Option.Image = image;
             }
-            return this.SafeAction(func, overlayPolocy);
+            return this.SafeAction(func, handled, overlayPolocy);
         }
-        protected SafeAction(func: Function, ...policies: Data.ActionPolicy[]) {
+        protected SafeAction(func: Function, handled?: boolean, ...policies: Data.ActionPolicy[]) {
             var behavior = new Data.ActionBindingBehavior();
-            var list: Data.ActionPolicy[] = [new Data.ExceptionHandlingActionPolicy()];
+
+            var list: Data.ActionPolicy[] = [];
+            if (!handled) {
+                list.push(new Data.ExceptionHandlingActionPolicy());
+            }
             if (policies) {
                 $.each(policies, (i, value) => list.push(value));
             }

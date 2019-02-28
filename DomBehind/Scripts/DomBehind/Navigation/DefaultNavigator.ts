@@ -117,10 +117,10 @@
             }
 
             if (setting.Width) {
-                modal.css("width", option.Width);
+                modal.css("width", setting.Width);
             }
             if (setting.Height) {
-                modal.css("height", option.Height);
+                modal.css("height", setting.Height);
             }
             if (!setting.ShowHeader) {
                 container.find(".modal-header").hide();

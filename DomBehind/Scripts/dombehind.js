@@ -3956,8 +3956,7 @@ $.AbsoluteUri = function (uri) {
         return uri;
     if (uri.toLowerCase().StartsWith("https://"))
         return uri;
-    var rootUri = $.GetLocalStorage("RootUri", "");
-    return "" + rootUri + uri;
+    return location.origin + "/" + uri;
 };
 var w_dynamicPrefix = "__Framework";
 $.GetWindowDynamic = function (key, defaultValue) {
@@ -5592,10 +5591,10 @@ var DomBehind;
                     });
                 }
                 if (setting.Width) {
-                    modal.css("width", option.Width);
+                    modal.css("width", setting.Width);
                 }
                 if (setting.Height) {
-                    modal.css("height", option.Height);
+                    modal.css("height", setting.Height);
                 }
                 if (!setting.ShowHeader) {
                     container.find(".modal-header").hide();
@@ -6229,6 +6228,18 @@ var DomBehind;
             else {
                 x.removeAttr("disabled");
                 x.removeClass("disabled");
+            }
+            if (x.is('input[type=radio]') ||
+                x.is('input[type=checkbox]')) {
+                var parent_1 = x.closest("label");
+                if (parent_1) {
+                    if (disabled) {
+                        parent_1.addClass("disablecheck");
+                    }
+                    else {
+                        parent_1.removeClass("disablecheck");
+                    }
+                }
             }
         }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.IsVisibleProperty = DomBehind.Data.DependencyProperty.RegisterAttached("display", function (x) { return x.attr("display") === "none" ? false : true; }, function (x, y) {
@@ -7793,6 +7804,11 @@ var DomBehind;
                 else {
                     var a = $("<a href=\"javascript:void(0);\">" + value.Title + "</a>");
                     a.click(function (e) {
+                        var newE = new Event("breadbrumbTapped");
+                        newE.__title = value.Title;
+                        newE.__uri = value.Uri;
+                        newE.__e = e;
+                        window.dispatchEvent(newE);
                         location.replace(value.Uri);
                     });
                     aList.push(a);
@@ -8159,20 +8175,23 @@ var DomBehind;
             var lastErrors = this.LastErrors(mark).Select(function (x) { return new DomBehind.ApplicationException(x); });
             throw new DomBehind.ApplicationAggregateException(lastErrors);
         };
-        BizViewModel.prototype.WaitingOverlay = function (func, image) {
+        BizViewModel.prototype.WaitingOverlay = function (func, handled, image) {
             var overlayPolocy = new DomBehind.Data.WindowWaitingOverlayActionPolicy();
             if (image) {
                 overlayPolocy.Option.Image = image;
             }
-            return this.SafeAction(func, overlayPolocy);
+            return this.SafeAction(func, handled, overlayPolocy);
         };
-        BizViewModel.prototype.SafeAction = function (func) {
+        BizViewModel.prototype.SafeAction = function (func, handled) {
             var policies = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                policies[_i - 1] = arguments[_i];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                policies[_i - 2] = arguments[_i];
             }
             var behavior = new DomBehind.Data.ActionBindingBehavior();
-            var list = [new DomBehind.Data.ExceptionHandlingActionPolicy()];
+            var list = [];
+            if (!handled) {
+                list.push(new DomBehind.Data.ExceptionHandlingActionPolicy());
+            }
             if (policies) {
                 $.each(policies, function (i, value) { return list.push(value); });
             }
