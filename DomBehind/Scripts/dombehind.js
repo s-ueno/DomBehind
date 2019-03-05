@@ -5251,6 +5251,26 @@ var DomBehind;
             this.DbName = db;
             this.TableName = name;
         }
+        IndexedDBHelper.prototype.Drop = function () {
+            var _this = this;
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    d.resolve();
+                    return;
+                }
+                _this.Upgrade(x.version + 1, function (y) {
+                    var newDb = y.target.result;
+                    if (newDb && newDb.deleteObjectStore)
+                        newDb.deleteObjectStore(_this.TableName);
+                    d.resolve();
+                });
+            }).fail(function () {
+                d.reject();
+            });
+            return d.promise();
+        };
         IndexedDBHelper.prototype.List = function () {
             var _this = this;
             var d = $.Deferred();

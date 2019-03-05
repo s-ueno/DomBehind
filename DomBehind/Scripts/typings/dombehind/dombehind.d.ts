@@ -341,6 +341,7 @@ declare namespace DomBehind {
         constructor(ctor: TypedConstructor<T>, db: string);
         DbName: string;
         TableName: string;
+        Drop(): JQueryPromise<any>;
         List(): JQueryPromise<T[]>;
         Truncate(): JQueryPromise<any>;
         FindRowAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T>;

@@ -18,6 +18,30 @@
         public DbName: string;
         public TableName: string;
 
+        public Drop(): JQueryPromise<any> {
+            let d = $.Deferred<any>();
+            let db = this.Open();
+
+            db.done(x => {
+                if (!x.objectStoreNames.contains(this.TableName)) {
+                    d.resolve();
+                    return;
+                }
+
+                // 
+                this.Upgrade(x.version + 1, y => {
+                    let newDb: IDBDatabase = y.target.result;
+                    if (newDb && newDb.deleteObjectStore)
+                        newDb.deleteObjectStore(this.TableName);
+
+                    d.resolve();
+                });
+            }).fail(() => {
+                d.reject();
+            });
+            return d.promise();
+        }
+
         public List(): JQueryPromise<T[]> {
             let d = $.Deferred<any>();
             let db = this.Open();
