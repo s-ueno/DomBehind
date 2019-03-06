@@ -7863,6 +7863,121 @@ var DomBehind;
 //# sourceMappingURL=Breadbrumb.js.map
 var DomBehind;
 (function (DomBehind) {
+    var Appeal = (function () {
+        function Appeal() {
+        }
+        Appeal.Register = function (behavior) {
+            var style = $("#" + Appeal.styleIdentity);
+            if (style.length === 0) {
+                var head = document.head || document.getElementsByTagName('head')[0];
+                var css = "\n@keyframes rippleAppeal {\n    100% {\n        transform: scale(2);\n        border-width: 10px;\n        opacity: 0;\n    }\n}\n\n@keyframes rippleOut {\n    100% {\n        opacity: 0;\n    }\n}\n\n.ripple_appeal {\n    animation: rippleAppeal 3s linear 3\n}\n";
+                var newStyle = document.createElement('style');
+                head.appendChild(newStyle);
+                newStyle.type = 'text/css';
+                newStyle.appendChild(document.createTextNode(css));
+            }
+            var identity = behavior.Element.attr("appeal-identity");
+            if (!identity) {
+                identity = "appeal-" + NewUid();
+                behavior.Element.attr("appeal-identity", identity);
+            }
+            var appeal = window[identity];
+            if (!appeal) {
+                window[identity] = appeal = new Appeal();
+                appeal.Behavior = behavior;
+            }
+        };
+        Appeal.prototype.Render = function (newValue) {
+            var el = this.Behavior.Element;
+            var identity = el.attr("ripple_appeal_identity");
+            if (!identity) {
+                identity = "ripple-" + NewUid();
+                el.attr("ripple_appeal_identity", identity);
+            }
+            var pnl = $("#" + identity);
+            if (!newValue)
+                pnl.remove();
+            var oldValue = !!el.attr("ripple_appeal_value");
+            if (newValue === oldValue) {
+                return;
+            }
+            el.attr("ripple_appeal_value", "" + newValue);
+            if (!newValue) {
+                return;
+            }
+            var offset = el.offset();
+            var css = {
+                "height": el.height() + "px",
+                "width": el.width() + "px",
+                "top": offset.top + "px",
+                "left": offset.left + "px",
+                "position": "fixed",
+                "background-color": "transparent",
+                "border-color": "rgba(0, 90, 255, 0.4)",
+                "pointer-events": "none"
+            };
+            var parent = el.closest("div");
+            var clone = el.clone().empty();
+            if (el.is("input")) {
+                clone = $("<div />");
+                var h = el.height();
+                var w = el.width();
+                if (h < w) {
+                    h = w;
+                }
+                else {
+                    w = h;
+                }
+                if (h < 50) {
+                    w = h = 50;
+                }
+                var topOffset = Number(el.css("margin-top").replace(/[^-\d\.]/g, '')) +
+                    Number(el.css("margin-bottom").replace(/[^-\d\.]/g, ''));
+                var leftOffset = Number(el.css("margin-left").replace(/[^-\d\.]/g, '')) +
+                    Number(el.css("margin-right").replace(/[^-\d\.]/g, ''));
+                css = $.extend(true, css, {
+                    "height": h + "px",
+                    "width": w + "px",
+                    "top": offset.top - (el.height() + topOffset) + "px",
+                    "left": offset.left + leftOffset + "px",
+                    "border-radius": "50%",
+                    "transform": "scale(0)",
+                    "background": "rgba(0, 90, 255, 0.4)",
+                });
+            }
+            clone.attr("id", identity);
+            clone.css(css);
+            clone.addClass("ripple_appeal");
+            parent.append(clone);
+            setTimeout(function () {
+                clone.remove();
+            }, 9 * 1000);
+        };
+        Appeal.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("appealEnabled", null, function (x, y) {
+            var identity = x.attr("appeal-identity");
+            var timeoutHandle = x.attr("clearTimeout");
+            var appeal = window[identity];
+            if (appeal) {
+                if (timeoutHandle) {
+                    clearTimeout(Number(timeoutHandle));
+                }
+                var value = setTimeout(function () {
+                    x.attr("clearTimeout", "");
+                    appeal.Render(!!y);
+                }, 1 * 1000);
+                x.attr("clearTimeout", value);
+            }
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, function (behavior) {
+            Appeal.Register(behavior);
+        });
+        Appeal.styleIdentity = "appeal-style";
+        return Appeal;
+    }());
+    DomBehind.Appeal = Appeal;
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Appeal.js.map
+var DomBehind;
+(function (DomBehind) {
     var Application = (function () {
         function Application() {
             this._navigator = new DomBehind.Navigation.DefaultNavigator();

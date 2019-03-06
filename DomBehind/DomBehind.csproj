@@ -106,6 +106,7 @@
     <TypeScriptCompile Include="Scripts\DomBehind\BindingAnnotation.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\BizView.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\BizViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\DomBehind\Controls\Appeal.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\Breadbrumb.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\FileBrowser.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Controls\InputElement.ts" />
