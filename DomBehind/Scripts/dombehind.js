@@ -6325,6 +6325,7 @@ var DomBehind;
             }
         });
         UIElement.Keydown = DomBehind.EventBuilder.RegisterAttached("keydown");
+        UIElement.FocusIn = DomBehind.EventBuilder.RegisterAttached("focusin");
         UIElement.LostFocus = DomBehind.EventBuilder.RegisterAttached("focusout");
         UIElement.Initialize = DomBehind.EventBuilder.RegisterAttached("initialize");
         UIElement.Activate = DomBehind.EventBuilder.RegisterAttached("activate");

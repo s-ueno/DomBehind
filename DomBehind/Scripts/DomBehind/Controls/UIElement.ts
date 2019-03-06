@@ -166,6 +166,9 @@
         public static Keydown: IEventBuilder
             = EventBuilder.RegisterAttached<JQueryEventObject>("keydown");
 
+        public static FocusIn: IEventBuilder
+            = EventBuilder.RegisterAttached<JQueryEventObject>("focusin");
+
         public static LostFocus: IEventBuilder
             = EventBuilder.RegisterAttached<JQueryEventObject>("focusout");
 
