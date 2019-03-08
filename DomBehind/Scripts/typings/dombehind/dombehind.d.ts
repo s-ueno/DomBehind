@@ -789,6 +789,7 @@ declare namespace DomBehind {
         static Click: IEventBuilder;
         static Enter: IEventBuilder;
         static Keydown: IEventBuilder;
+        static FocusIn: IEventBuilder;
         static LostFocus: IEventBuilder;
         static Initialize: IEventBuilder;
         static Activate: IEventBuilder;
