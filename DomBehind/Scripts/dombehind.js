@@ -4573,6 +4573,7 @@ var DomBehind;
             behavior.PInfo = new DomBehind.LamdaExpression(this.Owner.DataContext, bindingExpression);
             behavior.BindingPolicy.Trigger = !Object.IsNullOrUndefined(updateTrigger) ? updateTrigger : property.UpdateSourceTrigger;
             behavior.BindingPolicy.Mode = !Object.IsNullOrUndefined(mode) ? mode : property.BindingMode;
+            behavior.AdditionalInfo["selector"] = this.CurrentSelector;
             var dataBindingBuilder = new DomBehind.Data.DataBindingBehaviorBuilder(this.Owner);
             dataBindingBuilder.CurrentBehavior = this.CurrentBehavior;
             dataBindingBuilder.CurrentElement = this.CurrentElement;

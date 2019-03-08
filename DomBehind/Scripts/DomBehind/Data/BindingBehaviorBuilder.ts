@@ -67,7 +67,7 @@
             behavior.PInfo = new LamdaExpression(this.Owner.DataContext, bindingExpression);
             behavior.BindingPolicy.Trigger = !Object.IsNullOrUndefined(updateTrigger) ? updateTrigger : property.UpdateSourceTrigger;
             behavior.BindingPolicy.Mode = !Object.IsNullOrUndefined(mode) ? mode : property.BindingMode;
-
+            behavior.AdditionalInfo["selector"] = this.CurrentSelector;
 
             let dataBindingBuilder = new Data.DataBindingBehaviorBuilder<T>(this.Owner);
             dataBindingBuilder.CurrentBehavior = this.CurrentBehavior;
