@@ -123,15 +123,15 @@
             this.View.ClearValidator(mark);
         }
 
-        protected LastErrors(mark?: string): string[] {
+        protected LastErrors(mark?: string): DomBehind.Validation.Validator[] {
             let result = [];
             $.each(this.View.BindingBehaviors.ListDataBindingBehavior(mark), (i, behavior) => {
                 if (behavior.BindingPolicy &&
                     behavior.BindingPolicy.Validators) {
 
                     $.each(behavior.BindingPolicy.Validators.toArray(), (x, v) => {
-                        if (v.HasError && v.Message) {
-                            result.push(v.Message);
+                        if (v.HasError) {
+                            result.push(v);
                         }
                     })
                 }
@@ -143,7 +143,7 @@
             let result = this.Validate(mark);
             if (result) return;
 
-            let lastErrors = this.LastErrors(mark).Select(x => new ApplicationException(x));
+            let lastErrors = this.LastErrors(mark).Select(x => new ApplicationException(x.Message));
             throw new ApplicationAggregateException(lastErrors);
         }
 

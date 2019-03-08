@@ -311,7 +311,7 @@ declare namespace DomBehind {
         UpdateSource(mark?: string): void;
         Validate(mark?: string): boolean;
         ClearValidation(mark?: string): void;
-        protected LastErrors(mark?: string): string[];
+        protected LastErrors(mark?: string): DomBehind.Validation.Validator[];
         protected ThrownValidate(mark?: string): void;
         protected WaitingOverlay(func: Function, handled?: boolean, image?: string): any;
         protected SafeAction(func: Function, handled?: boolean, ...policies: Data.ActionPolicy[]): any;

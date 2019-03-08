@@ -8296,8 +8296,8 @@ var DomBehind;
                 if (behavior.BindingPolicy &&
                     behavior.BindingPolicy.Validators) {
                     $.each(behavior.BindingPolicy.Validators.toArray(), function (x, v) {
-                        if (v.HasError && v.Message) {
-                            result.push(v.Message);
+                        if (v.HasError) {
+                            result.push(v);
                         }
                     });
                 }
@@ -8308,7 +8308,7 @@ var DomBehind;
             var result = this.Validate(mark);
             if (result)
                 return;
-            var lastErrors = this.LastErrors(mark).Select(function (x) { return new DomBehind.ApplicationException(x); });
+            var lastErrors = this.LastErrors(mark).Select(function (x) { return new DomBehind.ApplicationException(x.Message); });
             throw new DomBehind.ApplicationAggregateException(lastErrors);
         };
         BizViewModel.prototype.WaitingOverlay = function (func, handled, image) {
