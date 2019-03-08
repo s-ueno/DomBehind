@@ -85,6 +85,7 @@
       "Scripts/DomBehind/Validation/MaxLengthValidator.js",
       "Scripts/DomBehind/Validation/RegexValidator.js",
       "Scripts/DomBehind/Validation/RequiredValidator.js",
+      "Scripts/DomBehind/Validation/PipelineValidator.js",
 
       /* DomBehind/Threading */
       "Scripts/DomBehind/Threading/PoolType.js",

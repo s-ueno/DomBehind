@@ -5999,6 +5999,91 @@ var DomBehind;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=RequiredValidator.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var DomBehind;
+(function (DomBehind) {
+    var Validation;
+    (function (Validation) {
+        var PipelineValidator = (function (_super) {
+            __extends(PipelineValidator, _super);
+            function PipelineValidator() {
+                var _this = _super.call(this) || this;
+                _this.Validators = [];
+                return _this;
+            }
+            PipelineValidator.prototype.Validate = function (value) {
+                var _this = this;
+                var result = true;
+                var lastErrorMessage;
+                this.Error = null;
+                $.each(this.Validators, function (i, x) {
+                    x.HasError = false;
+                    x.Apply();
+                    if (!x.Validate(value)) {
+                        lastErrorMessage = x.Message;
+                        result = false;
+                        _this.Error = x;
+                        return false;
+                    }
+                });
+                this.Message = lastErrorMessage;
+                return result;
+            };
+            PipelineValidator.prototype.Apply = function () {
+                this.Validators.forEach(function (x) { return x.Apply(); });
+            };
+            PipelineValidator.prototype.RemoveValidation = function () {
+                this.Validators.forEach(function (x) { return x.RemoveValidation(); });
+            };
+            PipelineValidator.prototype.ClearValidation = function () {
+                this.Validators.forEach(function (x) { return x.ClearValidation(); });
+            };
+            PipelineValidator.prototype.AddValidation = function () {
+                this.Validators.forEach(function (x) { return x.AddValidation(); });
+            };
+            PipelineValidator.prototype.AddValidator = function (validator) {
+                validator.Behavior = this.Behavior;
+                this.Validators.push(validator);
+            };
+            PipelineValidator.prototype.Dispose = function () {
+                this.Validators.forEach(function (x) { return x.Dispose(); });
+            };
+            return PipelineValidator;
+        }(DomBehind.Validation.Validator));
+        Validation.PipelineValidator = PipelineValidator;
+    })(Validation = DomBehind.Validation || (DomBehind.Validation = {}));
+})(DomBehind || (DomBehind = {}));
+(function (DomBehind) {
+    DomBehind.BindingBehaviorBuilder.prototype.AddPipelineValidator = function (validator) {
+        var me = this;
+        if (me.CurrentBehavior instanceof DomBehind.Data.DataBindingBehavior) {
+            var lastValidator = me.CurrentBehavior.BindingPolicy.Validators.toArray().LastOrDefault();
+            if (lastValidator && lastValidator instanceof DomBehind.Validation.PipelineValidator) {
+                lastValidator.AddValidator(validator);
+            }
+            else {
+                var pipelineValidator = new DomBehind.Validation.PipelineValidator();
+                pipelineValidator.Behavior = me.CurrentBehavior;
+                pipelineValidator.AddValidator(validator);
+                me.CurrentBehavior.BindingPolicy.Validators.add(pipelineValidator);
+            }
+        }
+        return me;
+    };
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=PipelineValidator.js.map
 var DomBehind;
 (function (DomBehind) {
     var PoolType;
