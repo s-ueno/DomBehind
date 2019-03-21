@@ -26,6 +26,7 @@
             = Data.DependencyProperty.RegisterAttached("enabled",
                 null, (x, y) => {
                     let disabled = y === false ? true : false;
+                    let oldDisabledValue = x.hasClass("disabled");
                     if (disabled === true) {
                         x.attr("disabled", "");
                         x.addClass("disabled");
@@ -34,7 +35,7 @@
                         x.removeClass("disabled");
                     }
 
-                    // 
+                    // set an disable style on nearby label
                     if (x.is('input[type=radio]') ||
                         x.is('input[type=checkbox]')) {
                         let parent = x.closest("label");
@@ -46,6 +47,10 @@
                             }
                         }
                     }
+
+                    if (disabled === oldDisabledValue) return;
+
+                    UIElement.RaiseEnabledChanged(x, !disabled);
 
                 }, Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
 
@@ -180,6 +185,45 @@
 
         public static ModalClosing: IEventBuilder
             = EventBuilder.RegisterAttached<JQueryEventObject>("modalClosing");
+
+        public static EnabledChanged: IEventBuilder
+            = EventBuilder.RegisterAttached<JQueryEventObject>("enabledChanged");
+        public static RaiseEnabledChanged(element: JQuery, isEnabled: boolean) {
+            element.Raise(UIElement.EnabledChanged, (e: any) => e.isEnabled = isEnabled);
+        }
     }
+
+
+
+    export interface BindingBehaviorBuilder<T> {
+        ClearLastBindingValueWhenDisabled();
+    }
+
+    BindingBehaviorBuilder.prototype.ClearLastBindingValueWhenDisabled = function () {
+        let me: BindingBehaviorBuilder<any> = this;
+        let lastBinding = me.CurrentBehavior;
+        if (lastBinding instanceof Data.DataBindingBehavior) {
+            me.BindingActionWithOption(UIElement.EnabledChanged, (x, e) => {
+                let isEnabled = e.isEnabled;
+                if (!isEnabled) {
+                    let lastBinding = e.Args as Data.DataBindingBehavior;
+                    // todo
+                    if (lastBinding) {
+                        if (lastBinding.Element.is("input")) {
+                            lastBinding.PInfo.SetValue(null);
+                        } else if (lastBinding.Element.is("select")) {
+                            let bindingValue = lastBinding.ValueCore;
+                            if (bindingValue instanceof Data.ListCollectionView) {
+                                bindingValue.UnSelect();
+                            }
+                        }
+                        lastBinding.UpdateTarget();
+                    }
+                }
+            }, { args: lastBinding });
+        }
+        return me;
+    }
+
 }
 

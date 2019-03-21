@@ -153,7 +153,14 @@
             return actionBindingBuilder;
         }
 
-
+        public BindingActionWithOption(event: IEventBuilder, action: (x: T, args: any) => void, option?: { allowBubbling?: boolean, args?: any }): BindingBehaviorBuilder<T> {
+            let result = this.BindingAction(event, action);
+            if (option && this.CurrentBehavior instanceof Data.ActionBindingBehavior) {
+                this.CurrentBehavior.AllowBubbling = option.allowBubbling;
+                this.CurrentBehavior.ExtendedProperties["Args"] = option.args;
+            }
+            return result;
+        }
         // #endregion
 
         // #region Add

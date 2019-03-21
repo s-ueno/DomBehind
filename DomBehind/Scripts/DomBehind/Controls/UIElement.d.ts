@@ -25,5 +25,10 @@ declare namespace DomBehind {
         static Initialize: IEventBuilder;
         static Activate: IEventBuilder;
         static ModalClosing: IEventBuilder;
+        static EnabledChanged: IEventBuilder;
+        static RaiseEnabledChanged(element: JQuery, isEnabled: boolean): void;
+    }
+    interface BindingBehaviorBuilder<T> {
+        ClearLastBindingValueWhenDisabled(): any;
     }
 }

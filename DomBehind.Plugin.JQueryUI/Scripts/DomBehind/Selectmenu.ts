@@ -10,12 +10,19 @@
                 (el, newValue) => {
                     if (Object.IsNullOrUndefined(el)) return;
 
+                    let oldValueString = el.attr("selectMenu_oldIsEnabled");
+                    let oldValue = oldValueString === "false" ? false : true;
                     try {
+                        el.attr("selectMenu_oldIsEnabled", newValue);
                         el.selectmenu("option", "disabled", newValue === false);
                     } catch (e) {
                         // selectmenu before initilize
-                        el.attr("_disabled", "true");
+                        el.attr("_disabled", newValue === false ? "true" : "false");
                     }
+
+                    if (newValue === oldValue) return;
+
+                    UIElement.RaiseEnabledChanged(el, newValue);                     
                 },
                 Data.UpdateSourceTrigger.Explicit,
                 Data.BindingMode.OneWay

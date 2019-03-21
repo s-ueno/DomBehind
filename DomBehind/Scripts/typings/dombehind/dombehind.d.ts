@@ -794,6 +794,8 @@ declare namespace DomBehind {
         static Initialize: IEventBuilder;
         static Activate: IEventBuilder;
         static ModalClosing: IEventBuilder;
+        static EnabledChanged: IEventBuilder;
+        static RaiseEnabledChanged(element: JQuery, isEnabled: boolean): void;
     }
 }
 
@@ -1106,7 +1108,7 @@ interface JQuery {
     SetCustomError(errorMessage: string): void;
     ClearCustomError(): void;
     CheckValidity(allChildren?: boolean): void;
-    Raise(event: DomBehind.IEventBuilder): JQueryEventObject;
+    Raise(event: DomBehind.IEventBuilder, ensure?: (x: JQueryEventObject) => void): JQueryEventObject;
 }
 
 interface ObjectConstructor {
@@ -1141,8 +1143,6 @@ interface String {
     StartsWith(s: string): boolean;
     EndsWith(s: string): boolean;
 }
-
-
 
 declare namespace DomBehind.Navigation {
     class DefaultNavigator implements INavigator {
@@ -1181,7 +1181,6 @@ declare namespace DomBehind.Navigation {
         Reload(forcedReload?: boolean): any;
     }
 }
-
 
 declare namespace DomBehind {
     enum PoolType {
@@ -1603,13 +1602,6 @@ declare namespace DomBehind.Validation {
         protected _disposed: boolean;
     }
 }
-
-
-
-
-
-
-
 
 declare namespace DomBehind.Web {
     class PlainXMLHttpRequestWorker extends Threading.WorkerWrapper {

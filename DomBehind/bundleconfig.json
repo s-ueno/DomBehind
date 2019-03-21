@@ -68,12 +68,7 @@
       "Scripts/DomBehind/Data/ActionPolicy/WaitingOverlayActionPolicy.js",
       "Scripts/DomBehind/Data/ActionPolicy/SuppressDuplicateActionPolicy.js",
 
-
-
       "Scripts/DomBehind/IndexedDBHelper.js",
-
-
-
 
       /* DomBehind/Navigation */
       "Scripts/DomBehind/Navigation/INavigator.js",
@@ -109,28 +104,6 @@
       "Scripts/DomBehind/Controls/Breadbrumb.js",
       "Scripts/DomBehind/Controls/Appeal.js",
       "Scripts/DomBehind/Controls/Flip.js",
-
-      ///* DomBehind/JQueryUI */
-      //"Scripts/DomBehind/JQueryUI/Tooltip.js",
-      //"Scripts/DomBehind/JQueryUI/Selectmenu.js",
-
-      ///* DomBehind/Calendar */
-      //"Scripts/DomBehind/Calendar/Calendar.js",
-
-      ///* DomBehind/bootstrap-wysiwyg  */
-      //"Scripts/DomBehind/Bootstrap/Editor.js",
-
-      /* DomBehind/SignaturePad  */
-      /* "Scripts/DomBehind/SignaturePad/Sign.js", */
-
-      ///* DomBehind/W2UI */
-      //"Scripts/DomBehind/W2UI/Toolbar.js",
-      //"Scripts/DomBehind/W2UI/Layout.js",
-      //"Scripts/DomBehind/W2UI/Sidebar.js",
-      //"Scripts/DomBehind/W2UI/Grid.js",
-      //"Scripts/DomBehind/W2UI/MessageBox.js",
-      //"Scripts/DomBehind/W2UI/Dropdown.js",
-      //"Scripts/DomBehind/W2UI/DatePicker.js",
 
       /* DomBehind(MVVM) */
       "Scripts/DomBehind/Application.js",

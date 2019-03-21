@@ -15,6 +15,10 @@ declare namespace DomBehind {
         BindingViewViewModel(view: (x: T) => BizView, viewModel: (x: T) => BizViewModel): BindingBehaviorBuilder<T>;
         BindingAction(event: IEventBuilder, action: (x: T) => any): BindingBehaviorBuilder<T>;
         BindingAction(event: IEventBuilder, action: (x: T, args: any) => void): BindingBehaviorBuilder<T>;
+        BindingActionWithOption(event: IEventBuilder, action: (x: T, args: any) => void, option?: {
+            allowBubbling?: boolean;
+            args?: any;
+        }): BindingBehaviorBuilder<T>;
         Add<TBehavior extends Data.BindingBehavior>(behavior: TBehavior): TBehavior;
     }
     class SimpleConverter implements DomBehind.IValueConverter {
