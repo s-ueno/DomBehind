@@ -26,6 +26,7 @@
             = Data.DependencyProperty.RegisterAttached("enabled",
                 null, (x, y) => {
                     let disabled = y === false ? true : false;
+                    let oldDisabledValue = x.hasClass("disabled");
                     if (disabled === true) {
                         x.attr("disabled", "");
                         x.addClass("disabled");
@@ -34,7 +35,7 @@
                         x.removeClass("disabled");
                     }
 
-                    // 
+                    // set an disable style on nearby label
                     if (x.is('input[type=radio]') ||
                         x.is('input[type=checkbox]')) {
                         let parent = x.closest("label");
@@ -46,6 +47,12 @@
                             }
                         }
                     }
+
+                    if (disabled === oldDisabledValue) return;
+
+                    let e: any = new $.Event("enabledChanged");
+                    e.isEnabled = !disabled;
+                    x.trigger(e);
 
                 }, Data.UpdateSourceTrigger.Explicit, Data.BindingMode.OneWay);
 
@@ -180,6 +187,10 @@
 
         public static ModalClosing: IEventBuilder
             = EventBuilder.RegisterAttached<JQueryEventObject>("modalClosing");
+
+        public static EnabledChanged: IEventBuilder
+            = EventBuilder.RegisterAttached<JQueryEventObject>("enabledChanged");
+
     }
 }
 

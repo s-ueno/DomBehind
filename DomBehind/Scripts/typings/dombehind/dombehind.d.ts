@@ -794,6 +794,7 @@ declare namespace DomBehind {
         static Initialize: IEventBuilder;
         static Activate: IEventBuilder;
         static ModalClosing: IEventBuilder;
+        static EnabledChanged: IEventBuilder;
     }
 }
 
@@ -1142,8 +1143,6 @@ interface String {
     EndsWith(s: string): boolean;
 }
 
-
-
 declare namespace DomBehind.Navigation {
     class DefaultNavigator implements INavigator {
         NewWindow(uri: string, target?: string, style?: string): Window;
@@ -1181,7 +1180,6 @@ declare namespace DomBehind.Navigation {
         Reload(forcedReload?: boolean): any;
     }
 }
-
 
 declare namespace DomBehind {
     enum PoolType {
@@ -1603,13 +1601,6 @@ declare namespace DomBehind.Validation {
         protected _disposed: boolean;
     }
 }
-
-
-
-
-
-
-
 
 declare namespace DomBehind.Web {
     class PlainXMLHttpRequestWorker extends Threading.WorkerWrapper {

@@ -140,13 +140,10 @@
     <TypeScriptCompile Include="Scripts\DomBehind\Extensions\PropertyDescriptorExtensions.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Extensions\StringExtensions.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\IndexedDBHelper.ts" />
-    <TypeScriptCompile Include="Scripts\DomBehind\JQueryUI\Selectmenu.ts" />
-    <TypeScriptCompile Include="Scripts\DomBehind\JQueryUI\Tooltip.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Locator.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Navigation\DefaultNavigator.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Navigation\INavigator.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Repository.ts" />
-    <TypeScriptCompile Include="Scripts\DomBehind\SignaturePad\Sign.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Threading\PoolType.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Threading\WorkerPool.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Threading\WorkerWrapper.ts" />
@@ -179,13 +176,6 @@
     <TypeScriptCompile Include="Scripts\DomBehind\Validation\RequiredValidator.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Validation\Validator.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Validation\ValidatorCollection.ts" />
-    <TypeScriptCompile Include="Scripts\DomBehind\W2UI\DatePicker.ts" />
-    <TypeScriptCompile Include="Scripts\DomBehind\W2UI\Dropdown.ts" />
-    <TypeScriptCompile Include="Scripts\DomBehind\W2UI\Grid.ts" />
-    <TypeScriptCompile Include="Scripts\DomBehind\W2UI\Layout.ts" />
-    <TypeScriptCompile Include="Scripts\DomBehind\W2UI\MessageBox.ts" />
-    <TypeScriptCompile Include="Scripts\DomBehind\W2UI\Sidebar.ts" />
-    <TypeScriptCompile Include="Scripts\DomBehind\W2UI\Toolbar.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Web\PlainXMLHttpRequestWorker.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Web\WebService.ts" />
     <None Include="Scripts\typings\dombehind\dombehind.d.ts" />

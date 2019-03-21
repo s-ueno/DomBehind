@@ -3,12 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Biz.Model", "Biz.Model\Biz.Model.csproj", "{E74B26B6-B9EE-4675-831A-879FF0F54A78}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Biz.Service", "Biz.Service\Biz.Service.csproj", "{1DE5612A-CC48-48DF-99B7-A564A0C83C64}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Biz.WebApp", "Biz.WebApp\Biz.WebApp.csproj", "{2E6E56A0-4A0E-45E8-8986-C8E2AFA9D7FA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomBehind.Plugin.SignaturePad", "DomBehind.Plugin.SignaturePad\DomBehind.Plugin.SignaturePad.csproj", "{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomBehind.Plugin.W2UI", "DomBehind.Plugin.W2UI\DomBehind.Plugin.W2UI.csproj", "{2402FAFD-FAC6-498D-B4BE-25103B57F261}"
@@ -45,18 +39,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E74B26B6-B9EE-4675-831A-879FF0F54A78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E74B26B6-B9EE-4675-831A-879FF0F54A78}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E74B26B6-B9EE-4675-831A-879FF0F54A78}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E74B26B6-B9EE-4675-831A-879FF0F54A78}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1DE5612A-CC48-48DF-99B7-A564A0C83C64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1DE5612A-CC48-48DF-99B7-A564A0C83C64}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1DE5612A-CC48-48DF-99B7-A564A0C83C64}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1DE5612A-CC48-48DF-99B7-A564A0C83C64}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2E6E56A0-4A0E-45E8-8986-C8E2AFA9D7FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2E6E56A0-4A0E-45E8-8986-C8E2AFA9D7FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2E6E56A0-4A0E-45E8-8986-C8E2AFA9D7FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2E6E56A0-4A0E-45E8-8986-C8E2AFA9D7FA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}.Release|Any CPU.ActiveCfg = Release|Any CPU

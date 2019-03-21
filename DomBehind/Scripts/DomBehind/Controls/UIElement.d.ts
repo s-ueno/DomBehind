@@ -25,5 +25,6 @@ declare namespace DomBehind {
         static Initialize: IEventBuilder;
         static Activate: IEventBuilder;
         static ModalClosing: IEventBuilder;
+        static EnabledChanged: IEventBuilder;
     }
 }

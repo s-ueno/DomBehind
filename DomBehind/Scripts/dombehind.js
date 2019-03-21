@@ -6327,6 +6327,7 @@ var DomBehind;
         UIElement.HrefProperty = DomBehind.Data.DependencyProperty.RegisterAttached("href", function (x) { return x.attr("href"); }, function (x, y) { return x.attr("href", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("enabled", null, function (x, y) {
             var disabled = y === false ? true : false;
+            var oldDisabledValue = x.hasClass("disabled");
             if (disabled === true) {
                 x.attr("disabled", "");
                 x.addClass("disabled");
@@ -6347,6 +6348,11 @@ var DomBehind;
                     }
                 }
             }
+            if (disabled === oldDisabledValue)
+                return;
+            var e = new $.Event("enabledChanged");
+            e.isEnabled = !disabled;
+            x.trigger(e);
         }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.IsVisibleProperty = DomBehind.Data.DependencyProperty.RegisterAttached("display", function (x) { return x.attr("display") === "none" ? false : true; }, function (x, y) {
             var visible = y ? true : false;
@@ -6416,6 +6422,7 @@ var DomBehind;
         UIElement.Initialize = DomBehind.EventBuilder.RegisterAttached("initialize");
         UIElement.Activate = DomBehind.EventBuilder.RegisterAttached("activate");
         UIElement.ModalClosing = DomBehind.EventBuilder.RegisterAttached("modalClosing");
+        UIElement.EnabledChanged = DomBehind.EventBuilder.RegisterAttached("enabledChanged");
         return UIElement;
     }());
     DomBehind.UIElement = UIElement;
