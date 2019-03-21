@@ -108,6 +108,7 @@
       "Scripts/DomBehind/Controls/FileBrowser.js",
       "Scripts/DomBehind/Controls/Breadbrumb.js",
       "Scripts/DomBehind/Controls/Appeal.js",
+      "Scripts/DomBehind/Controls/Flip.js",
 
       ///* DomBehind/JQueryUI */
       //"Scripts/DomBehind/JQueryUI/Tooltip.js",

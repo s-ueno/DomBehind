@@ -52,6 +52,9 @@
                 stack = this.ToDecompress(json.Value);
             }
             if (stack.Any()) {
+
+
+
                 if (oldQueryStrings.Any()) {
                     stack.LastOrDefault().Uri = `${currentUri}&isPop=true`;
                 } else {

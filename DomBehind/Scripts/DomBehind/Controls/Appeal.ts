@@ -29,11 +29,7 @@
                 });
 
         private static styleIdentity: string = "appeal-style";
-        public static Register(behavior: Data.DataBindingBehavior) {
-            let style = $(`#${Appeal.styleIdentity}`);
-            if (style.length === 0) {
-                let head = document.head || document.getElementsByTagName('head')[0];
-                let css = `
+        private static css = `
 @keyframes rippleAppeal {
     100% {
         transform: scale(2);
@@ -52,11 +48,16 @@
     animation: rippleAppeal 3s linear 3
 }
 `;
+        public static Register(behavior: Data.DataBindingBehavior) {
+            let style = $(`#${Appeal.styleIdentity}`);
+            if (style.length === 0) {
+                let head = document.head || document.getElementsByTagName('head')[0];
                 // https://stackoverflow.com/questions/524696/how-to-create-a-style-tag-with-javascript
                 let newStyle = document.createElement('style');
                 head.appendChild(newStyle);
                 newStyle.type = 'text/css';
-                newStyle.appendChild(document.createTextNode(css));
+                newStyle.appendChild(document.createTextNode(Appeal.css));
+                newStyle.setAttribute("id", Appeal.styleIdentity);
             }
 
             let identity = behavior.Element.attr(`appeal-identity`);
@@ -87,13 +88,16 @@
             if (!newValue)
                 pnl.remove();
 
-            let oldValue = !!el.attr("ripple_appeal_value");
+            let oldValueString = el.attr("ripple_appeal_value");
+            let oldValue = false;
+            if (!String.IsNullOrWhiteSpace(oldValueString)) {
+                oldValue = Boolean(oldValue);
+            }
+            el.attr("ripple_appeal_value", `${newValue}`);
+
             if (newValue === oldValue) {
                 return;
             }
-
-            el.attr("ripple_appeal_value", `${newValue}`);
-
             if (!newValue) {
                 return;
             }
@@ -113,11 +117,14 @@
             let parent = el.closest("div");
             let clone = el.clone().empty();
 
-            if (el.is("input")) {
+            if (el.is("input") || el.is("select")) {
 
                 clone = $("<div />");
                 let h = el.height();
                 let w = el.width();
+
+
+
                 if (h < w) {
                     h = w;
                 } else {
@@ -128,19 +135,36 @@
                     w = h = 50;
                 }
 
+                let top = offset.top;
                 let topOffset =
                     Number(el.css("margin-top").replace(/[^-\d\.]/g, '')) +
                     Number(el.css("margin-bottom").replace(/[^-\d\.]/g, ''));
 
+                let left = offset.left;
                 let leftOffset =
                     Number(el.css("margin-left").replace(/[^-\d\.]/g, '')) +
                     Number(el.css("margin-right").replace(/[^-\d\.]/g, ''));
 
+                // jquery ui select
+                if (el.is('select') && top === 0 && left === 0) {
+                    let nextSpan = el.next("span");
+                    if (nextSpan.length !== 0) {
+                        h = w = nextSpan.height();
+                        if (h < 50) {
+                            w = h = 50;
+                        }
+
+                        let buffOffset = nextSpan.offset();
+                        top = buffOffset.top + (nextSpan.height() / 2);
+                        left = buffOffset.left + (nextSpan.width() / 2);
+                    }
+                }
+
                 css = $.extend(true, css, {
                     "height": `${h}px`,
                     "width": `${w}px`,
-                    "top": `${offset.top - (el.height() + topOffset)}px`,
-                    "left": `${offset.left + leftOffset}px`,
+                    "top": `${top - (el.height() + topOffset)}px`,
+                    "left": `${left + leftOffset}px`,
                     "border-radius": "50%",
                     "transform": "scale(0)",
                     "background": "rgba(0, 90, 255, 0.4)",
@@ -154,6 +178,7 @@
 
             setTimeout(() => {
                 clone.remove();
+                el.attr("ripple_appeal_value", `false`);
             }, 9 * 1000);
         }
 
