@@ -4019,9 +4019,12 @@ $.fn.CheckValidity = function () {
         result = me.checkValidity();
     }
 };
-$.fn.Raise = function (event) {
+$.fn.Raise = function (event, ensure) {
     var me = this;
     var e = $.Event(event.EventName);
+    if (ensure) {
+        ensure(e);
+    }
     me.trigger(e);
     return e;
 };
@@ -4325,6 +4328,7 @@ var DomBehind;
             __extends(ActionBindingBehavior, _super);
             function ActionBindingBehavior() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.ExtendedProperties = {};
                 _this.ActionPolicyCollection = [];
                 return _this;
             }
@@ -4390,6 +4394,8 @@ var DomBehind;
                             result = _this.Action(_this.DataContext);
                         }
                         else if (_this.ActionParameterCount === 2) {
+                            e.ExtendedProperties = _this.ExtendedProperties;
+                            e.Args = _this.ExtendedProperties["Args"];
                             result = _this.Action(_this.DataContext, e);
                         }
                         else {
@@ -4618,6 +4624,14 @@ var DomBehind;
             actionBindingBuilder.CurrentBehavior = this.CurrentBehavior;
             actionBindingBuilder.CurrentElement = this.CurrentElement;
             return actionBindingBuilder;
+        };
+        BindingBehaviorBuilder.prototype.BindingActionWithOption = function (event, action, option) {
+            var result = this.BindingAction(event, action);
+            if (option && this.CurrentBehavior instanceof DomBehind.Data.ActionBindingBehavior) {
+                this.CurrentBehavior.AllowBubbling = option.allowBubbling;
+                this.CurrentBehavior.ExtendedProperties["Args"] = option.args;
+            }
+            return result;
         };
         BindingBehaviorBuilder.prototype.Add = function (behavior) {
             this.CurrentBehavior = behavior;
@@ -6321,6 +6335,9 @@ var DomBehind;
     var UIElement = (function () {
         function UIElement() {
         }
+        UIElement.RaiseEnabledChanged = function (element, isEnabled) {
+            element.Raise(UIElement.EnabledChanged, function (e) { return e.isEnabled = isEnabled; });
+        };
         UIElement.ValueProperty = DomBehind.Data.DependencyProperty.RegisterAttached("val", function (x) { return x.val(); }, function (x, y) { return x.val(y); }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
         UIElement.TextProperty = DomBehind.Data.DependencyProperty.RegisterAttached("text", function (x) { return x.text(); }, function (x, y) { return x.text(y); }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
         UIElement.SrcProperty = DomBehind.Data.DependencyProperty.RegisterAttached("src", function (x) { return x.attr("src"); }, function (x, y) { return x.attr("src", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
@@ -6350,9 +6367,7 @@ var DomBehind;
             }
             if (disabled === oldDisabledValue)
                 return;
-            var e = new $.Event("enabledChanged");
-            e.isEnabled = !disabled;
-            x.trigger(e);
+            UIElement.RaiseEnabledChanged(x, !disabled);
         }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.IsVisibleProperty = DomBehind.Data.DependencyProperty.RegisterAttached("display", function (x) { return x.attr("display") === "none" ? false : true; }, function (x, y) {
             var visible = y ? true : false;
@@ -6426,6 +6441,31 @@ var DomBehind;
         return UIElement;
     }());
     DomBehind.UIElement = UIElement;
+    DomBehind.BindingBehaviorBuilder.prototype.ClearLastBindingValueWhenDisabled = function () {
+        var me = this;
+        var lastBinding = me.CurrentBehavior;
+        if (lastBinding instanceof DomBehind.Data.DataBindingBehavior) {
+            me.BindingActionWithOption(UIElement.EnabledChanged, function (x, e) {
+                var isEnabled = e.isEnabled;
+                if (!isEnabled) {
+                    var lastBinding_1 = e.Args;
+                    if (lastBinding_1) {
+                        if (lastBinding_1.Element.is("input")) {
+                            lastBinding_1.PInfo.SetValue(null);
+                        }
+                        else if (lastBinding_1.Element.is("select")) {
+                            var bindingValue = lastBinding_1.ValueCore;
+                            if (bindingValue instanceof DomBehind.Data.ListCollectionView) {
+                                bindingValue.UnSelect();
+                            }
+                        }
+                        lastBinding_1.UpdateTarget();
+                    }
+                }
+            }, { args: lastBinding });
+        }
+        return me;
+    };
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=UIElement.js.map
 var DomBehind;

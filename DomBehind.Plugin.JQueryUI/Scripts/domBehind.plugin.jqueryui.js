@@ -73,12 +73,18 @@ var DomBehind;
             }, function (el, newValue) {
                 if (Object.IsNullOrUndefined(el))
                     return;
+                var oldValueString = el.attr("selectMenu_oldIsEnabled");
+                var oldValue = oldValueString === "false" ? false : true;
                 try {
+                    el.attr("selectMenu_oldIsEnabled", newValue);
                     el.selectmenu("option", "disabled", newValue === false);
                 }
                 catch (e) {
-                    el.attr("_disabled", "true");
+                    el.attr("_disabled", newValue === false ? "true" : "false");
                 }
+                if (newValue === oldValue)
+                    return;
+                DomBehind.UIElement.RaiseEnabledChanged(el, newValue);
             }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
             Selectmenu.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", function (el) {
             }, function (el, newValue) {
