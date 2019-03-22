@@ -27,7 +27,6 @@
 
         public ActionParameterCount: number;
         public AllowBubbling: boolean;
-        public ExtendedProperties: { [key: string]: any } = {};
 
         // #region Ensure
 
@@ -110,8 +109,8 @@
                         result = this.Action(this.DataContext);
                     }
                     else if (this.ActionParameterCount === 2) {
-                        e.ExtendedProperties = this.ExtendedProperties;
-                        e.Args = this.ExtendedProperties["Args"];
+                        e.AdditionalInfo = this.AdditionalInfo;
+                        e.Args = this.AdditionalInfo["Args"];
                         result = this.Action(this.DataContext, e);
                     }
                     else {

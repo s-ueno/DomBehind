@@ -126,6 +126,8 @@ interface JQuery {
     CheckValidity(allChildren?: boolean): void;
 
     Raise(event: DomBehind.IEventBuilder, ensure?: (x: JQueryEventObject) => void): JQueryEventObject;
+
+    Equals(ele: JQuery): boolean;
 }
 
 $.fn.ValidityState = function () {
@@ -187,3 +189,14 @@ $.fn.Raise = function (event: DomBehind.IEventBuilder, ensure?: (x: JQueryEventO
     return e;
 };
 
+$.fn.Equals = function (compareTo) {
+    if (!compareTo || this.length != compareTo.length) {
+        return false;
+    }
+    for (var i = 0; i < this.length; ++i) {
+        if (this[i] !== compareTo[i]) {
+            return false;
+        }
+    }
+    return true;
+};

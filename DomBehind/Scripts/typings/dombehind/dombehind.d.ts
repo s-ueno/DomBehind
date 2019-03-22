@@ -392,6 +392,7 @@ declare namespace DomBehind {
         static _clearTimeout: any;
         static IsEnabledProperty: Data.DependencyProperty;
         private static styleIdentity;
+        private static css;
         static Register(behavior: Data.DataBindingBehavior): void;
         protected Behavior: Data.DataBindingBehavior;
         protected Render(newValue: boolean): void;
@@ -490,6 +491,36 @@ declare namespace DomBehind {
     }
     interface BindingBehaviorBuilder<T> {
         BuildFileBrowser(selectedEvent?: (x: T, args: ISelectedFiles) => void): FileBrowserBindingBehaviorBuilder<T>;
+    }
+}
+
+declare namespace DomBehind {
+    enum FlipAnimation {
+        Flip = 0,
+        Slide = 1
+    }
+    interface IFlipOption {
+        front?: JQuery;
+        back?: JQuery;
+        fit?: boolean;
+        animation?: FlipAnimation;
+    }
+    class FlipBehavior extends Data.DataBindingBehavior {
+        Option: IFlipOption;
+        static readonly IdentityKey = "flip-identity";
+        static readonly IsFlipProperty: Data.DependencyProperty;
+        private static readonly ValueKey;
+        protected SetValue(el: JQuery, newValue: boolean): void;
+        private static readonly css;
+        private static readonly cssIdentity;
+        static Register(behavior: FlipBehavior): void;
+    }
+    class FlipBindingBehaviorBuilder<T> extends BindingBehaviorBuilder<T> {
+        constructor(owner: BizView);
+        BindingFlip(exp: (owner: T) => boolean, option?: IFlipOption): BindingBehaviorBuilder<T>;
+    }
+    interface BindingBehaviorBuilder<T> {
+        FlipElement(frontSelector: string, backSelector: string): FlipBindingBehaviorBuilder<T>;
     }
 }
 
@@ -797,6 +828,11 @@ declare namespace DomBehind {
         static EnabledChanged: IEventBuilder;
         static RaiseEnabledChanged(element: JQuery, isEnabled: boolean): void;
     }
+    interface BindingBehaviorBuilder<T> {
+        ClearValueWhenDisabled(option?: {
+            clearAction?: (owner?: T, value?: any, element?: JQuery) => any;
+        }): any;
+    }
 }
 
 declare namespace DomBehind.Data {
@@ -832,6 +868,7 @@ declare namespace DomBehind.Data {
         Element: JQuery;
         BindingPolicy: BindingPolicy;
         Priolity: number;
+        AdditionalInfo: collections.LinkedDictionary<string, any>;
         abstract Ensure(): void;
         Dispose(): void;
         protected _disposed: boolean;
@@ -855,6 +892,10 @@ declare namespace DomBehind {
         BindingViewViewModel(view: (x: T) => BizView, viewModel: (x: T) => BizViewModel): BindingBehaviorBuilder<T>;
         BindingAction(event: IEventBuilder, action: (x: T) => any): BindingBehaviorBuilder<T>;
         BindingAction(event: IEventBuilder, action: (x: T, args: any) => void): BindingBehaviorBuilder<T>;
+        BindingActionWithOption(event: IEventBuilder, action: (x: T, args: any) => void, option?: {
+            allowBubbling?: boolean;
+            args?: any;
+        }): BindingBehaviorBuilder<T>;
         Add<TBehavior extends Data.BindingBehavior>(behavior: TBehavior): TBehavior;
     }
     class SimpleConverter implements DomBehind.IValueConverter {
@@ -891,7 +932,6 @@ declare namespace DomBehind.Data {
         PInfo: PropertyInfo;
         private _pinfo;
         Marks: string[];
-        AdditionalInfo: collections.LinkedDictionary<string, any>;
         readonly ValueCore: any;
         UpdateSourceEvent: IEvent;
         UpdateSource(): void;
@@ -1109,6 +1149,7 @@ interface JQuery {
     ClearCustomError(): void;
     CheckValidity(allChildren?: boolean): void;
     Raise(event: DomBehind.IEventBuilder, ensure?: (x: JQueryEventObject) => void): JQueryEventObject;
+    Equals(ele: JQuery): boolean;
 }
 
 interface ObjectConstructor {

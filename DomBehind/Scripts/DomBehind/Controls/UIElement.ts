@@ -189,37 +189,78 @@
         public static EnabledChanged: IEventBuilder
             = EventBuilder.RegisterAttached<JQueryEventObject>("enabledChanged");
         public static RaiseEnabledChanged(element: JQuery, isEnabled: boolean) {
-            element.Raise(UIElement.EnabledChanged, (e: any) => e.isEnabled = isEnabled);
+            element.Raise(UIElement.EnabledChanged, (e: any) => {
+                e.isEnabled = isEnabled;
+            });
         }
     }
 
 
 
     export interface BindingBehaviorBuilder<T> {
-        ClearLastBindingValueWhenDisabled();
+        ClearValueWhenDisabled(option?: { clearAction?: (owner?: T, value?: any, element?: JQuery) => any });
     }
 
-    BindingBehaviorBuilder.prototype.ClearLastBindingValueWhenDisabled = function () {
+    BindingBehaviorBuilder.prototype.ClearValueWhenDisabled = function (option?: { clearAction?: (owner?: any, value?: any, element?: JQuery) => any }) {
         let me: BindingBehaviorBuilder<any> = this;
         let lastBinding = me.CurrentBehavior;
         if (lastBinding instanceof Data.DataBindingBehavior) {
             me.BindingActionWithOption(UIElement.EnabledChanged, (x, e) => {
-                let isEnabled = e.isEnabled;
-                if (!isEnabled) {
-                    let lastBinding = e.Args as Data.DataBindingBehavior;
-                    // todo
-                    if (lastBinding) {
-                        if (lastBinding.Element.is("input")) {
-                            lastBinding.PInfo.SetValue(null);
-                        } else if (lastBinding.Element.is("select")) {
-                            let bindingValue = lastBinding.ValueCore;
-                            if (bindingValue instanceof Data.ListCollectionView) {
-                                bindingValue.UnSelect();
+
+                let d = $.Deferred();
+                setTimeout((_e: { behavior, option, sourceEvent }) => {
+                    let exception: any;
+                    try {
+                        let lastBinding = _e.behavior as Data.DataBindingBehavior;
+                        if (!lastBinding) return;
+
+                        let sender = $(_e.sourceEvent.target);
+                        let ele = lastBinding.Element;
+                        if (!sender.Equals(ele)) return;
+
+                        if (ele.is('input')) {
+                            let disabled = ele.hasClass("disabled");
+                            if (!disabled) return;
+
+                            if (_e.option && _e.option.clearAction) {
+                                _e.option.clearAction(lastBinding.DataContext, lastBinding.ValueCore, ele);
+                            } else {
+                                if (ele.is('input[type=radio]') ||
+                                    ele.is('input[type=checkbox]')) {
+
+                                    let checkEle = (<HTMLInputElement>ele.get(0));
+                                    if (checkEle.checked) {
+                                        checkEle.checked = false;
+                                    }
+                                } else {
+                                    ele.val(null);
+                                }
+                            }
+                        } else {
+                            let isEnabled = _e.sourceEvent.isEnabled;
+                            if (isEnabled) return;
+
+                            if (_e.option && _e.option.clearAction) {
+                                _e.option.clearAction(lastBinding.DataContext, lastBinding.ValueCore, ele);
+                            } else {
+                                let nowValue = lastBinding.ValueCore;
+                                if (nowValue instanceof Data.ListCollectionView) {
+                                    nowValue.UnSelect();
+                                    nowValue.Refresh();
+                                }
                             }
                         }
-                        lastBinding.UpdateTarget();
+                    } catch (e) {
+                        exception = e;
+                    } finally {
+                        if (exception) {
+                            d.reject(exception);
+                        } else {
+                            d.resolve();
+                        }
                     }
-                }
+                }, 0, { behavior: lastBinding, option: option, sourceEvent: e });
+                return d.promise();
             }, { args: lastBinding });
         }
         return me;

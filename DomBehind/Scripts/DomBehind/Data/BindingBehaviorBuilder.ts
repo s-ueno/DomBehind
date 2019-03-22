@@ -157,7 +157,7 @@
             let result = this.BindingAction(event, action);
             if (option && this.CurrentBehavior instanceof Data.ActionBindingBehavior) {
                 this.CurrentBehavior.AllowBubbling = option.allowBubbling;
-                this.CurrentBehavior.ExtendedProperties["Args"] = option.args;
+                this.CurrentBehavior.AdditionalInfo["Args"] = option.args;
             }
             return result;
         }

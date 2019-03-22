@@ -29,6 +29,8 @@ declare namespace DomBehind {
         static RaiseEnabledChanged(element: JQuery, isEnabled: boolean): void;
     }
     interface BindingBehaviorBuilder<T> {
-        ClearLastBindingValueWhenDisabled(): any;
+        ClearValueWhenDisabled(option?: {
+            clearAction?: (owner?: T, value?: any, element?: JQuery) => any;
+        }): any;
     }
 }

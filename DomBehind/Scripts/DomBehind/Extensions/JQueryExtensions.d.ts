@@ -32,4 +32,5 @@ interface JQuery {
     ClearCustomError(): void;
     CheckValidity(allChildren?: boolean): void;
     Raise(event: DomBehind.IEventBuilder, ensure?: (x: JQueryEventObject) => void): JQueryEventObject;
+    Equals(ele: JQuery): boolean;
 }

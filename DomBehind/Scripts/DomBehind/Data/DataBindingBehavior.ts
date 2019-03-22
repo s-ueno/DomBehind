@@ -20,8 +20,7 @@
 
         public Marks: string[] = [];
 
-        public AdditionalInfo: collections.LinkedDictionary<string, any>
-            = new collections.LinkedDictionary<string, any>();
+
         // #region UpdateSource - UpdateTarget
 
         /**

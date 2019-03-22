@@ -4,6 +4,7 @@ declare namespace DomBehind.Data {
         Element: JQuery;
         BindingPolicy: BindingPolicy;
         Priolity: number;
+        AdditionalInfo: collections.LinkedDictionary<string, any>;
         abstract Ensure(): void;
         Dispose(): void;
         protected _disposed: boolean;

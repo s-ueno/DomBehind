@@ -11,6 +11,9 @@
         public Element: JQuery;
         public BindingPolicy: BindingPolicy = new BindingPolicy();
         public Priolity: number = 0;
+
+        public AdditionalInfo: collections.LinkedDictionary<string, any>
+            = new collections.LinkedDictionary<string, any>();
         // #endregion
 
         // #region must inherits

@@ -4166,6 +4166,7 @@ var DomBehind;
             function BindingBehavior() {
                 this.BindingPolicy = new Data.BindingPolicy();
                 this.Priolity = 0;
+                this.AdditionalInfo = new collections.LinkedDictionary();
                 this._disposed = false;
             }
             BindingBehavior.prototype.Dispose = function () {
@@ -4203,7 +4204,6 @@ var DomBehind;
             function DataBindingBehavior() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.Marks = [];
-                _this.AdditionalInfo = new collections.LinkedDictionary();
                 _this.UpdateSourceEvent = new DomBehind.TypedEvent();
                 _this.UpdateTargetEvent = new DomBehind.TypedEvent();
                 _this.Events = [];
@@ -4393,6 +4393,8 @@ var DomBehind;
                             result = _this.Action(_this.DataContext);
                         }
                         else if (_this.ActionParameterCount === 2) {
+                            e.AdditionalInfo = _this.AdditionalInfo;
+                            e.Args = _this.AdditionalInfo["Args"];
                             result = _this.Action(_this.DataContext, e);
                         }
                         else {
@@ -4621,6 +4623,14 @@ var DomBehind;
             actionBindingBuilder.CurrentBehavior = this.CurrentBehavior;
             actionBindingBuilder.CurrentElement = this.CurrentElement;
             return actionBindingBuilder;
+        };
+        BindingBehaviorBuilder.prototype.BindingActionWithOption = function (event, action, option) {
+            var result = this.BindingAction(event, action);
+            if (option && this.CurrentBehavior instanceof DomBehind.Data.ActionBindingBehavior) {
+                this.CurrentBehavior.AllowBubbling = option.allowBubbling;
+                this.CurrentBehavior.AdditionalInfo["Args"] = option.args;
+            }
+            return result;
         };
         BindingBehaviorBuilder.prototype.Add = function (behavior) {
             this.CurrentBehavior = behavior;
@@ -6430,6 +6440,35 @@ var DomBehind;
         return UIElement;
     }());
     DomBehind.UIElement = UIElement;
+    DomBehind.BindingBehaviorBuilder.prototype.ClearLastBindingValueWhenDisabled = function (option) {
+        var me = this;
+        var lastBinding = me.CurrentBehavior;
+        if (lastBinding instanceof DomBehind.Data.DataBindingBehavior) {
+            me.BindingActionWithOption(UIElement.EnabledChanged, function (x, e) {
+                var isEnabled = e.isEnabled;
+                if (!isEnabled) {
+                    var lastBinding_1 = e.Args;
+                    if (lastBinding_1) {
+                        var nowValue = lastBinding_1.ValueCore;
+                        if (option && option.clearAction) {
+                            var clearValue = option.clearAction(lastBinding_1.DataContext, nowValue);
+                            lastBinding_1.PInfo.SetValue(clearValue);
+                        }
+                        else {
+                            if (nowValue instanceof DomBehind.Data.ListCollectionView) {
+                                nowValue.UnSelect();
+                            }
+                            else {
+                                lastBinding_1.PInfo.SetValue(null);
+                            }
+                        }
+                        lastBinding_1.UpdateTarget();
+                    }
+                }
+            }, { args: lastBinding });
+        }
+        return me;
+    };
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=UIElement.js.map
 var DomBehind;
@@ -7968,11 +8007,11 @@ var DomBehind;
             var style = $("#" + Appeal.styleIdentity);
             if (style.length === 0) {
                 var head = document.head || document.getElementsByTagName('head')[0];
-                var css = "\n@keyframes rippleAppeal {\n    100% {\n        transform: scale(2);\n        border-width: 10px;\n        opacity: 0;\n    }\n}\n\n@keyframes rippleOut {\n    100% {\n        opacity: 0;\n    }\n}\n\n.ripple_appeal {\n    animation: rippleAppeal 3s linear 3\n}\n";
                 var newStyle = document.createElement('style');
                 head.appendChild(newStyle);
                 newStyle.type = 'text/css';
-                newStyle.appendChild(document.createTextNode(css));
+                newStyle.appendChild(document.createTextNode(Appeal.css));
+                newStyle.setAttribute("id", Appeal.styleIdentity);
             }
             var identity = behavior.Element.attr("appeal-identity");
             if (!identity) {
@@ -7995,11 +8034,15 @@ var DomBehind;
             var pnl = $("#" + identity);
             if (!newValue)
                 pnl.remove();
-            var oldValue = !!el.attr("ripple_appeal_value");
+            var oldValueString = el.attr("ripple_appeal_value");
+            var oldValue = false;
+            if (!String.IsNullOrWhiteSpace(oldValueString)) {
+                oldValue = Boolean(oldValue);
+            }
+            el.attr("ripple_appeal_value", "" + newValue);
             if (newValue === oldValue) {
                 return;
             }
-            el.attr("ripple_appeal_value", "" + newValue);
             if (!newValue) {
                 return;
             }
@@ -8016,7 +8059,7 @@ var DomBehind;
             };
             var parent = el.closest("div");
             var clone = el.clone().empty();
-            if (el.is("input")) {
+            if (el.is("input") || el.is("select")) {
                 clone = $("<div />");
                 var h = el.height();
                 var w = el.width();
@@ -8029,15 +8072,29 @@ var DomBehind;
                 if (h < 50) {
                     w = h = 50;
                 }
+                var top_1 = offset.top;
                 var topOffset = Number(el.css("margin-top").replace(/[^-\d\.]/g, '')) +
                     Number(el.css("margin-bottom").replace(/[^-\d\.]/g, ''));
+                var left = offset.left;
                 var leftOffset = Number(el.css("margin-left").replace(/[^-\d\.]/g, '')) +
                     Number(el.css("margin-right").replace(/[^-\d\.]/g, ''));
+                if (el.is('select') && top_1 === 0 && left === 0) {
+                    var nextSpan = el.next("span");
+                    if (nextSpan.length !== 0) {
+                        h = w = nextSpan.height();
+                        if (h < 50) {
+                            w = h = 50;
+                        }
+                        var buffOffset = nextSpan.offset();
+                        top_1 = buffOffset.top + (nextSpan.height() / 2);
+                        left = buffOffset.left + (nextSpan.width() / 2);
+                    }
+                }
                 css = $.extend(true, css, {
                     "height": h + "px",
                     "width": w + "px",
-                    "top": offset.top - (el.height() + topOffset) + "px",
-                    "left": offset.left + leftOffset + "px",
+                    "top": top_1 - (el.height() + topOffset) + "px",
+                    "left": left + leftOffset + "px",
                     "border-radius": "50%",
                     "transform": "scale(0)",
                     "background": "rgba(0, 90, 255, 0.4)",
@@ -8049,6 +8106,7 @@ var DomBehind;
             parent.append(clone);
             setTimeout(function () {
                 clone.remove();
+                el.attr("ripple_appeal_value", "false");
             }, 9 * 1000);
         };
         Appeal.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("appealEnabled", null, function (x, y) {
@@ -8069,11 +8127,136 @@ var DomBehind;
             Appeal.Register(behavior);
         });
         Appeal.styleIdentity = "appeal-style";
+        Appeal.css = "\n@keyframes rippleAppeal {\n    100% {\n        transform: scale(2);\n        border-width: 10px;\n        opacity: 0;\n    }\n}\n\n@keyframes rippleOut {\n    100% {\n        opacity: 0;\n    }\n}\n\n.ripple_appeal {\n    animation: rippleAppeal 3s linear 3\n}\n";
         return Appeal;
     }());
     DomBehind.Appeal = Appeal;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Appeal.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var DomBehind;
+(function (DomBehind) {
+    var FlipAnimation;
+    (function (FlipAnimation) {
+        FlipAnimation[FlipAnimation["Flip"] = 0] = "Flip";
+        FlipAnimation[FlipAnimation["Slide"] = 1] = "Slide";
+    })(FlipAnimation = DomBehind.FlipAnimation || (DomBehind.FlipAnimation = {}));
+    var FlipBehavior = (function (_super) {
+        __extends(FlipBehavior, _super);
+        function FlipBehavior() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        FlipBehavior.prototype.SetValue = function (el, newValue) {
+            var oldValue = false;
+            var oldValueString = el.attr(FlipBehavior.ValueKey);
+            if (!String.IsNullOrWhiteSpace(oldValueString)) {
+                oldValue = Boolean(oldValueString);
+            }
+            else {
+                this.Option.back.addClass("hide");
+            }
+            el.attr(FlipBehavior.ValueKey, "" + newValue);
+            if (newValue === oldValue)
+                return;
+            if (newValue) {
+                this.Option.front.removeClass("flip-slide-in");
+                this.Option.front.addClass("hide");
+                this.Option.back.removeClass("hide");
+                this.Option.back.addClass("flip-slide-in");
+            }
+            else {
+                this.Option.front.removeClass("hide");
+                this.Option.front.addClass("flip-slide-in");
+                this.Option.back.removeClass("flip-slide-in");
+                this.Option.back.addClass("hide");
+            }
+        };
+        FlipBehavior.Register = function (behavior) {
+            var identity = "id-" + NewUid();
+            behavior.Option.front.attr(FlipBehavior.IdentityKey, identity);
+            window[identity] = behavior;
+            var style = $("#" + FlipBehavior.cssIdentity);
+            if (style.length === 0) {
+                var head = document.head || document.getElementsByTagName('head')[0];
+                var newStyle = document.createElement('style');
+                head.appendChild(newStyle);
+                newStyle.type = 'text/css';
+                newStyle.appendChild(document.createTextNode(FlipBehavior.css));
+                newStyle.setAttribute("id", FlipBehavior.cssIdentity);
+            }
+        };
+        FlipBehavior.IdentityKey = "flip-identity";
+        FlipBehavior.IsFlipProperty = DomBehind.Data.DependencyProperty.RegisterAttached("isflip", function (el) {
+        }, function (el, newValue) {
+            var identity = el.attr(FlipBehavior.IdentityKey);
+            var behavior = window[identity];
+            if (behavior) {
+                behavior.SetValue(el, newValue);
+            }
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        FlipBehavior.ValueKey = "flip-value";
+        FlipBehavior.css = "\n@keyframes kf-flip-slide-in {\n  0% {\n    opacity: 0;\n    transform: translateX(10px);\n  }\n  100% {\n    opacity: 1;\n    transform: translateX(0);\n  }\n}\n.flip-slide-in {\n    animation: kf-flip-slide-in 1s linear 1\n}\n\n@keyframes kf-flip-slide-out {\n  0% {\n    opacity: 1;\n    transform: translateX(0);\n  }\n  100% {\n    opacity: 0;\n    transform: translateX(-50px);\n  }\n}\n.flip-slide-out {\n    animation: kf-flip-slide-out 1s linear 1\n}\n";
+        FlipBehavior.cssIdentity = "flip-style";
+        return FlipBehavior;
+    }(DomBehind.Data.DataBindingBehavior));
+    DomBehind.FlipBehavior = FlipBehavior;
+    var FlipBindingBehaviorBuilder = (function (_super) {
+        __extends(FlipBindingBehaviorBuilder, _super);
+        function FlipBindingBehaviorBuilder(owner) {
+            return _super.call(this, owner) || this;
+        }
+        FlipBindingBehaviorBuilder.prototype.BindingFlip = function (exp, option) {
+            var me = this;
+            var behavior = me.CurrentBehavior;
+            if (behavior instanceof FlipBehavior) {
+                if (option) {
+                    behavior.Option = $.extend(true, behavior.Option, option);
+                }
+                behavior.Property = FlipBehavior.IsFlipProperty;
+                behavior.PInfo = new DomBehind.LamdaExpression(behavior.DataContext, exp);
+                behavior.Marks = [behavior.PInfo.MemberPath];
+            }
+            return me;
+        };
+        return FlipBindingBehaviorBuilder;
+    }(DomBehind.BindingBehaviorBuilder));
+    DomBehind.FlipBindingBehaviorBuilder = FlipBindingBehaviorBuilder;
+    DomBehind.BindingBehaviorBuilder.prototype.FlipElement = function (frontSelector, backSelector) {
+        var me = this;
+        var frontElement = me.Owner.Container.find(frontSelector);
+        if (frontElement.length === 0) {
+            frontElement = $(frontSelector);
+        }
+        var backElement = me.Owner.Container.find(backSelector);
+        if (backElement.length === 0) {
+            backElement = $(backSelector);
+        }
+        me.CurrentElement = frontElement;
+        var behavior = me.Add(new FlipBehavior());
+        behavior.Option = {
+            front: frontElement,
+            back: backElement,
+        };
+        FlipBehavior.Register(behavior);
+        var newMe = new FlipBindingBehaviorBuilder(me.Owner);
+        newMe.CurrentElement = me.CurrentElement;
+        newMe.CurrentBehavior = me.CurrentBehavior;
+        return newMe;
+    };
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Flip.js.map
 var DomBehind;
 (function (DomBehind) {
     var Application = (function () {

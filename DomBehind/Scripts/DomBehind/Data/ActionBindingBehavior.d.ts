@@ -6,9 +6,6 @@ declare namespace DomBehind.Data {
         protected ActionHandle: (e: any) => void;
         ActionParameterCount: number;
         AllowBubbling: boolean;
-        ExtendedProperties: {
-            [key: string]: any;
-        };
         Ensure(): void;
         OnTrigger(e: any): void;
         ActionPolicyCollection: ActionPolicy[];

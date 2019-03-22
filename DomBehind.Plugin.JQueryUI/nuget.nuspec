@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>DomBehind.Plugin.JQueryUI</id>
-    <version>1.0.9</version>
+    <version>1.0.10</version>
     <title>DOM Behind Plugin JQueryUI</title>
     <authors>uEN</authors>
     <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/s-ueno/DomBehind</projectUrl>
     <tags>typescript javascript jquery mvvm</tags>
     <description>
-      ・add Suggest
+      ・
     </description>
     <releaseNotes>
     </releaseNotes>
