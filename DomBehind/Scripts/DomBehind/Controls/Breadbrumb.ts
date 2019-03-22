@@ -209,16 +209,19 @@
                     aList.push($(`<a>${value.Title}</a>`));
                 } else {
                     let a = $(`<a href="javascript:void(0);">${value.Title}</a>`);
+
                     a.click(e => {
                         // タップして戻る際にイベントが取れないので発行する
                         let newE: any = new Event("breadbrumbTapped");
                         newE.__title = value.Title;
                         newE.__uri = value.Uri;
                         newE.__e = e;
+                        newE.__canceled = false;
                         window.dispatchEvent(newE);
-
-                        location.replace(value.Uri);
+                        if (!newE.__canceled)
+                            location.replace(value.Uri);
                     });
+
                     aList.push(a);
                 }
                 aList.push($(`<span> > </span>`));
