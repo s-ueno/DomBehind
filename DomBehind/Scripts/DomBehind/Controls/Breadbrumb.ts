@@ -52,11 +52,10 @@
                 stack = this.ToDecompress(json.Value);
             }
             if (stack.Any()) {
-
-
-
                 if (oldQueryStrings.Any()) {
-                    stack.LastOrDefault().Uri = `${currentUri}&isPop=true`;
+                    if (!oldQueryStrings.Any(x => x.Key === 'isPop')) {
+                        stack.LastOrDefault().Uri = `${currentUri}&isPop=true`;
+                    }
                 } else {
                     stack.LastOrDefault().Uri = `${currentUri}?isPop=true`;
                 }
@@ -114,7 +113,9 @@
             }
             if (stack.Any()) {
                 if (oldQueryStrings.Any()) {
-                    stack.LastOrDefault().Uri = `${currentUri}&isPop=true`;
+                    if (!oldQueryStrings.Any(x => x.Key === 'isPop')) {
+                        stack.LastOrDefault().Uri = `${currentUri}&isPop=true`;
+                    }
                 } else {
                     stack.LastOrDefault().Uri = `${currentUri}?isPop=true`;
                 }
