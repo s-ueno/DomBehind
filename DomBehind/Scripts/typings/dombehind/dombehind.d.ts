@@ -1166,6 +1166,7 @@ interface StringConstructor {
     IsNullOrEmpty(str: string): boolean;
     IsNullOrWhiteSpace(str: string): boolean;
     Split(value: string, separator: string): string[];
+    ToBoolean(value: string, defaultValue?: boolean): boolean;
 }
 declare enum StringSplitOptions {
     None = 0,

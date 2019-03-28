@@ -41,9 +41,9 @@
 
             let oldValueString = el.attr(FlipBehavior.ValueKey);
             if (!String.IsNullOrWhiteSpace(oldValueString)) {
-                oldValue = Boolean(oldValueString);
+                oldValue = String.ToBoolean(oldValueString);
             } else {
-                this.Option.back.addClass("hide");
+                this.Option.back.addClass("invisible");
             }
 
             el.attr(FlipBehavior.ValueKey, `${newValue}`);
@@ -52,16 +52,16 @@
 
             if (newValue) {
                 this.Option.front.removeClass("flip-slide-in");
-                this.Option.front.addClass("hide");
+                this.Option.front.addClass("invisible");
 
-                this.Option.back.removeClass("hide");
+                this.Option.back.removeClass("invisible");
                 this.Option.back.addClass("flip-slide-in");
             } else {
-                this.Option.front.removeClass("hide");
+                this.Option.front.removeClass("invisible");
                 this.Option.front.addClass("flip-slide-in");
 
                 this.Option.back.removeClass("flip-slide-in");
-                this.Option.back.addClass("hide");
+                this.Option.back.addClass("invisible");
             }
         }
 

@@ -3,6 +3,7 @@
     IsNullOrWhiteSpace(str: string): boolean;
 
     Split(value: string, separator: string): string[];
+    ToBoolean(value: string, defaultValue?: boolean): boolean;
 }
 // declare var String: StringConstructor;
 
@@ -11,7 +12,15 @@ String.IsNullOrWhiteSpace = (s: string) => String.IsNullOrEmpty(s) || s.replace(
 String.Split = function (s: string, sep: string) {
     return s.split(sep);
 };
+String.ToBoolean = function (s, defaultValue = false) {
+    if (Object.IsNullOrUndefined(s)) return defaultValue;
+    s = s.toLowerCase();
 
+    if (s === 'true') return true;
+    if (s === 'false') return false;
+
+    return defaultValue;
+}
 
 
 
