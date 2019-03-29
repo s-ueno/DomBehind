@@ -2,11 +2,12 @@
 
 
     export enum FlipAnimation {
-        Flip,
+        HorizontalFlip,
         Slide
     }
 
     export interface IFlipOption {
+        container?: JQuery;
         front?: JQuery;
         back?: JQuery;
 
@@ -33,6 +34,10 @@
                 },
                 Data.UpdateSourceTrigger.Explicit,
                 Data.BindingMode.OneWay,
+                (b: FlipBehavior) => {
+                    if (b.Option.animation === FlipAnimation.Slide)
+                        b.Option.back.addClass("hidden");
+                }
             );
 
         private static readonly ValueKey = "flip-value";
@@ -42,28 +47,55 @@
             let oldValueString = el.attr(FlipBehavior.ValueKey);
             if (!String.IsNullOrWhiteSpace(oldValueString)) {
                 oldValue = String.ToBoolean(oldValueString);
-            } else {
-                this.Option.back.addClass("invisible");
             }
 
             el.attr(FlipBehavior.ValueKey, `${newValue}`);
 
             if (newValue === oldValue) return;
 
-            if (newValue) {
-                this.Option.front.removeClass("flip-slide-in");
-                this.Option.front.addClass("invisible");
+            if (this.Option.animation === FlipAnimation.HorizontalFlip) {
+                this.HorizontalFlip(newValue);
+            } else {
+                this.Slide(newValue);
+            }
+        }
+        protected HorizontalFlip(isBack: boolean) {
+            if (!this.Option.container.hasClass("flip-container")) {
+                this.Option.container.addClass("flip-container")
+            }
+            if (!this.Option.front.hasClass("flip-item")) {
+                this.Option.front.addClass("flip-item")
+            }
+            if (!this.Option.back.hasClass("flip-item")) {
+                this.Option.back.addClass("flip-item")
+            }
+            if (!this.Option.back.hasClass("flip-horizontal-back")) {
+                this.Option.back.addClass("flip-horizontal-back")
+            }
 
-                this.Option.back.removeClass("invisible");
+            if (isBack) {
+                this.Option.container.addClass("flip-horizontal");
+            } else {
+                this.Option.container.removeClass("flip-horizontal");
+            }
+        }
+        protected Slide(isBack: boolean) {
+            if (isBack) {
+                this.Option.front.removeClass("flip-slide-in");
+                this.Option.front.addClass("hidden");
+
+                this.Option.back.removeClass("hidden");
                 this.Option.back.addClass("flip-slide-in");
             } else {
-                this.Option.front.removeClass("invisible");
+                this.Option.front.removeClass("hidden");
                 this.Option.front.addClass("flip-slide-in");
 
                 this.Option.back.removeClass("flip-slide-in");
-                this.Option.back.addClass("invisible");
+                this.Option.back.addClass("hidden");
             }
         }
+
+
 
         private static readonly css = `
 @keyframes kf-flip-slide-in {
@@ -93,13 +125,32 @@
 .flip-slide-out {
     animation: kf-flip-slide-out 1s linear 1
 }
+
+
+
+.flip-container {
+    transition: transform 1s;
+    transform-style: preserve-3d;
+    position: relative; 
+}
+.flip-item {
+    position: absolute;
+    backface-visibility: hidden;
+}
+.flip-horizontal {
+    transform: rotateY(180deg);
+}
+.flip-horizontal-back {
+    transform: rotateY(180deg);
+}
+
 `;
         private static readonly cssIdentity = `flip-style`;
 
         public static Register(behavior: FlipBehavior) {
             // ID for pointing to the instant of the behavior
             let identity = `id-${NewUid()}`;
-            behavior.Option.front.attr(FlipBehavior.IdentityKey, identity);
+            behavior.Option.container.attr(FlipBehavior.IdentityKey, identity);
             window[identity] = behavior;
 
             let style = $(`#${FlipBehavior.cssIdentity}`);
@@ -136,35 +187,45 @@
 
     }
     export interface BindingBehaviorBuilder<T> {
-        FlipElement(frontSelector: string, backSelector: string): FlipBindingBehaviorBuilder<T>
+        FlipElement(
+            containerSelector: string,
+            frontSelector: string,
+            backSelector: string): FlipBindingBehaviorBuilder<T>
     }
 
-    BindingBehaviorBuilder.prototype.FlipElement = function (frontSelector: string, backSelector: string) {
-        let me: BindingBehaviorBuilder<any> = this;
+    BindingBehaviorBuilder.prototype.FlipElement =
+        function (containerSelector: string, frontSelector: string, backSelector: string) {
+            let me: BindingBehaviorBuilder<any> = this;
 
-        let frontElement = me.Owner.Container.find(frontSelector);
-        if (frontElement.length === 0) {
-            frontElement = $(frontSelector);
+            let container = me.Owner.Container.find(containerSelector);
+            if (container.length === 0) {
+                container = $(containerSelector);
+            }
+
+            let frontElement = me.Owner.Container.find(frontSelector);
+            if (frontElement.length === 0) {
+                frontElement = $(frontSelector);
+            }
+
+            let backElement = me.Owner.Container.find(backSelector);
+            if (backElement.length === 0) {
+                backElement = $(backSelector);
+            }
+
+            me.CurrentElement = container;
+            let behavior = me.Add(new FlipBehavior());
+            behavior.Option = {
+                container: container,
+                front: frontElement,
+                back: backElement,
+                animation: FlipAnimation.Slide,
+            };
+            FlipBehavior.Register(behavior);
+
+            let newMe = new FlipBindingBehaviorBuilder<any>(me.Owner);
+            newMe.CurrentElement = me.CurrentElement;
+            newMe.CurrentBehavior = me.CurrentBehavior;
+            return newMe;
         }
-
-        let backElement = me.Owner.Container.find(backSelector);
-        if (backElement.length === 0) {
-            backElement = $(backSelector);
-        }
-
-        // さしあたって、フロントを代表要素と仮置きする
-        me.CurrentElement = frontElement;
-        let behavior = me.Add(new FlipBehavior());
-        behavior.Option = {
-            front: frontElement,
-            back: backElement,
-        };
-        FlipBehavior.Register(behavior);
-
-        let newMe = new FlipBindingBehaviorBuilder<any>(me.Owner);
-        newMe.CurrentElement = me.CurrentElement;
-        newMe.CurrentBehavior = me.CurrentBehavior;
-        return newMe;
-    }
 
 }

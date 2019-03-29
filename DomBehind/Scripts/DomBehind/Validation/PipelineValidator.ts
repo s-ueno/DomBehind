@@ -20,9 +20,10 @@
             this.Error = null;
 
             $.each(this.Validators, (i, x) => {
-                x.HasError = false;
-                x.Apply();
-                if (!x.Validate(value)) {
+
+                x.OnValidationg();
+
+                if (x.HasError) {
                     lastErrorMessage = x.Message;
                     result = false;
                     this.Error = x;

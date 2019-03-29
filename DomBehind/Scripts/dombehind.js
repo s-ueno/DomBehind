@@ -6065,9 +6065,8 @@ var DomBehind;
                 var lastErrorMessage;
                 this.Error = null;
                 $.each(this.Validators, function (i, x) {
-                    x.HasError = false;
-                    x.Apply();
-                    if (!x.Validate(value)) {
+                    x.OnValidationg();
+                    if (x.HasError) {
                         lastErrorMessage = x.Message;
                         result = false;
                         _this.Error = x;
@@ -7891,7 +7890,12 @@ var DomBehind;
             }
             if (stack.Any()) {
                 if (oldQueryStrings.Any()) {
-                    stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                    if (!oldQueryStrings.Any(function (x) { return x.Key === 'isPop'; })) {
+                        stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                    }
+                    else {
+                        stack.LastOrDefault().Uri = "" + currentUri;
+                    }
                 }
                 else {
                     stack.LastOrDefault().Uri = currentUri + "?isPop=true";
@@ -7942,7 +7946,12 @@ var DomBehind;
             }
             if (stack.Any()) {
                 if (oldQueryStrings.Any()) {
-                    stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                    if (!oldQueryStrings.Any(function (x) { return x.Key === 'isPop'; })) {
+                        stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                    }
+                    else {
+                        stack.LastOrDefault().Uri = "" + currentUri;
+                    }
                 }
                 else {
                     stack.LastOrDefault().Uri = currentUri + "?isPop=true";
@@ -8029,8 +8038,24 @@ var DomBehind;
                         newE.__title = value.Title;
                         newE.__uri = value.Uri;
                         newE.__e = e;
+                        newE.__canceled = false;
                         window.dispatchEvent(newE);
-                        location.replace(value.Uri);
+                        if (typeof newE.__canceled === "boolean") {
+                            if (!newE.__canceled) {
+                                location.replace(value.Uri);
+                            }
+                        }
+                        else if (Object.IsPromise(newE.__canceled)) {
+                            var pms = newE.__canceled;
+                            pms.then(function (canceled) {
+                                if (!canceled) {
+                                    location.replace(value.Uri);
+                                }
+                            });
+                        }
+                        else {
+                            location.replace(value.Uri);
+                        }
                     });
                     aList.push(a);
                 }
@@ -8214,7 +8239,7 @@ var DomBehind;
 (function (DomBehind) {
     var FlipAnimation;
     (function (FlipAnimation) {
-        FlipAnimation[FlipAnimation["Flip"] = 0] = "Flip";
+        FlipAnimation[FlipAnimation["HorizontalFlip"] = 0] = "HorizontalFlip";
         FlipAnimation[FlipAnimation["Slide"] = 1] = "Slide";
     })(FlipAnimation = DomBehind.FlipAnimation || (DomBehind.FlipAnimation = {}));
     var FlipBehavior = (function (_super) {
@@ -8228,28 +8253,53 @@ var DomBehind;
             if (!String.IsNullOrWhiteSpace(oldValueString)) {
                 oldValue = String.ToBoolean(oldValueString);
             }
-            else {
-                this.Option.back.addClass("invisible");
-            }
             el.attr(FlipBehavior.ValueKey, "" + newValue);
             if (newValue === oldValue)
                 return;
-            if (newValue) {
+            if (this.Option.animation === FlipAnimation.HorizontalFlip) {
+                this.HorizontalFlip(newValue);
+            }
+            else {
+                this.Slide(newValue);
+            }
+        };
+        FlipBehavior.prototype.HorizontalFlip = function (isBack) {
+            if (!this.Option.container.hasClass("flip-container")) {
+                this.Option.container.addClass("flip-container");
+            }
+            if (!this.Option.front.hasClass("flip-item")) {
+                this.Option.front.addClass("flip-item");
+            }
+            if (!this.Option.back.hasClass("flip-item")) {
+                this.Option.back.addClass("flip-item");
+            }
+            if (!this.Option.back.hasClass("flip-horizontal-back")) {
+                this.Option.back.addClass("flip-horizontal-back");
+            }
+            if (isBack) {
+                this.Option.container.addClass("flip-horizontal");
+            }
+            else {
+                this.Option.container.removeClass("flip-horizontal");
+            }
+        };
+        FlipBehavior.prototype.Slide = function (isBack) {
+            if (isBack) {
                 this.Option.front.removeClass("flip-slide-in");
-                this.Option.front.addClass("invisible");
-                this.Option.back.removeClass("invisible");
+                this.Option.front.addClass("hidden");
+                this.Option.back.removeClass("hidden");
                 this.Option.back.addClass("flip-slide-in");
             }
             else {
-                this.Option.front.removeClass("invisible");
+                this.Option.front.removeClass("hidden");
                 this.Option.front.addClass("flip-slide-in");
                 this.Option.back.removeClass("flip-slide-in");
-                this.Option.back.addClass("invisible");
+                this.Option.back.addClass("hidden");
             }
         };
         FlipBehavior.Register = function (behavior) {
             var identity = "id-" + NewUid();
-            behavior.Option.front.attr(FlipBehavior.IdentityKey, identity);
+            behavior.Option.container.attr(FlipBehavior.IdentityKey, identity);
             window[identity] = behavior;
             var style = $("#" + FlipBehavior.cssIdentity);
             if (style.length === 0) {
@@ -8269,9 +8319,12 @@ var DomBehind;
             if (behavior) {
                 behavior.SetValue(el, newValue);
             }
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, function (b) {
+            if (b.Option.animation === FlipAnimation.Slide)
+                b.Option.back.addClass("hidden");
+        });
         FlipBehavior.ValueKey = "flip-value";
-        FlipBehavior.css = "\n@keyframes kf-flip-slide-in {\n  0% {\n    opacity: 0;\n    transform: translateX(10px);\n  }\n  100% {\n    opacity: 1;\n    transform: translateX(0);\n  }\n}\n.flip-slide-in {\n    animation: kf-flip-slide-in 1s linear 1\n}\n\n@keyframes kf-flip-slide-out {\n  0% {\n    opacity: 1;\n    transform: translateX(0);\n  }\n  100% {\n    opacity: 0;\n    transform: translateX(-50px);\n  }\n}\n.flip-slide-out {\n    animation: kf-flip-slide-out 1s linear 1\n}\n";
+        FlipBehavior.css = "\n@keyframes kf-flip-slide-in {\n  0% {\n    opacity: 0;\n    transform: translateX(10px);\n  }\n  100% {\n    opacity: 1;\n    transform: translateX(0);\n  }\n}\n.flip-slide-in {\n    animation: kf-flip-slide-in 1s linear 1\n}\n\n@keyframes kf-flip-slide-out {\n  0% {\n    opacity: 1;\n    transform: translateX(0);\n  }\n  100% {\n    opacity: 0;\n    transform: translateX(-50px);\n  }\n}\n.flip-slide-out {\n    animation: kf-flip-slide-out 1s linear 1\n}\n\n\n\n.flip-container {\n    transition: transform 1s;\n    transform-style: preserve-3d;\n    position: relative; \n}\n.flip-item {\n    position: absolute;\n    backface-visibility: hidden;\n}\n.flip-horizontal {\n    transform: rotateY(180deg);\n}\n.flip-horizontal-back {\n    transform: rotateY(180deg);\n}\n\n";
         FlipBehavior.cssIdentity = "flip-style";
         return FlipBehavior;
     }(DomBehind.Data.DataBindingBehavior));
@@ -8297,28 +8350,35 @@ var DomBehind;
         return FlipBindingBehaviorBuilder;
     }(DomBehind.BindingBehaviorBuilder));
     DomBehind.FlipBindingBehaviorBuilder = FlipBindingBehaviorBuilder;
-    DomBehind.BindingBehaviorBuilder.prototype.FlipElement = function (frontSelector, backSelector) {
-        var me = this;
-        var frontElement = me.Owner.Container.find(frontSelector);
-        if (frontElement.length === 0) {
-            frontElement = $(frontSelector);
-        }
-        var backElement = me.Owner.Container.find(backSelector);
-        if (backElement.length === 0) {
-            backElement = $(backSelector);
-        }
-        me.CurrentElement = frontElement;
-        var behavior = me.Add(new FlipBehavior());
-        behavior.Option = {
-            front: frontElement,
-            back: backElement,
+    DomBehind.BindingBehaviorBuilder.prototype.FlipElement =
+        function (containerSelector, frontSelector, backSelector) {
+            var me = this;
+            var container = me.Owner.Container.find(containerSelector);
+            if (container.length === 0) {
+                container = $(containerSelector);
+            }
+            var frontElement = me.Owner.Container.find(frontSelector);
+            if (frontElement.length === 0) {
+                frontElement = $(frontSelector);
+            }
+            var backElement = me.Owner.Container.find(backSelector);
+            if (backElement.length === 0) {
+                backElement = $(backSelector);
+            }
+            me.CurrentElement = container;
+            var behavior = me.Add(new FlipBehavior());
+            behavior.Option = {
+                container: container,
+                front: frontElement,
+                back: backElement,
+                animation: FlipAnimation.Slide,
+            };
+            FlipBehavior.Register(behavior);
+            var newMe = new FlipBindingBehaviorBuilder(me.Owner);
+            newMe.CurrentElement = me.CurrentElement;
+            newMe.CurrentBehavior = me.CurrentBehavior;
+            return newMe;
         };
-        FlipBehavior.Register(behavior);
-        var newMe = new FlipBindingBehaviorBuilder(me.Owner);
-        newMe.CurrentElement = me.CurrentElement;
-        newMe.CurrentBehavior = me.CurrentBehavior;
-        return newMe;
-    };
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Flip.js.map
 var DomBehind;

@@ -55,6 +55,8 @@
                 if (oldQueryStrings.Any()) {
                     if (!oldQueryStrings.Any(x => x.Key === 'isPop')) {
                         stack.LastOrDefault().Uri = `${currentUri}&isPop=true`;
+                    } else {
+                        stack.LastOrDefault().Uri = `${currentUri}`;
                     }
                 } else {
                     stack.LastOrDefault().Uri = `${currentUri}?isPop=true`;
@@ -115,6 +117,8 @@
                 if (oldQueryStrings.Any()) {
                     if (!oldQueryStrings.Any(x => x.Key === 'isPop')) {
                         stack.LastOrDefault().Uri = `${currentUri}&isPop=true`;
+                    } else {
+                        stack.LastOrDefault().Uri = `${currentUri}`;
                     }
                 } else {
                     stack.LastOrDefault().Uri = `${currentUri}?isPop=true`;
@@ -218,10 +222,22 @@
                         newE.__e = e;
                         newE.__canceled = false;
                         window.dispatchEvent(newE);
-                        if (!newE.__canceled)
-                            location.replace(value.Uri);
-                    });
 
+                        if (typeof newE.__canceled === "boolean") {
+                            if (!newE.__canceled) {
+                                location.replace(value.Uri);
+                            }
+                        } else if (Object.IsPromise(newE.__canceled)) {
+                            let pms: JQueryPromise<boolean> = newE.__canceled;
+                            pms.then(canceled => {
+                                if (!canceled) {
+                                    location.replace(value.Uri);
+                                }
+                            });
+                        } else {
+                            location.replace(value.Uri);
+                        }
+                    });
                     aList.push(a);
                 }
                 aList.push($(`<span> > </span>`));
