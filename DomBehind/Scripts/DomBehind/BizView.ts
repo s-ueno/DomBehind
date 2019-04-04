@@ -157,9 +157,9 @@
                         result = false;
                     }
                 });
-                if (result) {
-                    this.RemoveValidator(mark);
-                }
+                //if (result) {
+                //    this.RemoveValidator(mark);
+                //} 
             }
 
             // サードパーティやNugetライブラリ拡張用
