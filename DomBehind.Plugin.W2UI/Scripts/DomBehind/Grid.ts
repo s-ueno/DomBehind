@@ -226,6 +226,9 @@
         public RowClassBinding: (row: any) => string;
         public Column: IColumnBinding<any>[] = [];
         protected Grid: W2UI.W2Grid;
+        public RowClassBindingConverter: (obj: any) => string;
+        public RowStyleBindingConverter: (obj: any) => string;
+        public CellStyleBindingConverter: (obj: any) => string;
         protected get IsMultiSelect(): boolean {
             if (this.GridOption && this.GridOption.multiSelect) {
                 return true;
@@ -643,6 +646,11 @@
             if (this.RowStyleBinding) {
                 // defaultStyle
                 let defaultValue = this.RowStyleBinding(value);
+
+                if (this.RowStyleBindingConverter) {
+                    defaultValue = this.RowStyleBindingConverter(defaultValue);
+                }
+
                 if (!String.IsNullOrWhiteSpace(defaultValue)) {
                     value.w2ui.style = defaultValue;
                 }
@@ -654,6 +662,11 @@
                     observable.PropertyChanged.AddHandler((ss, ee) => {
                         let id = ss.recid;
                         let style = this.RowStyleBinding(ss);
+
+                        if (this.RowStyleBindingConverter) {
+                            style = this.RowStyleBindingConverter(style);
+                        }
+
                         value.w2ui.style = style;
                         this.Grid.refreshRow(id);
                     });
@@ -666,6 +679,11 @@
             if (this.CellStyleBinding) {
                 // defaultStyle
                 let defaultValue = this.CellStyleBinding(value);
+
+                if (this.CellStyleBindingConverter) {
+                    defaultValue = this.CellStyleBindingConverter(defaultValue);
+                }
+
                 if (!String.IsNullOrWhiteSpace(defaultValue)) {
                     value.w2ui.style = this.ParseCellStyles(defaultValue);
                 }
@@ -677,6 +695,11 @@
                     observable.PropertyChanged.AddHandler((ss, ee) => {
                         let id = ss.recid;
                         let style = this.CellStyleBinding(ss);
+
+                        if (this.CellStyleBindingConverter) {
+                            style = this.CellStyleBindingConverter(style);
+                        }
+
                         value.w2ui.style = this.ParseCellStyles(style);
                         this.Grid.refreshRow(id);
                     });
@@ -688,6 +711,11 @@
             if (this.RowClassBinding) {
                 // default style
                 let defaultValue = this.RowClassBinding(value);
+
+                if (this.RowClassBindingConverter) {
+                    defaultValue = this.RowClassBindingConverter(defaultValue);
+                }
+
                 if (!String.IsNullOrWhiteSpace(defaultValue)) {
                     value.w2ui.class = defaultValue;
                 }
@@ -700,6 +728,11 @@
                     observable.PropertyChanged.AddHandler((ss, ee) => {
                         let id = ss.recid;
                         let style = this.RowClassBinding(ss);
+
+                        if (this.RowClassBindingConverter) {
+                            style = this.RowClassBindingConverter(style);
+                        }
+
                         value.w2ui.class = style;
                         this.Grid.refreshRow(id);
                     });
@@ -776,8 +809,9 @@
          * @param styleBinding　style属性値の文字列を示すプロパティ先をラムダで指定します。
          * 
          */
-        public RowStyleBinding(styleBinding: (row: T) => string): W2GridBindingBehaviorBuilder<T> {
+        public RowStyleBinding(styleBinding: (row: T) => string, convertTarget?:(obj: any) => string): W2GridBindingBehaviorBuilder<T> {
             let gridBehavior: W2GridBindingBehavior = this.CurrentBehavior as W2GridBindingBehavior;
+            gridBehavior.RowStyleBindingConverter = convertTarget;
             gridBehavior.RowStyleBinding = styleBinding;
             return this;
         }
@@ -788,9 +822,10 @@
          * @param classBinding css名の文字列を示すプロパティ先をラムダで指定します
          * 
          */
-        public RowCssBinding(classBinding: (row: T) => string): W2GridBindingBehaviorBuilder<T> {
+        public RowCssBinding(classBinding: (row: T) => string, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T> {
             let gridBehavior: W2GridBindingBehavior = this.CurrentBehavior as W2GridBindingBehavior;
             gridBehavior.RowClassBinding = classBinding;
+            gridBehavior.RowClassBindingConverter = convertTarget;
             return this;
         }
 
@@ -805,8 +840,9 @@
          *  
          * @param cellStyleBinding style属性値の文字列を示すプロパティ先をラムダで指定します。ただし、列を示すJSON形式です
          */
-        public CellStyleBinding(cellStyleBinding: (row: T) => string): W2GridBindingBehaviorBuilder<T> {
+        public CellStyleBinding(cellStyleBinding: (row: T) => string, convertTarget?:(obj: any) => string): W2GridBindingBehaviorBuilder<T> {
             let gridBehavior: W2GridBindingBehavior = this.CurrentBehavior as W2GridBindingBehavior;
+            gridBehavior.CellStyleBindingConverter = convertTarget;
             gridBehavior.CellStyleBinding = cellStyleBinding;
             return this;
         }

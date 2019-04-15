@@ -4,7 +4,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -447,6 +447,9 @@ var DomBehind;
             value.recid = this.GenerateRecId();
             if (this.RowStyleBinding) {
                 var defaultValue = this.RowStyleBinding(value);
+                if (this.RowStyleBindingConverter) {
+                    defaultValue = this.RowStyleBindingConverter(defaultValue);
+                }
                 if (!String.IsNullOrWhiteSpace(defaultValue)) {
                     value.w2ui.style = defaultValue;
                 }
@@ -456,6 +459,9 @@ var DomBehind;
                     observable.PropertyChanged.AddHandler(function (ss, ee) {
                         var id = ss.recid;
                         var style = _this.RowStyleBinding(ss);
+                        if (_this.RowStyleBindingConverter) {
+                            style = _this.RowStyleBindingConverter(style);
+                        }
                         value.w2ui.style = style;
                         _this.Grid.refreshRow(id);
                     });
@@ -464,6 +470,9 @@ var DomBehind;
             }
             if (this.CellStyleBinding) {
                 var defaultValue = this.CellStyleBinding(value);
+                if (this.CellStyleBindingConverter) {
+                    defaultValue = this.CellStyleBindingConverter(defaultValue);
+                }
                 if (!String.IsNullOrWhiteSpace(defaultValue)) {
                     value.w2ui.style = this.ParseCellStyles(defaultValue);
                 }
@@ -473,6 +482,9 @@ var DomBehind;
                     observable.PropertyChanged.AddHandler(function (ss, ee) {
                         var id = ss.recid;
                         var style = _this.CellStyleBinding(ss);
+                        if (_this.CellStyleBindingConverter) {
+                            style = _this.CellStyleBindingConverter(style);
+                        }
                         value.w2ui.style = _this.ParseCellStyles(style);
                         _this.Grid.refreshRow(id);
                     });
@@ -480,6 +492,9 @@ var DomBehind;
             }
             if (this.RowClassBinding) {
                 var defaultValue = this.RowClassBinding(value);
+                if (this.RowClassBindingConverter) {
+                    defaultValue = this.RowClassBindingConverter(defaultValue);
+                }
                 if (!String.IsNullOrWhiteSpace(defaultValue)) {
                     value.w2ui.class = defaultValue;
                 }
@@ -490,6 +505,9 @@ var DomBehind;
                     observable.PropertyChanged.AddHandler(function (ss, ee) {
                         var id = ss.recid;
                         var style = _this.RowClassBinding(ss);
+                        if (_this.RowClassBindingConverter) {
+                            style = _this.RowClassBindingConverter(style);
+                        }
                         value.w2ui.class = style;
                         _this.Grid.refreshRow(id);
                     });
@@ -575,18 +593,21 @@ var DomBehind;
             gridBehavior.AddColumn(op);
             return this;
         };
-        W2GridBindingBehaviorBuilder.prototype.RowStyleBinding = function (styleBinding) {
+        W2GridBindingBehaviorBuilder.prototype.RowStyleBinding = function (styleBinding, convertTarget) {
             var gridBehavior = this.CurrentBehavior;
+            gridBehavior.RowStyleBindingConverter = convertTarget;
             gridBehavior.RowStyleBinding = styleBinding;
             return this;
         };
-        W2GridBindingBehaviorBuilder.prototype.RowCssBinding = function (classBinding) {
+        W2GridBindingBehaviorBuilder.prototype.RowCssBinding = function (classBinding, convertTarget) {
             var gridBehavior = this.CurrentBehavior;
             gridBehavior.RowClassBinding = classBinding;
+            gridBehavior.RowClassBindingConverter = convertTarget;
             return this;
         };
-        W2GridBindingBehaviorBuilder.prototype.CellStyleBinding = function (cellStyleBinding) {
+        W2GridBindingBehaviorBuilder.prototype.CellStyleBinding = function (cellStyleBinding, convertTarget) {
             var gridBehavior = this.CurrentBehavior;
+            gridBehavior.CellStyleBindingConverter = convertTarget;
             gridBehavior.CellStyleBinding = cellStyleBinding;
             return this;
         };

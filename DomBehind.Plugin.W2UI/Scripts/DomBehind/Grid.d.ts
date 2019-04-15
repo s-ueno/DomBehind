@@ -90,6 +90,9 @@ declare namespace DomBehind {
         RowClassBinding: (row: any) => string;
         Column: IColumnBinding<any>[];
         protected Grid: W2UI.W2Grid;
+        RowClassBindingConverter: (obj: any) => string;
+        RowStyleBindingConverter: (obj: any) => string;
+        CellStyleBindingConverter: (obj: any) => string;
         protected readonly IsMultiSelect: boolean;
         protected GenerateRecId(): number;
         private __id;
@@ -116,9 +119,9 @@ declare namespace DomBehind {
         constructor(owner: BizView);
         protected readonly DefaultOption: IColumnBindingOption;
         ColumnBinding(title: string, binding: (row: T) => any, option?: IColumnBinding<T>): W2GridBindingBehaviorBuilder<T>;
-        RowStyleBinding(styleBinding: (row: T) => string): W2GridBindingBehaviorBuilder<T>;
-        RowCssBinding(classBinding: (row: T) => string): W2GridBindingBehaviorBuilder<T>;
-        CellStyleBinding(cellStyleBinding: (row: T) => string): W2GridBindingBehaviorBuilder<T>;
+        RowStyleBinding(styleBinding: (row: T) => string, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;
+        RowCssBinding(classBinding: (row: T) => string, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;
+        CellStyleBinding(cellStyleBinding: (row: T) => string, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;
     }
     interface BindingBehaviorBuilder<T> {
         BuildGrid<TRow>(itemSource: (x: T) => any, option?: IGridOption<T>): W2GridBindingBehaviorBuilder<TRow>;
