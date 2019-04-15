@@ -122,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+    <Folder Include="Scripts\typings\dombehind.plugin\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\DomBehind\DatePicker.ts" />
