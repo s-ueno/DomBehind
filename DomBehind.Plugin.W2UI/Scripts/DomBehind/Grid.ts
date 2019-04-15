@@ -221,9 +221,9 @@
         public ItemsSource: PropertyInfo;
         public ListCollectionView: Data.ListCollectionView;
         public GridOption: IGridOption<any>;
-        public RowStyleBinding: (row: any) => string;
-        public CellStyleBinding: (row: any) => string;
-        public RowClassBinding: (row: any) => string;
+        public RowStyleBinding: (row: any) => any;
+        public CellStyleBinding: (row: any) => any;
+        public RowClassBinding: (row: any) => any;
         public Column: IColumnBinding<any>[] = [];
         protected Grid: W2UI.W2Grid;
         public RowClassBindingConverter: (obj: any) => string;
@@ -809,7 +809,7 @@
          * @param styleBinding　style属性値の文字列を示すプロパティ先をラムダで指定します。
          * 
          */
-        public RowStyleBinding(styleBinding: (row: T) => string, convertTarget?:(obj: any) => string): W2GridBindingBehaviorBuilder<T> {
+        public RowStyleBinding(styleBinding: (row: T) => any, convertTarget?:(obj: any) => string): W2GridBindingBehaviorBuilder<T> {
             let gridBehavior: W2GridBindingBehavior = this.CurrentBehavior as W2GridBindingBehavior;
             gridBehavior.RowStyleBindingConverter = convertTarget;
             gridBehavior.RowStyleBinding = styleBinding;
@@ -822,7 +822,7 @@
          * @param classBinding css名の文字列を示すプロパティ先をラムダで指定します
          * 
          */
-        public RowCssBinding(classBinding: (row: T) => string, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T> {
+        public RowCssBinding(classBinding: (row: T) => any, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T> {
             let gridBehavior: W2GridBindingBehavior = this.CurrentBehavior as W2GridBindingBehavior;
             gridBehavior.RowClassBinding = classBinding;
             gridBehavior.RowClassBindingConverter = convertTarget;
@@ -840,7 +840,7 @@
          *  
          * @param cellStyleBinding style属性値の文字列を示すプロパティ先をラムダで指定します。ただし、列を示すJSON形式です
          */
-        public CellStyleBinding(cellStyleBinding: (row: T) => string, convertTarget?:(obj: any) => string): W2GridBindingBehaviorBuilder<T> {
+        public CellStyleBinding(cellStyleBinding: (row: T) => any, convertTarget?:(obj: any) => string): W2GridBindingBehaviorBuilder<T> {
             let gridBehavior: W2GridBindingBehavior = this.CurrentBehavior as W2GridBindingBehavior;
             gridBehavior.CellStyleBindingConverter = convertTarget;
             gridBehavior.CellStyleBinding = cellStyleBinding;

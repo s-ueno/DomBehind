@@ -106,9 +106,9 @@ declare namespace DomBehind {
         ItemsSource: PropertyInfo;
         ListCollectionView: Data.ListCollectionView;
         GridOption: IGridOption<any>;
-        RowStyleBinding: (row: any) => string;
-        CellStyleBinding: (row: any) => string;
-        RowClassBinding: (row: any) => string;
+        RowStyleBinding: (row: any) => any;
+        CellStyleBinding: (row: any) => any;
+        RowClassBinding: (row: any) => any;
         Column: IColumnBinding<any>[];
         protected Grid: W2UI.W2Grid;
         RowClassBindingConverter: (obj: any) => string;
@@ -140,9 +140,9 @@ declare namespace DomBehind {
         constructor(owner: BizView);
         protected readonly DefaultOption: IColumnBindingOption;
         ColumnBinding(title: string, binding: (row: T) => any, option?: IColumnBinding<T>): W2GridBindingBehaviorBuilder<T>;
-        RowStyleBinding(styleBinding: (row: T) => string, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;
-        RowCssBinding(classBinding: (row: T) => string, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;
-        CellStyleBinding(cellStyleBinding: (row: T) => string, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;
+        RowStyleBinding(styleBinding: (row: T) => any, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;
+        RowCssBinding(classBinding: (row: T) => any, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;
+        CellStyleBinding(cellStyleBinding: (row: T) => any, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;
     }
     interface BindingBehaviorBuilder<T> {
         BuildGrid<TRow>(itemSource: (x: T) => any, option?: IGridOption<T>): W2GridBindingBehaviorBuilder<TRow>;
