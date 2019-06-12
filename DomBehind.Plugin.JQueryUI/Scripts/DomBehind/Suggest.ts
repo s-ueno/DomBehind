@@ -2,7 +2,7 @@
 
 
     export enum SuggestSource {
-        Google, Amazon, Custom
+        Google, Amazon, Array, Custom
     }
 
 
@@ -40,25 +40,44 @@
                         }
                     });
                 }
+            } else if (this.Source == SuggestSource.Array) {
+                this.CustomSource = (request, response) => {
+                    response(this.Option.array.Where(x => x.StartsWith(request.term)));
+                }
             }
 
             let suggest = this.Element.autocomplete({
                 source: (request, response) => this.CustomSource(request, response),
                 delay: this.Delay,
+                minLength: this.Option.minLength,
             });
+
+
+            if (this.Option && this.Option.isShow) {
+                this.Element.focusin(() => {
+                    this.Element.autocomplete('search', this.Element.val());
+                });
+            }
         }
+
         public Source: SuggestSource;
         public Delay: number;
         public CustomSource?: (request, response) => void
+        public Option?: SuggestionOption;
     }
 
-
+    export interface SuggestionOption {
+        minLength?: number,
+        isShow?: boolean,
+        array?: Array<string>
+    }
 
     export interface BindingBehaviorBuilder<T> {
-        BuildSuggest<TRow>(source?: SuggestSource, delay?: number, customSource?: (request, response) => void): BindingBehaviorBuilder<TRow>;
+        BuildSuggest<TRow>(source?: SuggestSource, delay?: number, option?: SuggestionOption): BindingBehaviorBuilder<TRow>;
     }
 
-    BindingBehaviorBuilder.prototype.BuildSuggest = function (source?: SuggestSource, delay?: number, customSource?: (request, response) => void) {
+    BindingBehaviorBuilder.prototype.BuildSuggest = function (source?: SuggestSource, delay?: number,
+        option?: SuggestionOption) {
         let me: BindingBehaviorBuilder<any> = this;
 
         let behavior = me.Add(new Suggest());
@@ -68,8 +87,9 @@
         if (delay) {
             behavior.Delay = delay;
         }
-        if (customSource) {
-            behavior.CustomSource = customSource;
+
+        if (option) {
+            behavior.Option = option;
         }
         return me;
     }

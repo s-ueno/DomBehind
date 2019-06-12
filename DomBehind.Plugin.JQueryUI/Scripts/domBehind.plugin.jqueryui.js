@@ -179,7 +179,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -192,7 +192,8 @@ var DomBehind;
     (function (SuggestSource) {
         SuggestSource[SuggestSource["Google"] = 0] = "Google";
         SuggestSource[SuggestSource["Amazon"] = 1] = "Amazon";
-        SuggestSource[SuggestSource["Custom"] = 2] = "Custom";
+        SuggestSource[SuggestSource["Array"] = 2] = "Array";
+        SuggestSource[SuggestSource["Custom"] = 3] = "Custom";
     })(SuggestSource = DomBehind.SuggestSource || (DomBehind.SuggestSource = {}));
     var Suggest = (function (_super) {
         __extends(Suggest, _super);
@@ -229,15 +230,26 @@ var DomBehind;
                     });
                 };
             }
+            else if (this.Source == SuggestSource.Array) {
+                this.CustomSource = function (request, response) {
+                    response(_this.Option.array.Where(function (x) { return x.StartsWith(request.term); }));
+                };
+            }
             var suggest = this.Element.autocomplete({
                 source: function (request, response) { return _this.CustomSource(request, response); },
                 delay: this.Delay,
+                minLength: this.Option.minLength,
             });
+            if (this.Option && this.Option.isShow) {
+                this.Element.focusin(function () {
+                    _this.Element.autocomplete('search', _this.Element.val());
+                });
+            }
         };
         return Suggest;
     }(DomBehind.Data.BindingBehavior));
     DomBehind.Suggest = Suggest;
-    DomBehind.BindingBehaviorBuilder.prototype.BuildSuggest = function (source, delay, customSource) {
+    DomBehind.BindingBehaviorBuilder.prototype.BuildSuggest = function (source, delay, option) {
         var me = this;
         var behavior = me.Add(new Suggest());
         if (source) {
@@ -246,8 +258,8 @@ var DomBehind;
         if (delay) {
             behavior.Delay = delay;
         }
-        if (customSource) {
-            behavior.CustomSource = customSource;
+        if (option) {
+            behavior.Option = option;
         }
         return me;
     };
