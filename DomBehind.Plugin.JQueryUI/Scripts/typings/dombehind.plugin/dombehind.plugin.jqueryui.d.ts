@@ -35,11 +35,14 @@ declare namespace DomBehind {
         Delay: number;
         CustomSource?: (request: any, response: any) => void;
         Option?: SuggestionOption;
+        SelectAction?: (event: any, ui: any) => any;
     }
     interface SuggestionOption {
         minLength?: number;
         isShow?: boolean;
-        array?: Array<string>;
+        array?: any;
+        customSelectAction?: (x: any) => any;
+        customFilter?: (item: any, inputValue: any) => boolean;
     }
     interface BindingBehaviorBuilder<T> {
         BuildSuggest<TRow>(source?: SuggestSource, delay?: number, option?: SuggestionOption): BindingBehaviorBuilder<TRow>;

@@ -57,14 +57,24 @@ var DomBehind;
             }
             else if (this.Source == SuggestSource.Array) {
                 this.CustomSource = function (request, response) {
-                    response(_this.Option.array.Where(function (x) { return x.StartsWith(request.term); }));
+                    response(_this.Option.array.Where(function (x) { return _this.Option.customFilter(x, request.term); }));
                 };
             }
-            var suggest = this.Element.autocomplete({
+            var option = {
                 source: function (request, response) { return _this.CustomSource(request, response); },
                 delay: this.Delay,
                 minLength: this.Option.minLength,
-            });
+            };
+            if (this.Option.customSelectAction) {
+                this.SelectAction = function (ev, ui) {
+                    var val = _this.Option.customSelectAction(ui);
+                    _this.Element.val(val);
+                };
+                option = $.extend(true, option, {
+                    select: this.SelectAction,
+                });
+            }
+            var suggest = this.Element.autocomplete(option);
             if (this.Option && this.Option.isShow) {
                 this.Element.focusin(function () {
                     _this.Element.autocomplete('search', _this.Element.val());

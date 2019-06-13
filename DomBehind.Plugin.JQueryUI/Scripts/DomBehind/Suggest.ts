@@ -42,16 +42,26 @@
                 }
             } else if (this.Source == SuggestSource.Array) {
                 this.CustomSource = (request, response) => {
-                    response(this.Option.array.Where(x => x.StartsWith(request.term)));
+                    response(this.Option.array.Where(x => this.Option.customFilter(x, request.term)));
                 }
-            }
+            } 
 
-            let suggest = this.Element.autocomplete({
+            let option = {
                 source: (request, response) => this.CustomSource(request, response),
                 delay: this.Delay,
                 minLength: this.Option.minLength,
-            });
+            };
+            if (this.Option.customSelectAction) {
+                this.SelectAction = (ev, ui) => {
+                    let val = this.Option.customSelectAction(ui);
+                    this.Element.val(val);
+                };
+                option = $.extend(true, option, {
+                    select: this.SelectAction,
+                });
+            }
 
+            let suggest = this.Element.autocomplete(option);
 
             if (this.Option && this.Option.isShow) {
                 this.Element.focusin(() => {
@@ -64,13 +74,17 @@
         public Delay: number;
         public CustomSource?: (request, response) => void
         public Option?: SuggestionOption;
+        public SelectAction?: (event, ui) => any;
     }
 
     export interface SuggestionOption {
         minLength?: number,
         isShow?: boolean,
-        array?: Array<string>
+        array?: any,
+        customSelectAction?: (x: any) => any;
+        customFilter?: (item: any, inputValue: any) => boolean;
     }
+
 
     export interface BindingBehaviorBuilder<T> {
         BuildSuggest<TRow>(source?: SuggestSource, delay?: number, option?: SuggestionOption): BindingBehaviorBuilder<TRow>;
