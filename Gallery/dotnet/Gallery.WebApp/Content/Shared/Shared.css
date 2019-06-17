@@ -1,0 +1,24 @@
+﻿#_layout {
+    overflow-y: hidden;
+    overflow-x: hidden;
+    height: 100vh;
+}
+
+    #_layout .nav_title {
+        height: 100px;
+    }
+
+    #_layout .banner {
+        margin-top: 20px;
+    }
+
+    #_layout .banner_title {
+        font-size: 14px;
+        color: #F2F5F7;
+    }
+
+
+    #_layout .nav > li > a,
+    #_layout .nav.child_menu > li > a {
+        font-size: 16px;
+    }

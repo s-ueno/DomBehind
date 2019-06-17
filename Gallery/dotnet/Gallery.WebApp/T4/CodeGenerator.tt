@@ -1,0 +1,1563 @@
+﻿<#@ template language="C#" debug="true" hostspecific="true" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="Microsoft.VisualStudio.Shell.Interop.8.0" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="EnvDTE80" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="EnvDTE" #>
+<#@ import namespace="Microsoft.VisualStudio.Shell.Interop" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#@ Include File="T4Lib.iniclude" #>
+<#@ Include File="TSGenerator.T4settings" #>
+<#
+
+	var serviceProvider = Host as IServiceProvider;
+	var dte = serviceProvider.GetService(typeof(DTE)) as DTE;
+	var ns = dte.Solution.FindProjectItem(this.Host.TemplateFile).ContainingProject.Properties.Item("DefaultNamespace").Value.ToString();
+
+	this.WriteLine(@"using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Security;
+		");
+	this.WriteLine($"namespace {ns}.Controllers");
+	this.WriteLine("{");
+
+	var helper = new DteHelper(this.Host);
+	var classList = helper.GetClasses();
+	var allItems = helper.GetProjectItems();
+	var viewModelTs = GetTypeScripts(allItems);
+	var parseViewModelTs = ParseTypeScripts(viewModelTs);
+	var list  = new List<CodeClass>();
+    foreach(var each in classList){
+		if (helper.HasAttribute(each, "ControllerGenerateFacadeMark")){
+			list.Add(each);
+		}
+	}
+
+	Func<string, string> tsTypeParse = x => {
+		if (x.StartsWith("System.")){
+			return "any";
+		}
+		return x;
+	};
+	var tsWriter = new StringBuilder();
+	foreach(var group in list.GroupBy(x => x.Namespace.Name)) {
+		var n = group.Key;
+		var arr = n.Split('.');
+		var controllerName = $"{arr[arr.Length - 1]}";
+		this.WriteLine($"    public partial class {controllerName}Controller : AppController");
+		this.WriteLine("    {");
+
+		tsWriter.AppendLine($"namespace {ns}.{controllerName} {{");
+		
+		foreach(var each in group){
+			var members = each.Members;
+			if (members != null){
+				foreach(var mem in members){
+					if (mem is CodeFunction func && 
+						func.Access == vsCMAccess.vsCMAccessPublic && 
+						func.Name == "Execute" &&
+						func.Parameters != null && 
+						func.Parameters.Count == 1){
+					
+						var methodName = each.Name;
+						var returnTypeName = func.Type.AsFullName;
+						var requestTypeName = func.Parameters.OfType<CodeParameter>().First().Type.AsFullName;
+
+						// this.WriteLine("       [Authorize]");
+						this.WriteLine($"        public ActionResult {methodName}()");
+						this.WriteLine("        {");
+						this.WriteLine($"            var request = ParseRequest<{requestTypeName}>();");
+						this.WriteLine($"            return Invoke<{each.FullName}, {requestTypeName}, {returnTypeName}>(request);");
+						this.WriteLine("        }");
+
+						tsWriter.AppendLine($"    export class {methodName}Proxy extends DomBehind.Web.WebService<{tsTypeParse(requestTypeName)}, {tsTypeParse(returnTypeName)}> {{");
+						tsWriter.AppendLine($"        protected Url: string = \"{controllerName}/{methodName}\";");
+						tsWriter.AppendLine($"    }}");
+					}
+				}
+			}
+		}
+		// class close
+		this.WriteLine("    }");
+		tsWriter.AppendLine("}");
+	}
+
+	// namespace close
+	this.WriteLine("}");
+
+
+	// マルチファイル出力
+	using(var writer = new MultiWriter(this.Host, GenerationEnvironment, "TSGenerator.ts")){
+		var projects = helper.GetProjects();
+		var tsList = GetDataToRender(projects, classList).ToList();
+		var code = OutputFormatter.GetOutput(tsList, GetSettings()); 
+		writer.WriteLine(code);
+
+
+		// インターフェイスだと型を保てないので、GetType()できるようにクラスだけ宣言する		
+		var _tsDic = tsList.ToDictionary(x => x.QualifiedName);		
+		foreach(var each in tsList){
+			var nameSpace = each.QualifiedName;
+			var tsInterfaces = each.Interfaces.ToList();		
+			var groups = tsInterfaces.GroupBy(x => x.Name);
+			writer.WriteLine($"namespace {nameSpace} {{");
+			foreach(var group in groups){
+				var className = group.Key;				
+				writer.WriteLine($"    export class {className} {{");
+				writer.WriteLine($"        public /* override */ toString() : string {{");
+				writer.WriteLine($"            return \"{nameSpace}.{className}\";");
+				writer.WriteLine($"        }}");
+				writer.WriteLine($"    }}");
+			}
+			writer.WriteLine($"}}");
+		}
+	}
+	
+	// マルチファイル出力
+	using(var writer = new MultiWriter(this.Host, GenerationEnvironment, "TSGeneratorLazy.ts")){
+		foreach(var each in parseViewModelTs){
+			var nameSpace = each.QualifiedName;
+			var tsInterfaces = each.Interfaces.ToList();		
+			var groups = tsInterfaces.GroupBy(x => x.Name);
+			foreach(var group in groups){
+				var className = group.Key;				
+				writer.WriteLine($"{nameSpace}.{className}.prototype.toString = function() {{");
+				writer.WriteLine($"    return \"{nameSpace}.{className}\";");
+				writer.WriteLine($"}}");
+			}
+		}
+	}
+
+	// マルチファイル出力
+	var generateCshtmlList = new List<string>();
+	using(var writer = new MultiWriter(this.Host, GenerationEnvironment, "WebServiceProxy.ts")){
+		writer.WriteLine(tsWriter.ToString());
+	}
+
+	// マルチファイル出力
+	var ignoreControllerList = new [] { "Shared", "Views" };
+	using(var writer = new MultiWriter(this.Host, GenerationEnvironment, "ViewController.cs")){
+		writer.WriteLine(@"using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Security;");
+
+		writer.WriteLine($"namespace {ns}.Controllers");
+		writer.WriteLine("{");
+
+		foreach(var each in allItems){
+			if (each.Properties == null) continue;
+			var fullPath = each.Properties.Item("FullPath")?.Value as string;			
+			if (System.IO.File.Exists(fullPath)){
+				var fileName = System.IO.Path.GetFileNameWithoutExtension(fullPath);
+				var ext = System.IO.Path.GetExtension(fullPath);				
+				if (ext == ".cshtml"){
+					generateCshtmlList.Add(fullPath);
+
+					var dir = System.IO.Path.GetDirectoryName(fullPath).Split(System.IO.Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
+					if (!ignoreControllerList.Contains(dir)){
+						writer.WriteLine($"    public partial class {dir}Controller : AppController");
+						writer.WriteLine($"    {{");
+						// writer.WriteLine($"        [Authorize]");
+						writer.WriteLine($"        public ActionResult {fileName}()");
+						writer.WriteLine($"        {{");
+						writer.WriteLine($"            this.Ensure();");
+						writer.WriteLine($"            return View();");
+						writer.WriteLine($"        }}");
+						writer.WriteLine($"    }}");
+					}
+				}
+			}
+		}
+		writer.WriteLine("}");
+	}
+	
+
+	// マルチファイル出力
+	var tsUriList = new List<(string Dir, string FileName, string Uri)>();
+	using(var writer = new MultiWriter(this.Host, GenerationEnvironment, "RouteConfig.cs")){
+		writer.WriteLine(@"using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;");
+		writer.WriteLine($"namespace {ns}");
+		writer.WriteLine("{");
+		writer.WriteLine(@"    public partial class RouteConfig
+    {
+        public static void GenerateRegisterRoutes(RouteCollection routes)
+        {");
+
+		// cshtmlファイルの階層をシステムで任意に掘り下げたとしてもControllerが正しくマップするようにコードを自動生成する
+		var viewStart = allItems.FirstOrDefault(x => {
+			var fullPath = x.Properties.Item("FullPath")?.Value as string;
+			if (System.IO.File.Exists(fullPath)){
+				var fileName = System.IO.Path.GetFileName(fullPath);
+				return fileName == "_ViewStart.cshtml";
+			}
+			return false;
+		})?.Properties.Item("FullPath")?.Value as string;
+		var offset = viewStart.Split(System.IO.Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries).Length;
+
+		var groups = generateCshtmlList.Select(x => new { 
+			Dir = System.IO.Path.GetDirectoryName(x), 
+			FullPath = x, 
+			FileName = System.IO.Path.GetFileNameWithoutExtension(x) 
+		}).GroupBy(x => x.Dir);
+		foreach(var group in groups){
+			var pathArray = group.Key.Split(System.IO.Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries).Skip(offset - 1).ToArray();
+			// 階層が1階層以上の場合はMapRouteでControllerと紐つけが必要
+			// ・・・なんだけど、うまく動かない。敗北
+			if (1 < pathArray.Length){
+				var mapName = String.Join("_", pathArray);
+				var mapPath = String.Join("/", pathArray.Take(pathArray.Length - 1));
+				var a = String.Join("/", pathArray);
+
+				writer.WriteLine("            routes.MapRoute(");
+				writer.WriteLine($"                name: \"{mapName}\",");
+				// writer.WriteLine($"                name: null,");
+				writer.WriteLine($"                url: \"{mapPath}/{{controller}}/{{action}}/{{id}}\",");
+				// writer.WriteLine($"                url: \"{a}\",");
+				writer.WriteLine($"                defaults: new {{ controller = \"{pathArray[pathArray.Length - 1]}\", id = UrlParameter.Optional }}");
+				writer.WriteLine("            );");
+			}
+
+			// tsUriList
+			foreach(var each in group){
+				var mapPath = String.Join("_", pathArray);
+				tsUriList.Add((mapPath, System.IO.Path.GetFileNameWithoutExtension(each.FullPath), $"{mapPath}/{System.IO.Path.GetFileNameWithoutExtension(each.FullPath)}"));
+			}
+		}
+		writer.WriteLine("        }");
+		writer.WriteLine("    }");
+		writer.WriteLine("}");
+	}
+
+
+	// バンドル化の支援
+	using(var writer = new MultiWriter(this.Host, GenerationEnvironment, "AppBundle.cs")){
+		writer.WriteLine($"namespace {ns}");
+		writer.WriteLine("{");
+		writer.WriteLine(@"    public static class AppBundle");
+		writer.WriteLine("    {");
+
+		var siteCss = allItems.FirstOrDefault(x => {
+			var fullPath = x.Properties.Item("FullPath")?.Value as string;
+			if (System.IO.File.Exists(fullPath)){
+				var fileName = System.IO.Path.GetFileName(fullPath);
+				return fileName == "Site.css";
+			}
+			return false;
+		})?.Properties.Item("FullPath")?.Value as string;
+		var siteCssDir = System.IO.Path.GetDirectoryName(siteCss);
+
+		var appTs = allItems.FirstOrDefault(x => {
+			var fullPath = x.Properties.Item("FullPath")?.Value as string;
+			if (System.IO.File.Exists(fullPath)){
+				var fileName = System.IO.Path.GetFileName(fullPath);
+				return fileName == "App.ts";
+			}
+			return false;
+		})?.Properties.Item("FullPath")?.Value as string;
+		var appTsDir = System.IO.Path.GetDirectoryName(appTs);
+
+		var tsPathList = new List<string>();
+		var cssList = new List<string>();
+		var line = "," + System.Environment.NewLine;
+
+		foreach(var each in allItems){
+			if (each.Properties == null) continue;
+			var fullPath = each.Properties.Item("FullPath")?.Value as string;	
+			if (System.IO.File.Exists(fullPath)){
+				var fileName = System.IO.Path.GetFileName(fullPath);
+				var ext = System.IO.Path.GetExtension(fullPath);	
+				var dir =  System.IO.Path.GetDirectoryName(fullPath);
+				if (ext == ".css" && dir != siteCssDir){
+					if (!dir.Contains("Scripts")){
+						var relativeDir  = String.Join("/", dir.Replace(siteCssDir, "").Split(System.IO.Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
+						if (!relativeDir.Contains("DomBehind"))
+							cssList.Add($"             \"~/Content/{relativeDir}/{fileName}\"");						
+					}
+				} else if (ext == ".ts" && (dir.Contains("Scripts/App") || dir.Contains("Scripts\\App")) && dir != appTsDir){
+					tsPathList.Add(fullPath);
+				}
+			}
+		}
+		var sortedTsPathList = tsPathList.Select(x => {
+			var dirArr = System.IO.Path.GetDirectoryName(x).Split(new [] { "\\" } , StringSplitOptions.RemoveEmptyEntries);
+			return new { FilePath = x, Depth = dirArr.Length };
+		})
+		.OrderBy(x => x.Depth)
+		.ThenBy(x => x.FilePath)
+		.Select(x => x.FilePath)
+		.ToArray();
+
+		var tsList = new List<string>();
+		foreach(var each in sortedTsPathList){		
+			var fileName = System.IO.Path.GetFileName(each);
+			var ext = System.IO.Path.GetExtension(each);	
+			var dir =  System.IO.Path.GetDirectoryName(each);
+		
+			var relativeDir  = String.Join("/", dir.Replace(appTsDir, "").Split(System.IO.Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
+			tsList.Add($"             \"~/Scripts/App/{relativeDir}/{System.IO.Path.GetFileNameWithoutExtension(fileName)}.js\"");		
+		}
+
+		writer.WriteLine("        public static readonly string[] AppCssFiles = new string[] {");
+		writer.WriteLine($"{String.Join(line, cssList)}");
+		writer.WriteLine("        };");
+		writer.WriteLine("        public static readonly string[] AppJsFiles = new string[] {");
+		writer.WriteLine(@"        ");
+
+
+		var sharedList = new List<string>();
+		var signinList = new List<string>();
+		var appList = new List<string>();
+		var coreList = new List<string>();
+		var dialogList = new List<string>();
+		foreach(var each in tsList){
+			if (each.Contains(@"/Shared/")) {
+				sharedList.Add(each);
+			} else if (each.Contains(@"/Signin/")) {
+				signinList.Add(each);
+			} else if (each.Contains(@"/Core/")) {
+				coreList.Add(each);
+			} else if (each.Contains(@"/Dialog/")) {
+				dialogList.Add(each);
+			} else {
+				appList.Add(each);
+			}
+		}
+
+		writer.WriteLine($"{String.Join(line, coreList.Concat(dialogList).Concat(sharedList).Concat(signinList).Concat(appList))}");
+
+		writer.WriteLine("        };");
+
+		writer.WriteLine("    }");
+		writer.WriteLine("}");
+	}
+
+	// 
+	using(var writer = new MultiWriter(this.Host, GenerationEnvironment, "ViewUri.ts")){
+		writer.WriteLine($"namespace {ns} {{");
+		writer.WriteLine($"    export class Uri {{");
+
+		foreach(var each in tsUriList){
+			var n = String.Join("_", each.Dir.Split(System.IO.Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
+
+			writer.WriteLine($"        public static readonly {n}_{each.FileName}: string = \"{each.Uri}\";");
+		}
+
+		writer.WriteLine($"    }}");
+		writer.WriteLine($"}}");
+	}
+
+#>
+<#+ 
+const string InterfaceAttributeFullName = "TSGenerateClassMarkAttribute";
+const string MemberAttributeFullName = "TSGenerateMemberMarkAttribute";
+
+Settings settings = null;
+Settings GetSettings()
+{
+    if (settings== null)
+        settings = Settings.Parse(SettingsValues);
+
+    return settings;
+}
+
+IEnumerable<ProjectItem> GetTypeScripts(IEnumerable<ProjectItem> all){
+	var list = new List<ProjectItem>();
+	foreach(var each in all){
+		if (each.Properties == null) continue;
+		var fullPath = each.Properties.Item("FullPath")?.Value as string;	
+		if (System.IO.File.Exists(fullPath)){
+			var fileName = System.IO.Path.GetFileNameWithoutExtension(fullPath);
+			var ext = System.IO.Path.GetExtension(fullPath);	
+			if (ext.ToLower() == ".ts" && fileName.EndsWith("ViewModel")){
+				list.Add(each);
+			}
+		}
+	}
+	return list;
+}
+
+static Regex NameSpaceRegex = new Regex(@"namespace (.*) \{", RegexOptions.Compiled);
+static Regex ClassNameRegex = new Regex(@"export class (.*) extends AppBizViewModel \{", RegexOptions.Compiled);
+IEnumerable<TypeScriptModule> ParseTypeScripts(IEnumerable<ProjectItem> tsList){
+	var list = new List<TypeScriptModule>();
+	foreach(var each in tsList){
+		if (each.Properties == null) continue;
+
+		var fullPath = each.Properties.Item("FullPath")?.Value as string;	
+		if (System.IO.File.Exists(fullPath)){
+			var readAllLine = System.IO.File.ReadAllLines(fullPath);
+			if (readAllLine.Length < 2) continue;
+
+			var nameSpaceLine = readAllLine.FirstOrDefault(x => {
+				var r = NameSpaceRegex.Match(x);
+				return r.Success;
+			});
+			var classNameLine = readAllLine.FirstOrDefault(x =>{
+				var r = ClassNameRegex.Match(x);
+				return r.Success;
+			});
+
+			if (String.IsNullOrWhiteSpace(nameSpaceLine)) continue;
+			if (String.IsNullOrWhiteSpace(classNameLine)) continue;
+
+			var r1 = NameSpaceRegex.Match(nameSpaceLine);
+			var r2 = ClassNameRegex.Match(classNameLine);
+
+			if (r1.Success && r2.Success && r1.Groups.Count == 2 && r2.Groups.Count == 2){
+				var r1Group = r1.Groups[1];
+				var r2Group = r2.Groups[1];
+
+				var ns = r1Group.Value;
+				var cs = r2Group.Value;
+
+				var tsModule = list.FirstOrDefault(x => x.QualifiedName == ns);
+				if (tsModule == null){
+					tsModule = new TypeScriptModule();
+					tsModule.QualifiedName = ns;
+					list.Add(tsModule);
+				}
+
+				if (!tsModule.Interfaces.Any(x => x.FullName == $"{ns}.{cs}")){
+					var tsInterface = new TypeScriptInterface();
+					tsInterface.Name = cs;
+					tsInterface.FullName = $"{ns}.{cs}";
+
+					tsModule.Interfaces.Add(tsInterface);
+				}
+			}
+		}
+	}
+	return list;
+}
+
+
+IEnumerable<TypeScriptModule> GetDataToRender(IEnumerable<Project> projects, IEnumerable<CodeClass> classList) {
+	var helper = new DteHelper(this.Host);
+    var project = GetProjectContainingT4File(helper.Dte);       
+    if (project == null)
+        throw new Exception("Could not find the VS project containing the T4TS file.");
+
+    var generator = new CodeTraverser(projects, classList, GetSettings());
+    return generator.GetAllInterfaces();
+}
+
+Project GetProjectContainingT4File(DTE dte) {
+
+    // Find the .tt file's ProjectItem
+    ProjectItem projectItem = dte.Solution.FindProjectItem(Host.TemplateFile);
+
+    // If the .tt file is not opened, open it
+    if (projectItem.Document == null)
+        projectItem.Open(Constants.vsViewKindCode);
+
+    // Mark the .tt file as unsaved. This way it will be saved and update itself next time the
+    // project is built. Basically, it keeps marking itself as unsaved to make the next build work.
+    // Note: this is certainly hacky, but is the best I could come up with so far.
+
+	// Todo S.Ueno
+    // projectItem.Document.Saved = false;
+
+    return projectItem.ContainingProject;
+}
+
+    public abstract class OutputAppender<TSegment> where TSegment: class
+    {
+        protected StringBuilder Output { get; private set; }
+        protected int BaseIndentation { get; private set; }
+        protected Settings Settings { get; private set; }
+
+        public OutputAppender(StringBuilder output, int baseIndentation, Settings settings)
+        {
+            if (output == null)
+                throw new ArgumentNullException("output");
+            
+            if (settings == null)
+                throw new ArgumentNullException("settings");
+
+            this.Output = output;
+            this.BaseIndentation = baseIndentation;
+            this.Settings = settings;
+        }
+
+        public abstract void AppendOutput(TSegment segment);
+
+        protected void AppendIndented(string text)
+        {
+            AppendIndendation();
+            Output.Append(text);
+        }
+
+        protected void AppendIndentedLine(string line)
+        {
+            AppendIndendation();
+            Output.AppendLine(line);
+        }
+
+        protected void AppendIndendation()
+        {
+            Output.Append(' ', BaseIndentation);
+        }
+
+        public override string ToString()
+        {
+            return Output.ToString();
+        }
+    }
+
+    public class InterfaceOutputAppender : OutputAppender<TypeScriptInterface>
+    {
+        private bool InGlobalModule { get; set; }
+
+        public InterfaceOutputAppender(StringBuilder output, int baseIndentation, Settings settings, bool inGlobalModule)
+            : base(output, baseIndentation, settings)
+        {
+            this.InGlobalModule = inGlobalModule;
+        }
+
+        public override void AppendOutput(TypeScriptInterface tsInterface)
+        {
+            BeginInterface(tsInterface);
+
+            AppendMembers(tsInterface);
+            
+            if (tsInterface.IndexedType != null)
+                AppendIndexer(tsInterface);
+
+            EndInterface();
+        }
+
+        private void AppendMembers(TypeScriptInterface tsInterface)
+        {
+            var appender = new MemberOutputAppender(Output, BaseIndentation + 4, Settings);
+            foreach (var member in tsInterface.Members)
+                appender.AppendOutput(member);
+        }
+
+        private void BeginInterface(TypeScriptInterface tsInterface)
+        {
+            AppendIndentedLine("/** Generated from " + tsInterface.FullName + " **/");
+
+            if (InGlobalModule)
+                AppendIndented("interface " + tsInterface.Name);
+            else
+                AppendIndented("export interface " + tsInterface.Name);
+
+            if (tsInterface.Parent != null)
+                Output.Append(" extends " + (tsInterface.Parent.Module.IsGlobal ? "" : tsInterface.Parent.Module.QualifiedName + ".") + tsInterface.Parent.Name);
+
+            Output.AppendLine(" {");
+        }
+
+        private void EndInterface()
+        {
+            AppendIndentedLine("}");
+        }
+
+        private void AppendIndexer(TypeScriptInterface tsInterface)
+        {
+            AppendIndendation();
+            Output.AppendFormat("    [index: number]: {0};", tsInterface.IndexedType);
+            Output.AppendLine();
+        }
+    }
+
+    public class MemberOutputAppender : OutputAppender<TypeScriptInterfaceMember>
+    {
+        public MemberOutputAppender(StringBuilder output, int baseIndentation, Settings settings)
+            : base(output, baseIndentation, settings)
+        {
+        }
+
+        public override void AppendOutput(TypeScriptInterfaceMember member)
+        {
+            AppendIndendation();
+
+            bool isOptional = member.Optional;
+            string type = member.Type.ToString();
+
+            if (member.Type is BoolType)
+            {
+                if (Settings.CompatibilityVersion != null && Settings.CompatibilityVersion < new Version(0, 9, 0))
+                    type = "bool";
+                else
+                    type = "boolean";
+            }
+
+            Output.AppendFormat("{0}{1}: {2}",
+                member.Name,
+                (isOptional ? "?" : ""),
+                type
+            );
+            
+            Output.AppendLine(";");
+        }
+    }
+
+    public class ModuleOutputAppender : OutputAppender<TypeScriptModule>
+    {
+        public ModuleOutputAppender(StringBuilder output, int baseIndentation, Settings settings)
+            : base(output, baseIndentation, settings)
+        {
+        }
+
+        public override void AppendOutput(TypeScriptModule module)
+        {
+            BeginModule(module);
+
+            var interfaceAppender = new InterfaceOutputAppender(Output, BaseIndentation + 4, Settings, module.IsGlobal);
+            foreach (var tsInterface in module.Interfaces)
+                interfaceAppender.AppendOutput(tsInterface);
+
+            EndModule(module);
+        }
+
+        private void BeginModule(TypeScriptModule module)
+        {
+            if (module.IsGlobal)
+            {
+                Output.AppendLine("// -- Begin global interfaces");
+            }
+            else
+            {
+                if (Settings.CompatibilityVersion != null && Settings.CompatibilityVersion < new Version(0, 9, 0))
+                    Output.Append("module ");
+                else
+                    Output.Append("namespace ");
+
+                Output.Append(module.QualifiedName);
+                Output.AppendLine(" {");
+            }
+        }
+
+        private void EndModule(TypeScriptModule module)
+        {
+            if (module.IsGlobal)
+                Output.AppendLine("// -- End global interfaces");
+            else
+                Output.AppendLine("}");
+        }
+    }
+
+    public static class OutputFormatter
+    {
+        public static string GetOutput(IEnumerable<TypeScriptModule> modules, Settings settings)
+        {
+            var output = new StringBuilder();
+            
+            var moduleAppender = new ModuleOutputAppender(output, 0, settings);
+            foreach (var module in modules)
+            {
+                output.AppendLine();
+                moduleAppender.AppendOutput(module);
+            }
+
+            return output.ToString();
+        }
+    }
+
+    public class TypeScriptInterfaceAttributeValues
+    {
+        public string Module { get; set; }
+        public string Name { get; set; }
+        public string NamePrefix { get; set; }
+    }
+
+    public class TypeScriptMemberAttributeValues
+    {
+        public string Name { get; set; }
+        public bool Optional { get; set; }
+        public string Type { get; set; }
+        public bool CamelCase { get; set; }
+        public bool Ignore { get; set; }
+    }
+
+    public class CodeTraverser
+    {
+        public IEnumerable<Project> Projects { get; private set; }
+		public IEnumerable<CodeClass> ClassList { get; private set; }
+		public IEnumerable<CodeClass> TraverseClassList { get; private set; }
+        public Settings Settings { get; private set; }
+
+        public CodeTraverser(IEnumerable<Project> projects, IEnumerable<CodeClass> classList, Settings settings)
+        {
+            if (projects == null)
+                throw new ArgumentNullException("projects");
+
+            if (settings == null)
+                throw new ArgumentNullException("settings");
+
+            Projects = projects;
+			ClassList = classList;
+            this.Settings = settings;
+        }
+
+        public TypeContext BuildContext()
+        {
+            var typeContext = new TypeContext(this.Settings);
+            var partialClasses = new Dictionary<string, CodeClass>();
+			var list = new List<CodeClass>();
+            new SolutionTraverser(this.Projects, (ns) =>
+            {
+                new NamespaceTraverser(ns, (codeClass) =>
+                {
+					list.Add(codeClass);
+
+                    CodeAttribute attribute;
+					
+					// 
+					if (TryGetAttribute(codeClass.Attributes, new [] { InterfaceAttributeFullName }, out attribute)){
+
+						var values = GetInterfaceValues(codeClass, attribute);
+						var interfaceType = new InterfaceType(values);
+
+						if (!typeContext.ContainsInterfaceType(codeClass.FullName))
+							typeContext.AddInterfaceType(codeClass.FullName, interfaceType);
+
+					}
+                });
+            });
+			TraverseClassList = list;
+            return typeContext;
+        }
+
+        public IEnumerable<TypeScriptModule> GetAllInterfaces()
+        {
+            var typeContext = BuildContext();
+            var byModuleName = new Dictionary<string, TypeScriptModule>();
+            var tsMap = new Dictionary<CodeClass, TypeScriptInterface>();
+
+
+			foreach(var codeClass in TraverseClassList){
+                InterfaceType interfaceType;
+                if (!typeContext.TryGetInterfaceType(codeClass.FullName, out interfaceType))
+                    continue;
+
+                var values = interfaceType.AttributeValues;
+                    
+                TypeScriptModule module;
+                if (!byModuleName.TryGetValue(values.Module, out module))
+                {
+                    module = new TypeScriptModule { QualifiedName = values.Module };
+                    byModuleName.Add(values.Module, module);
+                }
+
+                var tsInterface = BuildInterface(codeClass, values, typeContext);
+                tsMap.Add(codeClass, tsInterface);
+                tsInterface.Module = module;
+                module.Interfaces.Add(tsInterface);						
+			}
+
+			/*
+
+            new SolutionTraverser(this.Projects, (ns) =>
+            {
+                new NamespaceTraverser(ns, (codeClass) =>
+                {
+                    InterfaceType interfaceType;
+                    if (!typeContext.TryGetInterfaceType(codeClass.FullName, out interfaceType))
+                        return;
+
+                    var values = interfaceType.AttributeValues;
+                    
+                    TypeScriptModule module;
+                    if (!byModuleName.TryGetValue(values.Module, out module))
+                    {
+                        module = new TypeScriptModule { QualifiedName = values.Module };
+                        byModuleName.Add(values.Module, module);
+                    }
+
+                    var tsInterface = BuildInterface(codeClass, values, typeContext);
+                    tsMap.Add(codeClass, tsInterface);
+                    tsInterface.Module = module;
+                    module.Interfaces.Add(tsInterface);
+                });
+            });
+
+			*/
+
+            var tsInterfaces = tsMap.Values.ToList();
+			var tsDic = tsInterfaces.ToDictionary(x => x.FullName);
+            tsMap.Keys.ToList().ForEach(codeClass =>
+            {
+                CodeElements baseClasses = codeClass.Bases;
+                if (baseClasses != null && baseClasses.Count > 0)
+                {
+                    CodeElement baseClass = baseClasses.Item(1);
+                    if (baseClass != null)
+                    {
+                        if (tsDic.ContainsKey(baseClass.FullName))
+                        {
+                            var parent = tsDic[baseClass.FullName];
+                            tsMap[codeClass].Parent = parent;
+                        }
+                    }
+                }
+            });
+
+            return byModuleName.Values
+                .OrderBy(m => m.QualifiedName)
+                .ToList();
+        }
+        
+        private string GetInterfaceName(TypeScriptInterfaceAttributeValues attributeValues)
+        {
+            if (!string.IsNullOrEmpty(attributeValues.NamePrefix))
+                return attributeValues.NamePrefix + attributeValues.Name;
+
+            return attributeValues.Name;
+        }
+
+        private TypeScriptInterface BuildInterface(CodeClass codeClass, TypeScriptInterfaceAttributeValues attributeValues, TypeContext typeContext)
+        {
+            var tsInterface = new TypeScriptInterface
+            {
+                FullName = codeClass.FullName,
+                Name = GetInterfaceName(attributeValues)
+            };
+
+            TypescriptType indexedType;
+            if (TryGetIndexedType(codeClass, typeContext, out indexedType))
+                tsInterface.IndexedType = indexedType;
+
+            new ClassTraverser(codeClass, (property) =>
+            {
+                TypeScriptInterfaceMember member;
+                if (TryGetMember(property, typeContext, out member))
+                    tsInterface.Members.Add(member);
+            });
+
+            return tsInterface;
+        }
+
+        private bool TryGetAttribute(CodeElements attributes, string attributeFullName, out CodeAttribute attribute)
+        {
+            foreach (CodeAttribute attr in attributes)
+            {
+                if (attr.FullName.Contains(attributeFullName))
+                {
+                    attribute = attr;
+                    return true;
+                }
+            }
+
+            attribute = null;
+            return false;
+        }
+        private bool TryGetAttribute(CodeElements attributes, string[] attributeFullNameArray, out CodeAttribute attribute)
+        {
+            foreach (CodeAttribute attr in attributes)
+            {
+                if (attributeFullNameArray.Any(x => x == attr.FullName))
+                {
+                    attribute = attr;
+                    return true;
+                }
+            }
+
+            attribute = null;
+            return false;
+        }
+
+		private bool HasImplements(CodeClass cc, string baseClassName){
+			if (cc == null) return false;
+		
+			try{
+				if (cc.Bases != null) {
+					foreach(CodeClass each in cc.Bases){
+						if (each.Name.StartsWith(baseClassName)) return true;
+					}
+				}
+			}catch{
+				return false;
+			}
+			return false;
+		}
+		private bool HasImplements(CodeClass cc, string[] baseClassNameArray){
+			if (cc == null) return false;
+		
+			try{
+				if (cc.Bases != null) {
+					foreach(CodeClass each in cc.Bases){
+						if (baseClassNameArray.Any(x => each.Name.StartsWith(x))) return true;
+					}
+				}
+			}catch{
+				return false;
+			}
+			return false;
+		}
+        private bool TryGetIndexedType(CodeClass codeClass, TypeContext typeContext, out TypescriptType indexedType)
+        {
+            indexedType = null;
+            if (codeClass.Bases == null || codeClass.Bases.Count == 0)
+                return false;
+
+            foreach (CodeElement baseClass in codeClass.Bases)
+            {
+                if (typeContext.IsGenericEnumerable(baseClass.FullName))
+                {
+                    string fullName = typeContext.UnwrapGenericType(baseClass.FullName);
+                    indexedType = typeContext.GetTypeScriptType(fullName);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private TypeScriptInterfaceAttributeValues GetInterfaceValues(CodeClass codeClass, CodeAttribute interfaceAttribute)
+        {
+            var values = GetAttributeValues(interfaceAttribute);
+
+            return new TypeScriptInterfaceAttributeValues
+            {
+                Name = values.ContainsKey("Name") ? values["Name"] : codeClass.Name,
+                Module = values.ContainsKey("Module") ? values["Module"] : 
+							Settings.UserCodeNameSpace == true ? codeClass.Namespace.FullName : Settings.DefaultModule ?? "T4TS",
+                NamePrefix = values.ContainsKey("NamePrefix") ? values["NamePrefix"] : Settings.DefaultInterfaceNamePrefix ?? string.Empty
+            };
+        }
+
+        private bool TryGetMember(CodeProperty property, TypeContext typeContext, out TypeScriptInterfaceMember member)
+        {
+            member = null;
+            if (property.Access != vsCMAccess.vsCMAccessPublic)
+                return false;
+
+            var getter = property.Getter;
+            if (getter == null)
+                return false;
+
+            var values = GetMemberValues(property, typeContext);
+
+            string name;
+            if (values.Name != null)
+            {
+                name = values.Name;
+            }
+            else
+            {
+                name = property.Name;
+                if (name.StartsWith("@"))
+                    name = name.Substring(1);
+            }
+
+            member = new TypeScriptInterfaceMember
+            {
+                Name = name,
+                //FullName = property.FullName,
+                Optional = values.Optional,
+                Ignore = values.Ignore,
+                Type = (string.IsNullOrWhiteSpace(values.Type))
+                    ? typeContext.GetTypeScriptType(getter.Type)
+                    : new InterfaceType(values.Type)
+            };
+
+            if (member.Ignore)
+                return false;
+
+            if (values.CamelCase && values.Name == null)
+                member.Name = member.Name.Substring(0, 1).ToLowerInvariant() + member.Name.Substring(1);
+
+            return true;
+        }
+
+        private TypeScriptMemberAttributeValues GetMemberValues(CodeProperty property, TypeContext typeContext)
+        {
+            bool? attributeOptional = null;
+            bool? attributeCamelCase = null;
+            bool attributeIgnore = false;
+            string attributeName = null;
+            string attributeType = null;
+
+            CodeAttribute attribute;
+            if (TryGetAttribute(property.Attributes, MemberAttributeFullName, out attribute))
+            {
+                var values = GetAttributeValues(attribute);
+                bool parsedProperty;
+                if (values.ContainsKey("Optional") && bool.TryParse(values["Optional"], out parsedProperty))
+                    attributeOptional = parsedProperty;
+
+                if (values.ContainsKey("CamelCase") && bool.TryParse(values["CamelCase"], out parsedProperty))
+                    attributeCamelCase = parsedProperty;
+
+                if (values.ContainsKey("Ignore") && bool.TryParse(values["Ignore"], out parsedProperty))
+                    attributeIgnore = parsedProperty;
+
+                values.TryGetValue("Name", out attributeName);
+                values.TryGetValue("Type", out attributeType);
+            }
+
+            return new TypeScriptMemberAttributeValues
+            {
+                Optional = attributeOptional.HasValue ? attributeOptional.Value : Settings.DefaultOptional,
+                Name = attributeName,
+                Type = attributeType,
+                CamelCase = attributeCamelCase ?? Settings.DefaultCamelCaseMemberNames,
+                Ignore = attributeIgnore
+            };
+        }
+
+        private Dictionary<string, string> GetAttributeValues(CodeAttribute codeAttribute)
+        {
+            var values = new Dictionary<string, string>();
+			if (codeAttribute != null){
+				foreach (CodeElement child in codeAttribute.Children)
+				{
+					var property = (EnvDTE80.CodeAttributeArgument)child;
+					if (property == null || property.Value == null)
+						continue;
+                
+					// remove quotes if the property is a string
+					string val = property.Value ?? string.Empty;
+					if (val.StartsWith("\"") && val.EndsWith("\""))
+						val = val.Substring(1, val.Length - 2);
+
+					values[property.Name] = val;
+					// values.Add(property.Name, val);
+				}
+			}
+            return values;
+        }
+    }
+
+    public class Settings
+    {
+        public bool? UserCodeNameSpace { get; set; }
+
+        /// <summary>
+        /// The default module of the generated interface, if not specified by the TypeScriptInterfaceAttribute
+        /// </summary>
+        public string DefaultModule { get; set; }
+
+        /// <summary>
+        /// The default value for Optional, if not specified by the TypeScriptMemberAttribute
+        /// </summary>
+        public bool DefaultOptional { get; set; }
+
+        /// <summary>
+        /// The default value for the CamelCase flag for an interface member name, if not specified by the TypeScriptMemberAttribute
+        /// </summary>
+        public bool DefaultCamelCaseMemberNames { get; set; }
+
+        /// <summary>
+        /// The default string to prefix interface names with. For instance, you might want to prefix the names with an "I" to get conventional interface names.
+        /// </summary>
+        public string DefaultInterfaceNamePrefix { get; set; }
+
+        /// <summary>
+        /// The version of Typescript that is targeted
+        /// </summary>
+        public Version CompatibilityVersion { get; set; }
+
+        /// <summary>
+        /// If true translates System.DateTime to native date
+        /// </summary>
+        public bool UseNativeDates { get; set; }
+
+        public static Settings Parse(Dictionary<string,object> settingsValues)
+        {
+            // Read settings from T4TS.tt.settings.tt
+            return new Settings
+            {
+				UserCodeNameSpace = ParseSettingNullableType(settingsValues, "UserCodeNameSpace", false),
+                DefaultModule = ParseSettingReferenceType(settingsValues, "DefaultModule", s => s as string, "T4TS"),
+                DefaultOptional = ParseSettingNullableType(settingsValues, "DefaultOptional", false),
+                DefaultCamelCaseMemberNames = ParseSettingNullableType(settingsValues, "DefaultCamelCaseMemberNames", false),
+                DefaultInterfaceNamePrefix = ParseSettingReferenceType(settingsValues, "DefaultInterfaceNamePrefix", s => s as string, string.Empty),
+                CompatibilityVersion = ParseSettingReferenceType(settingsValues, "CompatibilityVersion", v => v as Version, new Version(0, 9, 1, 1)),
+                UseNativeDates = ParseSettingNullableType(settingsValues, "UseNativeDates", false)
+            };
+        }
+
+        private static T ParseSettingReferenceType<T>(Dictionary<string, object> settingsValues, string key, Func<object, T> convert, T defaultValue) where T : class
+        {
+            object val;
+            if (settingsValues.TryGetValue(key, out val))
+                return convert(val) ?? defaultValue;
+
+            return defaultValue;
+        }
+
+        private static T ParseSettingNullableType<T>(Dictionary<string, object> settingsValues, string key, T defaultValue) where T : struct
+        {
+            object val;
+            if (settingsValues.TryGetValue(key, out val))
+            {
+                var nullable = val as Nullable<T>;
+                if (nullable == null || !nullable.HasValue)
+                    return defaultValue;
+
+                return nullable.Value;
+            }
+
+            return defaultValue;
+        }
+
+        private static T ParseConfigValueType<T>(Dictionary<string, object> settingsValues, string key, Func<object, T> convert, T defaultValue)
+        {
+            object val;
+            if (settingsValues.TryGetValue(key, out val))
+                return convert(val);
+
+            return defaultValue;
+        }
+    }
+
+    public class ClassTraverser
+    {
+        public CodeClass CodeClass { get; private set; }
+        public Action<CodeProperty> WithProperty { get; set; }
+
+        public ClassTraverser(CodeClass codeClass, Action<CodeProperty> withProperty)
+        {
+            if (codeClass == null)
+                throw new ArgumentNullException("codeClass");
+            
+            if (withProperty == null)
+                throw new ArgumentNullException("withProperty");
+
+            this.CodeClass = codeClass;
+            this.WithProperty = withProperty;
+
+            if (codeClass.Members != null)
+                Traverse(codeClass.Members);
+        }
+
+        private void Traverse(CodeElements members)
+        {
+            foreach (var property in members)
+            {
+                if (property is CodeProperty codeProperty)
+                    WithProperty(codeProperty);
+            }
+        }
+    }
+
+    public class NamespaceTraverser
+    {
+        public Action<CodeClass> WithCodeClass { get; private set; }
+
+        public NamespaceTraverser(CodeNamespace ns, Action<CodeClass> withCodeClass)
+        {
+            if (ns == null)
+                throw new ArgumentNullException("ns");
+            
+            if (withCodeClass == null)
+                throw new ArgumentNullException("withCodeClass");
+            
+            WithCodeClass = withCodeClass;
+            
+            if (ns.Members != null)
+                Traverse(ns.Members);
+
+        }
+
+        private void Traverse(CodeElements members)
+        {
+            foreach (object elem in members)
+            {
+                if (elem is CodeClass codeClass)
+                    WithCodeClass(codeClass);
+            }
+        }
+    }
+
+    public class ProjectTraverser
+    {
+        public Action<CodeNamespace> WithNamespace { get; private set; }
+
+        public ProjectTraverser(Project project, Action<CodeNamespace> withNamespace)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+            
+            if (withNamespace == null)
+                throw new ArgumentNullException("withNamespace");
+
+            WithNamespace = withNamespace;
+
+            if (project.ProjectItems != null)
+                Traverse(project.ProjectItems);
+        }
+
+        private void Traverse(ProjectItems items)
+        {
+            foreach (ProjectItem pi in items)
+            {
+				var name = pi.Name;
+                if (pi.FileCodeModel != null)
+                {
+                    var codeElements = pi.FileCodeModel.CodeElements;                    
+                    foreach (CodeElement elem in codeElements)
+                    {
+                        if (elem is CodeNamespace)
+                            WithNamespace((CodeNamespace)elem);
+                    }
+                }
+
+                if (pi.ProjectItems != null)
+                    Traverse(pi.ProjectItems);
+            }
+        }
+    }
+
+    public class TypeScriptModule
+    {
+        public string QualifiedName { get; set; }
+        public List<TypeScriptInterface> Interfaces { get; set; }
+
+        /// <summary>
+        /// Returns true if this is the global namespace (ie. no module name)
+        /// </summary>
+        public bool IsGlobal
+        {
+            get { return string.IsNullOrWhiteSpace(QualifiedName); }
+        }
+
+        public TypeScriptModule()
+        {
+            Interfaces = new List<TypeScriptInterface>();
+        }
+    }
+
+    public class SolutionTraverser
+    {
+        public Action<CodeNamespace> WithNamespace { get; private set; }
+
+		public SolutionTraverser(IEnumerable<Project> projects, Action<CodeNamespace> withNamespace){
+            if (projects == null)
+                throw new ArgumentNullException("projects");
+
+            if (withNamespace == null)
+                throw new ArgumentNullException("withNamespace");
+
+            WithNamespace = withNamespace;
+
+            foreach (Project project in projects)
+            {
+				// new ProjectTraverser(project, WithNamespace);
+				
+				try{
+		            new ProjectTraverser(project, WithNamespace);
+				}catch (Exception ex) {
+					Console.WriteLine(ex.ToString());
+				}
+				
+			}
+		}
+    }
+
+    public class ArrayType: TypescriptType
+    {
+        public TypescriptType ElementType { get; set; }
+
+        public override string ToString()
+        {
+            return ElementType.ToString() + "[]";
+        }
+    }
+
+    public class BoolType: TypescriptType
+    {
+        public override string Name
+        {
+            get { return "boolean"; }
+        }
+    }
+
+    public class InterfaceType : TypescriptType
+    {
+        public TypeScriptInterfaceAttributeValues AttributeValues { get; private set; }
+
+        public string QualifedModule 
+        { 
+            get 
+            {
+                if (AttributeValues == null)
+                    return null;
+
+                return AttributeValues.Module; 
+            } 
+        }
+
+        public override string Name
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(AttributeValues.NamePrefix))
+                    return AttributeValues.NamePrefix + AttributeValues.Name;
+
+                return AttributeValues.Name;
+            }
+        }
+
+        public InterfaceType(TypeScriptInterfaceAttributeValues values)
+        {
+            AttributeValues = values;
+        }
+
+        public InterfaceType(string name)
+        {
+            AttributeValues = new TypeScriptInterfaceAttributeValues
+            {
+                Name = name
+            };
+        }
+
+        public override string ToString()
+        {
+            if (string.IsNullOrWhiteSpace(QualifedModule))
+                return base.ToString();
+
+            return QualifedModule + "." + base.ToString();
+        }
+    }
+
+    public class NullableType : TypescriptType
+    {
+        public TypescriptType WrappedType { get; set; }
+
+        public override string ToString()
+        {
+            return WrappedType.ToString();
+        }
+    }
+
+    public class NumberType : TypescriptType
+    {
+        public override string Name
+        {
+            get { return "number"; }
+        }
+    }
+
+    public class DateTimeType : TypescriptType
+    {
+        public override string Name
+        {
+            get { return "Date"; }
+        }
+    }
+
+    public class StringType: TypescriptType
+    {
+        public override string Name
+        {
+            get { return "string"; }
+        }
+    }
+
+    public class TypeContext
+    {
+        public Settings Settings { get; private set; }
+        public TypeContext(Settings settings)
+        {
+            this.Settings = settings;
+        }
+
+        private static readonly string[] genericCollectionTypeStarts = new string[] {
+            "System.Collections.Generic.List<",
+            "System.Collections.Generic.IList<",
+            "System.Collections.Generic.ICollection<",
+			"SIS.Common.Core.Data.EntityDataSet<",
+        };
+
+        private static readonly string nullableTypeStart = "System.Nullable<";
+
+        /// <summary>
+        /// Lookup table for "interface types", ie. non-builtin types (typically classes or unknown types). Keyed on the FullName of the type.
+        /// </summary>
+        private Dictionary<string, InterfaceType> interfaceTypes = new Dictionary<string, InterfaceType>();
+
+        public void AddInterfaceType(string typeFullName, InterfaceType interfaceType)
+        {
+            interfaceTypes.Add(typeFullName, interfaceType);
+        }
+
+        public bool TryGetInterfaceType(string typeFullName, out InterfaceType interfaceType)
+        {
+            return interfaceTypes.TryGetValue(typeFullName, out interfaceType);
+        }
+
+        public bool ContainsInterfaceType(string typeFullName)
+        {
+            return interfaceTypes.ContainsKey(typeFullName);
+        }
+
+        public TypescriptType GetTypeScriptType(CodeTypeRef codeType)
+        {
+            switch (codeType.TypeKind)
+            {
+                case vsCMTypeRef.vsCMTypeRefChar:
+                case vsCMTypeRef.vsCMTypeRefString:
+                    return new StringType();
+
+                case vsCMTypeRef.vsCMTypeRefBool:
+                    return new BoolType();
+
+                case vsCMTypeRef.vsCMTypeRefByte:
+                case vsCMTypeRef.vsCMTypeRefDouble:
+                case vsCMTypeRef.vsCMTypeRefInt:
+                case vsCMTypeRef.vsCMTypeRefShort:
+                case vsCMTypeRef.vsCMTypeRefFloat:
+                case vsCMTypeRef.vsCMTypeRefLong:
+                case vsCMTypeRef.vsCMTypeRefDecimal:
+                    return new NumberType();
+
+                default:
+                    return TryResolveType(codeType);
+            }
+        }
+
+        private TypescriptType TryResolveType(CodeTypeRef codeType)
+        {
+            if (codeType.TypeKind == vsCMTypeRef.vsCMTypeRefArray)
+            {
+                return new ArrayType()
+                {
+                    ElementType = GetTypeScriptType(codeType.ElementType)
+                };
+            }
+
+            return GetTypeScriptType(codeType.AsFullName);
+        }
+
+        public TypescriptType GetTypeScriptType(string typeFullName)
+        {
+            InterfaceType interfaceType;
+            if (interfaceTypes.TryGetValue(typeFullName, out interfaceType))
+                return interfaceType;
+
+            if (IsGenericEnumerable(typeFullName))
+            {	
+				var innerTypeName = UnwrapGenericType(typeFullName);
+                return new ArrayType
+                {
+                    ElementType = GetTypeScriptType(innerTypeName)
+                };
+            }
+            else if (IsNullable(typeFullName))
+            {
+                return new NullableType
+                {
+                    WrappedType = GetTypeScriptType(UnwrapGenericType(typeFullName))
+                };
+            }
+
+            switch (typeFullName)
+            {
+                case "System.Guid":
+                    return new GuidType();
+
+                case "System.Double":
+                case "System.Int16":
+                case "System.Int32":
+                case "System.Int64":
+                case "System.UInt16":
+                case "System.UInt32":
+                case "System.UInt64":
+                case "System.Decimal":
+                case "System.Byte":
+                case "System.SByte":
+                case "System.Single":
+                    return new NumberType();
+
+                case "System.String":
+                    return new StringType();
+
+                case "System.DateTime":
+                case "System.DateTimeOffset":
+                    if (Settings.UseNativeDates)
+                        return new DateTimeType();
+                    else
+                        return new StringType();
+
+                default:
+                    return new TypescriptType();
+            }
+        }
+
+        private bool IsNullable(string typeFullName)
+        {
+            return typeFullName.StartsWith(nullableTypeStart);
+        }
+
+        public string UnwrapGenericType(string typeFullName)
+        {
+            int firstIndex = typeFullName.IndexOf('<');
+            return typeFullName.Substring(firstIndex+1, typeFullName.Length - firstIndex- 2);
+        }
+
+        public bool IsGenericEnumerable(string typeFullName)
+        {
+            return genericCollectionTypeStarts.Any(t => typeFullName.StartsWith(t));
+        }
+    }
+
+    public class TypeScriptInterface
+    {
+        public string Name { get; set; }
+        public string FullName { get; set; }
+
+        public List<TypeScriptInterfaceMember> Members { get; set; }
+        public TypescriptType IndexedType { get; set; }
+        public TypeScriptInterface Parent { get; set; }
+        public TypeScriptModule Module { get; set; }
+
+        public TypeScriptInterface()
+        {
+            Members = new List<TypeScriptInterfaceMember>();
+        }
+    }
+
+    public class TypeScriptInterfaceMember
+    {
+        public string Name { get; set; }
+        public TypescriptType Type { get; set; }
+        public bool Optional { get; set; }
+        //public string FullName { get; set; }
+        public bool Ignore { get; set; }
+    }
+
+    public class GuidType : TypescriptType
+    {
+        public override string Name
+        {
+            get { return "string"; }
+        }
+    }
+
+    public class TypescriptType
+    {
+        public virtual string Name { get { return "any"; } }
+
+        public override string ToString()
+        {
+            return Name;
+        }
+    }
+
+#>
+<#+
+#>

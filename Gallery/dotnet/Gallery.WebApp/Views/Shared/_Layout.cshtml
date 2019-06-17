@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+
+    <title>@ViewBag.Title</title>
+
+    <link rel="manifest" href="/manifest.json" />
+    <link href="/favicon.png" rel="icon apple-touch-icon apple-touch-startup-image" type="image/png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    @Styles.Render("~/bundles/css")
+    @Scripts.Render("~/bundles/nuget-js")
+    @Scripts.Render("~/bundles/app-js")
+</head>
+<body class="nav-md" id="_body">
+    <div id="_layout" class="container body">
+        <div class="main_container">
+            @* side menu *@
+            <div class="col-md-3 left_col">
+                <div class="left_col scroll-view">
+                    <!-- side menu - log & profile -->
+                    <div class="navbar nav_title">
+                        <div class="horizontal-center">
+                            <label class="banner">
+                                <a class="banner_title">Sample System</a>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="profile clearfix">
+                        <div class="profile_pic">
+                            <img src="~/Content/images/profile.png" class="img-circle profile_img" />
+                        </div>
+                        <div class="profile_info">
+                            <span>こんにちは</span>
+                            <h2 class="login_userName"></h2>
+                        </div>
+                    </div>
+                    <!-- /side menu - log & profile -->
+
+                    <br />
+
+                    <!-- sidebar-menu -->
+                    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                        <div class="menu_section">
+                            <h3>Sample System</h3>
+                            <ul class="nav side-menu">
+                                <li class="">
+                                    <a><i class="fa fa-home"></i> home <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li data-identity="Home/Index"><a>Menu - 1</a></li>
+                                        <li data-identity="Home/Index"><a>Menu - 2</a></li>
+                                        <li data-identity="Home/Index"><a>Menu - 3</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- /sidebar-menu -->
+                </div>
+            </div>
+
+            <!-- top navigation -->
+            <div class="top_nav">
+                <div class="nav_menu">
+                    <nav>
+                        <!-- パンくず用エリア。基盤が自動でパンくず作る -->
+                        <p class="BreadcrumbContainer"></p>
+                        <div class="nav toggle">
+                            <a class="menu_toggle"><i class="fa fa-bars"></i></a>
+                        </div>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="">
+                                <a class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <img src="~/Content/images/profile.png" />
+                                    <span class="header_login_userName"></span>
+                                    <span class="fa fa-angle-down"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <!-- /top navigation -->
+            <!-- main content -->
+            <div class="right_col main" role="main">
+                @RenderSection("SPAViews", required: false)
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+    <script>
+        sessionStorage.setItem("QueryString", JSON.stringify("@ViewBag.QueryString"));
+        window.addEventListener("binding", function (e) {
+            $.BindingAnnotation("#_layout",
+                function () { return Gallery.WebApp.Shared.LayoutView; },
+                function () { return Gallery.WebApp.Shared.LayoutViewModel; });
+        });
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

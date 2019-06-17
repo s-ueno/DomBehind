@@ -670,7 +670,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -2028,6 +2028,198 @@ var collections;
     collections.BSTree = BSTree;
 })(collections || (collections = {}));
 //# sourceMappingURL=collections.js.map
+// https://stackoverflow.com/questions/9514179/how-to-find-the-operating-system-version-using-javascript/9514341
+// https://jsfiddle.net/ChristianL/AVyND/
+/**
+ * JavaScript Client Detection
+ * (C) viazenetti GmbH (Christian Ludwig)
+ */
+(function (window) {
+    {
+        var unknown = '-';
+
+        // screen
+        var screenSize = '';
+        if (screen.width) {
+            width = (screen.width) ? screen.width : '';
+            height = (screen.height) ? screen.height : '';
+            screenSize += '' + width + " x " + height;
+        }
+
+        // browser
+        var nVer = navigator.appVersion;
+        var nAgt = navigator.userAgent;
+        var browser = navigator.appName;
+        var version = '' + parseFloat(navigator.appVersion);
+        var majorVersion = parseInt(navigator.appVersion, 10);
+        var nameOffset, verOffset, ix;
+
+        // Opera
+        if ((verOffset = nAgt.indexOf('Opera')) != -1) {
+            browser = 'Opera';
+            version = nAgt.substring(verOffset + 6);
+            if ((verOffset = nAgt.indexOf('Version')) != -1) {
+                version = nAgt.substring(verOffset + 8);
+            }
+        }
+        // Opera Next
+        if ((verOffset = nAgt.indexOf('OPR')) != -1) {
+            browser = 'Opera';
+            version = nAgt.substring(verOffset + 4);
+        }
+        // Edge
+        else if ((verOffset = nAgt.indexOf('Edge')) != -1) {
+            browser = 'Microsoft Edge';
+            version = nAgt.substring(verOffset + 5);
+        }
+        // MSIE
+        else if ((verOffset = nAgt.indexOf('MSIE')) != -1) {
+            browser = 'Microsoft Internet Explorer';
+            version = nAgt.substring(verOffset + 5);
+        }
+        // Chrome
+        else if ((verOffset = nAgt.indexOf('Chrome')) != -1) {
+            browser = 'Chrome';
+            version = nAgt.substring(verOffset + 7);
+        }
+        // Safari
+        else if ((verOffset = nAgt.indexOf('Safari')) != -1) {
+            browser = 'Safari';
+            version = nAgt.substring(verOffset + 7);
+            if ((verOffset = nAgt.indexOf('Version')) != -1) {
+                version = nAgt.substring(verOffset + 8);
+            }
+        }
+        // Firefox
+        else if ((verOffset = nAgt.indexOf('Firefox')) != -1) {
+            browser = 'Firefox';
+            version = nAgt.substring(verOffset + 8);
+        }
+        // MSIE 11+
+        else if (nAgt.indexOf('Trident/') != -1) {
+            browser = 'Microsoft Internet Explorer';
+            version = nAgt.substring(nAgt.indexOf('rv:') + 3);
+        }
+        // Other browsers
+        else if ((nameOffset = nAgt.lastIndexOf(' ') + 1) < (verOffset = nAgt.lastIndexOf('/'))) {
+            browser = nAgt.substring(nameOffset, verOffset);
+            version = nAgt.substring(verOffset + 1);
+            if (browser.toLowerCase() == browser.toUpperCase()) {
+                browser = navigator.appName;
+            }
+        }
+        // trim the version string
+        if ((ix = version.indexOf(';')) != -1) version = version.substring(0, ix);
+        if ((ix = version.indexOf(' ')) != -1) version = version.substring(0, ix);
+        if ((ix = version.indexOf(')')) != -1) version = version.substring(0, ix);
+
+        majorVersion = parseInt('' + version, 10);
+        if (isNaN(majorVersion)) {
+            version = '' + parseFloat(navigator.appVersion);
+            majorVersion = parseInt(navigator.appVersion, 10);
+        }
+
+        // mobile version
+        var mobile = /Mobile|mini|Fennec|Android|iP(ad|od|hone)/.test(nVer);
+
+        // cookie
+        var cookieEnabled = (navigator.cookieEnabled) ? true : false;
+
+        if (typeof navigator.cookieEnabled == 'undefined' && !cookieEnabled) {
+            document.cookie = 'testcookie';
+            cookieEnabled = (document.cookie.indexOf('testcookie') != -1) ? true : false;
+        }
+
+        // system
+        var os = unknown;
+        var clientStrings = [
+            { s: 'Windows 10', r: /(Windows 10.0|Windows NT 10.0)/ },
+            { s: 'Windows 8.1', r: /(Windows 8.1|Windows NT 6.3)/ },
+            { s: 'Windows 8', r: /(Windows 8|Windows NT 6.2)/ },
+            { s: 'Windows 7', r: /(Windows 7|Windows NT 6.1)/ },
+            { s: 'Windows Vista', r: /Windows NT 6.0/ },
+            { s: 'Windows Server 2003', r: /Windows NT 5.2/ },
+            { s: 'Windows XP', r: /(Windows NT 5.1|Windows XP)/ },
+            { s: 'Windows 2000', r: /(Windows NT 5.0|Windows 2000)/ },
+            { s: 'Windows ME', r: /(Win 9x 4.90|Windows ME)/ },
+            { s: 'Windows 98', r: /(Windows 98|Win98)/ },
+            { s: 'Windows 95', r: /(Windows 95|Win95|Windows_95)/ },
+            { s: 'Windows NT 4.0', r: /(Windows NT 4.0|WinNT4.0|WinNT|Windows NT)/ },
+            { s: 'Windows CE', r: /Windows CE/ },
+            { s: 'Windows 3.11', r: /Win16/ },
+            { s: 'Android', r: /Android/ },
+            { s: 'Open BSD', r: /OpenBSD/ },
+            { s: 'Sun OS', r: /SunOS/ },
+            { s: 'Linux', r: /(Linux|X11)/ },
+            { s: 'iOS', r: /(iPhone|iPad|iPod)/ },
+            { s: 'Mac OS X', r: /Mac OS X/ },
+            { s: 'Mac OS', r: /(MacPPC|MacIntel|Mac_PowerPC|Macintosh)/ },
+            { s: 'QNX', r: /QNX/ },
+            { s: 'UNIX', r: /UNIX/ },
+            { s: 'BeOS', r: /BeOS/ },
+            { s: 'OS/2', r: /OS\/2/ },
+            { s: 'Search Bot', r: /(nuhk|Googlebot|Yammybot|Openbot|Slurp|MSNBot|Ask Jeeves\/Teoma|ia_archiver)/ }
+        ];
+        for (var id in clientStrings) {
+            var cs = clientStrings[id];
+            if (cs.r.test(nAgt)) {
+                os = cs.s;
+                break;
+            }
+        }
+
+        var osVersion = unknown;
+
+        if (/Windows/.test(os)) {
+            osVersion = /Windows (.*)/.exec(os)[1];
+            os = 'Windows';
+        }
+
+        switch (os) {
+            case 'Mac OS X':
+                osVersion = /Mac OS X (10[\.\_\d]+)/.exec(nAgt)[1];
+                break;
+
+            case 'Android':
+                osVersion = /Android ([\.\_\d]+)/.exec(nAgt)[1];
+                break;
+
+            case 'iOS':
+                osVersion = /OS (\d+)_(\d+)_?(\d+)?/.exec(nVer);
+                osVersion = osVersion[1] + '.' + osVersion[2] + '.' + (osVersion[3] | 0);
+                break;
+        }
+
+        // flash (you'll need to include swfobject)
+        /* script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js" */
+        var flashVersion = 'no check';
+        if (typeof swfobject != 'undefined') {
+            var fv = swfobject.getFlashPlayerVersion();
+            if (fv.major > 0) {
+                flashVersion = fv.major + '.' + fv.minor + ' r' + fv.release;
+            }
+            else {
+                flashVersion = unknown;
+            }
+        }
+    }
+
+    window._clientDetection = {
+        screen: screenSize,
+        browser: browser,
+        browserVersion: version,
+        browserMajorVersion: majorVersion,
+        mobile: mobile,
+        os: os,
+        osVersion: osVersion,
+        cookies: cookieEnabled,
+        flashVersion: flashVersion
+    };
+}(this));
+
+
+
+
 /**
  * @license
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
@@ -2607,7 +2799,6 @@ var collections;
     }
 
 })();
-
 function NewUid() {
     var uuid = "", i, random;
     for (i = 0; i < 32; i++) {
@@ -2660,7 +2851,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -2697,7 +2888,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -2772,7 +2963,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -2887,7 +3078,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -2914,7 +3105,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -2984,7 +3175,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -3095,7 +3286,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -3300,7 +3491,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -3330,31 +3521,34 @@ var DomBehind;
             if (source == null)
                 return;
             var keys = Object.keys(source);
-            var _loop_1 = function () {
+            for (var i = 0; i < keys.length; i++) {
                 var name_1 = keys[i];
                 if (String.IsNullOrWhiteSpace(name_1))
-                    return "continue";
+                    continue;
                 if (option) {
-                    this_1.Wrapper = option.wrapper;
+                    this.Wrapper = option.wrapper;
                     if (option.marks) {
                         $.each(option.marks, function (i, value) {
                             var buff = value.Split(".");
+                            var parentName = "";
                             $.each(buff, function (k, each) {
-                                _this.Recurcive(source, name_1, null);
+                                _this.Recurcive(source, each, parentName);
+                                if (parentName) {
+                                    parentName = parentName + "." + each;
+                                }
+                                else {
+                                    parentName = each;
+                                }
                             });
                         });
                     }
                     else {
-                        this_1.Recurcive(source, name_1, null);
+                        this.Recurcive(source, name_1, null);
                     }
                 }
                 else {
-                    this_1.Recurcive(source, name_1, null);
+                    this.Recurcive(source, name_1, null);
                 }
-            };
-            var this_1 = this;
-            for (var i = 0; i < keys.length; i++) {
-                _loop_1();
             }
         }
         Observable.Register = function (target) {
@@ -3396,7 +3590,7 @@ var DomBehind;
             return {
                 get: function () {
                     if (wrapper)
-                        return wrapper(value);
+                        return wrapper(value, notifibleName);
                     return value;
                 },
                 set: function (v) {
@@ -3571,6 +3765,17 @@ String.IsNullOrEmpty = function (str) { return !str; };
 String.IsNullOrWhiteSpace = function (s) { return String.IsNullOrEmpty(s) || s.replace(/\s/g, '').length < 1; };
 String.Split = function (s, sep) {
     return s.split(sep);
+};
+String.ToBoolean = function (s, defaultValue) {
+    if (defaultValue === void 0) { defaultValue = false; }
+    if (Object.IsNullOrUndefined(s))
+        return defaultValue;
+    s = s.toLowerCase();
+    if (s === 'true')
+        return true;
+    if (s === 'false')
+        return false;
+    return defaultValue;
 };
 var StringSplitOptions;
 (function (StringSplitOptions) {
@@ -3762,8 +3967,7 @@ $.AbsoluteUri = function (uri) {
         return uri;
     if (uri.toLowerCase().StartsWith("https://"))
         return uri;
-    var rootUri = $.GetLocalStorage("RootUri", "");
-    return "" + rootUri + uri;
+    return location.origin + "/" + uri;
 };
 var w_dynamicPrefix = "__Framework";
 $.GetWindowDynamic = function (key, defaultValue) {
@@ -3773,6 +3977,9 @@ $.GetWindowDynamic = function (key, defaultValue) {
 $.SetWindowDynamic = function (key, value) {
     var newKey = w_dynamicPrefix + "." + key;
     window[newKey] = value;
+};
+$.ClientDetection = function () {
+    return window._clientDetection;
 };
 $.fn.ValidityState = function () {
     var me = this;
@@ -3823,11 +4030,25 @@ $.fn.CheckValidity = function () {
         result = me.checkValidity();
     }
 };
-$.fn.Raise = function (event) {
+$.fn.Raise = function (event, ensure) {
     var me = this;
     var e = $.Event(event.EventName);
+    if (ensure) {
+        ensure(e);
+    }
     me.trigger(e);
     return e;
+};
+$.fn.Equals = function (compareTo) {
+    if (!compareTo || this.length != compareTo.length) {
+        return false;
+    }
+    for (var i = 0; i < this.length; ++i) {
+        if (this[i] !== compareTo[i]) {
+            return false;
+        }
+    }
+    return true;
 };
 //# sourceMappingURL=JQueryExtensions.js.map
 var DomBehind;
@@ -3967,6 +4188,7 @@ var DomBehind;
             function BindingBehavior() {
                 this.BindingPolicy = new Data.BindingPolicy();
                 this.Priolity = 0;
+                this.AdditionalInfo = new collections.LinkedDictionary();
                 this._disposed = false;
             }
             BindingBehavior.prototype.Dispose = function () {
@@ -3988,7 +4210,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -4004,7 +4226,6 @@ var DomBehind;
             function DataBindingBehavior() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.Marks = [];
-                _this.AdditionalInfo = new collections.LinkedDictionary();
                 _this.UpdateSourceEvent = new DomBehind.TypedEvent();
                 _this.UpdateTargetEvent = new DomBehind.TypedEvent();
                 _this.Events = [];
@@ -4114,7 +4335,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -4194,6 +4415,8 @@ var DomBehind;
                             result = _this.Action(_this.DataContext);
                         }
                         else if (_this.ActionParameterCount === 2) {
+                            e.AdditionalInfo = _this.AdditionalInfo;
+                            e.Args = _this.AdditionalInfo["Args"];
                             result = _this.Action(_this.DataContext, e);
                         }
                         else {
@@ -4234,7 +4457,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -4284,7 +4507,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -4377,6 +4600,7 @@ var DomBehind;
             behavior.PInfo = new DomBehind.LamdaExpression(this.Owner.DataContext, bindingExpression);
             behavior.BindingPolicy.Trigger = !Object.IsNullOrUndefined(updateTrigger) ? updateTrigger : property.UpdateSourceTrigger;
             behavior.BindingPolicy.Mode = !Object.IsNullOrUndefined(mode) ? mode : property.BindingMode;
+            behavior.AdditionalInfo["selector"] = this.CurrentSelector;
             var dataBindingBuilder = new DomBehind.Data.DataBindingBehaviorBuilder(this.Owner);
             dataBindingBuilder.CurrentBehavior = this.CurrentBehavior;
             dataBindingBuilder.CurrentElement = this.CurrentElement;
@@ -4422,6 +4646,14 @@ var DomBehind;
             actionBindingBuilder.CurrentElement = this.CurrentElement;
             return actionBindingBuilder;
         };
+        BindingBehaviorBuilder.prototype.BindingActionWithOption = function (event, action, option) {
+            var result = this.BindingAction(event, action);
+            if (option && this.CurrentBehavior instanceof DomBehind.Data.ActionBindingBehavior) {
+                this.CurrentBehavior.AllowBubbling = option.allowBubbling;
+                this.CurrentBehavior.AdditionalInfo["Args"] = option.args;
+            }
+            return result;
+        };
         BindingBehaviorBuilder.prototype.Add = function (behavior) {
             this.CurrentBehavior = behavior;
             behavior.DataContext = this.Owner.DataContext;
@@ -4456,7 +4688,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -4511,7 +4743,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -4610,7 +4842,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -4643,7 +4875,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -4694,7 +4926,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -4783,7 +5015,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -4982,7 +5214,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -5055,6 +5287,26 @@ var DomBehind;
             this.DbName = db;
             this.TableName = name;
         }
+        IndexedDBHelper.prototype.Drop = function () {
+            var _this = this;
+            var d = $.Deferred();
+            var db = this.Open();
+            db.done(function (x) {
+                if (!x.objectStoreNames.contains(_this.TableName)) {
+                    d.resolve();
+                    return;
+                }
+                _this.Upgrade(x.version + 1, function (y) {
+                    var newDb = y.target.result;
+                    if (newDb && newDb.deleteObjectStore)
+                        newDb.deleteObjectStore(_this.TableName);
+                    d.resolve();
+                });
+            }).fail(function () {
+                d.reject();
+            });
+            return d.promise();
+        };
         IndexedDBHelper.prototype.List = function () {
             var _this = this;
             var d = $.Deferred();
@@ -5395,10 +5647,10 @@ var DomBehind;
                     });
                 }
                 if (setting.Width) {
-                    modal.css("width", option.Width);
+                    modal.css("width", setting.Width);
                 }
                 if (setting.Height) {
-                    modal.css("height", option.Height);
+                    modal.css("height", setting.Height);
                 }
                 if (!setting.ShowHeader) {
                     container.find(".modal-header").hide();
@@ -5551,7 +5803,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -5607,7 +5859,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -5687,7 +5939,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -5744,7 +5996,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -5783,6 +6035,90 @@ var DomBehind;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=RequiredValidator.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var DomBehind;
+(function (DomBehind) {
+    var Validation;
+    (function (Validation) {
+        var PipelineValidator = (function (_super) {
+            __extends(PipelineValidator, _super);
+            function PipelineValidator() {
+                var _this = _super.call(this) || this;
+                _this.Validators = [];
+                return _this;
+            }
+            PipelineValidator.prototype.Validate = function (value) {
+                var _this = this;
+                var result = true;
+                var lastErrorMessage;
+                this.Error = null;
+                $.each(this.Validators, function (i, x) {
+                    x.OnValidationg();
+                    if (x.HasError) {
+                        lastErrorMessage = x.Message;
+                        result = false;
+                        _this.Error = x;
+                        return false;
+                    }
+                });
+                this.Message = lastErrorMessage;
+                return result;
+            };
+            PipelineValidator.prototype.Apply = function () {
+                this.Validators.forEach(function (x) { return x.Apply(); });
+            };
+            PipelineValidator.prototype.RemoveValidation = function () {
+                this.Validators.forEach(function (x) { return x.RemoveValidation(); });
+            };
+            PipelineValidator.prototype.ClearValidation = function () {
+                this.Validators.forEach(function (x) { return x.ClearValidation(); });
+            };
+            PipelineValidator.prototype.AddValidation = function () {
+                this.Validators.forEach(function (x) { return x.AddValidation(); });
+            };
+            PipelineValidator.prototype.AddValidator = function (validator) {
+                validator.Behavior = this.Behavior;
+                this.Validators.push(validator);
+            };
+            PipelineValidator.prototype.Dispose = function () {
+                this.Validators.forEach(function (x) { return x.Dispose(); });
+            };
+            return PipelineValidator;
+        }(DomBehind.Validation.Validator));
+        Validation.PipelineValidator = PipelineValidator;
+    })(Validation = DomBehind.Validation || (DomBehind.Validation = {}));
+})(DomBehind || (DomBehind = {}));
+(function (DomBehind) {
+    DomBehind.BindingBehaviorBuilder.prototype.AddPipelineValidator = function (validator) {
+        var me = this;
+        if (me.CurrentBehavior instanceof DomBehind.Data.DataBindingBehavior) {
+            var lastValidator = me.CurrentBehavior.BindingPolicy.Validators.toArray().LastOrDefault();
+            if (lastValidator && lastValidator instanceof DomBehind.Validation.PipelineValidator) {
+                lastValidator.AddValidator(validator);
+            }
+            else {
+                var pipelineValidator = new DomBehind.Validation.PipelineValidator();
+                pipelineValidator.Behavior = me.CurrentBehavior;
+                pipelineValidator.AddValidator(validator);
+                me.CurrentBehavior.BindingPolicy.Validators.add(pipelineValidator);
+            }
+        }
+        return me;
+    };
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=PipelineValidator.js.map
 var DomBehind;
 (function (DomBehind) {
     var PoolType;
@@ -5918,7 +6254,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -6019,12 +6355,18 @@ var DomBehind;
     var UIElement = (function () {
         function UIElement() {
         }
+        UIElement.RaiseEnabledChanged = function (element, isEnabled) {
+            element.Raise(UIElement.EnabledChanged, function (e) {
+                e.isEnabled = isEnabled;
+            });
+        };
         UIElement.ValueProperty = DomBehind.Data.DependencyProperty.RegisterAttached("val", function (x) { return x.val(); }, function (x, y) { return x.val(y); }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
         UIElement.TextProperty = DomBehind.Data.DependencyProperty.RegisterAttached("text", function (x) { return x.text(); }, function (x, y) { return x.text(y); }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
         UIElement.SrcProperty = DomBehind.Data.DependencyProperty.RegisterAttached("src", function (x) { return x.attr("src"); }, function (x, y) { return x.attr("src", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.HrefProperty = DomBehind.Data.DependencyProperty.RegisterAttached("href", function (x) { return x.attr("href"); }, function (x, y) { return x.attr("href", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("enabled", null, function (x, y) {
             var disabled = y === false ? true : false;
+            var oldDisabledValue = x.hasClass("disabled");
             if (disabled === true) {
                 x.attr("disabled", "");
                 x.addClass("disabled");
@@ -6033,6 +6375,21 @@ var DomBehind;
                 x.removeAttr("disabled");
                 x.removeClass("disabled");
             }
+            if (x.is('input[type=radio]') ||
+                x.is('input[type=checkbox]')) {
+                var parent_1 = x.closest("label");
+                if (parent_1) {
+                    if (disabled) {
+                        parent_1.addClass("disablecheck");
+                    }
+                    else {
+                        parent_1.removeClass("disablecheck");
+                    }
+                }
+            }
+            if (disabled === oldDisabledValue)
+                return;
+            UIElement.RaiseEnabledChanged(x, !disabled);
         }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         UIElement.IsVisibleProperty = DomBehind.Data.DependencyProperty.RegisterAttached("display", function (x) { return x.attr("display") === "none" ? false : true; }, function (x, y) {
             var visible = y ? true : false;
@@ -6097,13 +6454,84 @@ var DomBehind;
             }
         });
         UIElement.Keydown = DomBehind.EventBuilder.RegisterAttached("keydown");
+        UIElement.FocusIn = DomBehind.EventBuilder.RegisterAttached("focusin");
         UIElement.LostFocus = DomBehind.EventBuilder.RegisterAttached("focusout");
         UIElement.Initialize = DomBehind.EventBuilder.RegisterAttached("initialize");
         UIElement.Activate = DomBehind.EventBuilder.RegisterAttached("activate");
         UIElement.ModalClosing = DomBehind.EventBuilder.RegisterAttached("modalClosing");
+        UIElement.EnabledChanged = DomBehind.EventBuilder.RegisterAttached("enabledChanged");
         return UIElement;
     }());
     DomBehind.UIElement = UIElement;
+    DomBehind.BindingBehaviorBuilder.prototype.ClearValueWhenDisabled = function (option) {
+        var me = this;
+        var lastBinding = me.CurrentBehavior;
+        if (lastBinding instanceof DomBehind.Data.DataBindingBehavior) {
+            me.BindingActionWithOption(UIElement.EnabledChanged, function (x, e) {
+                var d = $.Deferred();
+                setTimeout(function (_e) {
+                    var exception;
+                    try {
+                        var lastBinding_1 = _e.behavior;
+                        if (!lastBinding_1)
+                            return;
+                        var sender = $(_e.sourceEvent.target);
+                        var ele = lastBinding_1.Element;
+                        if (!sender.Equals(ele))
+                            return;
+                        if (ele.is('input')) {
+                            var disabled = ele.hasClass("disabled");
+                            if (!disabled)
+                                return;
+                            if (_e.option && _e.option.clearAction) {
+                                _e.option.clearAction(lastBinding_1.DataContext, lastBinding_1.ValueCore, ele);
+                            }
+                            else {
+                                if (ele.is('input[type=radio]') ||
+                                    ele.is('input[type=checkbox]')) {
+                                    var checkEle = ele.get(0);
+                                    if (checkEle.checked) {
+                                        checkEle.checked = false;
+                                    }
+                                }
+                                else {
+                                    ele.val(null);
+                                }
+                            }
+                        }
+                        else {
+                            var isEnabled = _e.sourceEvent.isEnabled;
+                            if (isEnabled)
+                                return;
+                            if (_e.option && _e.option.clearAction) {
+                                _e.option.clearAction(lastBinding_1.DataContext, lastBinding_1.ValueCore, ele);
+                            }
+                            else {
+                                var nowValue = lastBinding_1.ValueCore;
+                                if (nowValue instanceof DomBehind.Data.ListCollectionView) {
+                                    nowValue.UnSelect();
+                                    nowValue.Refresh();
+                                }
+                            }
+                        }
+                    }
+                    catch (e) {
+                        exception = e;
+                    }
+                    finally {
+                        if (exception) {
+                            d.reject(exception);
+                        }
+                        else {
+                            d.resolve();
+                        }
+                    }
+                }, 0, { behavior: lastBinding, option: option, sourceEvent: e });
+                return d.promise();
+            }, { args: lastBinding });
+        }
+        return me;
+    };
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=UIElement.js.map
 var DomBehind;
@@ -6433,7 +6861,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -6665,7 +7093,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -6829,7 +7257,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -7129,7 +7557,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -7462,7 +7890,12 @@ var DomBehind;
             }
             if (stack.Any()) {
                 if (oldQueryStrings.Any()) {
-                    stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                    if (!oldQueryStrings.Any(function (x) { return x.Key === 'isPop'; })) {
+                        stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                    }
+                    else {
+                        stack.LastOrDefault().Uri = "" + currentUri;
+                    }
                 }
                 else {
                     stack.LastOrDefault().Uri = currentUri + "?isPop=true";
@@ -7513,7 +7946,12 @@ var DomBehind;
             }
             if (stack.Any()) {
                 if (oldQueryStrings.Any()) {
-                    stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                    if (!oldQueryStrings.Any(function (x) { return x.Key === 'isPop'; })) {
+                        stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                    }
+                    else {
+                        stack.LastOrDefault().Uri = "" + currentUri;
+                    }
                 }
                 else {
                     stack.LastOrDefault().Uri = currentUri + "?isPop=true";
@@ -7596,7 +8034,28 @@ var DomBehind;
                 else {
                     var a = $("<a href=\"javascript:void(0);\">" + value.Title + "</a>");
                     a.click(function (e) {
-                        location.replace(value.Uri);
+                        var newE = new Event("breadbrumbTapped");
+                        newE.__title = value.Title;
+                        newE.__uri = value.Uri;
+                        newE.__e = e;
+                        newE.__canceled = false;
+                        window.dispatchEvent(newE);
+                        if (typeof newE.__canceled === "boolean") {
+                            if (!newE.__canceled) {
+                                location.replace(value.Uri);
+                            }
+                        }
+                        else if (Object.IsPromise(newE.__canceled)) {
+                            var pms = newE.__canceled;
+                            pms.then(function (canceled) {
+                                if (!canceled) {
+                                    location.replace(value.Uri);
+                                }
+                            });
+                        }
+                        else {
+                            location.replace(value.Uri);
+                        }
                     });
                     aList.push(a);
                 }
@@ -7628,6 +8087,300 @@ var DomBehind;
     DomBehind.Breadbrumb = Breadbrumb;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Breadbrumb.js.map
+var DomBehind;
+(function (DomBehind) {
+    var Appeal = (function () {
+        function Appeal() {
+        }
+        Appeal.Register = function (behavior) {
+            var style = $("#" + Appeal.styleIdentity);
+            if (style.length === 0) {
+                var head = document.head || document.getElementsByTagName('head')[0];
+                var newStyle = document.createElement('style');
+                head.appendChild(newStyle);
+                newStyle.type = 'text/css';
+                newStyle.appendChild(document.createTextNode(Appeal.css));
+                newStyle.setAttribute("id", Appeal.styleIdentity);
+            }
+            var identity = behavior.Element.attr("appeal-identity");
+            if (!identity) {
+                identity = "appeal-" + NewUid();
+                behavior.Element.attr("appeal-identity", identity);
+            }
+            var appeal = window[identity];
+            if (!appeal) {
+                window[identity] = appeal = new Appeal();
+                appeal.Behavior = behavior;
+            }
+        };
+        Appeal.prototype.Render = function (newValue) {
+            var el = this.Behavior.Element;
+            var identity = el.attr("ripple_appeal_identity");
+            if (!identity) {
+                identity = "ripple-" + NewUid();
+                el.attr("ripple_appeal_identity", identity);
+            }
+            var pnl = $("#" + identity);
+            if (!newValue)
+                pnl.remove();
+            var oldValueString = el.attr("ripple_appeal_value");
+            var oldValue = false;
+            if (!String.IsNullOrWhiteSpace(oldValueString)) {
+                oldValue = Boolean(oldValue);
+            }
+            el.attr("ripple_appeal_value", "" + newValue);
+            if (newValue === oldValue) {
+                return;
+            }
+            if (!newValue) {
+                return;
+            }
+            var offset = el.offset();
+            var css = {
+                "height": el.height() + "px",
+                "width": el.width() + "px",
+                "top": offset.top + "px",
+                "left": offset.left + "px",
+                "position": "fixed",
+                "background-color": "transparent",
+                "border-color": "rgba(0, 90, 255, 0.4)",
+                "pointer-events": "none"
+            };
+            var parent = el.closest("div");
+            var clone = el.clone().empty();
+            if (el.is("input") || el.is("select")) {
+                clone = $("<div />");
+                var h = el.height();
+                var w = el.width();
+                if (h < w) {
+                    h = w;
+                }
+                else {
+                    w = h;
+                }
+                if (h < 50) {
+                    w = h = 50;
+                }
+                var top_1 = offset.top;
+                var topOffset = Number(el.css("margin-top").replace(/[^-\d\.]/g, '')) +
+                    Number(el.css("margin-bottom").replace(/[^-\d\.]/g, ''));
+                var left = offset.left;
+                var leftOffset = Number(el.css("margin-left").replace(/[^-\d\.]/g, '')) +
+                    Number(el.css("margin-right").replace(/[^-\d\.]/g, ''));
+                if (el.is('select') && top_1 === 0 && left === 0) {
+                    var nextSpan = el.next("span");
+                    if (nextSpan.length !== 0) {
+                        h = w = nextSpan.height();
+                        if (h < 50) {
+                            w = h = 50;
+                        }
+                        var buffOffset = nextSpan.offset();
+                        top_1 = buffOffset.top + (nextSpan.height() / 2);
+                        left = buffOffset.left + (nextSpan.width() / 2);
+                    }
+                }
+                css = $.extend(true, css, {
+                    "height": h + "px",
+                    "width": w + "px",
+                    "top": top_1 - (el.height() + topOffset) + "px",
+                    "left": left + leftOffset + "px",
+                    "border-radius": "50%",
+                    "transform": "scale(0)",
+                    "background": "rgba(0, 90, 255, 0.4)",
+                });
+            }
+            clone.attr("id", identity);
+            clone.css(css);
+            clone.addClass("ripple_appeal");
+            parent.append(clone);
+            setTimeout(function () {
+                clone.remove();
+                el.attr("ripple_appeal_value", "false");
+            }, 9 * 1000);
+        };
+        Appeal.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("appealEnabled", null, function (x, y) {
+            var identity = x.attr("appeal-identity");
+            var timeoutHandle = x.attr("clearTimeout");
+            var appeal = window[identity];
+            if (appeal) {
+                if (timeoutHandle) {
+                    clearTimeout(Number(timeoutHandle));
+                }
+                var value = setTimeout(function () {
+                    x.attr("clearTimeout", "");
+                    appeal.Render(!!y);
+                }, 1 * 1000);
+                x.attr("clearTimeout", value);
+            }
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, function (behavior) {
+            Appeal.Register(behavior);
+        });
+        Appeal.styleIdentity = "appeal-style";
+        Appeal.css = "\n@keyframes rippleAppeal {\n    100% {\n        transform: scale(2);\n        border-width: 10px;\n        opacity: 0;\n    }\n}\n\n@keyframes rippleOut {\n    100% {\n        opacity: 0;\n    }\n}\n\n.ripple_appeal {\n    animation: rippleAppeal 3s linear 3\n}\n";
+        return Appeal;
+    }());
+    DomBehind.Appeal = Appeal;
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Appeal.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var DomBehind;
+(function (DomBehind) {
+    var FlipAnimation;
+    (function (FlipAnimation) {
+        FlipAnimation[FlipAnimation["HorizontalFlip"] = 0] = "HorizontalFlip";
+        FlipAnimation[FlipAnimation["Slide"] = 1] = "Slide";
+    })(FlipAnimation = DomBehind.FlipAnimation || (DomBehind.FlipAnimation = {}));
+    var FlipBehavior = (function (_super) {
+        __extends(FlipBehavior, _super);
+        function FlipBehavior() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        FlipBehavior.prototype.SetValue = function (el, newValue) {
+            var oldValue = false;
+            var oldValueString = el.attr(FlipBehavior.ValueKey);
+            if (!String.IsNullOrWhiteSpace(oldValueString)) {
+                oldValue = String.ToBoolean(oldValueString);
+            }
+            el.attr(FlipBehavior.ValueKey, "" + newValue);
+            if (newValue === oldValue)
+                return;
+            if (this.Option.animation === FlipAnimation.HorizontalFlip) {
+                this.HorizontalFlip(newValue);
+            }
+            else {
+                this.Slide(newValue);
+            }
+        };
+        FlipBehavior.prototype.HorizontalFlip = function (isBack) {
+            if (!this.Option.container.hasClass("flip-container")) {
+                this.Option.container.addClass("flip-container");
+            }
+            if (!this.Option.front.hasClass("flip-item")) {
+                this.Option.front.addClass("flip-item");
+            }
+            if (!this.Option.back.hasClass("flip-item")) {
+                this.Option.back.addClass("flip-item");
+            }
+            if (!this.Option.back.hasClass("flip-horizontal-back")) {
+                this.Option.back.addClass("flip-horizontal-back");
+            }
+            if (isBack) {
+                this.Option.container.addClass("flip-horizontal");
+            }
+            else {
+                this.Option.container.removeClass("flip-horizontal");
+            }
+        };
+        FlipBehavior.prototype.Slide = function (isBack) {
+            if (isBack) {
+                this.Option.front.removeClass("flip-slide-in");
+                this.Option.front.addClass("hidden");
+                this.Option.back.removeClass("hidden");
+                this.Option.back.addClass("flip-slide-in");
+            }
+            else {
+                this.Option.front.removeClass("hidden");
+                this.Option.front.addClass("flip-slide-in");
+                this.Option.back.removeClass("flip-slide-in");
+                this.Option.back.addClass("hidden");
+            }
+        };
+        FlipBehavior.Register = function (behavior) {
+            var identity = "id-" + NewUid();
+            behavior.Option.container.attr(FlipBehavior.IdentityKey, identity);
+            window[identity] = behavior;
+            var style = $("#" + FlipBehavior.cssIdentity);
+            if (style.length === 0) {
+                var head = document.head || document.getElementsByTagName('head')[0];
+                var newStyle = document.createElement('style');
+                head.appendChild(newStyle);
+                newStyle.type = 'text/css';
+                newStyle.appendChild(document.createTextNode(FlipBehavior.css));
+                newStyle.setAttribute("id", FlipBehavior.cssIdentity);
+            }
+        };
+        FlipBehavior.IdentityKey = "flip-identity";
+        FlipBehavior.IsFlipProperty = DomBehind.Data.DependencyProperty.RegisterAttached("isflip", function (el) {
+        }, function (el, newValue) {
+            var identity = el.attr(FlipBehavior.IdentityKey);
+            var behavior = window[identity];
+            if (behavior) {
+                behavior.SetValue(el, newValue);
+            }
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, function (b) {
+            if (b.Option.animation === FlipAnimation.Slide)
+                b.Option.back.addClass("hidden");
+        });
+        FlipBehavior.ValueKey = "flip-value";
+        FlipBehavior.css = "\n@keyframes kf-flip-slide-in {\n  0% {\n    opacity: 0;\n    transform: translateX(10px);\n  }\n  100% {\n    opacity: 1;\n    transform: translateX(0);\n  }\n}\n.flip-slide-in {\n    animation: kf-flip-slide-in 1s linear 1\n}\n\n@keyframes kf-flip-slide-out {\n  0% {\n    opacity: 1;\n    transform: translateX(0);\n  }\n  100% {\n    opacity: 0;\n    transform: translateX(-50px);\n  }\n}\n.flip-slide-out {\n    animation: kf-flip-slide-out 1s linear 1\n}\n\n\n\n.flip-container {\n    transition: transform 1s;\n    transform-style: preserve-3d;\n    position: relative; \n}\n.flip-item {\n    position: absolute;\n    backface-visibility: hidden;\n}\n.flip-horizontal {\n    transform: rotateY(180deg);\n}\n.flip-horizontal-back {\n    transform: rotateY(180deg);\n}\n\n";
+        FlipBehavior.cssIdentity = "flip-style";
+        return FlipBehavior;
+    }(DomBehind.Data.DataBindingBehavior));
+    DomBehind.FlipBehavior = FlipBehavior;
+    var FlipBindingBehaviorBuilder = (function (_super) {
+        __extends(FlipBindingBehaviorBuilder, _super);
+        function FlipBindingBehaviorBuilder(owner) {
+            return _super.call(this, owner) || this;
+        }
+        FlipBindingBehaviorBuilder.prototype.BindingFlip = function (exp, option) {
+            var me = this;
+            var behavior = me.CurrentBehavior;
+            if (behavior instanceof FlipBehavior) {
+                if (option) {
+                    behavior.Option = $.extend(true, behavior.Option, option);
+                }
+                behavior.Property = FlipBehavior.IsFlipProperty;
+                behavior.PInfo = new DomBehind.LamdaExpression(behavior.DataContext, exp);
+                behavior.Marks = [behavior.PInfo.MemberPath];
+            }
+            return me;
+        };
+        return FlipBindingBehaviorBuilder;
+    }(DomBehind.BindingBehaviorBuilder));
+    DomBehind.FlipBindingBehaviorBuilder = FlipBindingBehaviorBuilder;
+    DomBehind.BindingBehaviorBuilder.prototype.FlipElement =
+        function (containerSelector, frontSelector, backSelector) {
+            var me = this;
+            var container = me.Owner.Container.find(containerSelector);
+            if (container.length === 0) {
+                container = $(containerSelector);
+            }
+            var frontElement = me.Owner.Container.find(frontSelector);
+            if (frontElement.length === 0) {
+                frontElement = $(frontSelector);
+            }
+            var backElement = me.Owner.Container.find(backSelector);
+            if (backElement.length === 0) {
+                backElement = $(backSelector);
+            }
+            me.CurrentElement = container;
+            var behavior = me.Add(new FlipBehavior());
+            behavior.Option = {
+                container: container,
+                front: frontElement,
+                back: backElement,
+                animation: FlipAnimation.Slide,
+            };
+            FlipBehavior.Register(behavior);
+            var newMe = new FlipBindingBehaviorBuilder(me.Owner);
+            newMe.CurrentElement = me.CurrentElement;
+            newMe.CurrentBehavior = me.CurrentBehavior;
+            return newMe;
+        };
+})(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Flip.js.map
 var DomBehind;
 (function (DomBehind) {
     var Application = (function () {
@@ -7792,9 +8545,6 @@ var DomBehind;
                         result = false;
                     }
                 });
-                if (result) {
-                    this.RemoveValidator(mark);
-                }
             }
             if (this.DependencyValidate) {
                 this.DependencyValidate(mark);
@@ -7851,7 +8601,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -7947,8 +8697,8 @@ var DomBehind;
                 if (behavior.BindingPolicy &&
                     behavior.BindingPolicy.Validators) {
                     $.each(behavior.BindingPolicy.Validators.toArray(), function (x, v) {
-                        if (v.HasError && v.Message) {
-                            result.push(v.Message);
+                        if (v.HasError) {
+                            result.push(v);
                         }
                     });
                 }
@@ -7959,23 +8709,26 @@ var DomBehind;
             var result = this.Validate(mark);
             if (result)
                 return;
-            var lastErrors = this.LastErrors(mark).Select(function (x) { return new DomBehind.ApplicationException(x); });
+            var lastErrors = this.LastErrors(mark).Select(function (x) { return new DomBehind.ApplicationException(x.Message); });
             throw new DomBehind.ApplicationAggregateException(lastErrors);
         };
-        BizViewModel.prototype.WaitingOverlay = function (func, image) {
+        BizViewModel.prototype.WaitingOverlay = function (func, handled, image) {
             var overlayPolocy = new DomBehind.Data.WindowWaitingOverlayActionPolicy();
             if (image) {
                 overlayPolocy.Option.Image = image;
             }
-            return this.SafeAction(func, overlayPolocy);
+            return this.SafeAction(func, handled, overlayPolocy);
         };
-        BizViewModel.prototype.SafeAction = function (func) {
+        BizViewModel.prototype.SafeAction = function (func, handled) {
             var policies = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                policies[_i - 1] = arguments[_i];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                policies[_i - 2] = arguments[_i];
             }
             var behavior = new DomBehind.Data.ActionBindingBehavior();
-            var list = [new DomBehind.Data.ExceptionHandlingActionPolicy()];
+            var list = [];
+            if (!handled) {
+                list.push(new DomBehind.Data.ExceptionHandlingActionPolicy());
+            }
             if (policies) {
                 $.each(policies, function (i, value) { return list.push(value); });
             }

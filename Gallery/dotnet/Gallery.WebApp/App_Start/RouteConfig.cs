@@ -7,7 +7,7 @@ using System.Web.Routing;
 
 namespace Gallery.WebApp
 {
-    public class RouteConfig
+    public partial class RouteConfig
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
