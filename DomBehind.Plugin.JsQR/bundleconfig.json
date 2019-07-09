@@ -1,0 +1,24 @@
+﻿[
+  {
+    "outputFileName": "Scripts/domBehind.plugin.jsqr.js",
+    "inputFiles": [
+      "Scripts/jsQR.js",
+      "Scripts/DomBehind/QRCodeReader.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "commentMode": "all"
+    },
+    "sourceMap": true
+  },
+  {
+    "inputFiles": [
+      /* 
+        d.tsファイルはロード順序関係ないので、wildcard指定。
+        jsをwildcard指定すると、依存関係無視でBundleするので、実行時エラーとなった。
+      */
+      "Scripts/DomBehind/*.d.ts"
+    ],
+    "outputFileName": "Scripts/typings/dombehind.plugin/dombehind.plugin.jsqr.d.ts"
+  }
+]
