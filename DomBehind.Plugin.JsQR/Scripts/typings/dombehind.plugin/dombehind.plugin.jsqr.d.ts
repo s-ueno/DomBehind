@@ -23,7 +23,7 @@ declare namespace DomBehind {
     interface QRCodeReaderResult {
         Data: string;
         BinaryData: number[];
-        ImageSize: {
+        VideoSize: {
             Width: number;
             Height: number;
         };

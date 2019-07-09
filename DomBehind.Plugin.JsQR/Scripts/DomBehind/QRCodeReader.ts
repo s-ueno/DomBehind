@@ -21,6 +21,10 @@
             let canvasEl: HTMLCanvasElement = this.Element[0] as HTMLCanvasElement;
             let context = canvasEl.getContext('2d');
 
+            // Videoの表示領域をCanvasのサイズに合わせる
+            video.width = canvasEl.width;
+            video.height = canvasEl.height;
+
             let media = navigator.mediaDevices.getUserMedia({
                 audio: false,
                 video: {
@@ -30,18 +34,13 @@
                     frameRate: {
                         min: this.Option.FrameRate.Min || this.DefaultFrameRate.Min,
                         max: this.Option.FrameRate.Max || this.DefaultFrameRate.Max
-                    },
+                    }
                 }
             });
 
             // QRCode読取する
             let readQRCode = () => {
-
                 if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                    // Canvasの高さ調整
-                    canvasEl.height = video.videoHeight;
-                    canvasEl.width = video.videoWidth;
-
                     // フレームを取得する
                     context.drawImage(video, 0, 0, canvasEl.width, canvasEl.height);
                     let imgData = context.getImageData(0, 0, canvasEl.width, canvasEl.height);
@@ -63,7 +62,7 @@
                             this.Option.OnRead({
                                 Data: code.data,
                                 BinaryData: code.binaryData,
-                                ImageSize: { Width: imgData.width, Height: imgData.height }
+                                VideoSize: { Width: video.videoWidth, Height: video.videoHeight }
                             });
                         }
                     }
@@ -113,8 +112,8 @@
         Data: string;
         // QRCodeデータ(バイナリ)
         BinaryData: number[];
-        // フレーム画像のサイズ
-        ImageSize: { Width: number, Height: number };
+        // ビデオサイズ(拡大・縮小なし)
+        VideoSize: { Width: number, Height: number}
     }
 
     export interface BindingBehaviorBuilder<T> {
@@ -128,11 +127,6 @@
         // フレームレート未指定の場合の規定値
         if (!option.FrameRate) {
             option.FrameRate = { Min: 0, Max: 15 };
-        }
-
-        // QRCodeスキャンのコールバックが未指定の場合の規定値
-        if (!option.OnRead) {
-            option.OnRead = (result: QRCodeReaderResult) => { };
         }
 
         behavior.Option = option;
