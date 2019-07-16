@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>DomBehind.Plugin.JsQR</id>
-    <version>1.0.27</version>
+    <version>1.0.30</version>
     <title>DOM Behind Plugin JsQR</title>
     <authors>Hashihiro</authors>
     <licenseUrl>https://github.com/s-ueno/DomBehind/tree/master/DomBehind.Plugin.JsQR/LICENSE</licenseUrl>

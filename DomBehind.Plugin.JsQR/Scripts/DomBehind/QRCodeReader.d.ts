@@ -6,13 +6,22 @@ declare namespace DomBehind {
             Min: number;
             Max: number;
         };
+        readonly DefaultResolution: {
+            Width: number;
+            Height: number;
+        };
+        readonly DefaultMarkColor: string;
         Ensure(): void;
         private DrawLine;
     }
     interface QRCodeReaderOption {
-        Mark: {
+        Mark?: {
             Enable: boolean;
-            Color?: string;
+            Color: string;
+        };
+        Resolution?: {
+            Width: number;
+            Height: number;
         };
         FrameRate?: {
             Min: number;

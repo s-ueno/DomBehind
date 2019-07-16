@@ -13,6 +13,20 @@
             return { Min: 0, Max: 15 };
         };
 
+        /**
+         * カメラ解像度のデフォルト値
+         */
+        public get DefaultResolution() {
+            return { Width: 640, Height: 480 };
+        }
+
+        /**
+         * マークのデフォルト色 
+         */
+        public get DefaultMarkColor() {
+            return '#FF3B58'
+        }
+
         public Ensure(): void {
             // Videoを生成する
             let video = document.createElement('video');
@@ -21,19 +35,17 @@
             let canvasEl: HTMLCanvasElement = this.Element[0] as HTMLCanvasElement;
             let context = canvasEl.getContext('2d');
 
-            // Videoの表示領域をCanvasのサイズに合わせる
-            video.width = canvasEl.width;
-            video.height = canvasEl.height;
-
             let media = navigator.mediaDevices.getUserMedia({
                 audio: false,
                 video: {
+                    width: this.Option.Resolution.Width,
+                    height: this.Option.Resolution.Height,
                     facingMode: {
                         exact: 'environment'
                     },
                     frameRate: {
-                        min: this.Option.FrameRate.Min || this.DefaultFrameRate.Min,
-                        max: this.Option.FrameRate.Max || this.DefaultFrameRate.Max
+                        min: this.Option.FrameRate.Min,
+                        max: this.Option.FrameRate.Max
                     }
                 }
             });
@@ -41,8 +53,8 @@
             // QRCode読取する
             let readQRCode = () => {
                 if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                    // フレームを取得する
-                    context.drawImage(video, 0, 0, canvasEl.width, canvasEl.height);
+                    // キャンバスに収まるようトリミングしたフレームを取得する
+                    context.drawImage(video, 0, 0, canvasEl.width, canvasEl.height, 0, 0,canvasEl.width, canvasEl.height);
                     let imgData = context.getImageData(0, 0, canvasEl.width, canvasEl.height);
 
                     // QRCode読取する
@@ -100,7 +112,9 @@
 
     export interface QRCodeReaderOption {
         // QRCode認識時にマークする
-        Mark: { Enable: boolean, Color?: string };
+        Mark?: { Enable: boolean, Color: string };
+        // カメラの解像度
+        Resolution?: { Width: number, Height: number };
         // カメラのFPS
         FrameRate?: { Min: number, Max: number };
         // QRCode読取のコールバック
@@ -113,7 +127,7 @@
         // QRCodeデータ(バイナリ)
         BinaryData: number[];
         // ビデオサイズ(拡大・縮小なし)
-        VideoSize: { Width: number, Height: number}
+        VideoSize: { Width: number, Height: number };
     }
 
     export interface BindingBehaviorBuilder<T> {
@@ -123,11 +137,14 @@
     BindingBehaviorBuilder.prototype.BuildQRCodeReader = function (option: QRCodeReaderOption) {
         let me: BindingBehaviorBuilder<any> = this;
         let behavior = me.Add(new QRCodeReader());
+        // マークの設定
+        option.Mark = option.Mark || { Enable: false, Color: behavior.DefaultMarkColor };
 
-        // フレームレート未指定の場合の規定値
-        if (!option.FrameRate) {
-            option.FrameRate = { Min: 0, Max: 15 };
-        }
+        // カメラ解像度の設定
+        option.Resolution = option.Resolution || behavior.DefaultResolution;
+
+        // フレームレートの設定
+        option.FrameRate = option.FrameRate || behavior.DefaultFrameRate;
 
         behavior.Option = option;
 
