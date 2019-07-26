@@ -27,6 +27,21 @@
             return '#FF3B58'
         }
 
+        /**
+         * カメラが起動中かどうかを表します
+         */
+        public get ActiveCamera(): boolean {
+            return this.activeCamera;
+        }
+
+        private activeCamera: boolean;
+
+        /**
+         * カメラ映像の取得元ストリーム
+         * ※ カメラ停止中はnullが入るので、Nullチェックした上で使うこと。
+         */
+        private stream?: MediaStream;
+
         public Ensure(): void {
             // Videoを生成する
             let video = document.createElement('video');
@@ -54,7 +69,7 @@
             let readQRCode = () => {
                 if (video.readyState === video.HAVE_ENOUGH_DATA) {
                     // キャンバスに収まるようトリミングしたフレームを取得する
-                    context.drawImage(video, 0, 0, canvasEl.width, canvasEl.height, 0, 0,canvasEl.width, canvasEl.height);
+                    context.drawImage(video, 0, 0, canvasEl.width, canvasEl.height, 0, 0, canvasEl.width, canvasEl.height);
                     let imgData = context.getImageData(0, 0, canvasEl.width, canvasEl.height);
 
                     // QRCode読取する
@@ -79,7 +94,6 @@
                         }
                     }
                 }
-
                 window.requestAnimationFrame(readQRCode);
             };
 
@@ -88,9 +102,30 @@
                 video.srcObject = stream;
                 video.setAttribute('playsinline', 'true');
                 video.play();
+                this.activeCamera = true;
 
                 window.requestAnimationFrame(readQRCode);
             });
+        }
+
+        /**
+         * カメラを起動します
+         */
+        public StartCamera() {
+            this.Ensure();
+        }
+
+        /**
+         * カメラを停止します
+         */
+        public StopCamera() {
+            if (this.stream) {
+                this.stream.getTracks().forEach((t) => {
+                    t.stop();
+                });
+            }
+
+            this.activeCamera = false;
         }
 
         /**
@@ -132,6 +167,7 @@
 
     export interface BindingBehaviorBuilder<T> {
         BuildQRCodeReader<TRow>(option: QRCodeReaderOption): BindingBehaviorBuilder<TRow>;
+        ActiveCamera(binding: (row: T) => BindingBehaviorBuilder<T>);
     }
 
     BindingBehaviorBuilder.prototype.BuildQRCodeReader = function (option: QRCodeReaderOption) {
@@ -145,7 +181,6 @@
 
         // フレームレートの設定
         option.FrameRate = option.FrameRate || behavior.DefaultFrameRate;
-
         behavior.Option = option;
 
         return me;
