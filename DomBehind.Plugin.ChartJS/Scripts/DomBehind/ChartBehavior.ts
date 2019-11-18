@@ -1,7 +1,7 @@
 ﻿namespace DomBehind {
 
     export enum ChartType {
-        Bar, Line,
+        Bar, Line, Radar, Pie, PolarArea, Bubble, Scatter
     }
 
     class ColorGenerator {
@@ -165,12 +165,29 @@
                     text: this.ChartTitle
                 };
             }
+
             settings.options.scales = this.ParseScales();
+
             if (!Object.IsNullOrUndefined(this.Responsive)) {
                 settings.options.responsive = this.Responsive;
             }
-            settings.options.tooltips = this.Tooltips;
-            settings.options.hover = this.Hover;
+            if (!Object.IsNullOrUndefined(this.Tooltips)) {
+                settings.options.tooltips = this.Tooltips;
+            } else {
+                settings.options.tooltips = {
+                    mode: "index",
+                };
+            }
+
+            if (!Object.IsNullOrUndefined(this.Hover)) {
+                settings.options.hover = this.Hover;
+            } else {
+                settings.options.hover = {
+                    mode:"nearest"
+                };
+            }
+
+
 
             this.Element.empty();
 
@@ -182,12 +199,30 @@
                 return "bar";
             } else if (this.Type === ChartType.Line) {
                 return "line";
+            } else if (this.Type === ChartType.Radar) {
+                return "radar";
+            } else if (this.Type === ChartType.Pie) {
+                return "pie";
+            } else if (this.Type === ChartType.PolarArea) {
+                return "polarArea";
+            } else if (this.Type === ChartType.Bubble) {
+                return "bubble";
+            } else if (this.Type === ChartType.Scatter) {
+                return "scatter";
             }
         }
         protected Labels() {
-            if (this.Expression.lineLabels) {
-                return this.Expression.lineLabels(this.DataContext);
+            let arr = new Array<string>();
+            if (this.Expression.label) {
+                let items = this.ItemsSource.ToArray();
+                if (items.length !== 0) {
+                    for (var i = 0; i < items.length; i++) {
+                        let row = items[i];
+                        arr.push(this.Expression.label(row));
+                    }
+                }
             }
+            return arr;
         }
         protected DataSets(): ChartDataSets[] {
             if (!this.ItemsSource) return null;
@@ -196,35 +231,40 @@
             if (items.length === 0) return null;
 
             let datasets = new Array<ChartDataSets>();
+
+            let schema: ChartDataSets = {};
+            let schemaData = new Array<any>();
+            let backgroundColorList = new Array<ChartColor>();
+            let borderColorList = new Array<ChartColor>();
             for (var i = 0; i < items.length; i++) {
                 let data = items[i];
                 if (Object.IsNullOrUndefined(data)) return;
 
-                let schema: ChartDataSets = {};
-
-                if (this.Expression.label) {
-                    let label = this.Expression.label(data);
-                    if (label) {
-                        schema.label = label;
-                    }
+                if (this.Expression.data) {
+                    schemaData.push(this.Expression.data(data));
                 }
 
                 let color = this.Colors.Pop(this.Type);
-                schema.backgroundColor = color.background;
-                schema.borderColor = color.border;
 
                 if (this.Expression.backgroundColor) {
                     let backgroundColor = this.Expression.backgroundColor(data);
                     if (backgroundColor) {
-                        schema.backgroundColor = backgroundColor;
+                        backgroundColorList.push(backgroundColor);
                     }
+                } else {
+                    backgroundColorList.push(color.background);
                 }
+
+
                 if (this.Expression.borderColor) {
                     let borderColor = this.Expression.backgroundColor(data);
                     if (borderColor) {
-                        schema.borderColor = borderColor;
+                        borderColorList.push(borderColor);
                     }
+                } else {
+                    borderColorList.push(color.border);
                 }
+
                 if (this.Expression.fill) {
                     let fill = this.Expression.fill(data);
                     if (fill) {
@@ -234,12 +274,12 @@
                     schema.fill = false;
                 }
 
-                if (this.Expression.data) {
-                    schema.data = this.Expression.data(data);
-                }
-
-                datasets.push(schema);
             }
+            schema.data = schemaData;
+            schema.backgroundColor = (<any>backgroundColorList);
+            schema.borderColor = (<any>borderColorList);
+
+            datasets.push(schema);
             return datasets;
         }
 
@@ -294,10 +334,7 @@
             borderWidth?: (row: any) => number,
             fill?: (row: any) => boolean,
 
-            data?: (row: any) => number[] | ChartPoint[],
-            labels?: (owner: any) => string,
-
-            lineLabels?: (owner: any) => string[]
+            data?: (row: any) => number | ChartPoint,
         };
     }
 
@@ -366,6 +403,8 @@
             return me;
         }
 
+
+
         public BindingBackgroundColor(exp: (row: TRow) => ChartColor): ChartBindingBehaviorBuilder<T, TRow> {
             let me: ChartBindingBehaviorBuilder<any, any> = this;
             if (me.CurrentBehavior instanceof ChartBehavior) {
@@ -394,29 +433,21 @@
             }
             return me;
         }
-        public BindingValues(exp: (row: TRow) => number[] | ChartPoint[]): ChartBindingBehaviorBuilder<T, TRow> {
+
+        public BindingLabel(exp: (row: TRow) => string): ChartBindingBehaviorBuilder<T, TRow> {
+            let me: ChartBindingBehaviorBuilder<any, any> = this;
+            if (me.CurrentBehavior instanceof ChartBehavior) {
+                me.CurrentBehavior.Expression.label = exp;
+            }
+            return me;
+        }
+        public BindingValue(exp: (row: TRow) => number | ChartPoint): ChartBindingBehaviorBuilder<T, TRow> {
             let me: ChartBindingBehaviorBuilder<any, any> = this;
             if (me.CurrentBehavior instanceof ChartBehavior) {
                 me.CurrentBehavior.Expression.data = exp;
             }
             return me;
         }
-        public BindingValueDescription(exp: (row: TRow) => string): ChartBindingBehaviorBuilder<T, TRow> {
-            let me: ChartBindingBehaviorBuilder<any, any> = this;
-            if (me.CurrentBehavior instanceof ChartBehavior) {
-                me.CurrentBehavior.Expression.labels = exp;
-            }
-            return me;
-        }
-        public BindingValueTitles(exp: (row: T) => string[]): ChartBindingBehaviorBuilder<T, TRow> {
-            let me: ChartBindingBehaviorBuilder<any, any> = this;
-            if (me.CurrentBehavior instanceof ChartBehavior) {
-                me.CurrentBehavior.Expression.lineLabels = exp;
-            }
-            return me;
-        }
-
-
 
         public BindingInstance(exp: (row: T) => ChartBehavior): ChartBindingBehaviorBuilder<T, TRow> {
             let me: ChartBindingBehaviorBuilder<any, any> = this;
@@ -428,7 +459,24 @@
     }
 
     export interface BindingBehaviorBuilder<T> {
+        BuildChart<TRow>(itemsSource: (x: T) => any, type: ChartType, option?: ChartOptions): ChartBindingBehaviorBuilder<T, TRow>;
         BuildChartOfLine<TRow>(itemsSource: (x: T) => any, option?: ChartOptions): ChartBindingBehaviorBuilder<T, TRow>;
+    }
+
+    BindingBehaviorBuilder.prototype.BuildChart = function (itemsSource: (x: any) => any, type: ChartType, option?: ChartOptions) {
+        let me: BindingBehaviorBuilder<any> = this;
+
+        let behavior = me.Add(new ChartBehavior());
+        behavior.Property = ChartBehavior.ItemsSourceProperty;
+        behavior.PInfo = new LamdaExpression(me.Owner.DataContext, itemsSource);
+        behavior.Expression = {};
+        behavior.Type = type;
+        behavior.Option = option;
+
+        let newMe = new ChartBindingBehaviorBuilder<any, any>(me.Owner);
+        newMe.CurrentBehavior = me.CurrentBehavior;
+        newMe.CurrentElement = me.CurrentElement;
+        return newMe;
     }
 
     BindingBehaviorBuilder.prototype.BuildChartOfLine = function (itemsSource: (x: any) => any, option?: ChartOptions) {
