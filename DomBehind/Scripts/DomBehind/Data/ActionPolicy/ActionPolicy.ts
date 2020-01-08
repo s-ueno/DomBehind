@@ -40,6 +40,25 @@
                     this.Done();
                     this.Always();
                     return result;
+                } else if (result instanceof Promise) {
+                    let dfd = $.Deferred();
+
+                    result.then(x => {
+                        this.Done();
+                        this.Always();
+                        dfd.resolve(x);
+                    }).catch(x => {
+                        let ex = new ActionPolicyExceptionEventArgs(this, x);
+                        this.Fail(ex);
+                        this.Always();
+
+                        if (!ex.Handled) {
+                            dfd.reject(ex);
+                        } else {
+                            dfd.reject(x);
+                        }
+                    });
+                    return dfd.promise();
                 } else {
                     let p: JQueryPromise<any> = result;
                     p.done(() => {

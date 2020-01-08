@@ -19,25 +19,13 @@ declare namespace DomBehind {
         height?: number;
         title?: string;
     }
-    class TemplatePopup extends Data.DataBindingBehavior implements IPopupController {
+    class TemplatePopup extends Data.RelativeDataBindingBehavior implements IPopupController {
         Option: IPopupOption;
         TitleExpression: LamdaExpression;
-        private _currentElement;
-        protected CurrentElement: JQuery;
-        protected Unsubscribe(value: JQuery): void;
-        protected Subscribe(value: JQuery): void;
-        protected Bindings: List<{
-            Binding: Data.BindingBehavior;
-            Selector: string;
-        }>;
-        readonly LastBinding: Data.BindingBehavior;
         Close(): void;
         Show(): void;
         Message(): void;
         protected CreateOption(): any;
-        UpdateTarget(): void;
-        UpdateSource(): void;
-        AddBinding<T extends Data.BindingBehavior>(binding: T, selector: string): T;
         protected FindTemplate(jtemplate: JQuery): JQuery;
     }
     class PopupTemplateBindingBuilder<T> extends Data.DataBindingBehaviorBuilder<T> {

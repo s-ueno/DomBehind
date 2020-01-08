@@ -2,23 +2,20 @@ var DomBehind;
 (function (DomBehind) {
     var Controls;
     (function (Controls) {
-        var Tooltip = (function () {
-            function Tooltip() {
+        class Tooltip {
+        }
+        Tooltip.TextProperty = DomBehind.Data.DependencyProperty.RegisterAttached("title", x => x.attr("title"), (x, y) => {
+            let element = x;
+            if (x.attr("type") === "checkbox") {
+                let parent = x.closest("label");
+                parent.tooltip();
+                parent.attr("title", y);
             }
-            Tooltip.TextProperty = DomBehind.Data.DependencyProperty.RegisterAttached("title", function (x) { return x.attr("title"); }, function (x, y) {
-                var element = x;
-                if (x.attr("type") === "checkbox") {
-                    var parent_1 = x.closest("label");
-                    parent_1.tooltip();
-                    parent_1.attr("title", y);
-                }
-                else {
-                    x.tooltip();
-                    x.attr("title", y);
-                }
-            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-            return Tooltip;
-        }());
+            else {
+                x.tooltip();
+                x.attr("title", y);
+            }
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
         Controls.Tooltip = Tooltip;
     })(Controls = DomBehind.Controls || (DomBehind.Controls = {}));
 })(DomBehind || (DomBehind = {}));

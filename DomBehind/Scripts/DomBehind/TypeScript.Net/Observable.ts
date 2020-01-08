@@ -25,7 +25,7 @@
         }) {
             if (source == null) return;
 
-            let keys = Object.keys(source);
+            let keys = Object.keys(<any>source);
             for (var i = 0; i < keys.length; i++) {
                 let name = keys[i];
                 if (String.IsNullOrWhiteSpace(name)) continue;

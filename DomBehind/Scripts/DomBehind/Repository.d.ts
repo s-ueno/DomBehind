@@ -4,6 +4,6 @@ declare namespace DomBehind {
         static AddService(context: string, getType: () => any, priority?: number): void;
         static RemoveService(context: string): void;
         static GetService<T>(context: string): T;
-        static CreateInstance<T>(resolveType: () => any): {};
+        static CreateInstance<T>(resolveType: () => any): unknown;
     }
 }

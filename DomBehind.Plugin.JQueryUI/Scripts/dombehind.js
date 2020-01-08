@@ -664,19 +664,6 @@ if( typeof module !== 'undefined' && module != null ) {
   module.exports = LZString
 }
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var collections;
 (function (collections) {
     var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -714,8 +701,7 @@ var collections;
         }
     }
     collections.defaultToString = defaultToString;
-    function makeString(item, join) {
-        if (join === void 0) { join = ","; }
+    function makeString(item, join = ",") {
         if (item === null) {
             return 'COLLECTION_NULL';
         }
@@ -780,7 +766,7 @@ var collections;
         };
     }
     collections.compareToEquals = compareToEquals;
-    var arrays;
+    let arrays;
     (function (arrays) {
         function indexOf(array, item, equalsFunction) {
             var equals = equalsFunction || collections.defaultEquals;
@@ -871,13 +857,13 @@ var collections;
         }
         arrays.forEach = forEach;
     })(arrays = collections.arrays || (collections.arrays = {}));
-    var LinkedList = (function () {
-        function LinkedList() {
+    class LinkedList {
+        constructor() {
             this.firstNode = null;
             this.lastNode = null;
             this.nElements = 0;
         }
-        LinkedList.prototype.add = function (item, index) {
+        add(item, index) {
             if (collections.isUndefined(index)) {
                 index = this.nElements;
             }
@@ -904,27 +890,27 @@ var collections;
             }
             this.nElements++;
             return true;
-        };
-        LinkedList.prototype.first = function () {
+        }
+        first() {
             if (this.firstNode !== null) {
                 return this.firstNode.element;
             }
             return undefined;
-        };
-        LinkedList.prototype.last = function () {
+        }
+        last() {
             if (this.lastNode !== null) {
                 return this.lastNode.element;
             }
             return undefined;
-        };
-        LinkedList.prototype.elementAtIndex = function (index) {
+        }
+        elementAtIndex(index) {
             var node = this.nodeAtIndex(index);
             if (node === null) {
                 return undefined;
             }
             return node.element;
-        };
-        LinkedList.prototype.indexOf = function (item, equalsFunction) {
+        }
+        indexOf(item, equalsFunction) {
             var equalsF = equalsFunction || collections.defaultEquals;
             if (collections.isUndefined(item)) {
                 return -1;
@@ -939,11 +925,11 @@ var collections;
                 currentNode = currentNode.next;
             }
             return -1;
-        };
-        LinkedList.prototype.contains = function (item, equalsFunction) {
+        }
+        contains(item, equalsFunction) {
             return (this.indexOf(item, equalsFunction) >= 0);
-        };
-        LinkedList.prototype.remove = function (item, equalsFunction) {
+        }
+        remove(item, equalsFunction) {
             var equalsF = equalsFunction || collections.defaultEquals;
             if (this.nElements < 1 || collections.isUndefined(item)) {
                 return false;
@@ -974,13 +960,13 @@ var collections;
                 currentNode = currentNode.next;
             }
             return false;
-        };
-        LinkedList.prototype.clear = function () {
+        }
+        clear() {
             this.firstNode = null;
             this.lastNode = null;
             this.nElements = 0;
-        };
-        LinkedList.prototype.equals = function (other, equalsFunction) {
+        }
+        equals(other, equalsFunction) {
             var eqF = equalsFunction || collections.defaultEquals;
             if (!(other instanceof collections.LinkedList)) {
                 return false;
@@ -989,8 +975,8 @@ var collections;
                 return false;
             }
             return this.equalsAux(this.firstNode, other.firstNode, eqF);
-        };
-        LinkedList.prototype.equalsAux = function (n1, n2, eqF) {
+        }
+        equalsAux(n1, n2, eqF) {
             while (n1 !== null) {
                 if (!eqF(n1.element, n2.element)) {
                     return false;
@@ -999,8 +985,8 @@ var collections;
                 n2 = n2.next;
             }
             return true;
-        };
-        LinkedList.prototype.removeElementAtIndex = function (index) {
+        }
+        removeElementAtIndex(index) {
             if (index < 0 || index >= this.nElements) {
                 return undefined;
             }
@@ -1027,8 +1013,8 @@ var collections;
             }
             this.nElements--;
             return element;
-        };
-        LinkedList.prototype.forEach = function (callback) {
+        }
+        forEach(callback) {
             var currentNode = this.firstNode;
             while (currentNode !== null) {
                 if (callback(currentNode.element) === false) {
@@ -1036,8 +1022,8 @@ var collections;
                 }
                 currentNode = currentNode.next;
             }
-        };
-        LinkedList.prototype.reverse = function () {
+        }
+        reverse() {
             var previous = null;
             var current = this.firstNode;
             var temp = null;
@@ -1050,8 +1036,8 @@ var collections;
             temp = this.firstNode;
             this.firstNode = this.lastNode;
             this.lastNode = temp;
-        };
-        LinkedList.prototype.toArray = function () {
+        }
+        toArray() {
             var array = [];
             var currentNode = this.firstNode;
             while (currentNode !== null) {
@@ -1059,17 +1045,17 @@ var collections;
                 currentNode = currentNode.next;
             }
             return array;
-        };
-        LinkedList.prototype.size = function () {
+        }
+        size() {
             return this.nElements;
-        };
-        LinkedList.prototype.isEmpty = function () {
+        }
+        isEmpty() {
             return this.nElements <= 0;
-        };
-        LinkedList.prototype.toString = function () {
+        }
+        toString() {
             return collections.arrays.toString(this.toArray());
-        };
-        LinkedList.prototype.nodeAtIndex = function (index) {
+        }
+        nodeAtIndex(index) {
             if (index < 0 || index >= this.nElements) {
                 return null;
             }
@@ -1081,30 +1067,29 @@ var collections;
                 node = node.next;
             }
             return node;
-        };
-        LinkedList.prototype.createNode = function (item) {
+        }
+        createNode(item) {
             return {
                 element: item,
                 next: null
             };
-        };
-        return LinkedList;
-    }());
+        }
+    }
     collections.LinkedList = LinkedList;
-    var Dictionary = (function () {
-        function Dictionary(toStrFunction) {
+    class Dictionary {
+        constructor(toStrFunction) {
             this.table = {};
             this.nElements = 0;
             this.toStr = toStrFunction || collections.defaultToString;
         }
-        Dictionary.prototype.getValue = function (key) {
+        getValue(key) {
             var pair = this.table['$' + this.toStr(key)];
             if (collections.isUndefined(pair)) {
                 return undefined;
             }
             return pair.value;
-        };
-        Dictionary.prototype.setValue = function (key, value) {
+        }
+        setValue(key, value) {
             if (collections.isUndefined(key) || collections.isUndefined(value)) {
                 return undefined;
             }
@@ -1123,8 +1108,8 @@ var collections;
                 value: value
             };
             return ret;
-        };
-        Dictionary.prototype.remove = function (key) {
+        }
+        remove(key) {
             var k = '$' + this.toStr(key);
             var previousElement = this.table[k];
             if (!collections.isUndefined(previousElement)) {
@@ -1133,8 +1118,8 @@ var collections;
                 return previousElement.value;
             }
             return undefined;
-        };
-        Dictionary.prototype.keys = function () {
+        }
+        keys() {
             var array = [];
             for (var name in this.table) {
                 if (has(this.table, name)) {
@@ -1143,8 +1128,8 @@ var collections;
                 }
             }
             return array;
-        };
-        Dictionary.prototype.values = function () {
+        }
+        values() {
             var array = [];
             for (var name in this.table) {
                 if (has(this.table, name)) {
@@ -1153,8 +1138,8 @@ var collections;
                 }
             }
             return array;
-        };
-        Dictionary.prototype.forEach = function (callback) {
+        }
+        forEach(callback) {
             for (var name in this.table) {
                 if (has(this.table, name)) {
                     var pair = this.table[name];
@@ -1164,88 +1149,84 @@ var collections;
                     }
                 }
             }
-        };
-        Dictionary.prototype.containsKey = function (key) {
+        }
+        containsKey(key) {
             return !collections.isUndefined(this.getValue(key));
-        };
-        Dictionary.prototype.clear = function () {
+        }
+        clear() {
             this.table = {};
             this.nElements = 0;
-        };
-        Dictionary.prototype.size = function () {
+        }
+        size() {
             return this.nElements;
-        };
-        Dictionary.prototype.isEmpty = function () {
+        }
+        isEmpty() {
             return this.nElements <= 0;
-        };
-        Dictionary.prototype.toString = function () {
+        }
+        toString() {
             var toret = "{";
-            this.forEach(function (k, v) {
+            this.forEach((k, v) => {
                 toret = toret + "\n\t" + k.toString() + " : " + v.toString();
             });
             return toret + "\n}";
-        };
-        return Dictionary;
-    }());
+        }
+    }
     collections.Dictionary = Dictionary;
-    var LinkedDictionaryPair = (function () {
-        function LinkedDictionaryPair(key, value) {
+    class LinkedDictionaryPair {
+        constructor(key, value) {
             this.key = key;
             this.value = value;
         }
-        LinkedDictionaryPair.prototype.unlink = function () {
+        unlink() {
             this.prev.next = this.next;
             this.next.prev = this.prev;
-        };
-        return LinkedDictionaryPair;
-    }());
-    var LinkedDictionary = (function (_super) {
-        __extends(LinkedDictionary, _super);
-        function LinkedDictionary(toStrFunction) {
-            var _this = _super.call(this, toStrFunction) || this;
-            _this.head = new LinkedDictionaryPair(null, null);
-            _this.tail = new LinkedDictionaryPair(null, null);
-            _this.head.next = _this.tail;
-            _this.tail.prev = _this.head;
-            return _this;
         }
-        LinkedDictionary.prototype.appendToTail = function (entry) {
+    }
+    class LinkedDictionary extends Dictionary {
+        constructor(toStrFunction) {
+            super(toStrFunction);
+            this.head = new LinkedDictionaryPair(null, null);
+            this.tail = new LinkedDictionaryPair(null, null);
+            this.head.next = this.tail;
+            this.tail.prev = this.head;
+        }
+        appendToTail(entry) {
             var lastNode = this.tail.prev;
             lastNode.next = entry;
             entry.prev = lastNode;
             entry.next = this.tail;
             this.tail.prev = entry;
-        };
-        LinkedDictionary.prototype.getLinkedDictionaryPair = function (key) {
+        }
+        getLinkedDictionaryPair(key) {
             if (collections.isUndefined(key)) {
                 return undefined;
             }
             var k = '$' + this.toStr(key);
             var pair = (this.table[k]);
             return pair;
-        };
-        LinkedDictionary.prototype.getValue = function (key) {
+        }
+        getValue(key) {
             var pair = this.getLinkedDictionaryPair(key);
             if (!collections.isUndefined(pair)) {
                 return pair.value;
             }
             return undefined;
-        };
-        LinkedDictionary.prototype.remove = function (key) {
+        }
+        remove(key) {
             var pair = this.getLinkedDictionaryPair(key);
             if (!collections.isUndefined(pair)) {
-                _super.prototype.remove.call(this, key);
+                super.remove(key);
                 pair.unlink();
                 return pair.value;
             }
             return undefined;
-        };
-        LinkedDictionary.prototype.clear = function () {
-            _super.prototype.clear.call(this);
+        }
+        clear() {
+            super.clear();
             this.head.next = this.tail;
             this.tail.prev = this.head;
-        };
-        LinkedDictionary.prototype.replace = function (oldPair, newPair) {
+        }
+        replace(oldPair, newPair) {
             var k = '$' + this.toStr(newPair.key);
             newPair.next = oldPair.next;
             newPair.prev = oldPair.prev;
@@ -1254,8 +1235,8 @@ var collections;
             newPair.next.prev = newPair;
             this.table[k] = newPair;
             ++this.nElements;
-        };
-        LinkedDictionary.prototype.setValue = function (key, value) {
+        }
+        setValue(key, value) {
             if (collections.isUndefined(key) || collections.isUndefined(value)) {
                 return undefined;
             }
@@ -1272,22 +1253,22 @@ var collections;
                 ++this.nElements;
                 return undefined;
             }
-        };
-        LinkedDictionary.prototype.keys = function () {
+        }
+        keys() {
             var array = [];
-            this.forEach(function (key, value) {
+            this.forEach((key, value) => {
                 array.push(key);
             });
             return array;
-        };
-        LinkedDictionary.prototype.values = function () {
+        }
+        values() {
             var array = [];
-            this.forEach(function (key, value) {
+            this.forEach((key, value) => {
                 array.push(value);
             });
             return array;
-        };
-        LinkedDictionary.prototype.forEach = function (callback) {
+        }
+        forEach(callback) {
             var crawlNode = this.head.next;
             while (crawlNode.next != null) {
                 var ret = callback(crawlNode.key, crawlNode.value);
@@ -1296,25 +1277,23 @@ var collections;
                 }
                 crawlNode = crawlNode.next;
             }
-        };
-        return LinkedDictionary;
-    }(Dictionary));
+        }
+    }
     collections.LinkedDictionary = LinkedDictionary;
-    var MultiDictionary = (function () {
-        function MultiDictionary(toStrFunction, valuesEqualsFunction, allowDuplicateValues) {
-            if (allowDuplicateValues === void 0) { allowDuplicateValues = false; }
+    class MultiDictionary {
+        constructor(toStrFunction, valuesEqualsFunction, allowDuplicateValues = false) {
             this.dict = new Dictionary(toStrFunction);
             this.equalsF = valuesEqualsFunction || collections.defaultEquals;
             this.allowDuplicate = allowDuplicateValues;
         }
-        MultiDictionary.prototype.getValue = function (key) {
+        getValue(key) {
             var values = this.dict.getValue(key);
             if (collections.isUndefined(values)) {
                 return [];
             }
             return collections.arrays.copy(values);
-        };
-        MultiDictionary.prototype.setValue = function (key, value) {
+        }
+        setValue(key, value) {
             if (collections.isUndefined(key) || collections.isUndefined(value)) {
                 return false;
             }
@@ -1330,8 +1309,8 @@ var collections;
             }
             array.push(value);
             return true;
-        };
-        MultiDictionary.prototype.remove = function (key, value) {
+        }
+        remove(key, value) {
             if (collections.isUndefined(value)) {
                 var v = this.dict.remove(key);
                 return !collections.isUndefined(v);
@@ -1344,11 +1323,11 @@ var collections;
                 return true;
             }
             return false;
-        };
-        MultiDictionary.prototype.keys = function () {
+        }
+        keys() {
             return this.dict.keys();
-        };
-        MultiDictionary.prototype.values = function () {
+        }
+        values() {
             var values = this.dict.values();
             var array = [];
             for (var i = 0; i < values.length; i++) {
@@ -1358,37 +1337,36 @@ var collections;
                 }
             }
             return array;
-        };
-        MultiDictionary.prototype.containsKey = function (key) {
+        }
+        containsKey(key) {
             return this.dict.containsKey(key);
-        };
-        MultiDictionary.prototype.clear = function () {
+        }
+        clear() {
             this.dict.clear();
-        };
-        MultiDictionary.prototype.size = function () {
+        }
+        size() {
             return this.dict.size();
-        };
-        MultiDictionary.prototype.isEmpty = function () {
+        }
+        isEmpty() {
             return this.dict.isEmpty();
-        };
-        return MultiDictionary;
-    }());
+        }
+    }
     collections.MultiDictionary = MultiDictionary;
-    var Heap = (function () {
-        function Heap(compareFunction) {
+    class Heap {
+        constructor(compareFunction) {
             this.data = [];
             this.compare = compareFunction || collections.defaultCompare;
         }
-        Heap.prototype.leftChildIndex = function (nodeIndex) {
+        leftChildIndex(nodeIndex) {
             return (2 * nodeIndex) + 1;
-        };
-        Heap.prototype.rightChildIndex = function (nodeIndex) {
+        }
+        rightChildIndex(nodeIndex) {
             return (2 * nodeIndex) + 2;
-        };
-        Heap.prototype.parentIndex = function (nodeIndex) {
+        }
+        parentIndex(nodeIndex) {
             return Math.floor((nodeIndex - 1) / 2);
-        };
-        Heap.prototype.minIndex = function (leftChild, rightChild) {
+        }
+        minIndex(leftChild, rightChild) {
             if (rightChild >= this.data.length) {
                 if (leftChild >= this.data.length) {
                     return -1;
@@ -1405,40 +1383,40 @@ var collections;
                     return rightChild;
                 }
             }
-        };
-        Heap.prototype.siftUp = function (index) {
+        }
+        siftUp(index) {
             var parent = this.parentIndex(index);
             while (index > 0 && this.compare(this.data[parent], this.data[index]) > 0) {
                 collections.arrays.swap(this.data, parent, index);
                 index = parent;
                 parent = this.parentIndex(index);
             }
-        };
-        Heap.prototype.siftDown = function (nodeIndex) {
+        }
+        siftDown(nodeIndex) {
             var min = this.minIndex(this.leftChildIndex(nodeIndex), this.rightChildIndex(nodeIndex));
             while (min >= 0 && this.compare(this.data[nodeIndex], this.data[min]) > 0) {
                 collections.arrays.swap(this.data, min, nodeIndex);
                 nodeIndex = min;
                 min = this.minIndex(this.leftChildIndex(nodeIndex), this.rightChildIndex(nodeIndex));
             }
-        };
-        Heap.prototype.peek = function () {
+        }
+        peek() {
             if (this.data.length > 0) {
                 return this.data[0];
             }
             else {
                 return undefined;
             }
-        };
-        Heap.prototype.add = function (element) {
+        }
+        add(element) {
             if (collections.isUndefined(element)) {
                 return undefined;
             }
             this.data.push(element);
             this.siftUp(this.data.length - 1);
             return true;
-        };
-        Heap.prototype.removeRoot = function () {
+        }
+        removeRoot() {
             if (this.data.length > 0) {
                 var obj = this.data[0];
                 this.data[0] = this.data[this.data.length - 1];
@@ -1449,149 +1427,145 @@ var collections;
                 return obj;
             }
             return undefined;
-        };
-        Heap.prototype.contains = function (element) {
+        }
+        contains(element) {
             var equF = collections.compareToEquals(this.compare);
             return collections.arrays.contains(this.data, element, equF);
-        };
-        Heap.prototype.size = function () {
+        }
+        size() {
             return this.data.length;
-        };
-        Heap.prototype.isEmpty = function () {
+        }
+        isEmpty() {
             return this.data.length <= 0;
-        };
-        Heap.prototype.clear = function () {
+        }
+        clear() {
             this.data.length = 0;
-        };
-        Heap.prototype.forEach = function (callback) {
+        }
+        forEach(callback) {
             collections.arrays.forEach(this.data, callback);
-        };
-        return Heap;
-    }());
+        }
+    }
     collections.Heap = Heap;
-    var Stack = (function () {
-        function Stack() {
+    class Stack {
+        constructor() {
             this.list = new LinkedList();
         }
-        Stack.prototype.push = function (elem) {
+        push(elem) {
             return this.list.add(elem, 0);
-        };
-        Stack.prototype.add = function (elem) {
+        }
+        add(elem) {
             return this.list.add(elem, 0);
-        };
-        Stack.prototype.pop = function () {
+        }
+        pop() {
             return this.list.removeElementAtIndex(0);
-        };
-        Stack.prototype.peek = function () {
+        }
+        peek() {
             return this.list.first();
-        };
-        Stack.prototype.size = function () {
+        }
+        size() {
             return this.list.size();
-        };
-        Stack.prototype.contains = function (elem, equalsFunction) {
+        }
+        contains(elem, equalsFunction) {
             return this.list.contains(elem, equalsFunction);
-        };
-        Stack.prototype.isEmpty = function () {
+        }
+        isEmpty() {
             return this.list.isEmpty();
-        };
-        Stack.prototype.clear = function () {
+        }
+        clear() {
             this.list.clear();
-        };
-        Stack.prototype.forEach = function (callback) {
+        }
+        forEach(callback) {
             this.list.forEach(callback);
-        };
-        return Stack;
-    }());
+        }
+    }
     collections.Stack = Stack;
-    var Queue = (function () {
-        function Queue() {
+    class Queue {
+        constructor() {
             this.list = new LinkedList();
         }
-        Queue.prototype.enqueue = function (elem) {
+        enqueue(elem) {
             return this.list.add(elem);
-        };
-        Queue.prototype.add = function (elem) {
+        }
+        add(elem) {
             return this.list.add(elem);
-        };
-        Queue.prototype.dequeue = function () {
+        }
+        dequeue() {
             if (this.list.size() !== 0) {
                 var el = this.list.first();
                 this.list.removeElementAtIndex(0);
                 return el;
             }
             return undefined;
-        };
-        Queue.prototype.peek = function () {
+        }
+        peek() {
             if (this.list.size() !== 0) {
                 return this.list.first();
             }
             return undefined;
-        };
-        Queue.prototype.size = function () {
+        }
+        size() {
             return this.list.size();
-        };
-        Queue.prototype.contains = function (elem, equalsFunction) {
+        }
+        contains(elem, equalsFunction) {
             return this.list.contains(elem, equalsFunction);
-        };
-        Queue.prototype.isEmpty = function () {
+        }
+        isEmpty() {
             return this.list.size() <= 0;
-        };
-        Queue.prototype.clear = function () {
+        }
+        clear() {
             this.list.clear();
-        };
-        Queue.prototype.forEach = function (callback) {
+        }
+        forEach(callback) {
             this.list.forEach(callback);
-        };
-        return Queue;
-    }());
+        }
+    }
     collections.Queue = Queue;
-    var PriorityQueue = (function () {
-        function PriorityQueue(compareFunction) {
+    class PriorityQueue {
+        constructor(compareFunction) {
             this.heap = new Heap(collections.reverseCompareFunction(compareFunction));
         }
-        PriorityQueue.prototype.enqueue = function (element) {
+        enqueue(element) {
             return this.heap.add(element);
-        };
-        PriorityQueue.prototype.add = function (element) {
+        }
+        add(element) {
             return this.heap.add(element);
-        };
-        PriorityQueue.prototype.dequeue = function () {
+        }
+        dequeue() {
             if (this.heap.size() !== 0) {
                 var el = this.heap.peek();
                 this.heap.removeRoot();
                 return el;
             }
             return undefined;
-        };
-        PriorityQueue.prototype.peek = function () {
+        }
+        peek() {
             return this.heap.peek();
-        };
-        PriorityQueue.prototype.contains = function (element) {
+        }
+        contains(element) {
             return this.heap.contains(element);
-        };
-        PriorityQueue.prototype.isEmpty = function () {
+        }
+        isEmpty() {
             return this.heap.isEmpty();
-        };
-        PriorityQueue.prototype.size = function () {
+        }
+        size() {
             return this.heap.size();
-        };
-        PriorityQueue.prototype.clear = function () {
+        }
+        clear() {
             this.heap.clear();
-        };
-        PriorityQueue.prototype.forEach = function (callback) {
+        }
+        forEach(callback) {
             this.heap.forEach(callback);
-        };
-        return PriorityQueue;
-    }());
+        }
+    }
     collections.PriorityQueue = PriorityQueue;
-    var Set = (function () {
-        function Set(toStringFunction) {
+    class Set {
+        constructor(toStringFunction) {
             this.dictionary = new Dictionary(toStringFunction);
         }
-        Set.prototype.contains = function (element) {
+        contains(element) {
             return this.dictionary.containsKey(element);
-        };
-        Set.prototype.add = function (element) {
+        }
+        add(element) {
             if (this.contains(element) || collections.isUndefined(element)) {
                 return false;
             }
@@ -1599,8 +1573,8 @@ var collections;
                 this.dictionary.setValue(element, element);
                 return true;
             }
-        };
-        Set.prototype.intersection = function (otherSet) {
+        }
+        intersection(otherSet) {
             var set = this;
             this.forEach(function (element) {
                 if (!otherSet.contains(element)) {
@@ -1608,22 +1582,22 @@ var collections;
                 }
                 return true;
             });
-        };
-        Set.prototype.union = function (otherSet) {
+        }
+        union(otherSet) {
             var set = this;
             otherSet.forEach(function (element) {
                 set.add(element);
                 return true;
             });
-        };
-        Set.prototype.difference = function (otherSet) {
+        }
+        difference(otherSet) {
             var set = this;
             otherSet.forEach(function (element) {
                 set.remove(element);
                 return true;
             });
-        };
-        Set.prototype.isSubsetOf = function (otherSet) {
+        }
+        isSubsetOf(otherSet) {
             if (this.size() > otherSet.size()) {
                 return false;
             }
@@ -1636,8 +1610,8 @@ var collections;
                 return true;
             });
             return isSub;
-        };
-        Set.prototype.remove = function (element) {
+        }
+        remove(element) {
             if (!this.contains(element)) {
                 return false;
             }
@@ -1645,38 +1619,36 @@ var collections;
                 this.dictionary.remove(element);
                 return true;
             }
-        };
-        Set.prototype.forEach = function (callback) {
+        }
+        forEach(callback) {
             this.dictionary.forEach(function (k, v) {
                 return callback(v);
             });
-        };
-        Set.prototype.toArray = function () {
+        }
+        toArray() {
             return this.dictionary.values();
-        };
-        Set.prototype.isEmpty = function () {
+        }
+        isEmpty() {
             return this.dictionary.isEmpty();
-        };
-        Set.prototype.size = function () {
+        }
+        size() {
             return this.dictionary.size();
-        };
-        Set.prototype.clear = function () {
+        }
+        clear() {
             this.dictionary.clear();
-        };
-        Set.prototype.toString = function () {
+        }
+        toString() {
             return collections.arrays.toString(this.toArray());
-        };
-        return Set;
-    }());
+        }
+    }
     collections.Set = Set;
-    var Bag = (function () {
-        function Bag(toStrFunction) {
+    class Bag {
+        constructor(toStrFunction) {
             this.toStrF = toStrFunction || collections.defaultToString;
             this.dictionary = new Dictionary(this.toStrF);
             this.nElements = 0;
         }
-        Bag.prototype.add = function (element, nCopies) {
-            if (nCopies === void 0) { nCopies = 1; }
+        add(element, nCopies = 1) {
             if (collections.isUndefined(element) || nCopies <= 0) {
                 return false;
             }
@@ -1692,20 +1664,19 @@ var collections;
             }
             this.nElements += nCopies;
             return true;
-        };
-        Bag.prototype.count = function (element) {
+        }
+        count(element) {
             if (!this.contains(element)) {
                 return 0;
             }
             else {
                 return this.dictionary.getValue(element).copies;
             }
-        };
-        Bag.prototype.contains = function (element) {
+        }
+        contains(element) {
             return this.dictionary.containsKey(element);
-        };
-        Bag.prototype.remove = function (element, nCopies) {
-            if (nCopies === void 0) { nCopies = 1; }
+        }
+        remove(element, nCopies = 1) {
             if (collections.isUndefined(element) || nCopies <= 0) {
                 return false;
             }
@@ -1726,8 +1697,8 @@ var collections;
                 }
                 return true;
             }
-        };
-        Bag.prototype.toArray = function () {
+        }
+        toArray() {
             var a = [];
             var values = this.dictionary.values();
             var vl = values.length;
@@ -1740,8 +1711,8 @@ var collections;
                 }
             }
             return a;
-        };
-        Bag.prototype.toSet = function () {
+        }
+        toSet() {
             var toret = new Set(this.toStrF);
             var elements = this.dictionary.values();
             var l = elements.length;
@@ -1750,8 +1721,8 @@ var collections;
                 toret.add(value);
             }
             return toret;
-        };
-        Bag.prototype.forEach = function (callback) {
+        }
+        forEach(callback) {
             this.dictionary.forEach(function (k, v) {
                 var value = v.value;
                 var copies = v.copies;
@@ -1762,27 +1733,26 @@ var collections;
                 }
                 return true;
             });
-        };
-        Bag.prototype.size = function () {
+        }
+        size() {
             return this.nElements;
-        };
-        Bag.prototype.isEmpty = function () {
+        }
+        isEmpty() {
             return this.nElements === 0;
-        };
-        Bag.prototype.clear = function () {
+        }
+        clear() {
             this.nElements = 0;
             this.dictionary.clear();
-        };
-        return Bag;
-    }());
+        }
+    }
     collections.Bag = Bag;
-    var BSTree = (function () {
-        function BSTree(compareFunction) {
+    class BSTree {
+        constructor(compareFunction) {
             this.root = null;
             this.compare = compareFunction || collections.defaultCompare;
             this.nElements = 0;
         }
-        BSTree.prototype.add = function (element) {
+        add(element) {
             if (collections.isUndefined(element)) {
                 return false;
             }
@@ -1791,24 +1761,24 @@ var collections;
                 return true;
             }
             return false;
-        };
-        BSTree.prototype.clear = function () {
+        }
+        clear() {
             this.root = null;
             this.nElements = 0;
-        };
-        BSTree.prototype.isEmpty = function () {
+        }
+        isEmpty() {
             return this.nElements === 0;
-        };
-        BSTree.prototype.size = function () {
+        }
+        size() {
             return this.nElements;
-        };
-        BSTree.prototype.contains = function (element) {
+        }
+        contains(element) {
             if (collections.isUndefined(element)) {
                 return false;
             }
             return this.searchNode(this.root, element) !== null;
-        };
-        BSTree.prototype.remove = function (element) {
+        }
+        remove(element) {
             var node = this.searchNode(this.root, element);
             if (node === null) {
                 return false;
@@ -1816,52 +1786,52 @@ var collections;
             this.removeNode(node);
             this.nElements--;
             return true;
-        };
-        BSTree.prototype.inorderTraversal = function (callback) {
+        }
+        inorderTraversal(callback) {
             this.inorderTraversalAux(this.root, callback, {
                 stop: false
             });
-        };
-        BSTree.prototype.preorderTraversal = function (callback) {
+        }
+        preorderTraversal(callback) {
             this.preorderTraversalAux(this.root, callback, {
                 stop: false
             });
-        };
-        BSTree.prototype.postorderTraversal = function (callback) {
+        }
+        postorderTraversal(callback) {
             this.postorderTraversalAux(this.root, callback, {
                 stop: false
             });
-        };
-        BSTree.prototype.levelTraversal = function (callback) {
+        }
+        levelTraversal(callback) {
             this.levelTraversalAux(this.root, callback);
-        };
-        BSTree.prototype.minimum = function () {
+        }
+        minimum() {
             if (this.isEmpty()) {
                 return undefined;
             }
             return this.minimumAux(this.root).element;
-        };
-        BSTree.prototype.maximum = function () {
+        }
+        maximum() {
             if (this.isEmpty()) {
                 return undefined;
             }
             return this.maximumAux(this.root).element;
-        };
-        BSTree.prototype.forEach = function (callback) {
+        }
+        forEach(callback) {
             this.inorderTraversal(callback);
-        };
-        BSTree.prototype.toArray = function () {
+        }
+        toArray() {
             var array = [];
             this.inorderTraversal(function (element) {
                 array.push(element);
                 return true;
             });
             return array;
-        };
-        BSTree.prototype.height = function () {
+        }
+        height() {
             return this.heightAux(this.root);
-        };
-        BSTree.prototype.searchNode = function (node, element) {
+        }
+        searchNode(node, element) {
             var cmp = null;
             while (node !== null && cmp !== 0) {
                 cmp = this.compare(element, node.element);
@@ -1873,8 +1843,8 @@ var collections;
                 }
             }
             return node;
-        };
-        BSTree.prototype.transplant = function (n1, n2) {
+        }
+        transplant(n1, n2) {
             if (n1.parent === null) {
                 this.root = n2;
             }
@@ -1887,8 +1857,8 @@ var collections;
             if (n2 !== null) {
                 n2.parent = n1.parent;
             }
-        };
-        BSTree.prototype.removeNode = function (node) {
+        }
+        removeNode(node) {
             if (node.leftCh === null) {
                 this.transplant(node, node.rightCh);
             }
@@ -1906,8 +1876,8 @@ var collections;
                 y.leftCh = node.leftCh;
                 y.leftCh.parent = y;
             }
-        };
-        BSTree.prototype.inorderTraversalAux = function (node, callback, signal) {
+        }
+        inorderTraversalAux(node, callback, signal) {
             if (node === null || signal.stop) {
                 return;
             }
@@ -1920,8 +1890,8 @@ var collections;
                 return;
             }
             this.inorderTraversalAux(node.rightCh, callback, signal);
-        };
-        BSTree.prototype.levelTraversalAux = function (node, callback) {
+        }
+        levelTraversalAux(node, callback) {
             var queue = new Queue();
             if (node !== null) {
                 queue.enqueue(node);
@@ -1938,8 +1908,8 @@ var collections;
                     queue.enqueue(node.rightCh);
                 }
             }
-        };
-        BSTree.prototype.preorderTraversalAux = function (node, callback, signal) {
+        }
+        preorderTraversalAux(node, callback, signal) {
             if (node === null || signal.stop) {
                 return;
             }
@@ -1952,8 +1922,8 @@ var collections;
                 return;
             }
             this.preorderTraversalAux(node.rightCh, callback, signal);
-        };
-        BSTree.prototype.postorderTraversalAux = function (node, callback, signal) {
+        }
+        postorderTraversalAux(node, callback, signal) {
             if (node === null || signal.stop) {
                 return;
             }
@@ -1966,26 +1936,26 @@ var collections;
                 return;
             }
             signal.stop = callback(node.element) === false;
-        };
-        BSTree.prototype.minimumAux = function (node) {
+        }
+        minimumAux(node) {
             while (node.leftCh !== null) {
                 node = node.leftCh;
             }
             return node;
-        };
-        BSTree.prototype.maximumAux = function (node) {
+        }
+        maximumAux(node) {
             while (node.rightCh !== null) {
                 node = node.rightCh;
             }
             return node;
-        };
-        BSTree.prototype.heightAux = function (node) {
+        }
+        heightAux(node) {
             if (node === null) {
                 return -1;
             }
             return Math.max(this.heightAux(node.leftCh), this.heightAux(node.rightCh)) + 1;
-        };
-        BSTree.prototype.insertNode = function (node) {
+        }
+        insertNode(node) {
             var parent = null;
             var position = this.root;
             var cmp = null;
@@ -2014,17 +1984,16 @@ var collections;
                 parent.rightCh = node;
             }
             return node;
-        };
-        BSTree.prototype.createNode = function (element) {
+        }
+        createNode(element) {
             return {
                 element: element,
                 leftCh: null,
                 rightCh: null,
                 parent: null
             };
-        };
-        return BSTree;
-    }());
+        }
+    }
     collections.BSTree = BSTree;
 })(collections || (collections = {}));
 //# sourceMappingURL=collections.js.map
@@ -2825,113 +2794,65 @@ function using(resource, func) {
 //# sourceMappingURL=IDisposable.js.map
 var DomBehind;
 (function (DomBehind) {
-    var EventArgs = (function () {
-        function EventArgs() {
-        }
-        return EventArgs;
-    }());
+    class EventArgs {
+    }
     DomBehind.EventArgs = EventArgs;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=EventArgs.js.map
 var DomBehind;
 (function (DomBehind) {
-    var CancelEventArgs = (function () {
-        function CancelEventArgs(Cancel) {
-            if (Cancel === void 0) { Cancel = false; }
+    class CancelEventArgs {
+        constructor(Cancel = false) {
             this.Cancel = Cancel;
         }
-        return CancelEventArgs;
-    }());
+    }
     DomBehind.CancelEventArgs = CancelEventArgs;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=CancelEventArgs.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
-    var CollectionChangedEventArgs = (function (_super) {
-        __extends(CollectionChangedEventArgs, _super);
-        function CollectionChangedEventArgs() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        return CollectionChangedEventArgs;
-    }(DomBehind.EventArgs));
+    class CollectionChangedEventArgs extends DomBehind.EventArgs {
+    }
     DomBehind.CollectionChangedEventArgs = CollectionChangedEventArgs;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=CollectionChangedEventArgs.js.map
 var DomBehind;
 (function (DomBehind) {
-    var Exception = (function () {
-        function Exception(Message) {
+    class Exception {
+        constructor(Message) {
             this.Message = Message;
         }
-        Exception.prototype.ToString = function () { return this.Message; };
-        return Exception;
-    }());
+        ToString() { return this.Message; }
+    }
     DomBehind.Exception = Exception;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Exception.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
-    var AjaxException = (function (_super) {
-        __extends(AjaxException, _super);
-        function AjaxException(JqXHR, TextStatus, ErrorThrown) {
-            var _this = _super.call(this, TextStatus) || this;
-            _this.JqXHR = JqXHR;
-            _this.TextStatus = TextStatus;
-            _this.ErrorThrown = ErrorThrown;
-            return _this;
+    class AjaxException extends DomBehind.Exception {
+        constructor(JqXHR, TextStatus, ErrorThrown) {
+            super(TextStatus);
+            this.JqXHR = JqXHR;
+            this.TextStatus = TextStatus;
+            this.ErrorThrown = ErrorThrown;
         }
-        Object.defineProperty(AjaxException.prototype, "ErrorStatus", {
-            get: function () {
-                return (this.JqXHR) ? this.JqXHR.status : null;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(AjaxException.prototype, "ErrorTitle", {
-            get: function () {
-                if (this.JqXHR) {
-                    var json = this.JqXHR.responseJSON;
-                    if (json && json.Message) {
-                        return json.Message;
-                    }
-                    return $(this.JqXHR.responseText).filter("title").text();
+        get ErrorStatus() {
+            return (this.JqXHR) ? this.JqXHR.status : null;
+        }
+        get ErrorTitle() {
+            if (this.JqXHR) {
+                let json = this.JqXHR.responseJSON;
+                if (json && json.Message) {
+                    return json.Message;
                 }
-                return this.TextStatus + ":" + this.ErrorThrown;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        AjaxException.prototype.ToString = function () {
-            return "status:" + this.ErrorStatus + "\n" + this.ErrorTitle;
-        };
-        return AjaxException;
-    }(DomBehind.Exception));
+                return $(this.JqXHR.responseText).filter("title").text();
+            }
+            return `${this.TextStatus}:${this.ErrorThrown}`;
+        }
+        ToString() {
+            return `status:${this.ErrorStatus}\n${this.ErrorTitle}`;
+        }
+    }
     DomBehind.AjaxException = AjaxException;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=AjaxException.js.map
@@ -2939,219 +2860,155 @@ var DomBehind;
 (function (DomBehind) {
     var Validation;
     (function (Validation) {
-        var ValidationException = (function () {
-            function ValidationException(Message, Selector) {
+        class ValidationException {
+            constructor(Message, Selector) {
                 this.Message = Message;
                 this.Selector = Selector;
             }
-            return ValidationException;
-        }());
+        }
         Validation.ValidationException = ValidationException;
-        var AggregateValidationException = (function () {
-            function AggregateValidationException(Items) {
+        class AggregateValidationException {
+            constructor(Items) {
                 this.Items = Items;
             }
-            return AggregateValidationException;
-        }());
+        }
         Validation.AggregateValidationException = AggregateValidationException;
     })(Validation = DomBehind.Validation || (DomBehind.Validation = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=ValidationException.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
-    var ApplicationException = (function (_super) {
-        __extends(ApplicationException, _super);
-        function ApplicationException(Message) {
-            var _this = _super.call(this) || this;
-            _this.Message = Message;
-            _this = _super.call(this, Message) || this;
-            return _this;
+    class ApplicationException extends DomBehind.Exception {
+        constructor(Message) {
+            super();
+            this.Message = Message;
+            super(Message);
         }
-        ApplicationException.prototype.ToString = function () { return this.Message; };
-        return ApplicationException;
-    }(DomBehind.Exception));
+        ToString() { return this.Message; }
+    }
     DomBehind.ApplicationException = ApplicationException;
-    var ApplicationAggregateException = (function (_super) {
-        __extends(ApplicationAggregateException, _super);
-        function ApplicationAggregateException(exceptions) {
-            var _this = _super.call(this) || this;
-            _this.exceptions = exceptions;
-            return _this;
+    class ApplicationAggregateException extends DomBehind.Exception {
+        constructor(exceptions) {
+            super();
+            this.exceptions = exceptions;
         }
-        return ApplicationAggregateException;
-    }(DomBehind.Exception));
+    }
     DomBehind.ApplicationAggregateException = ApplicationAggregateException;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=ApplicationException.js.map
 var DomBehind;
 (function (DomBehind) {
-    var TypedEvent = (function () {
-        function TypedEvent() {
+    class TypedEvent {
+        constructor() {
             this.handlers = [];
             this._disposed = false;
         }
-        Object.defineProperty(TypedEvent.prototype, "EventName", {
-            get: function () {
-                return this._eventName;
-            },
-            set: function (value) {
-                this._eventName = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        TypedEvent.prototype.AddHandler = function (handler) {
+        get EventName() {
+            return this._eventName;
+        }
+        set EventName(value) {
+            this._eventName = value;
+        }
+        AddHandler(handler) {
             this.handlers.push(handler);
-        };
-        TypedEvent.prototype.RemoveHandler = function (handler) {
-            this.handlers = this.handlers.filter(function (h) { return h !== handler; });
-        };
-        TypedEvent.prototype.Raise = function (sender, data) {
-            this.handlers.slice(0).forEach(function (h) { return h(sender, data); });
-        };
-        TypedEvent.prototype.Clear = function () {
-            var _this = this;
-            $.each(this.handlers, function (i, each) {
-                _this.handlers[i] = null;
+        }
+        RemoveHandler(handler) {
+            this.handlers = this.handlers.filter(h => h !== handler);
+        }
+        Raise(sender, data) {
+            this.handlers.slice(0).forEach(h => h(sender, data));
+        }
+        Clear() {
+            $.each(this.handlers, (i, each) => {
+                this.handlers[i] = null;
             });
             this.handlers = [];
-        };
-        TypedEvent.prototype.Ensure = function (behavior) {
+        }
+        Ensure(behavior) {
             if (this.EnsureHandler) {
                 this.EnsureHandler(behavior);
             }
-        };
-        TypedEvent.prototype.Dispose = function () {
+        }
+        Dispose() {
             if (!this._disposed) {
                 if (this.handlers) {
                     this.handlers.length = 0;
                 }
             }
             this._disposed = true;
-        };
-        return TypedEvent;
-    }());
+        }
+    }
     DomBehind.TypedEvent = TypedEvent;
-    var EventBuilder = (function () {
-        function EventBuilder(eventName) {
+    class EventBuilder {
+        constructor(eventName) {
             this._eventName = eventName;
         }
-        EventBuilder.prototype.Create = function () {
-            var event = new TypedEvent();
+        Create() {
+            let event = new TypedEvent();
             event.EventName = this.EventName;
             event.EnsureHandler = this.ensureHandler;
             return event;
-        };
-        Object.defineProperty(EventBuilder.prototype, "EventName", {
-            get: function () {
-                return this._eventName;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        EventBuilder.RegisterAttached = function (eventName, ensure) {
-            var builder = new EventBuilder(eventName);
+        }
+        get EventName() {
+            return this._eventName;
+        }
+        static RegisterAttached(eventName, ensure) {
+            let builder = new EventBuilder(eventName);
             builder.ensureHandler = ensure;
             return builder;
-        };
-        return EventBuilder;
-    }());
+        }
+    }
     DomBehind.EventBuilder = EventBuilder;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=EventBuilder.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
-    var PropertyChangedEventArgs = (function (_super) {
-        __extends(PropertyChangedEventArgs, _super);
-        function PropertyChangedEventArgs(Name) {
-            var _this = _super.call(this) || this;
-            _this.Name = Name;
-            return _this;
+    class PropertyChangedEventArgs extends DomBehind.EventArgs {
+        constructor(Name) {
+            super();
+            this.Name = Name;
         }
-        return PropertyChangedEventArgs;
-    }(DomBehind.EventArgs));
+    }
     DomBehind.PropertyChangedEventArgs = PropertyChangedEventArgs;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=INotifyPropertyChanged.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
-    var PropertyChangingEventArgs = (function (_super) {
-        __extends(PropertyChangingEventArgs, _super);
-        function PropertyChangingEventArgs(Name, OldValue, NewValue) {
-            var _this = _super.call(this) || this;
-            _this.Name = Name;
-            _this.OldValue = OldValue;
-            _this.NewValue = NewValue;
-            return _this;
+    class PropertyChangingEventArgs extends DomBehind.EventArgs {
+        constructor(Name, OldValue, NewValue) {
+            super();
+            this.Name = Name;
+            this.OldValue = OldValue;
+            this.NewValue = NewValue;
         }
-        return PropertyChangingEventArgs;
-    }(DomBehind.EventArgs));
+    }
     DomBehind.PropertyChangingEventArgs = PropertyChangingEventArgs;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=INotifyPropertyChanging.js.map
 var DomBehind;
 (function (DomBehind) {
-    var NotifiableImp = (function () {
-        function NotifiableImp() {
+    class NotifiableImp {
+        constructor() {
             this.PropertyChanged = new DomBehind.TypedEvent();
             this._dic = {};
             this._disposed = false;
         }
-        NotifiableImp.prototype.GetProperty = function (name, defaultValue) {
-            var obj = this._dic[name];
+        GetProperty(name, defaultValue) {
+            let obj = this._dic[name];
             return Object.IsNullOrUndefined(obj) ? defaultValue : obj;
-        };
-        NotifiableImp.prototype.SetProperty = function (name, value) {
+        }
+        SetProperty(name, value) {
             var result = false;
-            var oldValue = this.GetProperty(name);
+            let oldValue = this.GetProperty(name);
             if (value !== oldValue) {
                 result = true;
                 this._dic[name] = value;
-                this._dic[name + "_old___"] = oldValue;
+                this._dic[`${name}_old___`] = oldValue;
                 this.OnPropertyChanged(name);
             }
             return result;
-        };
-        NotifiableImp.prototype.Dispose = function () {
+        }
+        Dispose() {
             if (!this._disposed) {
                 this._dic = null;
                 if (this.PropertyChanged) {
@@ -3159,40 +3016,26 @@ var DomBehind;
                 }
             }
             this._disposed = true;
-        };
-        NotifiableImp.prototype.OnPropertyChanged = function (name) {
+        }
+        OnPropertyChanged(name) {
             this.PropertyChanged.Raise(this, new DomBehind.PropertyChangedEventArgs(name));
-        };
-        return NotifiableImp;
-    }());
+        }
+    }
     DomBehind.NotifiableImp = NotifiableImp;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=NotifiableImp.js.map
 //# sourceMappingURL=IValueConverter.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
-    var PropertyInfo = (function () {
-        function PropertyInfo(DataContext, MemberPath) {
+    class PropertyInfo {
+        constructor(DataContext, MemberPath) {
             this.DataContext = DataContext;
             this.MemberPath = MemberPath;
         }
-        PropertyInfo.prototype.SetValue = function (value) {
+        SetValue(value) {
             var arr = this.MemberPath.split(".");
             var lastDataContext = this.DataContext;
-            $.each(arr.slice(0, arr.length - 1), function (i, source) {
+            $.each(arr.slice(0, arr.length - 1), (i, source) => {
                 if (Object.IsNullOrUndefined(lastDataContext)) {
                     return false;
                 }
@@ -3203,11 +3046,11 @@ var DomBehind;
             }
             var path = arr[arr.length - 1];
             lastDataContext[path] = value;
-        };
-        PropertyInfo.prototype.GetValue = function () {
+        }
+        GetValue() {
             var arr = this.MemberPath.split(".");
             var lastDataContext = this.DataContext;
-            $.each(arr.slice(0, arr.length - 1), function (i, source) {
+            $.each(arr.slice(0, arr.length - 1), (i, source) => {
                 if (Object.IsNullOrUndefined(lastDataContext)) {
                     return false;
                 }
@@ -3218,138 +3061,111 @@ var DomBehind;
             }
             var path = arr[arr.length - 1];
             return lastDataContext[path];
-        };
-        PropertyInfo.prototype.Dispose = function () {
+        }
+        Dispose() {
             this.DataContext = null;
             this.MemberPath = null;
-        };
-        return PropertyInfo;
-    }());
-    DomBehind.PropertyInfo = PropertyInfo;
-    var LamdaExpression = (function (_super) {
-        __extends(LamdaExpression, _super);
-        function LamdaExpression(dataContext, Lamda) {
-            var _this = _super.call(this, dataContext, LamdaExpression.ParsePropertyPath(Lamda)) || this;
-            _this.Lamda = Lamda;
-            return _this;
         }
-        LamdaExpression.ParsePropertyPath = function (exp) {
+    }
+    DomBehind.PropertyInfo = PropertyInfo;
+    class LamdaExpression extends PropertyInfo {
+        constructor(dataContext, Lamda) {
+            super(dataContext, LamdaExpression.ParsePropertyPath(Lamda));
+            this.Lamda = Lamda;
+        }
+        static ParsePropertyPath(exp) {
             var path = LamdaExpression.NameOf(exp);
             return path.split(".").slice(1).join(".");
-        };
-        LamdaExpression.NameOf = function (expression) {
-            var m = LamdaExpression._extractor_Minified.exec(expression + "");
-            var s = m[1].trim();
+        }
+        static NameOf(expression) {
+            let m = LamdaExpression._extractor_Minified.exec(expression + "");
+            let s = m[1].trim();
             if (s.charAt(s.length - 1) === "}" ||
                 s.charAt(s.length - 1) === ";") {
                 m = LamdaExpression._extractor.exec(expression + "");
                 s = m[1];
             }
             return s;
-        };
-        LamdaExpression.prototype.Dispose = function () {
-            this.Lamda = null;
-            _super.prototype.Dispose.call(this);
-        };
-        LamdaExpression.Path = function (exp) {
-            return LamdaExpression.ParsePropertyPath(exp);
-        };
-        LamdaExpression.GetValueCore = function (dataContext, lamda) {
-            var exp = new LamdaExpression(dataContext, lamda);
-            return exp.GetValue();
-        };
-        LamdaExpression._extractor = new RegExp("return (.*);");
-        LamdaExpression._extractor_Minified = new RegExp("return (.*)}");
-        return LamdaExpression;
-    }(PropertyInfo));
-    DomBehind.LamdaExpression = LamdaExpression;
-    var BooleanFakeExpression = (function (_super) {
-        __extends(BooleanFakeExpression, _super);
-        function BooleanFakeExpression(Value) {
-            var _this = _super.call(this, null, ".") || this;
-            _this.Value = Value;
-            return _this;
         }
-        BooleanFakeExpression.prototype.SetValue = function (value) {
-        };
-        BooleanFakeExpression.prototype.GetValue = function () {
+        Dispose() {
+            this.Lamda = null;
+            super.Dispose();
+        }
+        static Path(exp) {
+            return LamdaExpression.ParsePropertyPath(exp);
+        }
+        static GetValueCore(dataContext, lamda) {
+            let exp = new LamdaExpression(dataContext, lamda);
+            return exp.GetValue();
+        }
+    }
+    LamdaExpression._extractor = new RegExp("return (.*);");
+    LamdaExpression._extractor_Minified = new RegExp("return (.*)}");
+    DomBehind.LamdaExpression = LamdaExpression;
+    class BooleanFakeExpression extends PropertyInfo {
+        constructor(Value) {
+            super(null, ".");
+            this.Value = Value;
+        }
+        SetValue(value) {
+        }
+        GetValue() {
             return this.Value;
-        };
-        return BooleanFakeExpression;
-    }(PropertyInfo));
+        }
+    }
     DomBehind.BooleanFakeExpression = BooleanFakeExpression;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=PropertyInfo.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ListCollectionView = (function (_super) {
-            __extends(ListCollectionView, _super);
-            function ListCollectionView(source, DisplayMemberPath) {
-                var _this = _super.call(this) || this;
-                _this.DisplayMemberPath = DisplayMemberPath;
-                _this.CurrentChanging = new DomBehind.TypedEvent();
-                _this.CurrentChanged = new DomBehind.TypedEvent();
-                _this.Added = new DomBehind.TypedEvent();
-                _this.Removed = new DomBehind.TypedEvent();
-                _this.engaged = false;
-                _this.Source = new collections.LinkedList();
-                _this.List = new collections.LinkedList();
-                $.each(source, function (i, value) {
-                    _this.Source.add(value);
-                    _this.List.add(value);
+        class ListCollectionView extends DomBehind.NotifiableImp {
+            constructor(source, DisplayMemberPath) {
+                super();
+                this.DisplayMemberPath = DisplayMemberPath;
+                this.CurrentChanging = new DomBehind.TypedEvent();
+                this.CurrentChanged = new DomBehind.TypedEvent();
+                this.Added = new DomBehind.TypedEvent();
+                this.Removed = new DomBehind.TypedEvent();
+                this.engaged = false;
+                this.Source = new collections.LinkedList();
+                this.List = new collections.LinkedList();
+                $.each(source, (i, value) => {
+                    this.Source.add(value);
+                    this.List.add(value);
                 });
-                _this.ViewReflected = ListCollectionView.ViewReflectedStatus.None;
-                return _this;
+                this.ViewReflected = ListCollectionView.ViewReflectedStatus.None;
             }
-            Object.defineProperty(ListCollectionView.prototype, "Current", {
-                get: function () { return this._current; },
-                set: function (value) {
-                    if (this.OnCurrentChanging().Cancel)
-                        return;
-                    this._current = value;
-                    this.ViewReflected = ListCollectionView.ViewReflectedStatus.NoReflected;
-                    if (this.engaged)
-                        return;
-                    this.OnCurrentChanged();
-                    this.OnPropertyChanged("Current");
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ListCollectionView.prototype.OnCurrentChanging = function () {
+            get Current() { return this._current; }
+            set Current(value) {
+                if (this.OnCurrentChanging().Cancel)
+                    return;
+                this._current = value;
+                this.ViewReflected = ListCollectionView.ViewReflectedStatus.NoReflected;
+                if (this.engaged)
+                    return;
+                this.OnCurrentChanged();
+                this.OnPropertyChanged("Current");
+            }
+            OnCurrentChanging() {
                 var e = new DomBehind.CancelEventArgs();
                 this.CurrentChanging.Raise(this, e);
                 return e;
-            };
-            ListCollectionView.prototype.OnCurrentChanged = function () {
+            }
+            OnCurrentChanged() {
                 if (this.engaged)
                     return;
                 this.CurrentChanged.Raise(this, new DomBehind.EventArgs());
-            };
-            ListCollectionView.prototype.Find = function (predicate) {
+            }
+            Find(predicate) {
                 return this.List.toArray().FirstOrDefault(predicate);
-            };
-            ListCollectionView.prototype.Contains = function (obj) {
-                var _this = this;
+            }
+            Contains(obj) {
                 if (obj instanceof Array) {
                     var contains = true;
-                    $.each(obj, function (i, value) {
-                        if (!_this.List.contains(value)) {
+                    $.each(obj, (i, value) => {
+                        if (!this.List.contains(value)) {
                             contains = false;
                             return false;
                         }
@@ -3357,43 +3173,42 @@ var DomBehind;
                     return contains;
                 }
                 return this.List.contains(obj);
-            };
-            ListCollectionView.prototype.Select = function (obj) {
+            }
+            Select(obj) {
                 this.Current = obj;
                 return this;
-            };
-            ListCollectionView.prototype.UnSelect = function () {
+            }
+            UnSelect() {
                 this.Current = null;
                 return this;
-            };
-            ListCollectionView.prototype.MoveFirst = function () {
+            }
+            MoveFirst() {
                 this.Current = this.List.first();
                 return this;
-            };
-            ListCollectionView.prototype.MoveLast = function () {
+            }
+            MoveLast() {
                 this.Current = this.List.last();
                 return this;
-            };
-            ListCollectionView.prototype.MoveToPosition = function (index) {
+            }
+            MoveToPosition(index) {
                 this.Current = this.List.elementAtIndex(index);
                 return this;
-            };
-            ListCollectionView.prototype.Refresh = function () {
+            }
+            Refresh() {
                 this.RefreshRaw();
                 this.OnPropertyChanged();
                 return this;
-            };
-            ListCollectionView.prototype.RefreshRaw = function () {
-                var _this = this;
+            }
+            RefreshRaw() {
                 this.List = new collections.LinkedList();
-                $.each(this.Source.toArray(), function (i, value) {
-                    if (_this.Filter) {
-                        if (_this.Filter(value)) {
-                            _this.List.add(value);
+                $.each(this.Source.toArray(), (i, value) => {
+                    if (this.Filter) {
+                        if (this.Filter(value)) {
+                            this.List.add(value);
                         }
                     }
                     else {
-                        _this.List.add(value);
+                        this.List.add(value);
                     }
                 });
                 if (this.Current) {
@@ -3401,21 +3216,21 @@ var DomBehind;
                         this.MoveFirst();
                     }
                 }
-            };
-            ListCollectionView.prototype.OnPropertyChanged = function (name) {
+            }
+            OnPropertyChanged(name) {
                 if (this.engaged)
                     return;
                 this.PropertyChanged.Raise(this, new DomBehind.PropertyChangedEventArgs(name));
-            };
-            ListCollectionView.prototype.Begin = function () {
+            }
+            Begin() {
                 this.engaged = true;
                 return this;
-            };
-            ListCollectionView.prototype.End = function () {
+            }
+            End() {
                 this.engaged = false;
                 return this;
-            };
-            ListCollectionView.prototype.Add = function (obj) {
+            }
+            Add(obj) {
                 this.Source.add(obj);
                 this.RefreshRaw();
                 this.ViewReflected = ListCollectionView.ViewReflectedStatus.NoReflected;
@@ -3423,8 +3238,8 @@ var DomBehind;
                 e.Item = obj;
                 this.Added.Raise(this, e);
                 this.OnPropertyChanged("Source - Add");
-            };
-            ListCollectionView.prototype.Remove = function (obj) {
+            }
+            Remove(obj) {
                 this.Source.remove(obj);
                 this.RefreshRaw();
                 this.ViewReflected = ListCollectionView.ViewReflectedStatus.NoReflected;
@@ -3432,15 +3247,13 @@ var DomBehind;
                 e.Item = obj;
                 this.Removed.Raise(this, e);
                 this.OnPropertyChanged("Source - Remove");
-            };
-            ListCollectionView.prototype.ToArray = function () {
-                var _this = this;
+            }
+            ToArray() {
                 return (this.Filter) ?
-                    this.List.toArray().Where(function (x) { return _this.Filter(x); }) :
+                    this.List.toArray().Where(x => this.Filter(x)) :
                     this.List.toArray();
-            };
-            return ListCollectionView;
-        }(DomBehind.NotifiableImp));
+            }
+        }
         Data.ListCollectionView = ListCollectionView;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
@@ -3449,7 +3262,7 @@ var DomBehind;
     (function (Data) {
         var ListCollectionView;
         (function (ListCollectionView) {
-            var ViewReflectedStatus;
+            let ViewReflectedStatus;
             (function (ViewReflectedStatus) {
                 ViewReflectedStatus[ViewReflectedStatus["None"] = 0] = "None";
                 ViewReflectedStatus[ViewReflectedStatus["NoReflected"] = 1] = "NoReflected";
@@ -3463,7 +3276,7 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var UpdateSourceTrigger;
+        let UpdateSourceTrigger;
         (function (UpdateSourceTrigger) {
             UpdateSourceTrigger[UpdateSourceTrigger["Explicit"] = 0] = "Explicit";
             UpdateSourceTrigger[UpdateSourceTrigger["LostForcus"] = 1] = "LostForcus";
@@ -3476,7 +3289,7 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var BindingMode;
+        let BindingMode;
         (function (BindingMode) {
             BindingMode[BindingMode["TwoWay"] = 0] = "TwoWay";
             BindingMode[BindingMode["OneWay"] = 1] = "OneWay";
@@ -3485,56 +3298,37 @@ var DomBehind;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=BindingMode.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
-    var List = (function (_super) {
-        __extends(List, _super);
-        function List() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        return List;
-    }(collections.LinkedList));
+    class List extends collections.LinkedList {
+    }
     DomBehind.List = List;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=List.js.map
 var DomBehind;
 (function (DomBehind) {
-    var Observable = (function () {
-        function Observable(source, option) {
-            var _this = this;
+    class Observable {
+        constructor(source, option) {
             this.source = source;
             this.PropertyChanging = new DomBehind.TypedEvent();
             this.PropertyChanged = new DomBehind.TypedEvent();
             if (source == null)
                 return;
-            var keys = Object.keys(source);
+            let keys = Object.keys(source);
             for (var i = 0; i < keys.length; i++) {
-                var name_1 = keys[i];
-                if (String.IsNullOrWhiteSpace(name_1))
+                let name = keys[i];
+                if (String.IsNullOrWhiteSpace(name))
                     continue;
                 if (option) {
                     this.Wrapper = option.wrapper;
                     if (option.marks) {
-                        $.each(option.marks, function (i, value) {
-                            var buff = value.Split(".");
-                            var parentName = "";
-                            $.each(buff, function (k, each) {
-                                _this.Recurcive(source, each, parentName);
+                        $.each(option.marks, (i, value) => {
+                            let buff = value.Split(".");
+                            let parentName = "";
+                            $.each(buff, (k, each) => {
+                                this.Recurcive(source, each, parentName);
                                 if (parentName) {
-                                    parentName = parentName + "." + each;
+                                    parentName = `${parentName}.${each}`;
                                 }
                                 else {
                                     parentName = each;
@@ -3543,50 +3337,42 @@ var DomBehind;
                         });
                     }
                     else {
-                        this.Recurcive(source, name_1, null);
+                        this.Recurcive(source, name, null);
                     }
                 }
                 else {
-                    this.Recurcive(source, name_1, null);
+                    this.Recurcive(source, name, null);
                 }
             }
         }
-        Observable.Register = function (target) {
-            var marks = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                marks[_i - 1] = arguments[_i];
-            }
+        static Register(target, ...marks) {
             return new Observable(target, { marks: marks });
-        };
-        Observable.RegisterAttached = function (target, option) {
+        }
+        static RegisterAttached(target, option) {
             return new Observable(target, option);
-        };
-        Observable.prototype.Recurcive = function (source, name, parentName) {
-            var value = source[name];
-            var notifibleName = (parentName) ? parentName + "." + name : name;
+        }
+        Recurcive(source, name, parentName) {
+            let value = source[name];
+            let notifibleName = (parentName) ? `${parentName}.${name}` : name;
             Object.defineProperty(source, name, this.CreateDescriptor(notifibleName, value));
             if (Object.IsNullOrUndefined(value))
                 return;
             if (typeof value !== "object")
                 return;
-            var keys = Object.keys(value);
+            let keys = Object.keys(value);
             for (var i = 0; i < keys.length; i++) {
                 this.Recurcive(value, keys[i], notifibleName);
             }
-        };
-        Object.defineProperty(Observable.prototype, "Source", {
-            get: function () {
-                return this.source;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Observable.prototype.CreateDescriptor = function (notifibleName, value) {
-            var changing = this.PropertyChanging;
-            var notifier = this.PropertyChanged;
-            var wrapper = this.Wrapper;
-            var e = new DomBehind.PropertyChangedEventArgs(notifibleName);
-            var sender = this.source;
+        }
+        get Source() {
+            return this.source;
+        }
+        CreateDescriptor(notifibleName, value) {
+            let changing = this.PropertyChanging;
+            let notifier = this.PropertyChanged;
+            let wrapper = this.Wrapper;
+            let e = new DomBehind.PropertyChangedEventArgs(notifibleName);
+            let sender = this.source;
             return {
                 get: function () {
                     if (wrapper)
@@ -3601,9 +3387,8 @@ var DomBehind;
                 enumerable: true,
                 configurable: true
             };
-        };
-        return Observable;
-    }());
+        }
+    }
     DomBehind.Observable = Observable;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Observable.js.map
@@ -3614,7 +3399,7 @@ Object.defineProperty(String.prototype, "ExtendedPrototype", {
     enumerable: false,
     writable: true,
     value: function (key, value) {
-        var me = this;
+        let me = this;
         Object.defineProperty(key, me, {
             configurable: true,
             enumerable: false,
@@ -3625,25 +3410,25 @@ Object.defineProperty(String.prototype, "ExtendedPrototype", {
 });
 //# sourceMappingURL=PropertyDescriptorExtensions.js.map
 "Where".ExtendedPrototype(Array.prototype, function (predicate) {
-    var me = this;
-    return me.filter(function (value) { return predicate(value); });
+    let me = this;
+    return me.filter(value => predicate(value));
 });
 "Select".ExtendedPrototype(Array.prototype, function (select) {
-    var me = this;
-    return me.map(function (x) { return select(x); });
+    let me = this;
+    return me.map(x => select(x));
 });
 "Any".ExtendedPrototype(Array.prototype, function (predicate) {
-    var me = this;
+    let me = this;
     if (!predicate) {
         return me.length !== 0;
     }
-    return me.some(function (x) { return predicate(x); });
+    return me.some(x => predicate(x));
 });
 "OrderBy".ExtendedPrototype(Array.prototype, function (selector) {
-    var me = this;
-    return me.sort(function (x, y) {
-        var xx = selector(x);
-        var yy = selector(y);
+    let me = this;
+    return me.sort((x, y) => {
+        let xx = selector(x);
+        let yy = selector(y);
         if (typeof xx === 'string' &&
             typeof yy === 'string') {
             return yy === xx ? 0 : yy < xx ? 1 : -1;
@@ -3652,10 +3437,10 @@ Object.defineProperty(String.prototype, "ExtendedPrototype", {
     });
 });
 "OrderByDecording".ExtendedPrototype(Array.prototype, function (selector) {
-    var me = this;
-    return me.sort(function (x, y) {
-        var xx = selector(x);
-        var yy = selector(y);
+    let me = this;
+    return me.sort((x, y) => {
+        let xx = selector(x);
+        let yy = selector(y);
         if (typeof xx === 'string' &&
             typeof yy === 'string') {
             return yy === xx ? 0 : xx < yy ? 1 : -1;
@@ -3664,44 +3449,44 @@ Object.defineProperty(String.prototype, "ExtendedPrototype", {
     });
 });
 "FirstOrDefault".ExtendedPrototype(Array.prototype, function (predicate) {
-    var me = this;
+    let me = this;
     if (predicate) {
-        me = me.filter(function (x) { return predicate(x); });
+        me = me.filter(x => predicate(x));
     }
     return 0 < me.length ? me[0] : null;
 });
 "LastOrDefault".ExtendedPrototype(Array.prototype, function (predicate) {
-    var me = this;
+    let me = this;
     if (predicate) {
-        me = me.filter(function (x) { return predicate(x); });
+        me = me.filter(x => predicate(x));
     }
     return 0 < me.length ? me[me.length - 1] : null;
 });
 "GroupBy".ExtendedPrototype(Array.prototype, function (selector) {
-    var me = this;
-    var result = new Array();
-    $.each(me, function (i, value) {
-        var groupKey = selector(value);
-        if (!result.some(function (x) { return x.Key === groupKey; })) {
+    let me = this;
+    let result = new Array();
+    $.each(me, (i, value) => {
+        let groupKey = selector(value);
+        if (!result.some(x => x.Key === groupKey)) {
             result.push({ Key: groupKey, Values: new Array() });
         }
-        var item = result.FirstOrDefault(function (x) { return x.Key === groupKey; });
+        let item = result.FirstOrDefault(x => x.Key === groupKey);
         item.Values.push(value);
     });
     return result;
 });
 "SequenceEqual".ExtendedPrototype(Array.prototype, function (target, predicate) {
-    var me = this;
+    let me = this;
     if (Object.IsNullOrUndefined(me) ||
         Object.IsNullOrUndefined(target)) {
         return false;
     }
     if (me.length !== target.length)
         return false;
-    var result = true;
+    let result = true;
     for (var i = 0; i < me.length; i++) {
-        var x = me[i];
-        var y = target[i];
+        let x = me[i];
+        let y = target[i];
         if (predicate) {
             if (!predicate(x, y)) {
                 result = false;
@@ -3718,19 +3503,19 @@ Object.defineProperty(String.prototype, "ExtendedPrototype", {
     return result;
 });
 "Sum".ExtendedPrototype(Array.prototype, function (selector) {
-    var me = this;
-    var value = 0;
-    me.forEach(function (x) {
+    let me = this;
+    let value = 0;
+    me.forEach(x => {
         value += selector(x);
     });
     return value;
 });
 "Chunk".ExtendedPrototype(Array.prototype, function (size) {
-    var arr = this;
+    let arr = this;
     if (!size) {
         size = 1;
     }
-    return arr.reduce(function (chunks, el, i) {
+    return arr.reduce((chunks, el, i) => {
         if (i % size === 0) {
             chunks.push([el]);
         }
@@ -3741,7 +3526,7 @@ Object.defineProperty(String.prototype, "ExtendedPrototype", {
     }, []);
 });
 //# sourceMappingURL=EnumerableExtensions.js.map
-Object.IsNullOrUndefined = function (obj) {
+Object.IsNullOrUndefined = (obj) => {
     if (obj == null)
         return true;
     if (obj === null)
@@ -3750,7 +3535,7 @@ Object.IsNullOrUndefined = function (obj) {
         return true;
     return false;
 };
-Object.IsPromise = function (value) {
+Object.IsPromise = value => {
     if (Object.IsNullOrUndefined(value))
         return false;
     if (typeof value === 'object' && typeof value.then !== "function") {
@@ -3761,10 +3546,20 @@ Object.IsPromise = function (value) {
     return promiseThenSrc === valueThenSrc;
 };
 //# sourceMappingURL=ObjectExtensions.js.map
-String.IsNullOrEmpty = function (str) { return !str; };
-String.IsNullOrWhiteSpace = function (s) { return String.IsNullOrEmpty(s) || s.replace(/\s/g, '').length < 1; };
+String.IsNullOrEmpty = (str) => !str;
+String.IsNullOrWhiteSpace = (s) => String.IsNullOrEmpty(s) || s.replace(/\s/g, '').length < 1;
 String.Split = function (s, sep) {
     return s.split(sep);
+};
+String.ToBoolean = function (s, defaultValue = false) {
+    if (Object.IsNullOrUndefined(s))
+        return defaultValue;
+    s = s.toLowerCase();
+    if (s === 'true')
+        return true;
+    if (s === 'false')
+        return false;
+    return defaultValue;
 };
 var StringSplitOptions;
 (function (StringSplitOptions) {
@@ -3772,14 +3567,14 @@ var StringSplitOptions;
     StringSplitOptions[StringSplitOptions["RemoveEmptyEntries"] = 1] = "RemoveEmptyEntries";
 })(StringSplitOptions || (StringSplitOptions = {}));
 "Split".ExtendedPrototype(String.prototype, function (separator, option) {
-    var me = this;
+    let me = this;
     if (Object.IsNullOrUndefined(option) ||
         option === StringSplitOptions.RemoveEmptyEntries)
-        return me.split(separator).filter(function (x) { return !String.IsNullOrWhiteSpace(x); });
+        return me.split(separator).filter(x => !String.IsNullOrWhiteSpace(x));
     return me.split(separator);
 });
 "Escape".ExtendedPrototype(String.prototype, function () {
-    var me = this;
+    let me = this;
     return me
         .replace(/&/g, '&amp;')
         .replace(/"/g, '&quot;')
@@ -3787,7 +3582,7 @@ var StringSplitOptions;
         .replace(/>/g, '&gt;');
 });
 "UnEscape".ExtendedPrototype(String.prototype, function () {
-    var me = this;
+    let me = this;
     return me
         .replace(/&amp;/g, '&')
         .replace(/&quot;/g, '"')
@@ -3795,7 +3590,7 @@ var StringSplitOptions;
         .replace(/&gt;/g, '>');
 });
 "Replace".ExtendedPrototype(String.prototype, function (searchValue, replaceValue) {
-    var me = this;
+    let me = this;
     return me.split(searchValue).join(replaceValue);
 });
 "Repeat".ExtendedPrototype(String.prototype, function (count) {
@@ -3863,11 +3658,11 @@ var StringSplitOptions;
     }
 });
 "SubString".ExtendedPrototype(String.prototype, function (start, length) {
-    var me = this;
+    let me = this;
     return me.toString().substr(start, length);
 });
 "Contains".ExtendedPrototype(String.prototype, function (search) {
-    var me = this;
+    let me = this;
     if (search.length > me.length) {
         return false;
     }
@@ -3876,7 +3671,7 @@ var StringSplitOptions;
     }
 });
 "StartsWith".ExtendedPrototype(String.prototype, function (s) {
-    var me = this;
+    let me = this;
     if (!String.prototype.startsWith) {
         return this.substr(0, s.length) === s;
     }
@@ -3885,7 +3680,7 @@ var StringSplitOptions;
     }
 });
 "EndsWith".ExtendedPrototype(String.prototype, function (s) {
-    var me = this;
+    let me = this;
     if (!String.prototype.endsWith) {
         return me.indexOf(s, this.length - s.length) !== -1;
     }
@@ -3894,7 +3689,7 @@ var StringSplitOptions;
     }
 });
 //# sourceMappingURL=StringExtensions.js.map
-var z_indexKey = "z_indexKey";
+const z_indexKey = "z_indexKey";
 $.GenerateZIndex = function () {
     var value = $.GetDomStorage(z_indexKey, 500);
     var newValue = value + 1;
@@ -3920,28 +3715,28 @@ $.SetSessionStorage = function (key, value) {
     window.sessionStorage.setItem(key, JSON.stringify(value));
 };
 $.GetDomStorage = function (key, defaultValue) {
-    var value = $("body").find("#DomStorage_" + key).val();
+    var value = $("body").find(`#DomStorage_${key}`).val();
     if (!value) {
         return defaultValue;
     }
     return JSON.parse(value);
 };
 $.SetDomStorage = function (key, value) {
-    if ($("body").find("#DomStorage_" + key).length === 0) {
+    if ($("body").find(`#DomStorage_${key}`).length === 0) {
         $("<input>", {
             type: "hidden",
-            id: "DomStorage_" + key,
+            id: `DomStorage_${key}`,
         }).appendTo("body");
     }
     if (Object.IsNullOrUndefined(value)) {
-        var domId = "#DomStorage_" + key;
-        var dom = $(domId);
+        let domId = `#DomStorage_${key}`;
+        let dom = $(domId);
         if (dom.length !== 0) {
             dom.remove();
             return;
         }
     }
-    $("body").find("#DomStorage_" + key).val(JSON.stringify(value));
+    $("body").find(`#DomStorage_${key}`).val(JSON.stringify(value));
 };
 $.SetRootUri = function (uri) {
     if (!uri)
@@ -3956,25 +3751,25 @@ $.AbsoluteUri = function (uri) {
         return uri;
     if (uri.toLowerCase().StartsWith("https://"))
         return uri;
-    return location.origin + "/" + uri;
+    return `${location.origin}/${uri}`;
 };
-var w_dynamicPrefix = "__Framework";
+const w_dynamicPrefix = "__Framework";
 $.GetWindowDynamic = function (key, defaultValue) {
-    var newKey = w_dynamicPrefix + "." + key;
+    let newKey = `${w_dynamicPrefix}.${key}`;
     return window[newKey];
 };
 $.SetWindowDynamic = function (key, value) {
-    var newKey = w_dynamicPrefix + "." + key;
+    let newKey = `${w_dynamicPrefix}.${key}`;
     window[newKey] = value;
 };
 $.ClientDetection = function () {
     return window._clientDetection;
 };
 $.fn.ValidityState = function () {
-    var me = this;
-    var validity = me.validity;
+    let me = this;
+    let validity = me.validity;
     if (Object.IsNullOrUndefined(validity)) {
-        $.each(me, function (i, value) {
+        $.each(me, (i, value) => {
             validity = value.validity;
             if (!Object.IsNullOrUndefined(validity)) {
                 return false;
@@ -3984,14 +3779,14 @@ $.fn.ValidityState = function () {
     return validity;
 };
 $.fn.HasError = function () {
-    var me = this;
-    var validity = me.ValidityState();
+    let me = this;
+    let validity = me.ValidityState();
     return !validity.valid;
 };
 $.fn.SetCustomError = function (errorMessage) {
-    var me = this;
+    let me = this;
     if (Object.IsNullOrUndefined(me.setCustomValidity)) {
-        $.each(me, function (i, value) {
+        $.each(me, (i, value) => {
             if (!Object.IsNullOrUndefined(value.setCustomValidity)) {
                 value.setCustomValidity(errorMessage);
             }
@@ -4002,14 +3797,14 @@ $.fn.SetCustomError = function (errorMessage) {
     }
 };
 $.fn.ClearCustomError = function () {
-    var me = this;
+    let me = this;
     me.SetCustomError("");
 };
 $.fn.CheckValidity = function () {
-    var me = this;
-    var result = true;
+    let me = this;
+    let result = true;
     if (Object.IsNullOrUndefined(me.checkValidity)) {
-        $.each(me, function (i, value) {
+        $.each(me, (i, value) => {
             if (!Object.IsNullOrUndefined(value.checkValidity)) {
                 result = value.checkValidity();
             }
@@ -4020,58 +3815,64 @@ $.fn.CheckValidity = function () {
     }
 };
 $.fn.Raise = function (event, ensure) {
-    var me = this;
-    var e = $.Event(event.EventName);
+    let me = this;
+    let e = $.Event(event.EventName);
     if (ensure) {
         ensure(e);
     }
     me.trigger(e);
     return e;
 };
+$.fn.Equals = function (compareTo) {
+    if (!compareTo || this.length != compareTo.length) {
+        return false;
+    }
+    for (var i = 0; i < this.length; ++i) {
+        if (this[i] !== compareTo[i]) {
+            return false;
+        }
+    }
+    return true;
+};
 //# sourceMappingURL=JQueryExtensions.js.map
 var DomBehind;
 (function (DomBehind) {
-    var TypedFactory = (function () {
-        function TypedFactory(_ctor) {
+    class TypedFactory {
+        constructor(_ctor) {
             this._ctor = _ctor;
         }
-        TypedFactory.prototype.CreateInstance = function () {
+        CreateInstance() {
             return new this._ctor();
-        };
-        return TypedFactory;
-    }());
+        }
+    }
     DomBehind.TypedFactory = TypedFactory;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=TypedFactory.js.map
 var DomBehind;
 (function (DomBehind) {
-    var Repository = (function () {
-        function Repository() {
-        }
-        Repository.AddService = function (context, getType, priority) {
-            if (priority === void 0) { priority = 0; }
+    class Repository {
+        static AddService(context, getType, priority = 0) {
             Repository.contextList.push({ Context: context, GetType: getType, Priority: priority });
-        };
-        Repository.RemoveService = function (context) {
-            Repository.contextList = Repository.contextList.filter(function (x) { return x.Context !== context; });
-        };
-        Repository.GetService = function (context) {
-            var value = Repository.contextList
-                .Where(function (x) { return x.Context === context; })
-                .OrderBy(function (x) { return x.Priority; })
+        }
+        static RemoveService(context) {
+            Repository.contextList = Repository.contextList.filter(x => x.Context !== context);
+        }
+        static GetService(context) {
+            let value = Repository.contextList
+                .Where(x => x.Context === context)
+                .OrderBy(x => x.Priority)
                 .FirstOrDefault();
             if (!value)
                 return null;
-            var factory = new DomBehind.TypedFactory(value.GetType());
+            let factory = new DomBehind.TypedFactory(value.GetType());
             return factory.CreateInstance();
-        };
-        Repository.CreateInstance = function (resolveType) {
-            var factory = new DomBehind.TypedFactory(resolveType());
+        }
+        static CreateInstance(resolveType) {
+            let factory = new DomBehind.TypedFactory(resolveType());
             return factory.CreateInstance();
-        };
-        Repository.contextList = [];
-        return Repository;
-    }());
+        }
+    }
+    Repository.contextList = [];
     DomBehind.Repository = Repository;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Repository.js.map
@@ -4079,65 +3880,38 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var DependencyProperty = (function () {
-            function DependencyProperty(name) {
+        class DependencyProperty {
+            constructor(name) {
                 this._propertyName = name;
             }
-            Object.defineProperty(DependencyProperty.prototype, "PropertyName", {
-                get: function () {
-                    return this._propertyName;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DependencyProperty.prototype, "GetValue", {
-                get: function () {
-                    return this._getter;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DependencyProperty.prototype, "SetValue", {
-                get: function () {
-                    return this._setter;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DependencyProperty.prototype, "UpdateSourceTrigger", {
-                get: function () {
-                    return this._updateSourceTrigger;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DependencyProperty.prototype, "BindingMode", {
-                get: function () {
-                    return this._bindingMode;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DependencyProperty.prototype, "Ensure", {
-                get: function () {
-                    return this._ensure;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            DependencyProperty.RegisterAttached = function (propertyName, getValue, setValue, defaultUpdateSourceTrigger, mode, ensure) {
-                if (defaultUpdateSourceTrigger === void 0) { defaultUpdateSourceTrigger = Data.UpdateSourceTrigger.Explicit; }
-                if (mode === void 0) { mode = Data.BindingMode.TwoWay; }
-                var dp = new DependencyProperty(propertyName);
+            get PropertyName() {
+                return this._propertyName;
+            }
+            get GetValue() {
+                return this._getter;
+            }
+            get SetValue() {
+                return this._setter;
+            }
+            get UpdateSourceTrigger() {
+                return this._updateSourceTrigger;
+            }
+            get BindingMode() {
+                return this._bindingMode;
+            }
+            get Ensure() {
+                return this._ensure;
+            }
+            static RegisterAttached(propertyName, getValue, setValue, defaultUpdateSourceTrigger = Data.UpdateSourceTrigger.Explicit, mode = Data.BindingMode.TwoWay, ensure) {
+                let dp = new DependencyProperty(propertyName);
                 dp._getter = getValue;
                 dp._setter = setValue;
                 dp._updateSourceTrigger = defaultUpdateSourceTrigger;
                 dp._bindingMode = mode;
                 dp._ensure = ensure;
                 return dp;
-            };
-            return DependencyProperty;
-        }());
+            }
+        }
         Data.DependencyProperty = DependencyProperty;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
@@ -4146,14 +3920,13 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var BindingPolicy = (function () {
-            function BindingPolicy() {
+        class BindingPolicy {
+            constructor() {
                 this.Trigger = Data.UpdateSourceTrigger.Explicit;
                 this.Mode = Data.BindingMode.TwoWay;
                 this.Validators = new DomBehind.Validation.ValidatorCollection();
             }
-            return BindingPolicy;
-        }());
+        }
         Data.BindingPolicy = BindingPolicy;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
@@ -4162,81 +3935,57 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var BindingBehavior = (function () {
-            function BindingBehavior() {
+        class BindingBehavior {
+            constructor() {
                 this.BindingPolicy = new Data.BindingPolicy();
                 this.Priolity = 0;
                 this.AdditionalInfo = new collections.LinkedDictionary();
                 this._disposed = false;
             }
-            BindingBehavior.prototype.Dispose = function () {
+            Dispose() {
                 if (!this._disposed) {
                     this.DataContext = null;
                     this.Element = null;
                 }
                 this._disposed = true;
-            };
-            return BindingBehavior;
-        }());
+            }
+        }
         Data.BindingBehavior = BindingBehavior;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=BindingBehavior.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var DataBindingBehavior = (function (_super) {
-            __extends(DataBindingBehavior, _super);
-            function DataBindingBehavior() {
-                var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.Marks = [];
-                _this.UpdateSourceEvent = new DomBehind.TypedEvent();
-                _this.UpdateTargetEvent = new DomBehind.TypedEvent();
-                _this.Events = [];
-                return _this;
+        class DataBindingBehavior extends Data.BindingBehavior {
+            constructor() {
+                super(...arguments);
+                this.Marks = [];
+                this.UpdateSourceEvent = new DomBehind.TypedEvent();
+                this.UpdateTargetEvent = new DomBehind.TypedEvent();
+                this.Events = [];
             }
-            Object.defineProperty(DataBindingBehavior.prototype, "PInfo", {
-                get: function () {
-                    return this._pinfo;
-                },
-                set: function (newValue) {
-                    if (this._pinfo === newValue)
-                        return;
-                    this._pinfo = newValue;
-                    if (newValue) {
-                        this.Marks.push(newValue.MemberPath);
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DataBindingBehavior.prototype, "ValueCore", {
-                get: function () {
-                    var value = this.Property.GetValue(this.Element);
-                    if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter) &&
-                        !Object.IsNullOrUndefined(this.BindingPolicy.Converter.ConvertBack)) {
-                        value = this.BindingPolicy.Converter.ConvertBack(value);
-                    }
-                    return value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            DataBindingBehavior.prototype.UpdateSource = function () {
+            get PInfo() {
+                return this._pinfo;
+            }
+            set PInfo(newValue) {
+                if (this._pinfo === newValue)
+                    return;
+                this._pinfo = newValue;
+                if (newValue) {
+                    this.Marks.push(newValue.MemberPath);
+                }
+            }
+            get ValueCore() {
+                let value = this.Property.GetValue(this.Element);
+                if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter) &&
+                    !Object.IsNullOrUndefined(this.BindingPolicy.Converter.ConvertBack)) {
+                    value = this.BindingPolicy.Converter.ConvertBack(value);
+                }
+                return value;
+            }
+            UpdateSource() {
                 if (this.BindingPolicy.Mode === Data.BindingMode.OneWay)
                     return;
                 if (Object.IsNullOrUndefined(this.Property))
@@ -4249,13 +3998,13 @@ var DomBehind;
                     var e = new DomBehind.PropertyChangedEventArgs(this.PInfo.MemberPath);
                     this.DataContext.PropertyChanged.Raise(this, e);
                 }
-            };
-            DataBindingBehavior.prototype.UpdateTarget = function () {
+            }
+            UpdateTarget() {
                 if (Object.IsNullOrUndefined(this.Property))
                     return;
                 if (Object.IsNullOrUndefined(this.Property.SetValue))
                     return;
-                var value = this.PInfo.GetValue();
+                let value = this.PInfo.GetValue();
                 if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter)) {
                     value = this.BindingPolicy.Converter.Convert(value);
                 }
@@ -4263,34 +4012,32 @@ var DomBehind;
                     this.Property.SetValue(this.Element, value, this);
                     this.UpdateTargetEvent.Raise(this, value);
                 }
-            };
-            DataBindingBehavior.prototype.Ensure = function () {
-                var _this = this;
+            }
+            Ensure() {
                 if (this.BindingPolicy.Trigger === Data.UpdateSourceTrigger.LostForcus) {
-                    var event_1 = 'focusout';
-                    this.Events.push(event_1);
-                    this.Element.off(event_1);
-                    this.Element.on(event_1, function (e) {
-                        _this.UpdateSource();
+                    let event = 'focusout';
+                    this.Events.push(event);
+                    this.Element.off(event);
+                    this.Element.on(event, e => {
+                        this.UpdateSource();
                     });
                 }
                 if ((this.Property) && (this.Property.Ensure)) {
                     this.Property.Ensure(this);
                 }
-            };
-            DataBindingBehavior.prototype.EventsOff = function () {
-                var _this = this;
+            }
+            EventsOff() {
                 if (Object.IsNullOrUndefined(this.Element))
                     return;
                 if (Object.IsNullOrUndefined(this.Events))
                     return;
-                $.each(this.Events, function (i, value) {
+                $.each(this.Events, (i, value) => {
                     if (!String.IsNullOrEmpty(value)) {
-                        _this.Element.off(value);
+                        this.Element.off(value);
                     }
                 });
-            };
-            DataBindingBehavior.prototype.Dispose = function () {
+            }
+            Dispose() {
                 if (!this._disposed) {
                     this.EventsOff();
                     this.Property = null;
@@ -4298,113 +4045,90 @@ var DomBehind;
                         this.PInfo.Dispose();
                     this.PInfo = null;
                     this.Marks.length = 0;
-                    _super.prototype.Dispose.call(this);
+                    super.Dispose();
                 }
-            };
-            return DataBindingBehavior;
-        }(Data.BindingBehavior));
+            }
+        }
         Data.DataBindingBehavior = DataBindingBehavior;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=DataBindingBehavior.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ActionBindingBehavior = (function (_super) {
-            __extends(ActionBindingBehavior, _super);
-            function ActionBindingBehavior() {
-                var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.ActionPolicyCollection = [];
-                return _this;
+        class ActionBindingBehavior extends Data.BindingBehavior {
+            constructor() {
+                super(...arguments);
+                this.ActionPolicyCollection = [];
             }
-            ActionBindingBehavior.prototype.Ensure = function () {
-                var _this = this;
-                this.ActionHandle = function (x) { return _this.OnTrigger(x); };
+            Ensure() {
+                this.ActionHandle = x => this.OnTrigger(x);
                 if (this.Event && this.Event) {
                     this.Event.Ensure(this);
                 }
                 if (this.Event && !String.IsNullOrWhiteSpace(this.Event.EventName)) {
-                    this.Element.on(this.Event.EventName, function (e) { return _this.ActionHandle(e); });
+                    this.Element.on(this.Event.EventName, e => this.ActionHandle(e));
                 }
-                this.EventHandle = function (sender, data) { return _this.Do(sender, data); };
+                this.EventHandle = (sender, data) => this.Do(sender, data);
                 if (this.Event) {
                     this.Event.AddHandler(this.EventHandle);
                 }
                 if (this.Element.is("a") && !this.Element.attr("href")) {
                     this.Element.attr("href", "javascript:void(0);");
                 }
-            };
-            ActionBindingBehavior.prototype.OnTrigger = function (e) {
+            }
+            OnTrigger(e) {
                 this.Event.Raise(this, e);
-            };
-            Object.defineProperty(ActionBindingBehavior.prototype, "ActionInvoker", {
-                get: function () {
-                    if (!this._actionInvoker) {
-                        var defaultPolicies = DomBehind.Application.Current.DefaultActionPolicy;
-                        var list = this.ActionPolicyCollection.concat(defaultPolicies);
-                        this._actionInvoker = this.CreateActionInvoker(list);
-                    }
-                    return this._actionInvoker;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ActionBindingBehavior.prototype.CreateActionInvoker = function (policies) {
-                var _this = this;
+            }
+            get ActionInvoker() {
+                if (!this._actionInvoker) {
+                    var defaultPolicies = DomBehind.Application.Current.DefaultActionPolicy;
+                    var list = this.ActionPolicyCollection.concat(defaultPolicies);
+                    this._actionInvoker = this.CreateActionInvoker(list);
+                }
+                return this._actionInvoker;
+            }
+            CreateActionInvoker(policies) {
                 var list = [];
                 if (policies) {
                     list = list.concat(policies);
                 }
-                list = list.OrderBy(function (x) { return x.Priority(); });
-                $.each(list, function (i, value) {
+                list = list.OrderBy(x => x.Priority());
+                $.each(list, (i, value) => {
                     var nextIndex = i + 1;
                     if (nextIndex < list.length) {
                         value.NextPolicy = list[nextIndex];
                     }
-                    value.Behavior = _this;
+                    value.Behavior = this;
                 });
                 return list[0];
-            };
-            ActionBindingBehavior.prototype.Do = function (sender, e) {
-                var _this = this;
+            }
+            Do(sender, e) {
                 if (!this.AllowBubbling) {
                     if (e.stopPropagation) {
                         e.stopPropagation();
                     }
                 }
-                this.ActionInvoker.Do(function () {
-                    var result;
-                    if (_this.Action) {
-                        if (_this.ActionParameterCount === 1) {
-                            result = _this.Action(_this.DataContext);
+                this.ActionInvoker.Do(() => {
+                    let result;
+                    if (this.Action) {
+                        if (this.ActionParameterCount === 1) {
+                            result = this.Action(this.DataContext);
                         }
-                        else if (_this.ActionParameterCount === 2) {
-                            e.AdditionalInfo = _this.AdditionalInfo;
-                            e.Args = _this.AdditionalInfo["Args"];
-                            result = _this.Action(_this.DataContext, e);
+                        else if (this.ActionParameterCount === 2) {
+                            e.AdditionalInfo = this.AdditionalInfo;
+                            e.Args = this.AdditionalInfo["Args"];
+                            result = this.Action(this.DataContext, e);
                         }
                         else {
-                            result = _this.Action(_this.DataContext);
+                            result = this.Action(this.DataContext);
                         }
                     }
                     return result;
                 });
-            };
-            ActionBindingBehavior.prototype.Dispose = function () {
+            }
+            Dispose() {
                 if (!this._disposed) {
                     if (!Object.IsNullOrUndefined(this.Element)) {
                         if (!Object.IsNullOrUndefined(this.Event)) {
@@ -4420,45 +4144,27 @@ var DomBehind;
                         this.Element = null;
                     }
                     this.ActionParameterCount = null;
-                    _super.prototype.Dispose.call(this);
+                    super.Dispose();
                 }
-            };
-            return ActionBindingBehavior;
-        }(Data.BindingBehavior));
+            }
+        }
         Data.ActionBindingBehavior = ActionBindingBehavior;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=ActionBindingBehavior.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ViewViewModelBindingBehavior = (function (_super) {
-            __extends(ViewViewModelBindingBehavior, _super);
-            function ViewViewModelBindingBehavior() {
-                return _super !== null && _super.apply(this, arguments) || this;
-            }
-            ViewViewModelBindingBehavior.prototype.Ensure = function () {
+        class ViewViewModelBindingBehavior extends Data.BindingBehavior {
+            Ensure() {
                 this.View = this.GetView(this.DataContext);
                 this.ViewModel = this.GetViewModel(this.DataContext);
                 this.View.Container = this.Element;
                 this.View.DataContext = this.ViewModel;
                 this.View.Ensure();
-            };
-            ViewViewModelBindingBehavior.prototype.Dispose = function () {
+            }
+            Dispose() {
                 if (!this._disposed) {
                     if (!Object.IsNullOrUndefined(this.View)) {
                         this.View.Dispose();
@@ -4470,94 +4176,76 @@ var DomBehind;
                     }
                     this.GetView = null;
                     this.GetViewModel = null;
-                    _super.prototype.Dispose.call(this);
+                    super.Dispose();
                 }
-            };
-            return ViewViewModelBindingBehavior;
-        }(Data.BindingBehavior));
+            }
+        }
         Data.ViewViewModelBindingBehavior = ViewViewModelBindingBehavior;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=ViewViewModelBindingBehavior.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var BindingBehaviorCollection = (function (_super) {
-            __extends(BindingBehaviorCollection, _super);
-            function BindingBehaviorCollection() {
-                var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this._disposed = false;
-                return _this;
+        class BindingBehaviorCollection extends collections.LinkedList {
+            constructor() {
+                super(...arguments);
+                this._disposed = false;
             }
-            BindingBehaviorCollection.prototype.Ensure = function () {
-                var _this = this;
+            Ensure() {
                 var sortedList = [];
-                var grouping = this.toArray().GroupBy(function (x) { return x.Element; });
-                grouping.forEach(function (x) {
-                    var items = x.Values.OrderBy(function (x) { return x.Priolity; });
-                    items.forEach(function (y) {
+                var grouping = this.toArray().GroupBy(x => x.Element);
+                grouping.forEach(x => {
+                    var items = x.Values.OrderBy(x => x.Priolity);
+                    items.forEach(y => {
                         sortedList.push(y);
                     });
                 });
                 this.clear();
-                sortedList.forEach(function (x) {
-                    _this.add(x);
+                sortedList.forEach(x => {
+                    this.add(x);
                     x.Ensure();
                 });
-            };
-            BindingBehaviorCollection.prototype.ListDataBindingBehavior = function (mark) {
-                var list = this.toArray().filter(function (x) { return x instanceof Data.DataBindingBehavior; });
+            }
+            ListDataBindingBehavior(mark) {
+                let list = this.toArray().filter(x => x instanceof Data.DataBindingBehavior);
                 if (!String.IsNullOrWhiteSpace(mark)) {
-                    list = list.filter(function (x) { return x.Marks.some(function (y) { return y === mark; }); });
+                    list = list.filter((x) => x.Marks.some(y => y === mark));
                 }
                 return list;
-            };
-            BindingBehaviorCollection.prototype.UpdateTarget = function (mark) {
+            }
+            UpdateTarget(mark) {
                 var list = this.ListDataBindingBehavior(mark);
-                $.each(list, function (i, x) {
+                $.each(list, (i, x) => {
                     x.UpdateTarget();
                 });
-            };
-            BindingBehaviorCollection.prototype.UpdateSource = function (mark) {
+            }
+            UpdateSource(mark) {
                 var list = this.ListDataBindingBehavior(mark);
-                $.each(list, function (i, x) {
+                $.each(list, (i, x) => {
                     x.UpdateSource();
                 });
-            };
-            BindingBehaviorCollection.prototype.Dispose = function () {
+            }
+            Dispose() {
                 if (!this._disposed) {
-                    $.each(this.toArray(), function (i, x) { return x.Dispose(); });
+                    $.each(this.toArray(), (i, x) => x.Dispose());
                     this.clear();
                 }
                 this._disposed = true;
-            };
-            return BindingBehaviorCollection;
-        }(collections.LinkedList));
+            }
+        }
         Data.BindingBehaviorCollection = BindingBehaviorCollection;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=BindingBehaviorCollection.js.map
 var DomBehind;
 (function (DomBehind) {
-    var BindingBehaviorBuilder = (function () {
-        function BindingBehaviorBuilder(owner) {
+    class BindingBehaviorBuilder {
+        constructor(owner) {
             this.Owner = owner;
         }
-        BindingBehaviorBuilder.prototype.Element = function (value) {
+        Element(value) {
             if (typeof value === "string") {
                 this.CurrentElement = this.Owner.Container.find(value);
                 this.CurrentSelector = value;
@@ -4567,196 +4255,143 @@ var DomBehind;
             }
             this.CurrentBehavior = null;
             return this;
-        };
-        BindingBehaviorBuilder.prototype.SetValue = function (dp, value) {
+        }
+        SetValue(dp, value) {
             dp.SetValue(this.CurrentElement, value, this.CurrentBehavior);
             return this;
-        };
-        BindingBehaviorBuilder.prototype.Binding = function (property, bindingExpression, mode, updateTrigger) {
-            var behavior = this.Add(new DomBehind.Data.DataBindingBehavior());
+        }
+        Binding(property, bindingExpression, mode, updateTrigger) {
+            let behavior = this.Add(new DomBehind.Data.DataBindingBehavior());
             behavior.Property = property;
             behavior.PInfo = new DomBehind.LamdaExpression(this.Owner.DataContext, bindingExpression);
             behavior.BindingPolicy.Trigger = !Object.IsNullOrUndefined(updateTrigger) ? updateTrigger : property.UpdateSourceTrigger;
             behavior.BindingPolicy.Mode = !Object.IsNullOrUndefined(mode) ? mode : property.BindingMode;
             behavior.AdditionalInfo["selector"] = this.CurrentSelector;
-            var dataBindingBuilder = new DomBehind.Data.DataBindingBehaviorBuilder(this.Owner);
+            let dataBindingBuilder = new DomBehind.Data.DataBindingBehaviorBuilder(this.Owner);
             dataBindingBuilder.CurrentBehavior = this.CurrentBehavior;
             dataBindingBuilder.CurrentElement = this.CurrentElement;
             return dataBindingBuilder.PartialMark(behavior.PInfo.MemberPath);
-        };
-        BindingBehaviorBuilder.prototype.SetConverter = function (conv) {
+        }
+        SetConverter(conv) {
             this.CurrentBehavior.BindingPolicy.Converter = conv;
             return this;
-        };
-        BindingBehaviorBuilder.prototype.ConvertTarget = function (exp) {
+        }
+        ConvertTarget(exp) {
             if (this.CurrentBehavior.BindingPolicy.Converter) {
                 throw new DomBehind.Exception("Another 'IValueConverter' has already been assigned.");
             }
-            var conv = new SimpleConverter();
+            let conv = new SimpleConverter();
             conv.ConvertHandler = exp;
             this.CurrentBehavior.BindingPolicy.Converter = conv;
             return this;
-        };
-        BindingBehaviorBuilder.prototype.ConvertSource = function (exp) {
+        }
+        ConvertSource(exp) {
             if (this.CurrentBehavior.BindingPolicy.Converter) {
                 throw new DomBehind.Exception("Another 'IValueConverter' has already been assigned.");
             }
-            var conv = new SimpleConverter();
+            let conv = new SimpleConverter();
             conv.ConvertBackHandler = exp;
             this.CurrentBehavior.BindingPolicy.Converter = conv;
             return this;
-        };
-        BindingBehaviorBuilder.prototype.BindingViewViewModel = function (view, viewModel) {
-            var behavior = this.Add(new DomBehind.Data.ViewViewModelBindingBehavior());
+        }
+        BindingViewViewModel(view, viewModel) {
+            let behavior = this.Add(new DomBehind.Data.ViewViewModelBindingBehavior());
             behavior.GetView = view;
             behavior.GetViewModel = viewModel;
             return this;
-        };
-        BindingBehaviorBuilder.prototype.BindingAction = function (event, action, allowBubbling) {
-            if (allowBubbling === void 0) { allowBubbling = false; }
-            var behavior = this.Add(new DomBehind.Data.ActionBindingBehavior());
+        }
+        BindingAction(event, action, allowBubbling = false) {
+            let behavior = this.Add(new DomBehind.Data.ActionBindingBehavior());
             behavior.Event = event.Create();
             behavior.Action = action;
             behavior.ActionParameterCount = action.length;
             behavior.AllowBubbling = allowBubbling;
-            var actionBindingBuilder = new DomBehind.Data.ActionBindingBehaviorBuilder(this.Owner);
+            let actionBindingBuilder = new DomBehind.Data.ActionBindingBehaviorBuilder(this.Owner);
             actionBindingBuilder.CurrentBehavior = this.CurrentBehavior;
             actionBindingBuilder.CurrentElement = this.CurrentElement;
             return actionBindingBuilder;
-        };
-        BindingBehaviorBuilder.prototype.BindingActionWithOption = function (event, action, option) {
-            var result = this.BindingAction(event, action);
+        }
+        BindingActionWithOption(event, action, option) {
+            let result = this.BindingAction(event, action);
             if (option && this.CurrentBehavior instanceof DomBehind.Data.ActionBindingBehavior) {
                 this.CurrentBehavior.AllowBubbling = option.allowBubbling;
                 this.CurrentBehavior.AdditionalInfo["Args"] = option.args;
             }
             return result;
-        };
-        BindingBehaviorBuilder.prototype.Add = function (behavior) {
+        }
+        Add(behavior) {
             this.CurrentBehavior = behavior;
             behavior.DataContext = this.Owner.DataContext;
             behavior.Element = this.CurrentElement;
             this.Owner.BindingBehaviors.add(behavior);
             return behavior;
-        };
-        return BindingBehaviorBuilder;
-    }());
-    DomBehind.BindingBehaviorBuilder = BindingBehaviorBuilder;
-    var SimpleConverter = (function () {
-        function SimpleConverter() {
         }
-        SimpleConverter.prototype.Convert = function (value) {
+    }
+    DomBehind.BindingBehaviorBuilder = BindingBehaviorBuilder;
+    class SimpleConverter {
+        Convert(value) {
             if (!this.ConvertHandler)
                 return value;
             return this.ConvertHandler(value);
-        };
-        SimpleConverter.prototype.ConvertBack = function (value) {
+        }
+        ConvertBack(value) {
             if (!this.ConvertBackHandler)
                 return value;
             return this.ConvertBackHandler(value);
-        };
-        return SimpleConverter;
-    }());
+        }
+    }
     DomBehind.SimpleConverter = SimpleConverter;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=BindingBehaviorBuilder.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var DataBindingBehaviorBuilder = (function (_super) {
-            __extends(DataBindingBehaviorBuilder, _super);
-            function DataBindingBehaviorBuilder(owner) {
-                return _super.call(this, owner) || this;
+        class DataBindingBehaviorBuilder extends DomBehind.BindingBehaviorBuilder {
+            constructor(owner) {
+                super(owner);
             }
-            Object.defineProperty(DataBindingBehaviorBuilder.prototype, "Behavior", {
-                get: function () {
-                    return this.CurrentBehavior;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            DataBindingBehaviorBuilder.prototype.PartialMark = function () {
-                var _this = this;
-                var mark = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    mark[_i] = arguments[_i];
-                }
-                $.each(mark, function (i, value) {
-                    _this.Behavior.Marks.push(value);
+            get Behavior() {
+                return this.CurrentBehavior;
+            }
+            PartialMark(...mark) {
+                $.each(mark, (i, value) => {
+                    this.Behavior.Marks.push(value);
                 });
                 return this;
-            };
-            DataBindingBehaviorBuilder.prototype.Converter = function (converter) {
+            }
+            Converter(converter) {
                 this.Behavior.BindingPolicy.Converter = converter;
                 return this;
-            };
-            DataBindingBehaviorBuilder.prototype.AddValidator = function (validator) {
+            }
+            AddValidator(validator) {
                 this.Behavior.BindingPolicy.Validators.add(validator);
                 validator.Behavior = this.Behavior;
                 return validator;
-            };
-            return DataBindingBehaviorBuilder;
-        }(DomBehind.BindingBehaviorBuilder));
+            }
+        }
         Data.DataBindingBehaviorBuilder = DataBindingBehaviorBuilder;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=DataBindingBehaviorBuilder.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ActionBindingBehaviorBuilder = (function (_super) {
-            __extends(ActionBindingBehaviorBuilder, _super);
-            function ActionBindingBehaviorBuilder(owner) {
-                return _super.call(this, owner) || this;
+        class ActionBindingBehaviorBuilder extends DomBehind.BindingBehaviorBuilder {
+            constructor(owner) {
+                super(owner);
             }
-            Object.defineProperty(ActionBindingBehaviorBuilder.prototype, "Behavior", {
-                get: function () {
-                    return this.CurrentBehavior;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ActionBindingBehaviorBuilder.prototype.ActionPolicy = function () {
-                var _this = this;
-                var policies = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    policies[_i] = arguments[_i];
-                }
-                $.each(policies, function (i, x) {
-                    _this.Behavior.ActionPolicyCollection.push(x);
+            get Behavior() {
+                return this.CurrentBehavior;
+            }
+            ActionPolicy(...policies) {
+                $.each(policies, (i, x) => {
+                    this.Behavior.ActionPolicyCollection.push(x);
                 });
                 return this;
-            };
-            return ActionBindingBehaviorBuilder;
-        }(DomBehind.BindingBehaviorBuilder));
+            }
+        }
         Data.ActionBindingBehaviorBuilder = ActionBindingBehaviorBuilder;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
@@ -4765,12 +4400,9 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ActionPolicy = (function () {
-            function ActionPolicy() {
-            }
-            ActionPolicy.prototype.Do = function (func) {
-                var _this = this;
-                var result;
+        class ActionPolicy {
+            Do(func) {
+                let result;
                 try {
                     this.Begin();
                     if (Object.IsNullOrUndefined(this.NextPolicy)) {
@@ -4785,14 +4417,14 @@ var DomBehind;
                         return result;
                     }
                     else {
-                        var p = result;
-                        p.done(function () {
-                            _this.Done();
-                            _this.Always();
-                        }).fail(function (x) {
-                            var ex = new Data.ActionPolicyExceptionEventArgs(_this, x);
-                            _this.Fail(ex);
-                            _this.Always();
+                        let p = result;
+                        p.done(() => {
+                            this.Done();
+                            this.Always();
+                        }).fail(x => {
+                            let ex = new Data.ActionPolicyExceptionEventArgs(this, x);
+                            this.Fail(ex);
+                            this.Always();
                             if (!ex.Handled) {
                                 return ex;
                             }
@@ -4801,84 +4433,52 @@ var DomBehind;
                     }
                 }
                 catch (e) {
-                    var ex = new Data.ActionPolicyExceptionEventArgs(this, e);
+                    let ex = new Data.ActionPolicyExceptionEventArgs(this, e);
                     this.Fail(ex);
                     this.Always();
                     if (!ex.Handled)
                         throw e;
                 }
-            };
-            return ActionPolicy;
-        }());
+            }
+        }
         Data.ActionPolicy = ActionPolicy;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=ActionPolicy.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ActionPolicyExceptionEventArgs = (function (_super) {
-            __extends(ActionPolicyExceptionEventArgs, _super);
-            function ActionPolicyExceptionEventArgs(sender, errorData) {
-                var _this = _super.call(this) || this;
-                _this.Data = errorData;
-                _this.Handled = false;
-                _this.Sender = sender;
-                return _this;
+        class ActionPolicyExceptionEventArgs extends DomBehind.EventArgs {
+            constructor(sender, errorData) {
+                super();
+                this.Data = errorData;
+                this.Handled = false;
+                this.Sender = sender;
             }
-            return ActionPolicyExceptionEventArgs;
-        }(DomBehind.EventArgs));
+        }
         Data.ActionPolicyExceptionEventArgs = ActionPolicyExceptionEventArgs;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=ActionPolicyExceptionEventArgs.js.map
 //# sourceMappingURL=IExceptionHandling.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ExceptionHandlingActionPolicy = (function (_super) {
-            __extends(ExceptionHandlingActionPolicy, _super);
-            function ExceptionHandlingActionPolicy() {
-                var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this._priority = 1;
-                return _this;
+        class ExceptionHandlingActionPolicy extends Data.ActionPolicy {
+            constructor() {
+                super(...arguments);
+                this._priority = 1;
             }
-            ExceptionHandlingActionPolicy.prototype.Priority = function () {
+            Priority() {
                 return this._priority;
-            };
-            ExceptionHandlingActionPolicy.prototype.Begin = function () {
-            };
-            ExceptionHandlingActionPolicy.prototype.Done = function () {
-            };
-            ExceptionHandlingActionPolicy.prototype.Fail = function (ex) {
+            }
+            Begin() {
+            }
+            Done() {
+            }
+            Fail(ex) {
                 if (this.Behavior.DataContext) {
                     var handlingObj = this.Behavior.DataContext;
                     if (handlingObj.Catch) {
@@ -4889,52 +4489,35 @@ var DomBehind;
                 }
                 DomBehind.Application.Current.UnhandledException(ex.Data);
                 ex.Handled = true;
-            };
-            ExceptionHandlingActionPolicy.prototype.Always = function () {
-            };
-            return ExceptionHandlingActionPolicy;
-        }(Data.ActionPolicy));
+            }
+            Always() {
+            }
+        }
         Data.ExceptionHandlingActionPolicy = ExceptionHandlingActionPolicy;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=ExceptionHandlingActionPolicy.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var ValidationExceptionHandlingActionPolicy = (function (_super) {
-            __extends(ValidationExceptionHandlingActionPolicy, _super);
-            function ValidationExceptionHandlingActionPolicy() {
-                var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this._priority = 50;
-                return _this;
+        class ValidationExceptionHandlingActionPolicy extends Data.ActionPolicy {
+            constructor() {
+                super(...arguments);
+                this._priority = 50;
             }
-            ValidationExceptionHandlingActionPolicy.prototype.Priority = function () {
+            Priority() {
                 return this._priority;
-            };
-            ValidationExceptionHandlingActionPolicy.prototype.Begin = function () { };
-            ValidationExceptionHandlingActionPolicy.prototype.Done = function () { };
-            ValidationExceptionHandlingActionPolicy.prototype.Fail = function (ex) {
-                var _this = this;
+            }
+            Begin() { }
+            Done() { }
+            Fail(ex) {
                 if (!this.Supported)
                     return;
                 if (ex.Data instanceof DomBehind.Validation.AggregateValidationException) {
                     var vex = ex.Data;
-                    $.each(vex.Items, function (i, each) {
-                        _this.SetCustomError(each);
+                    $.each(vex.Items, (i, each) => {
+                        this.SetCustomError(each);
                     });
                     ex.Handled = true;
                 }
@@ -4942,70 +4525,40 @@ var DomBehind;
                     this.SetCustomError(ex.Data);
                     ex.Handled = true;
                 }
-            };
-            ValidationExceptionHandlingActionPolicy.prototype.SetCustomError = function (vex) {
+            }
+            SetCustomError(vex) {
                 this.Owner.find(vex.Selector).SetCustomError(vex.Message);
-            };
-            Object.defineProperty(ValidationExceptionHandlingActionPolicy.prototype, "Supported", {
-                get: function () {
-                    if (!this.ViewModel)
-                        return false;
-                    if (!this.View)
-                        return false;
-                    if (!this.Owner)
-                        return false;
-                    return true;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(ValidationExceptionHandlingActionPolicy.prototype, "ViewModel", {
-                get: function () {
-                    return this.Behavior.DataContext;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(ValidationExceptionHandlingActionPolicy.prototype, "View", {
-                get: function () {
-                    return this.ViewModel.View;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(ValidationExceptionHandlingActionPolicy.prototype, "Owner", {
-                get: function () {
-                    return this.View.Container;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ValidationExceptionHandlingActionPolicy.prototype.Always = function () { };
-            return ValidationExceptionHandlingActionPolicy;
-        }(Data.ActionPolicy));
+            }
+            get Supported() {
+                if (!this.ViewModel)
+                    return false;
+                if (!this.View)
+                    return false;
+                if (!this.Owner)
+                    return false;
+                return true;
+            }
+            get ViewModel() {
+                return this.Behavior.DataContext;
+            }
+            get View() {
+                return this.ViewModel.View;
+            }
+            get Owner() {
+                return this.View.Container;
+            }
+            Always() { }
+        }
         Data.ValidationExceptionHandlingActionPolicy = ValidationExceptionHandlingActionPolicy;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=ValidationExceptionHandlingActionPolicy.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var DefaultWaitingOverlayOption = (function () {
-            function DefaultWaitingOverlayOption() {
+        class DefaultWaitingOverlayOption {
+            constructor() {
                 this.Color = "rgba(255, 255, 255, 0.8)";
                 this.Custom = "";
                 this.Fade = true;
@@ -5018,29 +4571,21 @@ var DomBehind;
                 this.Size = "50%";
                 this.ZIndex = 65535;
             }
-            return DefaultWaitingOverlayOption;
-        }());
-        var WaitingOverlayActionPolicy = (function (_super) {
-            __extends(WaitingOverlayActionPolicy, _super);
-            function WaitingOverlayActionPolicy(option) {
-                var _this = _super.call(this) || this;
-                _this._priority = 100;
-                _this._option = $.extend(true, {}, new DefaultWaitingOverlayOption(), option);
+        }
+        class WaitingOverlayActionPolicy extends Data.ActionPolicy {
+            constructor(option) {
+                super();
+                this._priority = 100;
+                this._option = $.extend(true, {}, new DefaultWaitingOverlayOption(), option);
                 ;
-                return _this;
             }
-            Object.defineProperty(WaitingOverlayActionPolicy.prototype, "Option", {
-                get: function () {
-                    return this._option;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            WaitingOverlayActionPolicy.prototype.Priority = function () {
+            get Option() {
+                return this._option;
+            }
+            Priority() {
                 return this._priority;
-            };
-            WaitingOverlayActionPolicy.prototype.Begin = function () {
-                var _this = this;
+            }
+            Begin() {
                 var container = this.Container();
                 var overlay = $("<div>", {
                     class: "loadingoverlay",
@@ -5080,7 +4625,7 @@ var DomBehind;
                 }
                 this.Resize(overlay);
                 if (this.Option.ResizeInterval > 0) {
-                    var resizeIntervalId = setInterval(function () { return _this.Resize(overlay); }, this.Option.ResizeInterval);
+                    var resizeIntervalId = setInterval(() => this.Resize(overlay), this.Option.ResizeInterval);
                     container.data("LoadingOverlayResizeIntervalId", resizeIntervalId);
                 }
                 if (!this.Option.Fade) {
@@ -5100,8 +4645,8 @@ var DomBehind;
                     .hide()
                     .appendTo("body")
                     .fadeIn(this.Option.Fade[0]);
-            };
-            WaitingOverlayActionPolicy.prototype.Resize = function (overlay) {
+            }
+            Resize(overlay) {
                 var container = this.Container();
                 var wholePage = this.IsWholePage();
                 if (!wholePage) {
@@ -5124,12 +4669,12 @@ var DomBehind;
                 }
                 overlay.css("background-size", size);
                 overlay.children(".loadingoverlay_fontawesome").css("font-size", size);
-            };
-            WaitingOverlayActionPolicy.prototype.Done = function () {
-            };
-            WaitingOverlayActionPolicy.prototype.Fail = function (ex) {
-            };
-            WaitingOverlayActionPolicy.prototype.Always = function () {
+            }
+            Done() {
+            }
+            Fail(ex) {
+            }
+            Always() {
                 var container = this.Container();
                 var resizeIntervalId = container.data("LoadingOverlayResizeIntervalId");
                 if (resizeIntervalId)
@@ -5138,37 +4683,31 @@ var DomBehind;
                     $(this).remove();
                 });
                 container.removeData(["LoadingOverlay", "LoadingOverlayFadeOutDuration", "LoadingOverlayResizeIntervalId"]);
-            };
-            return WaitingOverlayActionPolicy;
-        }(Data.ActionPolicy));
+            }
+        }
         Data.WaitingOverlayActionPolicy = WaitingOverlayActionPolicy;
-        var ElementWaitingOverlayActionPolicy = (function (_super) {
-            __extends(ElementWaitingOverlayActionPolicy, _super);
-            function ElementWaitingOverlayActionPolicy(element, option) {
-                var _this = _super.call(this, option) || this;
-                _this._container = element;
-                _this.Option.Image = "/Content/images/preloader.gif";
-                return _this;
+        class ElementWaitingOverlayActionPolicy extends WaitingOverlayActionPolicy {
+            constructor(element, option) {
+                super(option);
+                this._container = element;
+                this.Option.Image = "/Content/images/preloader.gif";
             }
-            ElementWaitingOverlayActionPolicy.prototype.Container = function () {
+            Container() {
                 return this._container;
-            };
-            ElementWaitingOverlayActionPolicy.prototype.IsWholePage = function () {
-                return false;
-            };
-            return ElementWaitingOverlayActionPolicy;
-        }(WaitingOverlayActionPolicy));
-        Data.ElementWaitingOverlayActionPolicy = ElementWaitingOverlayActionPolicy;
-        var WindowWaitingOverlayActionPolicy = (function (_super) {
-            __extends(WindowWaitingOverlayActionPolicy, _super);
-            function WindowWaitingOverlayActionPolicy(option) {
-                return _super.call(this, $(document), option) || this;
             }
-            WindowWaitingOverlayActionPolicy.prototype.IsWholePage = function () {
+            IsWholePage() {
+                return false;
+            }
+        }
+        Data.ElementWaitingOverlayActionPolicy = ElementWaitingOverlayActionPolicy;
+        class WindowWaitingOverlayActionPolicy extends ElementWaitingOverlayActionPolicy {
+            constructor(option) {
+                super($(document), option);
+            }
+            IsWholePage() {
                 return true;
-            };
-            return WindowWaitingOverlayActionPolicy;
-        }(ElementWaitingOverlayActionPolicy));
+            }
+        }
         Data.WindowWaitingOverlayActionPolicy = WindowWaitingOverlayActionPolicy;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
@@ -5176,7 +4715,7 @@ var DomBehind;
     var Data;
     (function (Data) {
         Data.ActionBindingBehaviorBuilder.prototype.WaitingOverlay = function (policy) {
-            var me = this;
+            let me = this;
             if (!policy) {
                 policy = new Data.WindowWaitingOverlayActionPolicy();
             }
@@ -5186,76 +4725,56 @@ var DomBehind;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=WaitingOverlayActionPolicy.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
-        var SuppressDuplicateWorkException = (function (_super) {
-            __extends(SuppressDuplicateWorkException, _super);
-            function SuppressDuplicateWorkException() {
-                return _super.call(this, "This exception is a safe exception issued to prevent double press") || this;
+        class SuppressDuplicateWorkException extends DomBehind.Exception {
+            constructor() { super("This exception is a safe exception issued to prevent double press"); }
+        }
+        class SuppressDuplicateActionPolicy extends Data.ActionPolicy {
+            constructor() {
+                super(...arguments);
+                this._priority = 10;
+                this.IsEnabled = DomBehind.UIElement.IsEnabledProperty;
+                this.referencecount = 0;
+                this.engaged = false;
             }
-            return SuppressDuplicateWorkException;
-        }(DomBehind.Exception));
-        var SuppressDuplicateActionPolicy = (function (_super) {
-            __extends(SuppressDuplicateActionPolicy, _super);
-            function SuppressDuplicateActionPolicy() {
-                var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this._priority = 10;
-                _this.IsEnabled = DomBehind.UIElement.IsEnabledProperty;
-                _this.referencecount = 0;
-                _this.engaged = false;
-                return _this;
-            }
-            SuppressDuplicateActionPolicy.prototype.Priority = function () {
+            Priority() {
                 return this._priority;
-            };
-            SuppressDuplicateActionPolicy.prototype.Begin = function () {
+            }
+            Begin() {
                 ++this.referencecount;
                 if (this.engaged) {
                     throw new SuppressDuplicateWorkException();
                 }
                 this.engaged = true;
                 this.IsEnabled.SetValue(this.Behavior.Element, false);
-            };
-            SuppressDuplicateActionPolicy.prototype.Done = function () {
-            };
-            SuppressDuplicateActionPolicy.prototype.Fail = function (ex) {
+            }
+            Done() {
+            }
+            Fail(ex) {
                 if (ex.Data instanceof SuppressDuplicateWorkException) {
                     ex.Handled = true;
                 }
-            };
-            SuppressDuplicateActionPolicy.prototype.Always = function () {
+            }
+            Always() {
                 if (--this.referencecount === 0) {
                     this.engaged = false;
                     this.IsEnabled.SetValue(this.Behavior.Element, true);
                 }
-            };
-            return SuppressDuplicateActionPolicy;
-        }(Data.ActionPolicy));
+            }
+        }
         Data.SuppressDuplicateActionPolicy = SuppressDuplicateActionPolicy;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=SuppressDuplicateActionPolicy.js.map
 var DomBehind;
 (function (DomBehind) {
-    var IndexedDBHelper = (function () {
-        function IndexedDBHelper(ctor, db) {
-            var schema = new ctor();
-            var name = schema.toString();
+    class IndexedDBHelper {
+        constructor(ctor, db) {
+            let schema = new ctor();
+            let name = schema.toString();
             if (name === "[object Object]") {
                 name = schema.constructor.name;
             }
@@ -5265,131 +4784,127 @@ var DomBehind;
             this.DbName = db;
             this.TableName = name;
         }
-        IndexedDBHelper.prototype.Drop = function () {
-            var _this = this;
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
+        Drop() {
+            let d = $.Deferred();
+            let db = this.Open();
+            db.done(x => {
+                if (!x.objectStoreNames.contains(this.TableName)) {
                     d.resolve();
                     return;
                 }
-                _this.Upgrade(x.version + 1, function (y) {
-                    var newDb = y.target.result;
+                this.Upgrade(x.version + 1, y => {
+                    let newDb = y.target.result;
                     if (newDb && newDb.deleteObjectStore)
-                        newDb.deleteObjectStore(_this.TableName);
+                        newDb.deleteObjectStore(this.TableName);
                     d.resolve();
                 });
-            }).fail(function () {
+            }).fail(() => {
                 d.reject();
             });
             return d.promise();
-        };
-        IndexedDBHelper.prototype.List = function () {
-            var _this = this;
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
+        }
+        List() {
+            let d = $.Deferred();
+            let db = this.Open();
+            db.done(x => {
+                if (!x.objectStoreNames.contains(this.TableName)) {
                     d.resolve([]);
                     return;
                 }
-                var trans = x.transaction(_this.TableName, "readwrite");
-                var objectStore = trans.objectStore(_this.TableName);
-                var dbRequest = objectStore.getAll();
-                dbRequest.onsuccess = function (e) {
-                    var result = dbRequest.result;
+                let trans = x.transaction(this.TableName, "readwrite");
+                let objectStore = trans.objectStore(this.TableName);
+                let dbRequest = objectStore.getAll();
+                dbRequest.onsuccess = e => {
+                    let result = dbRequest.result;
                     d.resolve(result);
                 };
-                dbRequest.onerror = function (e) {
+                dbRequest.onerror = e => {
                     d.reject();
                 };
-            }).fail(function () {
+            }).fail(() => {
                 d.reject();
             });
             return d.promise();
-        };
-        IndexedDBHelper.prototype.Truncate = function () {
-            var _this = this;
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
+        }
+        Truncate() {
+            let d = $.Deferred();
+            let db = this.Open();
+            db.done(x => {
+                if (!x.objectStoreNames.contains(this.TableName)) {
                     d.resolve([]);
                     return;
                 }
-                var trans = x.transaction(_this.TableName, "readwrite");
-                var objectStore = trans.objectStore(_this.TableName);
-                var dbRequest = objectStore.clear();
-                dbRequest.onsuccess = function (e) {
+                let trans = x.transaction(this.TableName, "readwrite");
+                let objectStore = trans.objectStore(this.TableName);
+                let dbRequest = objectStore.clear();
+                dbRequest.onsuccess = e => {
                     d.resolve();
                 };
-                dbRequest.onerror = function (e) {
+                dbRequest.onerror = e => {
                     d.reject();
                 };
-            }).fail(function () {
+            }).fail(() => {
                 d.reject();
             });
             return d.promise();
-        };
-        IndexedDBHelper.prototype.FindRowAsync = function (exp, value) {
-            var d = $.Deferred();
-            this.FindRowsAsync(exp, value).done(function (x) {
+        }
+        FindRowAsync(exp, value) {
+            let d = $.Deferred();
+            this.FindRowsAsync(exp, value).done(x => {
                 d.resolve(x.FirstOrDefault());
-            }).fail(function (x) {
+            }).fail(x => {
                 d.reject(x);
             });
             return d.promise();
-        };
-        IndexedDBHelper.prototype.FindRowsAsync = function (exp, value) {
-            var _this = this;
-            var path = DomBehind.LamdaExpression.Path(exp);
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
+        }
+        FindRowsAsync(exp, value) {
+            let path = DomBehind.LamdaExpression.Path(exp);
+            let d = $.Deferred();
+            let db = this.Open();
+            db.done(x => {
+                if (!x.objectStoreNames.contains(this.TableName)) {
                     d.resolve([]);
                     return;
                 }
-                var trans = x.transaction(_this.TableName, "readwrite");
-                var objectStore = trans.objectStore(_this.TableName);
+                let trans = x.transaction(this.TableName, "readwrite");
+                let objectStore = trans.objectStore(this.TableName);
                 if (objectStore.keyPath === path) {
-                    var dbRequest_1 = objectStore.get(value);
-                    dbRequest_1.onsuccess = function (e) {
-                        var result = [dbRequest_1.result];
+                    let dbRequest = objectStore.get(value);
+                    dbRequest.onsuccess = e => {
+                        let result = [dbRequest.result];
                         d.resolve(result);
                     };
-                    dbRequest_1.onerror = function (e) {
+                    dbRequest.onerror = e => {
                         d.reject(e);
                     };
                 }
                 else if (objectStore.indexNames.contains(path)) {
-                    _this.FetchCursor(objectStore.index(path), value, d);
+                    this.FetchCursor(objectStore.index(path), value, d);
                 }
                 else {
                     x.close();
-                    _this.Upgrade(x.version + 1, function (y) {
-                        var newDb = y.target.result;
-                        var newTrans = y.target.transaction;
-                        var newObjectStore = newTrans.objectStore(_this.TableName);
-                        var indexStore = newObjectStore.createIndex(path, path, { unique: false });
-                        _this.FetchCursor(indexStore, value, d);
+                    this.Upgrade(x.version + 1, y => {
+                        let newDb = y.target.result;
+                        let newTrans = y.target.transaction;
+                        let newObjectStore = newTrans.objectStore(this.TableName);
+                        let indexStore = newObjectStore.createIndex(path, path, { unique: false });
+                        this.FetchCursor(indexStore, value, d);
                     });
                 }
-            }).fail(function (x) {
+            }).fail(x => {
                 d.reject(x);
             });
             return d.promise();
-        };
-        IndexedDBHelper.prototype.FetchCursor = function (indexStore, value, d) {
-            var list = new DomBehind.List();
-            var cursorHandler = indexStore.openCursor(value);
-            cursorHandler.onsuccess = function (e) {
-                var cursor = e.target.result;
+        }
+        FetchCursor(indexStore, value, d) {
+            let list = new DomBehind.List();
+            let cursorHandler = indexStore.openCursor(value);
+            cursorHandler.onsuccess = (e) => {
+                let cursor = e.target.result;
                 if (cursor) {
-                    var value_1 = cursor.value;
-                    if (!Object.IsNullOrUndefined(value_1)) {
-                        list.add(value_1);
+                    let value = cursor.value;
+                    if (!Object.IsNullOrUndefined(value)) {
+                        list.add(value);
                     }
                     cursor.continue();
                 }
@@ -5397,41 +4912,40 @@ var DomBehind;
                     d.resolve(list.toArray());
                 }
             };
-            cursorHandler.onerror = function (e) {
+            cursorHandler.onerror = e => {
                 d.reject(e);
             };
-        };
-        IndexedDBHelper.prototype.UpsertAsync = function (entity, primaryKey) {
-            var _this = this;
-            var path;
+        }
+        UpsertAsync(entity, primaryKey) {
+            let path;
             if (primaryKey) {
                 path = DomBehind.LamdaExpression.Path(primaryKey);
             }
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
+            let d = $.Deferred();
+            let db = this.Open();
+            db.done(x => {
+                if (!x.objectStoreNames.contains(this.TableName)) {
                     x.close();
-                    _this.Upgrade(x.version + 1, function (y) {
-                        var newDb = y.target.result;
-                        var newStore;
+                    this.Upgrade(x.version + 1, y => {
+                        let newDb = y.target.result;
+                        let newStore;
                         if (path) {
-                            newStore = newDb.createObjectStore(_this.TableName, { keyPath: path });
+                            newStore = newDb.createObjectStore(this.TableName, { keyPath: path });
                         }
                         else {
-                            newStore = newDb.createObjectStore(_this.TableName, { keyPath: "__identity", autoIncrement: true });
+                            newStore = newDb.createObjectStore(this.TableName, { keyPath: "__identity", autoIncrement: true });
                         }
-                        newStore.transaction.oncomplete = function (e) {
+                        newStore.transaction.oncomplete = e => {
                             newDb.close();
-                            _this.UpsertAsync(entity, primaryKey).done(function (x) { return d.resolve(); }).fail(function (x) { return d.reject(x); });
+                            this.UpsertAsync(entity, primaryKey).done(x => d.resolve()).fail(x => d.reject(x));
                         };
                     });
                     return;
                 }
-                var trans = x.transaction(_this.TableName, "readwrite");
-                var store = trans.objectStore(_this.TableName);
+                let trans = x.transaction(this.TableName, "readwrite");
+                let store = trans.objectStore(this.TableName);
                 if (entity instanceof Array) {
-                    $.each(entity, function (i, value) {
+                    $.each(entity, (i, value) => {
                         store.put(value);
                     });
                 }
@@ -5439,77 +4953,75 @@ var DomBehind;
                     store.put(entity);
                 }
                 d.resolve();
-            }).fail(function (x) {
+            }).fail(x => {
                 d.reject(x);
             });
             return d.promise();
-        };
-        IndexedDBHelper.prototype.DeleteAsync = function (entity) {
-            var _this = this;
-            var d = $.Deferred();
-            var db = this.Open();
-            db.done(function (x) {
-                if (!x.objectStoreNames.contains(_this.TableName)) {
+        }
+        DeleteAsync(entity) {
+            let d = $.Deferred();
+            let db = this.Open();
+            db.done(x => {
+                if (!x.objectStoreNames.contains(this.TableName)) {
                     d.resolve();
                 }
                 else {
-                    var trans = x.transaction(_this.TableName, "readwrite");
-                    if (trans.objectStoreNames.contains(_this.TableName)) {
-                        var store_1 = trans.objectStore(_this.TableName);
+                    let trans = x.transaction(this.TableName, "readwrite");
+                    if (trans.objectStoreNames.contains(this.TableName)) {
+                        let store = trans.objectStore(this.TableName);
                         if (entity instanceof Array) {
-                            $.each(entity, function (i, value) {
-                                var id = value["" + store_1.keyPath];
-                                store_1.delete(id);
+                            $.each(entity, (i, value) => {
+                                let id = value[`${store.keyPath}`];
+                                store.delete(id);
                             });
                         }
                         else {
-                            var identity = entity["" + store_1.keyPath];
-                            store_1.delete(identity);
+                            let identity = entity[`${store.keyPath}`];
+                            store.delete(identity);
                         }
                         d.resolve();
                     }
                     else {
-                        d.reject("table not found. " + _this.TableName);
+                        d.reject(`table not found. ${this.TableName}`);
                     }
                 }
-            }).fail(function (x) {
+            }).fail(x => {
                 d.reject(x);
             });
             return d.promise();
-        };
-        IndexedDBHelper.prototype.Open = function () {
-            var d = $.Deferred();
-            var factory = window.indexedDB;
-            var openRequest = factory.open(this.DbName);
-            openRequest.onsuccess = function (e) {
-                var db = openRequest.result;
+        }
+        Open() {
+            let d = $.Deferred();
+            let factory = window.indexedDB;
+            let openRequest = factory.open(this.DbName);
+            openRequest.onsuccess = e => {
+                let db = openRequest.result;
                 d.resolve(db);
                 db.close();
             };
-            openRequest.onblocked = function (e) {
+            openRequest.onblocked = e => {
                 d.reject(e);
             };
-            openRequest.onerror = function (e) {
+            openRequest.onerror = e => {
                 d.reject(e);
             };
             return d.promise();
-        };
-        IndexedDBHelper.prototype.Upgrade = function (version, action) {
-            var factory = window.indexedDB;
-            var openRequest = factory.open(this.DbName, version);
-            openRequest.onsuccess = function (e) {
-                var dummy = e;
+        }
+        Upgrade(version, action) {
+            let factory = window.indexedDB;
+            let openRequest = factory.open(this.DbName, version);
+            openRequest.onsuccess = e => {
+                let dummy = e;
             };
-            openRequest.onupgradeneeded = function (e) {
-                var db = e.target.result;
+            openRequest.onupgradeneeded = (e) => {
+                let db = e.target.result;
                 action(e);
                 db.close();
             };
-            openRequest.onerror = function (e) {
+            openRequest.onerror = e => {
             };
-        };
-        return IndexedDBHelper;
-    }());
+        }
+    }
     DomBehind.IndexedDBHelper = IndexedDBHelper;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=IndexedDBHelper.js.map
@@ -5517,7 +5029,7 @@ var DomBehind;
 (function (DomBehind) {
     var Navigation;
     (function (Navigation) {
-        var ModalStartupLocation;
+        let ModalStartupLocation;
         (function (ModalStartupLocation) {
             ModalStartupLocation[ModalStartupLocation["CenterScreen"] = 0] = "CenterScreen";
             ModalStartupLocation[ModalStartupLocation["Manual"] = 1] = "Manual";
@@ -5529,10 +5041,10 @@ var DomBehind;
 (function (DomBehind) {
     var Navigation;
     (function (Navigation) {
-        var OnModalCloseEventName = "ModalClose";
-        var ReferenceCountKey = "ReferenceCountKey";
-        var DefaultNavigator = (function () {
-            function DefaultNavigator() {
+        const OnModalCloseEventName = "ModalClose";
+        const ReferenceCountKey = "ReferenceCountKey";
+        class DefaultNavigator {
+            constructor() {
                 this.DefaultSetting = {
                     FadeInDuration: 100,
                     FadeOutDuration: 100,
@@ -5544,13 +5056,13 @@ var DomBehind;
                     StartupLocationLeft: null
                 };
             }
-            DefaultNavigator.prototype.NewWindow = function (uri, target, style) {
+            NewWindow(uri, target, style) {
                 if (!String.IsNullOrWhiteSpace(uri) && uri !== "about:blank") {
                     uri = $.AbsoluteUri(uri);
                 }
                 return window.open(uri, target, style);
-            };
-            DefaultNavigator.prototype.Move = function (uri, historyBack) {
+            }
+            Move(uri, historyBack) {
                 uri = $.AbsoluteUri(uri);
                 if (location.href === uri)
                     return;
@@ -5560,21 +5072,21 @@ var DomBehind;
                 else {
                     location.replace(uri);
                 }
-            };
-            DefaultNavigator.prototype.Reload = function (forcedReload) {
+            }
+            Reload(forcedReload) {
                 location.reload(forcedReload);
-            };
-            DefaultNavigator.prototype.ShowModal = function (arg, option) {
-                var setting = $.extend(true, this.DefaultSetting, option);
+            }
+            ShowModal(arg, option) {
+                let setting = $.extend(true, this.DefaultSetting, option);
                 ;
-                var overlay = $("<div>", {
+                let overlay = $("<div>", {
                     class: "modal-overlay",
                 });
                 overlay.css("z-index", $.GenerateZIndex());
                 $("body").css("overflow", "hidden");
                 overlay
                     .appendTo("body")
-                    .fadeIn(setting.FadeInDuration, function () {
+                    .fadeIn(setting.FadeInDuration, () => {
                     $.SetDomStorage(ReferenceCountKey, $.GetDomStorage(ReferenceCountKey, 0) + 1);
                 });
                 var container;
@@ -5585,7 +5097,7 @@ var DomBehind;
                         async: false,
                         type: "GET",
                         cache: false,
-                        error: function (xhr, status, error) {
+                        error: (xhr, status, error) => {
                             ex = new DomBehind.AjaxException(xhr, status, error);
                         },
                     });
@@ -5597,7 +5109,7 @@ var DomBehind;
                 else {
                     container = arg;
                 }
-                container.find(".close").on("click", function (e, args) {
+                container.find(".close").on("click", (e, args) => {
                     $(e.target).trigger(OnModalCloseEventName, args);
                 });
                 if (!setting.ShowCloseButton) {
@@ -5608,8 +5120,8 @@ var DomBehind;
                         Object.IsNullOrUndefined(setting.StartupLocationLeft)) {
                         var buffCount = $.GetDomStorage(ReferenceCountKey, 0) + 1;
                         container.find(".modal-dialog")
-                            .css("top", -50 + (buffCount * 5) + "%")
-                            .css("left", -25 + (buffCount * 5) + "%");
+                            .css("top", `${-50 + (buffCount * 5)}%`)
+                            .css("left", `${-25 + (buffCount * 5)}%`);
                     }
                     else {
                         container.find(".modal-dialog")
@@ -5617,7 +5129,7 @@ var DomBehind;
                             .css("left", setting.StartupLocationLeft);
                     }
                 }
-                var modal = container.find(".modal-dialog");
+                let modal = container.find(".modal-dialog");
                 if (modal.draggable) {
                     modal.draggable({
                         handle: ".modal-header",
@@ -5635,16 +5147,16 @@ var DomBehind;
                     container.find(".modal-body").css("height", "100%");
                 }
                 if (setting.AllowCloseByClickOverlay) {
-                    overlay.click(overlay, function (e) {
+                    overlay.click(overlay, e => {
                         $(e.target).trigger(OnModalCloseEventName);
                     });
-                    container.click(function (e) {
+                    container.click(e => {
                         e.stopPropagation();
                     });
                 }
-                var d = $.Deferred();
+                let d = $.Deferred();
                 overlay.off(OnModalCloseEventName);
-                overlay.on(OnModalCloseEventName, { me: overlay, option: setting, target: container }, function (e, args) {
+                overlay.on(OnModalCloseEventName, { me: overlay, option: setting, target: container }, (e, args) => {
                     var eventObj = $.Event('modalClosing');
                     var modalBody = e.data.target.find(".modal-body");
                     $(modalBody.children()[0]).trigger(eventObj);
@@ -5656,7 +5168,7 @@ var DomBehind;
                     var eventOption = e.data.option;
                     var me = e.data.me;
                     me.off(OnModalCloseEventName);
-                    me.fadeOut(eventOption.FadeOutDuration, function () {
+                    me.fadeOut(eventOption.FadeOutDuration, () => {
                         me.remove();
                         $.SetDomStorage(ReferenceCountKey, $.GetDomStorage(ReferenceCountKey, 0) - 1);
                         if ($.GetDomStorage(ReferenceCountKey, 0) === 0) {
@@ -5667,9 +5179,8 @@ var DomBehind;
                 overlay.append(container);
                 container.hide().show(0);
                 return d.promise();
-            };
-            return DefaultNavigator;
-        }());
+            }
+        }
         Navigation.DefaultNavigator = DefaultNavigator;
     })(Navigation = DomBehind.Navigation || (DomBehind.Navigation = {}));
 })(DomBehind || (DomBehind = {}));
@@ -5678,24 +5189,20 @@ var DomBehind;
 (function (DomBehind) {
     var Validation;
     (function (Validation) {
-        var Validator = (function () {
-            function Validator(attribute) {
+        class Validator {
+            constructor(attribute) {
                 this._disposed = false;
                 this.Attribute = attribute;
             }
-            Object.defineProperty(Validator.prototype, "AttributeValue", {
-                get: function () {
-                    var ret = this.ParseAttributeValue();
-                    return Object.IsNullOrUndefined(ret) ? "" : ret;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Validator.prototype.ParseAttributeValue = function () {
+            get AttributeValue() {
+                var ret = this.ParseAttributeValue();
+                return Object.IsNullOrUndefined(ret) ? "" : ret;
+            }
+            ParseAttributeValue() {
                 if (Object.IsNullOrUndefined(this.AttributeExpression))
                     return null;
-                var obj = this.AttributeExpression;
-                var value;
+                let obj = this.AttributeExpression;
+                let value;
                 if (typeof obj === "string" || typeof obj === "number") {
                     value = this.AttributeExpression;
                 }
@@ -5703,8 +5210,8 @@ var DomBehind;
                     value = this.AttributeExpression(this.Behavior.DataContext);
                 }
                 return value;
-            };
-            Validator.prototype.OnValidationg = function () {
+            }
+            OnValidationg() {
                 this.HasError = false;
                 this.Apply();
                 this.HasError = !this.Validate(this.Behavior.ValueCore);
@@ -5714,8 +5221,8 @@ var DomBehind;
                         this.Behavior.Element.SetCustomError(message);
                     }
                 }
-            };
-            Validator.prototype.Apply = function () {
+            }
+            Apply() {
                 if (!Object.IsNullOrUndefined(this.AllowApply)) {
                     var ret = this.AllowApply(this.Behavior.DataContext);
                     if (!ret) {
@@ -5724,35 +5231,34 @@ var DomBehind;
                     }
                 }
                 this.AddValidation();
-            };
-            Validator.prototype.RemoveValidation = function () {
+            }
+            RemoveValidation() {
                 if (!String.IsNullOrWhiteSpace(this.Attribute)) {
                     this.Behavior.Element.removeAttr(this.Attribute);
                 }
                 this.Behavior.Element.ClearCustomError();
-            };
-            Validator.prototype.ClearValidation = function () {
-                var _this = this;
+            }
+            ClearValidation() {
                 if (!String.IsNullOrWhiteSpace(this.Attribute) &&
-                    Validator._ignoreMarks.Any(function (x) { return x !== _this.Attribute; })) {
+                    Validator._ignoreMarks.Any(x => x !== this.Attribute)) {
                     this.Behavior.Element.removeAttr(this.Attribute);
                 }
                 this.Behavior.Element.ClearCustomError();
-            };
-            Validator.prototype.AddValidation = function () {
+            }
+            AddValidation() {
                 this.RemoveValidation();
                 if (!String.IsNullOrWhiteSpace(this.Attribute)) {
                     this.Behavior.Element.attr(this.Attribute, this.AttributeValue);
                 }
-            };
-            Validator.prototype.Validate = function (value) {
+            }
+            Validate(value) {
                 return !this.Behavior.Element.HasError();
-            };
-            Validator.prototype.ValidationMessage = function (validity) {
+            }
+            ValidationMessage(validity) {
                 if (Object.IsNullOrUndefined(this.Message))
                     return null;
-                var obj = this.Message;
-                var errorMessage;
+                let obj = this.Message;
+                let errorMessage;
                 if (typeof obj === "string") {
                     errorMessage = this.Message;
                 }
@@ -5760,125 +5266,93 @@ var DomBehind;
                     errorMessage = this.Message(this.Behavior.DataContext);
                 }
                 return errorMessage;
-            };
-            Validator.prototype.Dispose = function () {
+            }
+            Dispose() {
                 if (!this._disposed) {
                 }
                 this._disposed = true;
-            };
-            Validator._ignoreMarks = [
-                "maxlength"
-            ];
-            return Validator;
-        }());
+            }
+        }
+        Validator._ignoreMarks = [
+            "maxlength"
+        ];
         Validation.Validator = Validator;
     })(Validation = DomBehind.Validation || (DomBehind.Validation = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Validator.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Validation;
     (function (Validation) {
-        var ValidatorCollection = (function (_super) {
-            __extends(ValidatorCollection, _super);
-            function ValidatorCollection() {
-                var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this._disposed = false;
-                return _this;
+        class ValidatorCollection extends collections.LinkedList {
+            constructor() {
+                super(...arguments);
+                this._disposed = false;
             }
-            ValidatorCollection.prototype.RemoveValidator = function () {
-                $.each(this.toArray(), function (i, x) { return x.RemoveValidation(); });
-            };
-            ValidatorCollection.prototype.ClearValidator = function () {
-                $.each(this.toArray(), function (i, x) { return x.ClearValidation(); });
-            };
-            ValidatorCollection.prototype.ApplyValidator = function () {
-                $.each(this.toArray(), function (i, x) { return x.Apply(); });
-            };
-            ValidatorCollection.prototype.Validate = function () {
-                var result = true;
-                $.each(this.toArray(), function (i, x) {
+            RemoveValidator() {
+                $.each(this.toArray(), (i, x) => x.RemoveValidation());
+            }
+            ClearValidator() {
+                $.each(this.toArray(), (i, x) => x.ClearValidation());
+            }
+            ApplyValidator() {
+                $.each(this.toArray(), (i, x) => x.Apply());
+            }
+            Validate() {
+                let result = true;
+                $.each(this.toArray(), (i, x) => {
                     x.OnValidationg();
                     if (x.HasError) {
                         result = false;
                     }
                 });
                 return result;
-            };
-            ValidatorCollection.prototype.Dispose = function () {
+            }
+            Dispose() {
                 if (!this._disposed) {
-                    $.each(this.toArray(), function (i, x) { return x.Dispose(); });
+                    $.each(this.toArray(), (i, x) => x.Dispose());
                     this.clear();
                 }
                 this._disposed = true;
-            };
-            return ValidatorCollection;
-        }(collections.LinkedList));
+            }
+        }
         Validation.ValidatorCollection = ValidatorCollection;
     })(Validation = DomBehind.Validation || (DomBehind.Validation = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=ValidatorCollection.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Validation;
     (function (Validation) {
-        var MaxLengthValidator = (function (_super) {
-            __extends(MaxLengthValidator, _super);
-            function MaxLengthValidator() {
-                return _super.call(this, "maxlength") || this;
+        class MaxLengthValidator extends Validation.Validator {
+            constructor() {
+                super("maxlength");
             }
-            MaxLengthValidator.prototype.Dispose = function () {
+            Dispose() {
                 if (!this._disposed) {
-                    _super.prototype.Dispose.call(this);
+                    super.Dispose();
                 }
-            };
-            return MaxLengthValidator;
-        }(Validation.Validator));
+            }
+        }
         Validation.MaxLengthValidator = MaxLengthValidator;
     })(Validation = DomBehind.Validation || (DomBehind.Validation = {}));
 })(DomBehind || (DomBehind = {}));
 (function (DomBehind) {
     DomBehind.BindingBehaviorBuilder.prototype.MaxLength = function (maxlength, message, applyRule) {
-        var me = this;
-        var dataBinding = this;
+        let me = this;
+        let dataBinding = this;
         if (dataBinding.AddValidator) {
-            var validator = dataBinding.AddValidator(new DomBehind.Validation.MaxLengthValidator());
+            let validator = dataBinding.AddValidator(new DomBehind.Validation.MaxLengthValidator());
             validator.AttributeExpression = maxlength;
             validator.Message = message;
             validator.AllowApply = applyRule;
         }
-        var inputType = me.CurrentElement.attr("type");
+        let inputType = me.CurrentElement.attr("type");
         if (inputType == "number") {
             me.CurrentElement.off('input');
             me.CurrentElement.on('input', function (e) {
-                var el = $(this);
-                var value = String(el.val());
+                let el = $(this);
+                let value = String(el.val());
                 if (value.length > maxlength) {
                     el.val(value.slice(0, maxlength));
                 }
@@ -5890,14 +5364,14 @@ var DomBehind;
         return me;
     };
     DomBehind.BindingBehaviorBuilder.prototype.MaxNumeric = function (max) {
-        var me = this;
+        let me = this;
         DomBehind.UIElement.MaxNumericProperty.SetValue(me.CurrentElement, max);
-        var length = max.toString().length;
+        let length = max.toString().length;
         me.CurrentElement.off('input');
         me.CurrentElement.on('input', function (e) {
-            var el = $(this);
-            var maxlength = el.attr('max').length;
-            var value = String(el.val());
+            let el = $(this);
+            let maxlength = el.attr('max').length;
+            let value = String(el.val());
             if (value.length > maxlength) {
                 el.val(value.slice(0, maxlength));
             }
@@ -5905,52 +5379,37 @@ var DomBehind;
         return me;
     };
     DomBehind.BindingBehaviorBuilder.prototype.MinNumeric = function (min) {
-        var me = this;
+        let me = this;
         DomBehind.UIElement.MinNumericProperty.SetValue(me.CurrentElement, min);
         return me;
     };
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=MaxLengthValidator.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Validation;
     (function (Validation) {
-        var RegexValidator = (function (_super) {
-            __extends(RegexValidator, _super);
-            function RegexValidator() {
-                return _super.call(this, "pattern") || this;
+        class RegexValidator extends Validation.Validator {
+            constructor() {
+                super("pattern");
             }
-            RegexValidator.prototype.RemoveValidation = function () {
-                _super.prototype.RemoveValidation.call(this);
+            RemoveValidation() {
+                super.RemoveValidation();
                 this.Behavior.Element.removeAttr("title");
-            };
-            RegexValidator.prototype.ValidationMessage = function (validity) {
-                var message = _super.prototype.ValidationMessage.call(this, validity);
+            }
+            ValidationMessage(validity) {
+                var message = super.ValidationMessage(validity);
                 if (String.IsNullOrWhiteSpace(message)) {
                     this.Behavior.Element.attr("title", this.AttributeValue);
                 }
                 return message;
-            };
-            RegexValidator.prototype.Dispose = function () {
+            }
+            Dispose() {
                 if (!this._disposed) {
-                    _super.prototype.Dispose.call(this);
+                    super.Dispose();
                 }
-            };
-            return RegexValidator;
-        }(Validation.Validator));
+            }
+        }
         Validation.RegexValidator = RegexValidator;
     })(Validation = DomBehind.Validation || (DomBehind.Validation = {}));
 })(DomBehind || (DomBehind = {}));
@@ -5958,7 +5417,7 @@ var DomBehind;
     var Data;
     (function (Data) {
         Data.DataBindingBehaviorBuilder.prototype.Pattern = function (regex, message, applyRule) {
-            var me = this;
+            let me = this;
             var validator = me.AddValidator(new DomBehind.Validation.RegexValidator());
             validator.AttributeExpression = regex;
             validator.Message = message;
@@ -5968,35 +5427,20 @@ var DomBehind;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=RegexValidator.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Validation;
     (function (Validation) {
-        var RequiredValidator = (function (_super) {
-            __extends(RequiredValidator, _super);
-            function RequiredValidator() {
-                return _super.call(this, "required") || this;
+        class RequiredValidator extends Validation.Validator {
+            constructor() {
+                super("required");
             }
-            RequiredValidator.prototype.Dispose = function () {
+            Dispose() {
                 if (!this._disposed) {
-                    _super.prototype.Dispose.call(this);
+                    super.Dispose();
                 }
-            };
-            return RequiredValidator;
-        }(Validation.Validator));
+            }
+        }
         Validation.RequiredValidator = RequiredValidator;
     })(Validation = DomBehind.Validation || (DomBehind.Validation = {}));
 })(DomBehind || (DomBehind = {}));
@@ -6004,7 +5448,7 @@ var DomBehind;
     var Data;
     (function (Data) {
         Data.DataBindingBehaviorBuilder.prototype.Required = function (message, applyRule) {
-            var me = this;
+            let me = this;
             var validator = me.AddValidator(new DomBehind.Validation.RequiredValidator());
             validator.Message = message;
             validator.AllowApply = applyRule;
@@ -6013,82 +5457,64 @@ var DomBehind;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=RequiredValidator.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Validation;
     (function (Validation) {
-        var PipelineValidator = (function (_super) {
-            __extends(PipelineValidator, _super);
-            function PipelineValidator() {
-                var _this = _super.call(this) || this;
-                _this.Validators = [];
-                return _this;
+        class PipelineValidator extends DomBehind.Validation.Validator {
+            constructor() {
+                super();
+                this.Validators = [];
             }
-            PipelineValidator.prototype.Validate = function (value) {
-                var _this = this;
-                var result = true;
-                var lastErrorMessage;
+            Validate(value) {
+                let result = true;
+                let lastErrorMessage;
                 this.Error = null;
-                $.each(this.Validators, function (i, x) {
-                    x.HasError = false;
-                    x.Apply();
-                    if (!x.Validate(value)) {
+                $.each(this.Validators, (i, x) => {
+                    x.OnValidationg();
+                    if (x.HasError) {
                         lastErrorMessage = x.Message;
                         result = false;
-                        _this.Error = x;
+                        this.Error = x;
                         return false;
                     }
                 });
                 this.Message = lastErrorMessage;
                 return result;
-            };
-            PipelineValidator.prototype.Apply = function () {
-                this.Validators.forEach(function (x) { return x.Apply(); });
-            };
-            PipelineValidator.prototype.RemoveValidation = function () {
-                this.Validators.forEach(function (x) { return x.RemoveValidation(); });
-            };
-            PipelineValidator.prototype.ClearValidation = function () {
-                this.Validators.forEach(function (x) { return x.ClearValidation(); });
-            };
-            PipelineValidator.prototype.AddValidation = function () {
-                this.Validators.forEach(function (x) { return x.AddValidation(); });
-            };
-            PipelineValidator.prototype.AddValidator = function (validator) {
+            }
+            Apply() {
+                this.Validators.forEach(x => x.Apply());
+            }
+            RemoveValidation() {
+                this.Validators.forEach(x => x.RemoveValidation());
+            }
+            ClearValidation() {
+                this.Validators.forEach(x => x.ClearValidation());
+            }
+            AddValidation() {
+                this.Validators.forEach(x => x.AddValidation());
+            }
+            AddValidator(validator) {
                 validator.Behavior = this.Behavior;
                 this.Validators.push(validator);
-            };
-            PipelineValidator.prototype.Dispose = function () {
-                this.Validators.forEach(function (x) { return x.Dispose(); });
-            };
-            return PipelineValidator;
-        }(DomBehind.Validation.Validator));
+            }
+            Dispose() {
+                this.Validators.forEach(x => x.Dispose());
+            }
+        }
         Validation.PipelineValidator = PipelineValidator;
     })(Validation = DomBehind.Validation || (DomBehind.Validation = {}));
 })(DomBehind || (DomBehind = {}));
 (function (DomBehind) {
     DomBehind.BindingBehaviorBuilder.prototype.AddPipelineValidator = function (validator) {
-        var me = this;
+        let me = this;
         if (me.CurrentBehavior instanceof DomBehind.Data.DataBindingBehavior) {
-            var lastValidator = me.CurrentBehavior.BindingPolicy.Validators.toArray().LastOrDefault();
+            let lastValidator = me.CurrentBehavior.BindingPolicy.Validators.toArray().LastOrDefault();
             if (lastValidator && lastValidator instanceof DomBehind.Validation.PipelineValidator) {
                 lastValidator.AddValidator(validator);
             }
             else {
-                var pipelineValidator = new DomBehind.Validation.PipelineValidator();
+                let pipelineValidator = new DomBehind.Validation.PipelineValidator();
                 pipelineValidator.Behavior = me.CurrentBehavior;
                 pipelineValidator.AddValidator(validator);
                 me.CurrentBehavior.BindingPolicy.Validators.add(pipelineValidator);
@@ -6100,7 +5526,7 @@ var DomBehind;
 //# sourceMappingURL=PipelineValidator.js.map
 var DomBehind;
 (function (DomBehind) {
-    var PoolType;
+    let PoolType;
     (function (PoolType) {
         PoolType[PoolType["PreLoad"] = 1] = "PreLoad";
         PoolType[PoolType["Reload"] = 2] = "Reload";
@@ -6111,27 +5537,23 @@ var DomBehind;
 (function (DomBehind) {
     var Threading;
     (function (Threading) {
-        var WorkerPool = (function () {
-            function WorkerPool() {
-            }
-            WorkerPool.Register = function (type, defaultPoolCount) {
-                var _this = this;
-                if (defaultPoolCount === void 0) { defaultPoolCount = 2; }
-                $("body").ready(function (e) {
-                    var factory = new DomBehind.TypedFactory(type());
+        class WorkerPool {
+            static Register(type, defaultPoolCount = 2) {
+                $("body").ready(e => {
+                    let factory = new DomBehind.TypedFactory(type());
                     for (var i = 0; i < defaultPoolCount; i++) {
-                        var newThread = factory.CreateInstance();
+                        let newThread = factory.CreateInstance();
                         if ((newThread.PoolType & DomBehind.PoolType.PreLoad) == DomBehind.PoolType.PreLoad) {
                             newThread.Load();
                         }
-                        _this.Pool.push(newThread);
+                        this.Pool.push(newThread);
                     }
                 });
-            };
-            WorkerPool.Do = function (type, arg) {
-                var thread = null;
-                var newPool = [];
-                $.each(WorkerPool.Pool, function (i, value) {
+            }
+            static Do(type, arg) {
+                let thread = null;
+                let newPool = [];
+                $.each(WorkerPool.Pool, (i, value) => {
                     if (thread) {
                         newPool.push(value);
                     }
@@ -6146,21 +5568,20 @@ var DomBehind;
                 });
                 WorkerPool.Pool = newPool;
                 if (!thread) {
-                    var factory = new DomBehind.TypedFactory(type);
+                    let factory = new DomBehind.TypedFactory(type);
                     thread = factory.CreateInstance();
                     thread.Load();
                 }
-                return thread.Do(arg).always(function () {
+                return thread.Do(arg).always(() => {
                     if (thread.PoolType & DomBehind.PoolType.Reload) {
                         thread.Terminate();
                         thread.Load();
                     }
                     WorkerPool.Pool.push(thread);
                 });
-            };
-            WorkerPool.Pool = [];
-            return WorkerPool;
-        }());
+            }
+        }
+        WorkerPool.Pool = [];
         Threading.WorkerPool = WorkerPool;
     })(Threading = DomBehind.Threading || (DomBehind.Threading = {}));
 })(DomBehind || (DomBehind = {}));
@@ -6169,36 +5590,28 @@ var DomBehind;
 (function (DomBehind) {
     var Threading;
     (function (Threading) {
-        var WorkerWrapper = (function () {
-            function WorkerWrapper() {
+        class WorkerWrapper {
+            constructor() {
                 this.PoolType = DomBehind.PoolType.Reload;
             }
-            Object.defineProperty(WorkerWrapper.prototype, "Thread", {
-                get: function () { return this._thread; },
-                enumerable: true,
-                configurable: true
-            });
+            get Thread() { return this._thread; }
             ;
-            WorkerWrapper.prototype.Load = function () {
+            Load() {
                 if (!this._thread)
                     this._thread = new Worker(this.WorkerScript);
-            };
-            Object.defineProperty(WorkerWrapper.prototype, "WorkerScript", {
-                get: function () { return null; },
-                enumerable: true,
-                configurable: true
-            });
-            WorkerWrapper.prototype.Do = function (arg) {
-                var d = $.Deferred();
-                this.Thread.onmessage = function (e) {
+            }
+            get WorkerScript() { return null; }
+            Do(arg) {
+                let d = $.Deferred();
+                this.Thread.onmessage = e => {
                     d.resolve(e.data);
                 };
-                this.Thread.onerror = function (e) {
-                    console.error(e.filename + ":(" + e.lineno + ")\n" + e.message);
+                this.Thread.onerror = (e) => {
+                    console.error(`${e.filename}:(${e.lineno})\n${e.message}`);
                     var errorMessage;
                     var stackTrace;
                     try {
-                        $.each($(e.message), function (i, value) {
+                        $.each($(e.message), (i, value) => {
                             if (value instanceof HTMLTitleElement) {
                                 errorMessage = value.text;
                             }
@@ -6214,51 +5627,28 @@ var DomBehind;
                 };
                 this.Thread.postMessage(arg);
                 return d.promise();
-            };
-            WorkerWrapper.prototype.Terminate = function () {
+            }
+            Terminate() {
                 if (this._thread) {
                     this._thread.terminate();
                     this._thread = null;
                 }
-            };
-            return WorkerWrapper;
-        }());
+            }
+        }
         Threading.WorkerWrapper = WorkerWrapper;
     })(Threading = DomBehind.Threading || (DomBehind.Threading = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=WorkerWrapper.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Web;
     (function (Web) {
-        DomBehind.Threading.WorkerPool.Register(function () { return PlainXMLHttpRequestWorker; });
-        var PlainXMLHttpRequestWorker = (function (_super) {
-            __extends(PlainXMLHttpRequestWorker, _super);
-            function PlainXMLHttpRequestWorker() {
-                return _super !== null && _super.apply(this, arguments) || this;
+        DomBehind.Threading.WorkerPool.Register(() => PlainXMLHttpRequestWorker);
+        class PlainXMLHttpRequestWorker extends DomBehind.Threading.WorkerWrapper {
+            get WorkerScript() {
+                return "~/Scripts/dombehind-PlainXMLHttpRequest.js";
             }
-            Object.defineProperty(PlainXMLHttpRequestWorker.prototype, "WorkerScript", {
-                get: function () {
-                    return "~/Scripts/dombehind-PlainXMLHttpRequest.js";
-                },
-                enumerable: true,
-                configurable: true
-            });
-            return PlainXMLHttpRequestWorker;
-        }(DomBehind.Threading.WorkerWrapper));
+        }
         Web.PlainXMLHttpRequestWorker = PlainXMLHttpRequestWorker;
     })(Web = DomBehind.Web || (DomBehind.Web = {}));
 })(DomBehind || (DomBehind = {}));
@@ -6267,16 +5657,16 @@ var DomBehind;
 (function (DomBehind) {
     var Web;
     (function (Web) {
-        var WebService = (function () {
-            function WebService() {
+        class WebService {
+            constructor() {
                 this.Timeout = 1000 * 30;
             }
-            WebService.prototype.Execute = function (request) {
-                var ex;
-                var option = this.DefaultPostSetting;
+            Execute(request) {
+                let ex;
+                let option = this.DefaultPostSetting;
                 option.data = request;
                 option.async = false;
-                option.error = function (xhr, status, error) {
+                option.error = (xhr, status, error) => {
                     ex = new DomBehind.AjaxException(xhr, status, error);
                 };
                 var promise = $.ajax(option);
@@ -6284,187 +5674,221 @@ var DomBehind;
                     throw ex;
                 }
                 return promise.responseJSON;
-            };
-            WebService.prototype.ExecuteAsync = function (request, option) {
-                var d = $.Deferred();
-                var p = $.extend(true, this.DefaultPostSetting, option);
+            }
+            ExecuteAsync(request, option) {
+                let d = $.Deferred();
+                let p = $.extend(true, this.DefaultPostSetting, option);
                 p.data = JSON.stringify(request);
                 p.async = true;
-                $.ajax(p).done(function (x) {
+                $.ajax(p).done(x => {
                     d.resolve(x);
-                }).fail(function (x) {
+                }).fail(x => {
                     d.reject(new DomBehind.AjaxException(x));
                 });
                 return d.promise();
-            };
-            WebService.prototype.ExecuteAjax = function (request, option) {
-                var d = $.Deferred();
-                var p = $.extend(true, this.DefaultPostSetting, option);
+            }
+            ExecuteAjax(request, option) {
+                let d = $.Deferred();
+                let p = $.extend(true, this.DefaultPostSetting, option);
                 p.data = request;
                 p.async = true;
-                $.ajax(p).done(function (x) {
+                $.ajax(p).done(x => {
                     d.resolve(x);
-                }).fail(function (x) {
+                }).fail(x => {
                     d.reject(new DomBehind.AjaxException(x));
                 });
                 return d.promise();
-            };
-            Object.defineProperty(WebService.prototype, "DefaultPostSetting", {
-                get: function () {
-                    return {
-                        type: "POST",
-                        dataType: "json",
-                        cache: false,
-                        url: $.AbsoluteUri(this.Url),
-                        timeout: this.Timeout,
-                        traditional: true
-                    };
-                },
-                enumerable: true,
-                configurable: true
-            });
-            return WebService;
-        }());
+            }
+            get DefaultPostSetting() {
+                return {
+                    type: "POST",
+                    dataType: "json",
+                    cache: false,
+                    url: $.AbsoluteUri(this.Url),
+                    timeout: this.Timeout,
+                    traditional: true
+                };
+            }
+        }
         Web.WebService = WebService;
     })(Web = DomBehind.Web || (DomBehind.Web = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=WebService.js.map
 var DomBehind;
 (function (DomBehind) {
-    var UIElement = (function () {
-        function UIElement() {
-        }
-        UIElement.RaiseEnabledChanged = function (element, isEnabled) {
-            element.Raise(UIElement.EnabledChanged, function (e) { return e.isEnabled = isEnabled; });
-        };
-        UIElement.ValueProperty = DomBehind.Data.DependencyProperty.RegisterAttached("val", function (x) { return x.val(); }, function (x, y) { return x.val(y); }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
-        UIElement.TextProperty = DomBehind.Data.DependencyProperty.RegisterAttached("text", function (x) { return x.text(); }, function (x, y) { return x.text(y); }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
-        UIElement.SrcProperty = DomBehind.Data.DependencyProperty.RegisterAttached("src", function (x) { return x.attr("src"); }, function (x, y) { return x.attr("src", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.HrefProperty = DomBehind.Data.DependencyProperty.RegisterAttached("href", function (x) { return x.attr("href"); }, function (x, y) { return x.attr("href", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("enabled", null, function (x, y) {
-            var disabled = y === false ? true : false;
-            var oldDisabledValue = x.hasClass("disabled");
-            if (disabled === true) {
-                x.attr("disabled", "");
-                x.addClass("disabled");
-            }
-            else {
-                x.removeAttr("disabled");
-                x.removeClass("disabled");
-            }
-            if (x.is('input[type=radio]') ||
-                x.is('input[type=checkbox]')) {
-                var parent_1 = x.closest("label");
-                if (parent_1) {
-                    if (disabled) {
-                        parent_1.addClass("disablecheck");
-                    }
-                    else {
-                        parent_1.removeClass("disablecheck");
-                    }
-                }
-            }
-            if (disabled === oldDisabledValue)
-                return;
-            UIElement.RaiseEnabledChanged(x, !disabled);
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.IsVisibleProperty = DomBehind.Data.DependencyProperty.RegisterAttached("display", function (x) { return x.attr("display") === "none" ? false : true; }, function (x, y) {
-            var visible = y ? true : false;
-            if (visible) {
-                x.attr("display", "");
-                try {
-                    x.show();
-                }
-                catch (e) {
-                }
-            }
-            else {
-                x.attr("display", "none");
-                try {
-                    x.hide();
-                }
-                catch (e) {
-                }
-            }
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
-        UIElement.OpacityProperty = DomBehind.Data.DependencyProperty.RegisterAttached("opacity", function (x) {
-        }, function (el, newValue) {
-            el.css("opacity", newValue);
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.PlaceHolderProperty = DomBehind.Data.DependencyProperty.RegisterAttached("placeholder", null, function (x, y) { return x.attr("placeholder", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.IsCheckedProperty = DomBehind.Data.DependencyProperty.RegisterAttached("checked", function (x) { return x.get(0).checked; }, function (x, y) {
-            var el = x.get(0);
-            el.checked = y;
-            if (el.hasAttribute("readonly")) {
-                el.onclick = function (e) { return false; };
-            }
-        }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
-        UIElement.MaxLengthProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("maxlength", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.MaxNumericProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("max", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.MinNumericProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, function (x, y) { return x.attr("min", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.BackgroundColorProperty = DomBehind.Data.DependencyProperty.RegisterAttached("background-color", null, function (x, y) { return x.css("background-color", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.ColorProperty = DomBehind.Data.DependencyProperty.RegisterAttached("color", null, function (x, y) { return x.css("color", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.BackgroundImageProperty = DomBehind.Data.DependencyProperty.RegisterAttached("background-image", null, function (x, y) { return x.css("background-image", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.ClassProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", function (x) { return x.attr("class"); }, function (x, y) { return x.attr("class", y); }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
-        UIElement.HtmlSource = DomBehind.Data.DependencyProperty.RegisterAttached("htmlSource", null, function (x, y) {
-            var p = {
-                url: y,
-                async: true,
-                type: "GET",
-                cache: true,
-            };
-            $.ajax(p).done(function (dom) {
-                var body = $(dom).find("#_Layout");
-                x.append($(dom));
-            }).fail(function (error) {
-                throw new DomBehind.AjaxException(error);
+    class UIElement {
+        static RaiseEnabledChanged(element, isEnabled) {
+            element.Raise(UIElement.EnabledChanged, (e) => {
+                e.isEnabled = isEnabled;
             });
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        UIElement.Click = DomBehind.EventBuilder.RegisterAttached("click");
-        UIElement.Enter = DomBehind.EventBuilder.RegisterAttached("enterKeydown", function (x) {
-            if (x && x.Element) {
-                x.Element.keydown(function (e) {
-                    if (e.which === 13) {
-                        x.Element.trigger("enterKeydown");
-                    }
-                });
+        }
+    }
+    UIElement.ValueProperty = DomBehind.Data.DependencyProperty.RegisterAttached("val", x => x.val(), (x, y) => x.val(y), DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
+    UIElement.TextProperty = DomBehind.Data.DependencyProperty.RegisterAttached("text", x => x.text(), (x, y) => x.text(y), DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
+    UIElement.SrcProperty = DomBehind.Data.DependencyProperty.RegisterAttached("src", x => x.attr("src"), (x, y) => x.attr("src", y), DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    UIElement.HrefProperty = DomBehind.Data.DependencyProperty.RegisterAttached("href", x => x.attr("href"), (x, y) => x.attr("href", y), DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    UIElement.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("enabled", null, (x, y) => {
+        let disabled = y === false ? true : false;
+        let oldDisabledValue = x.hasClass("disabled");
+        if (disabled === true) {
+            x.attr("disabled", "");
+            x.addClass("disabled");
+        }
+        else {
+            x.removeAttr("disabled");
+            x.removeClass("disabled");
+        }
+        if (x.is('input[type=radio]') ||
+            x.is('input[type=checkbox]')) {
+            let parent = x.closest("label");
+            if (parent) {
+                if (disabled) {
+                    parent.addClass("disablecheck");
+                }
+                else {
+                    parent.removeClass("disablecheck");
+                }
             }
+        }
+        if (disabled === oldDisabledValue)
+            return;
+        UIElement.RaiseEnabledChanged(x, !disabled);
+    }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    UIElement.IsVisibleProperty = DomBehind.Data.DependencyProperty.RegisterAttached("display", x => x.attr("display") === "none" ? false : true, (x, y) => {
+        let visible = y ? true : false;
+        if (visible) {
+            x.attr("display", "");
+            try {
+                x.show();
+            }
+            catch (e) {
+            }
+        }
+        else {
+            x.attr("display", "none");
+            try {
+                x.hide();
+            }
+            catch (e) {
+            }
+        }
+    }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
+    UIElement.OpacityProperty = DomBehind.Data.DependencyProperty.RegisterAttached("opacity", x => {
+    }, (el, newValue) => {
+        el.css("opacity", newValue);
+    }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    UIElement.PlaceHolderProperty = DomBehind.Data.DependencyProperty.RegisterAttached("placeholder", null, (x, y) => x.attr("placeholder", y), DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    UIElement.IsCheckedProperty = DomBehind.Data.DependencyProperty.RegisterAttached("checked", x => x.get(0).checked, (x, y) => {
+        let el = x.get(0);
+        el.checked = y;
+        if (el.hasAttribute("readonly")) {
+            el.onclick = e => false;
+        }
+    }, DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
+    UIElement.MaxLengthProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, (x, y) => x.attr("maxlength", y), DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    UIElement.MaxNumericProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, (x, y) => x.attr("max", y), DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    UIElement.MinNumericProperty = DomBehind.Data.DependencyProperty.RegisterAttached("maxlength", null, (x, y) => x.attr("min", y), DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    UIElement.BackgroundColorProperty = DomBehind.Data.DependencyProperty.RegisterAttached("background-color", null, (x, y) => x.css("background-color", y), DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    UIElement.ColorProperty = DomBehind.Data.DependencyProperty.RegisterAttached("color", null, (x, y) => x.css("color", y), DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    UIElement.BackgroundImageProperty = DomBehind.Data.DependencyProperty.RegisterAttached("background-image", null, (x, y) => x.css("background-image", y), DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    UIElement.ClassProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", x => x.attr("class"), (x, y) => x.attr("class", y), DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
+    UIElement.HtmlSource = DomBehind.Data.DependencyProperty.RegisterAttached("htmlSource", null, (x, y) => {
+        let p = {
+            url: y,
+            async: true,
+            type: "GET",
+            cache: true,
+        };
+        $.ajax(p).done(dom => {
+            let body = $(dom).find("#_Layout");
+            x.append($(dom));
+        }).fail(error => {
+            throw new DomBehind.AjaxException(error);
         });
-        UIElement.Keydown = DomBehind.EventBuilder.RegisterAttached("keydown");
-        UIElement.FocusIn = DomBehind.EventBuilder.RegisterAttached("focusin");
-        UIElement.LostFocus = DomBehind.EventBuilder.RegisterAttached("focusout");
-        UIElement.Initialize = DomBehind.EventBuilder.RegisterAttached("initialize");
-        UIElement.Activate = DomBehind.EventBuilder.RegisterAttached("activate");
-        UIElement.ModalClosing = DomBehind.EventBuilder.RegisterAttached("modalClosing");
-        UIElement.EnabledChanged = DomBehind.EventBuilder.RegisterAttached("enabledChanged");
-        return UIElement;
-    }());
+    }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    UIElement.Click = DomBehind.EventBuilder.RegisterAttached("click");
+    UIElement.Enter = DomBehind.EventBuilder.RegisterAttached("enterKeydown", x => {
+        if (x && x.Element) {
+            x.Element.keydown(e => {
+                if (e.which === 13) {
+                    x.Element.trigger("enterKeydown");
+                }
+            });
+        }
+    });
+    UIElement.Keydown = DomBehind.EventBuilder.RegisterAttached("keydown");
+    UIElement.FocusIn = DomBehind.EventBuilder.RegisterAttached("focusin");
+    UIElement.LostFocus = DomBehind.EventBuilder.RegisterAttached("focusout");
+    UIElement.Initialize = DomBehind.EventBuilder.RegisterAttached("initialize");
+    UIElement.Activate = DomBehind.EventBuilder.RegisterAttached("activate");
+    UIElement.ModalClosing = DomBehind.EventBuilder.RegisterAttached("modalClosing");
+    UIElement.EnabledChanged = DomBehind.EventBuilder.RegisterAttached("enabledChanged");
     DomBehind.UIElement = UIElement;
-    DomBehind.BindingBehaviorBuilder.prototype.ClearLastBindingValueWhenDisabled = function (option) {
-        var me = this;
-        var lastBinding = me.CurrentBehavior;
+    DomBehind.BindingBehaviorBuilder.prototype.ClearValueWhenDisabled = function (option) {
+        let me = this;
+        let lastBinding = me.CurrentBehavior;
         if (lastBinding instanceof DomBehind.Data.DataBindingBehavior) {
-            me.BindingActionWithOption(UIElement.EnabledChanged, function (x, e) {
-                var isEnabled = e.isEnabled;
-                if (!isEnabled) {
-                    var lastBinding_1 = e.Args;
-                    if (lastBinding_1) {
-                        var nowValue = lastBinding_1.ValueCore;
-                        if (option && option.clearAction) {
-                            var clearValue = option.clearAction(lastBinding_1.DataContext, nowValue);
-                            lastBinding_1.PInfo.SetValue(clearValue);
-                        }
-                        else {
-                            if (nowValue instanceof DomBehind.Data.ListCollectionView) {
-                                nowValue.UnSelect();
+            me.BindingActionWithOption(UIElement.EnabledChanged, (x, e) => {
+                let d = $.Deferred();
+                setTimeout((_e) => {
+                    let exception;
+                    try {
+                        let lastBinding = _e.behavior;
+                        if (!lastBinding)
+                            return;
+                        let sender = $(_e.sourceEvent.target);
+                        let ele = lastBinding.Element;
+                        if (!sender.Equals(ele))
+                            return;
+                        if (ele.is('input')) {
+                            let disabled = ele.hasClass("disabled");
+                            if (!disabled)
+                                return;
+                            if (_e.option && _e.option.clearAction) {
+                                _e.option.clearAction(lastBinding.DataContext, lastBinding.ValueCore, ele);
                             }
                             else {
-                                lastBinding_1.PInfo.SetValue(null);
+                                if (ele.is('input[type=radio]') ||
+                                    ele.is('input[type=checkbox]')) {
+                                    let checkEle = ele.get(0);
+                                    if (checkEle.checked) {
+                                        checkEle.checked = false;
+                                    }
+                                }
+                                else {
+                                    ele.val(null);
+                                }
                             }
                         }
-                        lastBinding_1.UpdateTarget();
+                        else {
+                            let isEnabled = _e.sourceEvent.isEnabled;
+                            if (isEnabled)
+                                return;
+                            if (_e.option && _e.option.clearAction) {
+                                _e.option.clearAction(lastBinding.DataContext, lastBinding.ValueCore, ele);
+                            }
+                            else {
+                                let nowValue = lastBinding.ValueCore;
+                                if (nowValue instanceof DomBehind.Data.ListCollectionView) {
+                                    nowValue.UnSelect();
+                                    nowValue.Refresh();
+                                }
+                            }
+                        }
                     }
-                }
+                    catch (e) {
+                        exception = e;
+                    }
+                    finally {
+                        if (exception) {
+                            d.reject(exception);
+                        }
+                        else {
+                            d.resolve();
+                        }
+                    }
+                }, 0, { behavior: lastBinding, option: option, sourceEvent: e });
+                return d.promise();
             }, { args: lastBinding });
         }
         return me;
@@ -6474,7 +5898,7 @@ var DomBehind;
 var DomBehind;
 (function (DomBehind) {
     DomBehind.BindingBehaviorBuilder.prototype.InputType = function (inputType) {
-        var me = this;
+        let me = this;
         var typeName = InputType[inputType];
         if (inputType === InputType.DateTimeLocal) {
             typeName = "DateTime-Local";
@@ -6484,7 +5908,7 @@ var DomBehind;
         me.CurrentElement.attr("type", typeName);
         return me;
     };
-    var InputType;
+    let InputType;
     (function (InputType) {
         InputType[InputType["Hidden"] = 0] = "Hidden";
         InputType[InputType["Text"] = 1] = "Text";
@@ -6515,8 +5939,8 @@ var DomBehind;
 var DomBehind;
 (function (DomBehind) {
     DomBehind.BindingBehaviorBuilder.prototype.Scrolling = function () {
-        var me = this;
-        me.CurrentElement.click(function (e) {
+        let me = this;
+        me.CurrentElement.click(e => {
             var a = e.target;
             var hash = a.hash;
             var offset = $(hash).offset();
@@ -6532,7 +5956,7 @@ var DomBehind;
         return me;
     };
     DomBehind.BindingBehaviorBuilder.prototype.SlideAnimation = function () {
-        var me = this;
+        let me = this;
         var uiElements = me.CurrentElement;
         $(window).scroll(function () {
             uiElements.each(function () {
@@ -6551,20 +5975,19 @@ var DomBehind;
 (function (DomBehind) {
     var Controls;
     (function (Controls) {
-        var Selector = (function () {
-            function Selector(Behavior) {
-                var _this = this;
+        class Selector {
+            constructor(Behavior) {
                 this.Behavior = Behavior;
-                this.UpdateTargetEventHandle = function (sender, e) { return _this.OnUpdateTarget(sender, e); };
+                this.UpdateTargetEventHandle = (sender, e) => this.OnUpdateTarget(sender, e);
                 Behavior.UpdateTargetEvent.AddHandler(this.UpdateTargetEventHandle);
-                this.UpdateSourceEventHandle = function (e) { return _this.UpdateSource(e); };
+                this.UpdateSourceEventHandle = e => this.UpdateSource(e);
                 Behavior.Element.off('change', this.UpdateSourceEventHandle);
                 Behavior.Element.on('change', this.UpdateSourceEventHandle);
-                this.PropertyChangedEventHandle = function (sender, e) { return _this.OnDataSourcePropertyChanged(sender, e); };
-                this.AddedHandle = function (sender, e) { return _this.Added(sender, e); };
-                this.RemovedHandle = function (sender, e) { return _this.Removed(sender, e); };
+                this.PropertyChangedEventHandle = (sender, e) => this.OnDataSourcePropertyChanged(sender, e);
+                this.AddedHandle = (sender, e) => this.Added(sender, e);
+                this.RemovedHandle = (sender, e) => this.Removed(sender, e);
             }
-            Selector.Register = function (behavior) {
+            static Register(behavior) {
                 if (!behavior.Element)
                     return;
                 if (behavior.AdditionalInfo[Selector.IgnoreMark])
@@ -6577,8 +6000,8 @@ var DomBehind;
                     return;
                 }
                 behavior.AdditionalInfo[Selector.InstanceMark] = new Selector(behavior);
-            };
-            Selector.prototype.UpdateSource = function (e) {
+            }
+            UpdateSource(e) {
                 if (!this.Behavior.PInfo)
                     return;
                 var dataSource = this.Behavior.PInfo.GetValue();
@@ -6588,115 +6011,110 @@ var DomBehind;
                         this.Select(collectionView);
                         return false;
                     }
-                    var selectedItems_1 = [];
-                    $.each(this.Behavior.Element.find("option"), function (i, value) {
+                    let selectedItems = [];
+                    $.each(this.Behavior.Element.find("option"), (i, value) => {
                         if (value.selected) {
                             var uid = value.getAttribute("uuid");
-                            var item = collectionView.Find(function (x) { return x.__uuid === uid; });
+                            var item = collectionView.Find(x => x.__uuid === uid);
                             if (item) {
-                                selectedItems_1.push(item);
+                                selectedItems.push(item);
                             }
                         }
                     });
                     dataSource.Begin();
                     if (this.Multiple) {
-                        dataSource.Current = selectedItems_1;
+                        dataSource.Current = selectedItems;
                     }
                     else {
-                        dataSource.Current = 0 < selectedItems_1.length ? selectedItems_1[0] : null;
+                        dataSource.Current = 0 < selectedItems.length ? selectedItems[0] : null;
                     }
                     dataSource.End();
                 }
-            };
-            Selector.prototype.OnUpdateTarget = function (sender, data) {
+            }
+            OnUpdateTarget(sender, data) {
                 if (data instanceof DomBehind.Data.ListCollectionView) {
                     this.Render(data);
                 }
                 else if (data instanceof Array) {
                     var list = [];
-                    $.each(data, function (i, value) {
+                    $.each(data, (i, value) => {
                         list.push({ Value: value });
                     });
                     this.Render(new DomBehind.Data.ListCollectionView(list, "Value"));
                 }
-            };
-            Selector.prototype.OnDataSourcePropertyChanged = function (sender, e) {
+            }
+            OnDataSourcePropertyChanged(sender, e) {
                 if (e.Name === "Current") {
                     this.Select(sender);
                 }
                 if (!e.Name) {
                     this.Render(sender);
                 }
-            };
-            Selector.prototype.Render = function (source) {
-                var _this = this;
+            }
+            Render(source) {
                 if (!this.HasChanges(source))
                     return;
                 this.Behavior.Element.empty();
                 var arr = source.ToArray();
                 if (source.Grouping) {
-                    $.each(arr.GroupBy(source.Grouping), function (i, group) {
-                        var optgroup = $("<optgroup>", { label: group.Key }).appendTo(_this.Behavior.Element);
-                        $.each(group.Values, function (k, each) {
-                            _this.RenderOption(optgroup, source, each);
+                    $.each(arr.GroupBy(source.Grouping), (i, group) => {
+                        let optgroup = $(`<optgroup>`, { label: group.Key }).appendTo(this.Behavior.Element);
+                        $.each(group.Values, (k, each) => {
+                            this.RenderOption(optgroup, source, each);
                         });
                     });
                 }
                 else {
-                    $.each(arr, function (i, value) {
-                        _this.RenderOption(_this.Behavior.Element, source, value);
+                    $.each(arr, (i, value) => {
+                        this.RenderOption(this.Behavior.Element, source, value);
                     });
                 }
                 this.Select(source);
-            };
-            Object.defineProperty(Selector.prototype, "Multiple", {
-                get: function () {
-                    return this.Behavior.Element.prop("multiple") ? true : false;
-                },
-                set: function (value) {
-                    this.Behavior.Element.prop("multiple", value);
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Selector.prototype.RenderOption = function (element, source, value) {
+            }
+            get Multiple() {
+                return this.Behavior.Element.prop("multiple") ? true : false;
+            }
+            set Multiple(value) {
+                this.Behavior.Element.prop("multiple", value);
+            }
+            RenderOption(element, source, value) {
                 if (!value.__uuid)
                     value = $.extend(value, ExtendIIdentity());
                 if (!value.DisplayMemberPath)
                     value = $.extend(value, this.EnsureDisplayMemberPath(source.DisplayMemberPath));
-                var option = $("<option uuid=\"" + value.__uuid + "\">" + Selector.GetDisplayValue(value, source.DisplayMemberPath) + "</option>");
+                let option = $(`<option uuid="${value.__uuid}">${Selector.GetDisplayValue(value, source.DisplayMemberPath)}</option>`);
                 option.appendTo(element);
                 value = $.extend(value, this.EnsureElement(option));
                 if (value instanceof DomBehind.NotifiableImp) {
                     if (!value.__EventMarked) {
                         value.__EventMarked = true;
-                        value.PropertyChanged.AddHandler(function (sender, e) {
+                        value.PropertyChanged.AddHandler((sender, e) => {
                             var selectable = sender;
                             var text = Selector.GetDisplayValue(sender, selectable.DisplayMemberPath);
                             selectable.__Selector.val(text);
                         });
                     }
                 }
-            };
-            Selector.prototype.EnsureDisplayMemberPath = function (path) {
+            }
+            EnsureDisplayMemberPath(path) {
                 return { DisplayMemberPath: path };
-            };
-            Selector.prototype.EnsureElement = function (option) {
+            }
+            EnsureElement(option) {
                 return {
                     __Selector: option,
                     __Element: option[0],
                 };
-            };
-            Selector.prototype.Added = function (source, obj) {
+            }
+            Added(source, obj) {
                 this.Render(source);
-            };
-            Selector.prototype.Removed = function (source, obj) {
+            }
+            Removed(source, obj) {
                 this.Render(source);
-            };
-            Selector.prototype.Select = function (source) {
+            }
+            Select(source) {
                 return this.Multiple ? this.MultipleSelect(source) : this.SingleSelect(source);
-            };
-            Selector.prototype.SingleSelect = function (source) {
+            }
+            SingleSelect(source) {
                 var value = source.Current;
                 if (Object.IsNullOrUndefined(value)) {
                     this.Behavior.Element.selectpicker('val', null);
@@ -6706,22 +6124,22 @@ var DomBehind;
                     this.Behavior.Element.selectpicker('refresh');
                 }
                 source.ViewReflected = DomBehind.Data.ListCollectionView.ViewReflectedStatus.Reflected;
-            };
-            Selector.prototype.MultipleSelect = function (source) {
+            }
+            MultipleSelect(source) {
                 var value = source.Current;
                 if (Object.IsNullOrUndefined(value)) {
                     this.Behavior.Element.selectpicker("deselectAll");
                 }
                 else {
-                    $.each(value, function (i, x) {
+                    $.each(value, (i, x) => {
                         var selectable = x;
                         selectable.__Element.selected = true;
                     });
                 }
                 this.Behavior.Element.selectpicker('refresh');
                 source.ViewReflected = DomBehind.Data.ListCollectionView.ViewReflectedStatus.Reflected;
-            };
-            Selector.prototype.HasChanges = function (source) {
+            }
+            HasChanges(source) {
                 if (source.ViewReflected === DomBehind.Data.ListCollectionView.ViewReflectedStatus.Reflected)
                     return false;
                 if (source.ViewReflected === DomBehind.Data.ListCollectionView.ViewReflectedStatus.None) {
@@ -6730,45 +6148,44 @@ var DomBehind;
                     this.Subscribe(source);
                 }
                 return true;
-            };
-            Selector.prototype.Subscribe = function (source) {
+            }
+            Subscribe(source) {
                 this.UnSubscribe(source);
                 source.Removed.AddHandler(this.RemovedHandle);
                 source.Added.AddHandler(this.AddedHandle);
                 source.PropertyChanged.AddHandler(this.PropertyChangedEventHandle);
-            };
-            Selector.prototype.UnSubscribe = function (source) {
+            }
+            UnSubscribe(source) {
                 source.Added.RemoveHandler(this.AddedHandle);
                 source.Removed.RemoveHandler(this.RemovedHandle);
                 source.PropertyChanged.RemoveHandler(this.PropertyChangedEventHandle);
-            };
-            Selector.GetDisplayValue = function (value, displayMemberPath) {
+            }
+            static GetDisplayValue(value, displayMemberPath) {
                 var displayValue = value;
                 if (displayMemberPath) {
                     displayValue = new DomBehind.PropertyInfo(value, displayMemberPath).GetValue();
                 }
                 return displayValue;
-            };
-            Selector.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", null, function (x, y) { }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, function (behavior) {
-                Selector.Register(behavior);
-            });
-            Selector.AllowMultipleProperty = DomBehind.Data.DependencyProperty.RegisterAttached("multiple", null, function (x, y) {
-                var old = x.prop('multiple');
-                if (old === y)
-                    return;
-                if (y === true) {
-                    x.prop('multiple', true);
-                }
-                else {
-                    x.prop('multiple', false);
-                }
-                x.selectpicker('destroy');
-                x.selectpicker();
-            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-            Selector.IgnoreMark = "Selector.Ignore";
-            Selector.InstanceMark = "Selector.Instance";
-            return Selector;
-        }());
+            }
+        }
+        Selector.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", null, (x, y) => { }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, behavior => {
+            Selector.Register(behavior);
+        });
+        Selector.AllowMultipleProperty = DomBehind.Data.DependencyProperty.RegisterAttached("multiple", null, (x, y) => {
+            let old = x.prop('multiple');
+            if (old === y)
+                return;
+            if (y === true) {
+                x.prop('multiple', true);
+            }
+            else {
+                x.prop('multiple', false);
+            }
+            x.selectpicker('destroy');
+            x.selectpicker();
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+        Selector.IgnoreMark = "Selector.Ignore";
+        Selector.InstanceMark = "Selector.Instance";
         Controls.Selector = Selector;
     })(Controls = DomBehind.Controls || (DomBehind.Controls = {}));
 })(DomBehind || (DomBehind = {}));
@@ -6777,8 +6194,8 @@ var DomBehind;
     (function (Data) {
         var Selector = DomBehind.Controls.Selector;
         Data.DataBindingBehaviorBuilder.prototype.Multiple = function (allowMultiple) {
-            var me = this;
-            var behavior = me.Add(new Data.DataBindingBehavior());
+            let me = this;
+            let behavior = me.Add(new Data.DataBindingBehavior());
             behavior.Property = Selector.AllowMultipleProperty;
             behavior.Priolity = -1;
             if (allowMultiple) {
@@ -6792,31 +6209,16 @@ var DomBehind;
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Selector.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
     var Controls;
     (function (Controls) {
-        var Tab = (function (_super) {
-            __extends(Tab, _super);
-            function Tab() {
-                var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.Options = [];
-                return _this;
+        class Tab extends Controls.Selector {
+            constructor() {
+                super(...arguments);
+                this.Options = [];
             }
-            Tab.Register = function (behavior) {
+            static Register(behavior) {
                 if (!behavior.Element)
                     return;
                 if (behavior.AdditionalInfo[Tab.IgnoreMark])
@@ -6829,109 +6231,97 @@ var DomBehind;
                     return;
                 }
                 behavior.AdditionalInfo[Tab.InstanceMark] = new Tab(behavior);
-            };
-            Tab.prototype.Render = function (source) {
+            }
+            Render(source) {
                 if (!this.HasChanges(source))
                     return;
                 this.Behavior.Element.empty();
                 this.HeaderContainer = $('<ul class="nav nav-tabs">');
-                this.ContentContainer = $("<div class=\"tab-content\">");
+                this.ContentContainer = $(`<div class="tab-content">`);
                 this.Options.length = 0;
                 var arr = source.ToArray();
-                for (var i = 0; i < arr.length; i++) {
+                for (let i = 0; i < arr.length; i++) {
                     this.NewAdd(source, arr[i], i === 0);
                 }
                 this.HeaderContainer.appendTo(this.Behavior.Element);
                 this.ContentContainer.appendTo(this.Behavior.Element);
-            };
-            Tab.prototype.NewAdd = function (source, option, isActive) {
-                if (isActive === void 0) { isActive = false; }
-                var bindingOption = new Tab.BindingOption(this);
+            }
+            NewAdd(source, option, isActive = false) {
+                let bindingOption = new Tab.BindingOption(this);
                 bindingOption.Source = source;
                 bindingOption.Option = option;
                 bindingOption.IsActive = isActive;
                 bindingOption.Ensure();
                 this.Options.push(bindingOption);
                 return bindingOption;
-            };
-            Tab.prototype.Added = function (source, obj) {
+            }
+            Added(source, obj) {
                 this.NewAdd(source, obj);
-            };
-            Tab.prototype.Removed = function (source, obj) {
+            }
+            Removed(source, obj) {
                 obj.__header.detach();
                 obj.__content.detach();
-            };
-            Tab.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", null, function (x, y) { }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, function (behavior) {
-                Tab.Register(behavior);
-            });
-            Tab.IgnoreMark = "Tab.Ignore";
-            Tab.InstanceMark = "Tab.Instance";
-            return Tab;
-        }(Controls.Selector));
+            }
+        }
+        Tab.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", null, (x, y) => { }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, behavior => {
+            Tab.Register(behavior);
+        });
+        Tab.IgnoreMark = "Tab.Ignore";
+        Tab.InstanceMark = "Tab.Instance";
         Controls.Tab = Tab;
         (function (Tab) {
-            var BindingOption = (function () {
-                function BindingOption(Parent) {
+            class BindingOption {
+                constructor(Parent) {
                     this.Parent = Parent;
                 }
-                Object.defineProperty(BindingOption.prototype, "HeaderContainer", {
-                    get: function () {
-                        return this.Parent.HeaderContainer;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(BindingOption.prototype, "ContentContainer", {
-                    get: function () {
-                        return this.Parent.ContentContainer;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                BindingOption.prototype.Ensure = function () {
-                    var _this = this;
+                get HeaderContainer() {
+                    return this.Parent.HeaderContainer;
+                }
+                get ContentContainer() {
+                    return this.Parent.ContentContainer;
+                }
+                Ensure() {
                     if (!this.Option.__uuid)
                         this.Option.__uuid = NewUid();
                     if (!this.Option.DisplayMemberPath)
                         this.Option.DisplayMemberPath = this.Source.DisplayMemberPath;
                     var titleCss = this.IsActive ? 'active' : '';
-                    this.Header = $("<li class=\"" + titleCss + "\" uuid=\"" + this.Option.__uuid + "\">").appendTo(this.HeaderContainer);
+                    this.Header = $(`<li class="${titleCss}" uuid="${this.Option.__uuid}">`).appendTo(this.HeaderContainer);
                     this.Option.__header = this.Header;
                     var contentCss = this.IsActive ? 'tab-pane fade in active' : 'tab-pane fade';
-                    this.Content = $("<div class=\"" + contentCss + "\" id=\"" + this.Option.__uuid + "\">").appendTo(this.ContentContainer);
+                    this.Content = $(`<div class="${contentCss}" id="${this.Option.__uuid}">`).appendTo(this.ContentContainer);
                     this.Option.__content = this.Content;
-                    this.Content.on('RegisteredViewViewModel', function (e, behavior) {
-                        var element = $(e.target);
+                    this.Content.on('RegisteredViewViewModel', (e, behavior) => {
+                        let element = $(e.target);
                         element.off('RegisteredViewViewModel');
-                        _this.Option.View = behavior.View;
-                        _this.Option.ViewModel = behavior.ViewModel;
-                        var title = Controls.Selector.GetDisplayValue(behavior.ViewModel, _this.Option.DisplayMemberPath);
-                        $("<a href=\"#" + _this.Option.__uuid + "\" data-toggle=\"tab\">")
+                        this.Option.View = behavior.View;
+                        this.Option.ViewModel = behavior.ViewModel;
+                        let title = Controls.Selector.GetDisplayValue(behavior.ViewModel, this.Option.DisplayMemberPath);
+                        $(`<a href="#${this.Option.__uuid}" data-toggle="tab">`)
                             .text(title)
-                            .appendTo(_this.Header);
-                        _this.PropertyChangedSafeHandle = function (sender, e) { return _this.OnRecievePropertyChanged(e); };
-                        behavior.ViewModel.PropertyChanged.AddHandler(_this.PropertyChangedSafeHandle);
+                            .appendTo(this.Header);
+                        this.PropertyChangedSafeHandle = (sender, e) => this.OnRecievePropertyChanged(e);
+                        behavior.ViewModel.PropertyChanged.AddHandler(this.PropertyChangedSafeHandle);
                     });
                     var uriOption = this.Option;
                     if (uriOption.Uri) {
                         this.Content.load(uriOption.Uri);
                     }
-                };
-                BindingOption.prototype.OnRecievePropertyChanged = function (e) {
+                }
+                OnRecievePropertyChanged(e) {
                     switch (e.Name) {
                         case this.Option.DisplayMemberPath:
                             var title = Controls.Selector.GetDisplayValue(this.Option.ViewModel, this.Option.DisplayMemberPath);
                             this.Header.find("a").text(title);
                             break;
-                        case DomBehind.LamdaExpression.Path(function (x) { return x.IsEnabled; }):
+                        case DomBehind.LamdaExpression.Path(x => x.IsEnabled):
                             var enabled = this.Option.ViewModel.IsEnabled;
                             DomBehind.UIElement.IsEnabledProperty.SetValue(this.Header.find("a"), enabled);
                             DomBehind.UIElement.IsEnabledProperty.SetValue(this.Header, enabled);
                             break;
                     }
-                };
-                return BindingOption;
-            }());
+                }
+            }
             Tab.BindingOption = BindingOption;
         })(Tab = Controls.Tab || (Controls.Tab = {}));
     })(Controls = DomBehind.Controls || (DomBehind.Controls = {}));
@@ -6939,63 +6329,54 @@ var DomBehind;
 //# sourceMappingURL=Tab.js.map
 var DomBehind;
 (function (DomBehind) {
-    var MessageStatus;
+    let MessageStatus;
     (function (MessageStatus) {
         MessageStatus[MessageStatus["Infomation"] = 0] = "Infomation";
         MessageStatus[MessageStatus["Warning"] = 1] = "Warning";
         MessageStatus[MessageStatus["Error"] = 2] = "Error";
     })(MessageStatus = DomBehind.MessageStatus || (DomBehind.MessageStatus = {}));
-    var MessaageBox = (function () {
-        function MessaageBox() {
-        }
-        MessaageBox.ShowInfomation = function (message, title) {
+    class MessaageBox {
+        static ShowInfomation(message, title) {
             MessaageBox.ShowMessage(message, title, MessageStatus.Infomation);
-        };
-        MessaageBox.ShowWarning = function (message, title) {
-            MessaageBox.ShowMessage(message, title, MessageStatus.Warning);
-        };
-        MessaageBox.ShowError = function (message, title) {
-            MessaageBox.ShowMessage(message, title, MessageStatus.Error);
-        };
-        MessaageBox.ShowMessage = function (message, title, status) {
-            MessaageBox.Container.ShowMessage(message, title, status);
-        };
-        MessaageBox.ShowYesNo = function (message, title, option) {
-            MessaageBox.Container.ShowYesNo(message, title, option);
-        };
-        MessaageBox.ShowOkCancel = function (message, title, option) {
-            MessaageBox.Container.ShowOkCancel(message, title, option);
-        };
-        MessaageBox.BuiltIn = function (lazy) {
-            MessaageBox._lazy = lazy;
-        };
-        ;
-        Object.defineProperty(MessaageBox, "Container", {
-            get: function () {
-                if (MessaageBox._container) {
-                    return MessaageBox._container;
-                }
-                if (!MessaageBox._lazy) {
-                    throw new DomBehind.Exception("メッセージ機能をビルドインしてください");
-                }
-                var fac = new DomBehind.TypedFactory(MessaageBox._lazy());
-                MessaageBox._container = fac.CreateInstance();
-                return MessaageBox._container;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return MessaageBox;
-    }());
-    DomBehind.MessaageBox = MessaageBox;
-    MessaageBox.BuiltIn(function () { return DefaultMessageContainer; });
-    var DefaultMessageContainer = (function () {
-        function DefaultMessageContainer() {
         }
-        DefaultMessageContainer.prototype.ShowMessage = function (message, title, status) {
+        static ShowWarning(message, title) {
+            MessaageBox.ShowMessage(message, title, MessageStatus.Warning);
+        }
+        static ShowError(message, title) {
+            MessaageBox.ShowMessage(message, title, MessageStatus.Error);
+        }
+        static ShowMessage(message, title, status) {
+            MessaageBox.Container.ShowMessage(message, title, status);
+        }
+        static ShowYesNo(message, title, option) {
+            MessaageBox.Container.ShowYesNo(message, title, option);
+        }
+        static ShowOkCancel(message, title, option) {
+            MessaageBox.Container.ShowOkCancel(message, title, option);
+        }
+        static BuiltIn(lazy) {
+            MessaageBox._lazy = lazy;
+        }
+        ;
+        static get Container() {
+            if (MessaageBox._container) {
+                return MessaageBox._container;
+            }
+            if (!MessaageBox._lazy) {
+                throw new DomBehind.Exception("メッセージ機能をビルドインしてください");
+            }
+            let fac = new DomBehind.TypedFactory(MessaageBox._lazy());
+            MessaageBox._container = fac.CreateInstance();
+            return MessaageBox._container;
+        }
+    }
+    DomBehind.MessaageBox = MessaageBox;
+    MessaageBox.BuiltIn(() => DefaultMessageContainer);
+    class DefaultMessageContainer {
+        ShowMessage(message, title, status) {
             window.alert(message);
-        };
-        DefaultMessageContainer.prototype.ShowYesNo = function (message, title, option) {
+        }
+        ShowYesNo(message, title, option) {
             if (window.confirm(message)) {
                 if (option && option.yesCallback) {
                     option.yesCallback();
@@ -7006,8 +6387,8 @@ var DomBehind;
                     option.noCallBack();
                 }
             }
-        };
-        DefaultMessageContainer.prototype.ShowOkCancel = function (message, title, option) {
+        }
+        ShowOkCancel(message, title, option) {
             if (window.confirm(message)) {
                 if (option && option.okCallback) {
                     option.okCallback();
@@ -7018,96 +6399,69 @@ var DomBehind;
                     option.cancelCallBack();
                 }
             }
-        };
-        return DefaultMessageContainer;
-    }());
+        }
+    }
     DomBehind.DefaultMessageContainer = DefaultMessageContainer;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=MessageBox.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
-    var ListView = (function (_super) {
-        __extends(ListView, _super);
-        function ListView() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        Object.defineProperty(ListView.prototype, "ItemsSource", {
-            get: function () {
-                return this._items;
-            },
-            set: function (newValue) {
-                var _this = this;
-                if (Object.IsNullOrUndefined(newValue)) {
-                    this.Clear();
-                    this._items = newValue;
-                    return;
-                }
-                var newItems = newValue.ToArray();
-                if (!Object.IsNullOrUndefined(this._items) &&
-                    newItems.SequenceEqual(this._items.ToArray())) {
-                    return;
-                }
+    class ListView extends DomBehind.Data.DataBindingBehavior {
+        set ItemsSource(newValue) {
+            if (Object.IsNullOrUndefined(newValue)) {
                 this.Clear();
-                var body = this.Element.find("#" + this.BodyId);
-                $.each(newItems, function (i, value) {
-                    var tr = $("<tr></tr>");
-                    $.each(_this.Columns, function (k, column) {
-                        var td = $("<td></td>");
-                        if (column.cellClass) {
-                            td.addClass(column.cellClass);
-                        }
-                        var cellValue = column.value(value);
-                        if (column.convertTarget) {
-                            cellValue = column.convertTarget(cellValue);
-                        }
-                        td.text(cellValue);
-                        tr.append(td);
-                    });
-                    body.append(tr);
+                this._items = newValue;
+                return;
+            }
+            let newItems = newValue.ToArray();
+            if (!Object.IsNullOrUndefined(this._items) &&
+                newItems.SequenceEqual(this._items.ToArray())) {
+                return;
+            }
+            this.Clear();
+            let body = this.Element.find(`#${this.BodyId}`);
+            $.each(newItems, (i, value) => {
+                let tr = $("<tr></tr>");
+                $.each(this.Columns, (k, column) => {
+                    let td = $(`<td></td>`);
+                    if (column.cellClass) {
+                        td.addClass(column.cellClass);
+                    }
+                    let cellValue = column.value(value);
+                    if (column.convertTarget) {
+                        cellValue = column.convertTarget(cellValue);
+                    }
+                    td.text(cellValue);
+                    tr.append(td);
                 });
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ListView.prototype.Clear = function () {
-            var body = this.Element.find("#" + this.BodyId);
+                body.append(tr);
+            });
+        }
+        Clear() {
+            let body = this.Element.find(`#${this.BodyId}`);
             body.empty();
-        };
-        Object.defineProperty(ListView.prototype, "DefaultTableOption", {
-            get: function () {
-                return {
-                    class: "",
-                };
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ListView.prototype.Ensure = function () {
-            _super.prototype.Ensure.call(this);
+        }
+        get ItemsSource() {
+            return this._items;
+        }
+        get DefaultTableOption() {
+            return {
+                class: "",
+            };
+        }
+        Ensure() {
+            super.Ensure();
             this.Element.empty();
             if (!this.Element.hasClass("table-responsive")) {
                 this.Element.addClass("table-responsive");
             }
-            var identity = "lv-" + NewUid();
+            let identity = `lv-${NewUid()}`;
             this.Element.attr("listview-identity", identity);
             window[identity] = this;
-            this.TableId = "tb-" + NewUid();
-            this.HeaderId = "th-" + NewUid();
-            this.BodyId = "tr-" + NewUid();
-            var table = $("<table id=\"" + this.TableId + "\" class=\"table\"></table>");
+            this.TableId = `tb-${NewUid()}`;
+            this.HeaderId = `th-${NewUid()}`;
+            this.BodyId = `tr-${NewUid()}`;
+            let table = $(`<table id="${this.TableId}" class="table"></table>`);
             if (this.TableOption.isHover) {
                 table.addClass("table-hover");
             }
@@ -7120,10 +6474,10 @@ var DomBehind;
             if (this.TableOption.class) {
                 table.addClass(this.TableOption.class);
             }
-            var header = $("<thead id=\"" + this.HeaderId + "\"></thead>");
-            var headerRow = $("<tr></tr>");
-            $.each(this.Columns, function (i, value) {
-                var th = $("<th>" + value.caption + "</th>");
+            let header = $(`<thead id="${this.HeaderId}"></thead>`);
+            let headerRow = $(`<tr></tr>`);
+            $.each(this.Columns, (i, value) => {
+                let th = $(`<th>${value.caption}</th>`);
                 if (value.width) {
                     th.css('width', value.width);
                 }
@@ -7134,212 +6488,186 @@ var DomBehind;
             });
             header.append(headerRow);
             table.append(header);
-            var body = $("<tbody id=\"" + this.BodyId + "\"></tbody>");
+            let body = $(`<tbody id="${this.BodyId}"></tbody>`);
             table.append(body);
             this.Element.append(table);
-        };
-        ListView.prototype.AddColumn = function (option) {
+        }
+        AddColumn(option) {
             if (!this.Columns) {
                 this.Columns = new Array();
             }
             this.Columns.push(option);
-        };
-        ListView.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", function (el) {
-        }, function (el, newValue) {
-            var identity = el.attr("listview-identity");
-            var me = window[identity];
-            if (newValue instanceof DomBehind.Data.ListCollectionView) {
-                me.ItemsSource = newValue;
-            }
-            else {
-                me.ItemsSource = new DomBehind.Data.ListCollectionView([]);
-            }
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        return ListView;
-    }(DomBehind.Data.DataBindingBehavior));
-    DomBehind.ListView = ListView;
-    var TableBindingBehaviorBuilder = (function (_super) {
-        __extends(TableBindingBehaviorBuilder, _super);
-        function TableBindingBehaviorBuilder(owner) {
-            return _super.call(this, owner) || this;
         }
-        TableBindingBehaviorBuilder.prototype.ColumnBinding = function (title, binding, option) {
+    }
+    ListView.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", el => {
+    }, (el, newValue) => {
+        let identity = el.attr("listview-identity");
+        let me = window[identity];
+        if (newValue instanceof DomBehind.Data.ListCollectionView) {
+            me.ItemsSource = newValue;
+        }
+        else {
+            me.ItemsSource = new DomBehind.Data.ListCollectionView([]);
+        }
+    }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    DomBehind.ListView = ListView;
+    class TableBindingBehaviorBuilder extends DomBehind.BindingBehaviorBuilder {
+        constructor(owner) {
+            super(owner);
+        }
+        ColumnBinding(title, binding, option) {
             if (this.CurrentBehavior instanceof ListView) {
-                var op = $.extend(true, {}, option);
+                let op = $.extend(true, {}, option);
                 op.value = binding;
                 op.caption = title;
                 this.CurrentBehavior.AddColumn(op);
             }
             return this;
-        };
-        return TableBindingBehaviorBuilder;
-    }(DomBehind.BindingBehaviorBuilder));
+        }
+    }
     DomBehind.TableBindingBehaviorBuilder = TableBindingBehaviorBuilder;
     DomBehind.BindingBehaviorBuilder.prototype.BuildListView = function (itemSource, option) {
-        var me = this;
-        var behavior = me.Add(new ListView());
+        let me = this;
+        let behavior = me.Add(new ListView());
         behavior.Property = ListView.ItemsSourceProperty;
         behavior.PInfo = new DomBehind.LamdaExpression(me.Owner.DataContext, itemSource);
         behavior.TableOption = option;
-        var newMe = new TableBindingBehaviorBuilder(me.Owner);
+        let newMe = new TableBindingBehaviorBuilder(me.Owner);
         newMe.CurrentBehavior = me.CurrentBehavior;
         newMe.CurrentElement = me.CurrentElement;
         return newMe;
     };
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=ListView.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
-    var TemplateListView = (function (_super) {
-        __extends(TemplateListView, _super);
-        function TemplateListView() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        Object.defineProperty(TemplateListView.prototype, "ItemsSource", {
-            set: function (newValue) {
-                var _this = this;
-                var jtemplate = $(document.body).find(this.Option.template);
-                if (jtemplate.length === 0)
-                    return;
-                var template = this.FindTemplate(jtemplate);
-                this.RemoveAll();
-                var dataContext = this.DataContext;
-                var rowContainer = $("<div class=\"templateRowContainer\"></div>");
-                $.each(newValue.ToArray(), function (i, value) {
-                    var newRow = template.clone();
-                    value.__element = newRow;
-                    var twowayMarks = new Array();
-                    $.each(_this.Columns, function (k, column) {
-                        var el = newRow.find(column.templateSelector);
-                        if (el.length === 0) {
-                            if (column.templateSelector.StartsWith(".")) {
-                                var selector = column.templateSelector.SubString(1, column.templateSelector.length - 1);
-                                if (newRow.hasClass(selector)) {
-                                    el = newRow;
+    class TemplateListView extends DomBehind.Data.DataBindingBehavior {
+        set ItemsSource(newValue) {
+            let jtemplate = $(document.body).find(this.Option.template);
+            if (jtemplate.length === 0)
+                return;
+            let template = this.FindTemplate(jtemplate);
+            this.RemoveAll();
+            let dataContext = this.DataContext;
+            let rowContainer = $(`<div class="templateRowContainer"></div>`);
+            $.each(newValue.ToArray(), (i, value) => {
+                let newRow = template.clone();
+                value.__element = newRow;
+                let twowayMarks = new Array();
+                $.each(this.Columns, (k, column) => {
+                    let el = newRow.find(column.templateSelector);
+                    if (el.length === 0) {
+                        if (column.templateSelector.StartsWith(".")) {
+                            let selector = column.templateSelector.SubString(1, column.templateSelector.length - 1);
+                            if (newRow.hasClass(selector)) {
+                                el = newRow;
+                            }
+                        }
+                    }
+                    if (el.length !== 0) {
+                        if (column.expression && column.dependencyProperty) {
+                            let ret = column.expression(value);
+                            if (column.convertTarget) {
+                                ret = column.convertTarget(ret, el);
+                            }
+                            column.dependencyProperty.SetValue(el, ret);
+                            if (column.mode === DomBehind.Data.BindingMode.TwoWay) {
+                                let path = DomBehind.LamdaExpression.Path(column.expression);
+                                twowayMarks.push({ column: column, element: el, marks: path });
+                            }
+                        }
+                        if (column.expressionAction && column.attachedEvent) {
+                            let newEvent = column.attachedEvent.Create();
+                            newEvent.AddHandler((sener, e) => {
+                                column.expressionAction(dataContext, value);
+                            });
+                            el.off(newEvent.EventName);
+                            el.on(newEvent.EventName, e => {
+                                newEvent.Raise(this, e);
+                                if (!column.allowBubbling) {
+                                    if (e.stopPropagation) {
+                                        e.stopPropagation();
+                                    }
+                                }
+                            });
+                            if (el.is("a") && !el.attr("href")) {
+                                el.attr("href", "javascript:void(0);");
+                            }
+                        }
+                        if (this.AlternateStyle) {
+                            if (i % 2 !== 0) {
+                                let el = newRow.find(this.AlternateStyle.Selector);
+                                if (el.length !== 0) {
+                                    el.addClass(this.AlternateStyle.Css);
                                 }
                             }
                         }
-                        if (el.length !== 0) {
-                            if (column.expression && column.dependencyProperty) {
-                                var ret = column.expression(value);
-                                if (column.convertTarget) {
-                                    ret = column.convertTarget(ret, el);
+                    }
+                });
+                if (twowayMarks.length !== 0) {
+                    let observe = DomBehind.Observable.RegisterAttached(value, { marks: twowayMarks.Select(x => x.marks) });
+                    observe.PropertyChanged.AddHandler((sender, d) => {
+                        if (sender) {
+                            let twowayList = twowayMarks.Where(x => x.marks === d.Name);
+                            for (var i = 0; i < twowayList.length; i++) {
+                                let v = sender[d.Name];
+                                let twoway = twowayList[i];
+                                if (twoway.column.convertTarget) {
+                                    v = twoway.column.convertTarget(v, twoway.element);
                                 }
-                                column.dependencyProperty.SetValue(el, ret);
-                                if (column.mode === DomBehind.Data.BindingMode.TwoWay) {
-                                    var path = DomBehind.LamdaExpression.Path(column.expression);
-                                    twowayMarks.push({ column: column, element: el, marks: path });
-                                }
-                            }
-                            if (column.expressionAction && column.attachedEvent) {
-                                var newEvent_1 = column.attachedEvent.Create();
-                                newEvent_1.AddHandler(function (sener, e) {
-                                    column.expressionAction(dataContext, value);
-                                });
-                                el.off(newEvent_1.EventName);
-                                el.on(newEvent_1.EventName, function (e) {
-                                    newEvent_1.Raise(_this, e);
-                                    if (!column.allowBubbling) {
-                                        if (e.stopPropagation) {
-                                            e.stopPropagation();
-                                        }
-                                    }
-                                });
-                                if (el.is("a") && !el.attr("href")) {
-                                    el.attr("href", "javascript:void(0);");
-                                }
-                            }
-                            if (_this.AlternateStyle) {
-                                if (i % 2 !== 0) {
-                                    var el_1 = newRow.find(_this.AlternateStyle.Selector);
-                                    if (el_1.length !== 0) {
-                                        el_1.addClass(_this.AlternateStyle.Css);
-                                    }
-                                }
+                                twoway.column.dependencyProperty.SetValue(twoway.element, v);
                             }
                         }
                     });
-                    if (twowayMarks.length !== 0) {
-                        var observe = DomBehind.Observable.RegisterAttached(value, { marks: twowayMarks.Select(function (x) { return x.marks; }) });
-                        observe.PropertyChanged.AddHandler(function (sender, d) {
-                            if (sender) {
-                                var twowayList = twowayMarks.Where(function (x) { return x.marks === d.Name; });
-                                for (var i = 0; i < twowayList.length; i++) {
-                                    var v = sender[d.Name];
-                                    var twoway = twowayList[i];
-                                    if (twoway.column.convertTarget) {
-                                        v = twoway.column.convertTarget(v, twoway.element);
-                                    }
-                                    twoway.column.dependencyProperty.SetValue(twoway.element, v);
-                                }
-                            }
-                        });
-                    }
-                    rowContainer.append(newRow);
-                });
-                this.Element.append(rowContainer);
-                newValue.PropertyChanged.Clear();
-                newValue.PropertyChanged.AddHandler(function (sender, e) {
-                    if (!e.Name) {
-                        _this.ItemsSource = sender;
-                    }
-                });
-            },
-            enumerable: true,
-            configurable: true
-        });
-        TemplateListView.prototype.FindTemplate = function (jtemplate) {
-            var support = ("content" in document.createElement("template"));
+                }
+                rowContainer.append(newRow);
+            });
+            this.Element.append(rowContainer);
+            newValue.PropertyChanged.Clear();
+            newValue.PropertyChanged.AddHandler((sender, e) => {
+                if (!e.Name) {
+                    this.ItemsSource = sender;
+                }
+            });
+        }
+        FindTemplate(jtemplate) {
+            let support = ("content" in document.createElement("template"));
             if (support) {
-                var temp = jtemplate[0];
-                var template = $(temp.content.querySelector("div"));
+                let temp = jtemplate[0];
+                let template = $(temp.content.querySelector("div"));
                 return template;
             }
             else {
-                var temp = jtemplate[0];
-                var template = $(temp.querySelector("div"));
+                let temp = jtemplate[0];
+                let template = $(temp.querySelector("div"));
                 return template;
             }
-        };
-        TemplateListView.prototype.RemoveAll = function () {
+        }
+        RemoveAll() {
             this.Element.empty();
-        };
-        TemplateListView.prototype.ClearSortMarks = function () {
-            var view = this.Owner.Container;
-            var headeArray = this.Columns.Where(function (x) { return x.header ? true : false; });
-            $.each(headeArray, function (i, each) {
-                var column = view.find(each.header);
+        }
+        ClearSortMarks() {
+            let view = this.Owner.Container;
+            let headeArray = this.Columns.Where(x => x.header ? true : false);
+            $.each(headeArray, (i, each) => {
+                let column = view.find(each.header);
                 if (column.length !== 0) {
-                    var span = column.find("span");
+                    let span = column.find("span");
                     if (span.length !== 0) {
                         span.removeClass();
                     }
                 }
             });
-        };
-        TemplateListView.prototype.Ensure = function () {
-            var _this = this;
-            _super.prototype.Ensure.call(this);
+        }
+        Ensure() {
+            super.Ensure();
             this.Option = $.extend(true, this.DefaultOption, this.Option);
-            var view = this.Owner.Container;
-            var headeArray = this.Columns.Where(function (x) { return x.header ? true : false; });
-            $.each(headeArray, function (i, each) {
-                var column = view.find(each.header);
+            let view = this.Owner.Container;
+            let headeArray = this.Columns.Where(x => x.header ? true : false);
+            $.each(headeArray, (i, each) => {
+                let column = view.find(each.header);
                 if (column.length !== 0) {
-                    var span = column.find("span");
+                    let span = column.find("span");
                     if (span.length === 0) {
                         column.append($("<span></span>"));
                     }
@@ -7347,27 +6675,26 @@ var DomBehind;
                         column.attr("href", "javascript:void(0);");
                     }
                     column.off("click");
-                    column.on("click", function (e) { return _this.OnColumnClick(e, each.header); });
+                    column.on("click", e => this.OnColumnClick(e, each.header));
                 }
             });
-            var identity = this.Element.attr("templateListView-identity");
+            let identity = this.Element.attr("templateListView-identity");
             if (!identity) {
-                identity = "id-" + NewUid();
+                identity = `id-${NewUid()}`;
                 this.Element.attr("templateListView-identity", identity);
             }
             window[identity] = this;
-        };
-        TemplateListView.prototype.OnColumnClick = function (e, header) {
-            var _this = this;
+        }
+        OnColumnClick(e, header) {
             if (header) {
-                var target = $(e.target);
-                var span = target.find("span");
-                var asc = span.hasClass(this.Option.descClass);
+                let target = $(e.target);
+                let span = target.find("span");
+                let asc = span.hasClass(this.Option.descClass);
                 if (span.length !== 0) {
                     this.ClearSortMarks();
                     span.addClass(asc ? this.Option.ascClass : this.Option.descClass);
                 }
-                var ee_1 = {
+                let ee = {
                     selector: header,
                     sender: this,
                     target: target,
@@ -7376,63 +6703,55 @@ var DomBehind;
                     value: target.val(),
                 };
                 if (this.Option.columnClick) {
-                    DomBehind.Application.Current.SafeAction(function () {
-                        return _this.Option.columnClick(_this.DataContext, ee_1);
-                    });
+                    DomBehind.Application.Current.SafeAction(() => this.Option.columnClick(this.DataContext, ee));
                 }
                 else {
-                    var column = this.Columns.FirstOrDefault(function (x) { return x.header === header; });
-                    var list = this.PInfo.GetValue();
+                    let column = this.Columns.FirstOrDefault(x => x.header === header);
+                    let list = this.PInfo.GetValue();
                     if (column && list instanceof DomBehind.Data.ListCollectionView) {
-                        var exp_1 = DomBehind.LamdaExpression.Path(column.expression);
-                        var filter = list.Filter;
+                        let exp = DomBehind.LamdaExpression.Path(column.expression);
+                        let filter = list.Filter;
                         list.Filter = null;
-                        var sorted = asc ? list.ToArray().OrderBy(function (x) { return x[exp_1]; }) : list.ToArray().OrderByDecording(function (x) { return x[exp_1]; });
-                        var newList = new DomBehind.Data.ListCollectionView(sorted);
+                        let sorted = asc ? list.ToArray().OrderBy(x => x[exp]) : list.ToArray().OrderByDecording(x => x[exp]);
+                        let newList = new DomBehind.Data.ListCollectionView(sorted);
                         newList.Filter = filter;
                         this.ItemsSource = this.DataContext[this.PInfo.MemberPath] = newList;
                     }
                 }
             }
-        };
-        Object.defineProperty(TemplateListView.prototype, "DefaultOption", {
-            get: function () {
-                return {
-                    template: "",
-                    ascClass: "fa fa-sort-asc",
-                    descClass: "fa fa-sort-desc",
-                };
-            },
-            enumerable: true,
-            configurable: true
-        });
-        TemplateListView.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", function (el) {
-        }, function (el, newValue) {
-            var identity = el.attr("templateListView-identity");
-            var template = window[identity];
-            if (newValue instanceof DomBehind.Data.ListCollectionView) {
-                template.ItemsSource = newValue;
-            }
-            else {
-                template.ItemsSource = new DomBehind.Data.ListCollectionView([]);
-            }
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        return TemplateListView;
-    }(DomBehind.Data.DataBindingBehavior));
-    DomBehind.TemplateListView = TemplateListView;
-    var TemplateListViewBindingBehaviorBuilder = (function (_super) {
-        __extends(TemplateListViewBindingBehaviorBuilder, _super);
-        function TemplateListViewBindingBehaviorBuilder(owner) {
-            return _super.call(this, owner) || this;
         }
-        TemplateListViewBindingBehaviorBuilder.prototype.BindingColumn = function (selector, exp, option) {
+        get DefaultOption() {
+            return {
+                template: "",
+                ascClass: "fa fa-sort-asc",
+                descClass: "fa fa-sort-desc",
+            };
+        }
+    }
+    TemplateListView.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("", el => {
+    }, (el, newValue) => {
+        let identity = el.attr("templateListView-identity");
+        let template = window[identity];
+        if (newValue instanceof DomBehind.Data.ListCollectionView) {
+            template.ItemsSource = newValue;
+        }
+        else {
+            template.ItemsSource = new DomBehind.Data.ListCollectionView([]);
+        }
+    }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+    DomBehind.TemplateListView = TemplateListView;
+    class TemplateListViewBindingBehaviorBuilder extends DomBehind.BindingBehaviorBuilder {
+        constructor(owner) {
+            super(owner);
+        }
+        BindingColumn(selector, exp, option) {
             return this.BindingProperty(DomBehind.UIElement.TextProperty, selector, exp, option);
-        };
-        TemplateListViewBindingBehaviorBuilder.prototype.BindingColumnAction = function (selector, exp, option) {
+        }
+        BindingColumnAction(selector, exp, option) {
             return this.BindingEvent(DomBehind.UIElement.Click, selector, exp, option);
-        };
-        TemplateListViewBindingBehaviorBuilder.prototype.BindingProperty = function (dp, selector, exp, option) {
-            var me = this;
+        }
+        BindingProperty(dp, selector, exp, option) {
+            let me = this;
             if (me.CurrentBehavior instanceof TemplateListView) {
                 option = $.extend(true, {}, option);
                 option.templateSelector = selector;
@@ -7442,9 +6761,9 @@ var DomBehind;
                 me.CurrentBehavior.Columns.push(option);
             }
             return me;
-        };
-        TemplateListViewBindingBehaviorBuilder.prototype.BindingEvent = function (ev, selector, exp, option) {
-            var me = this;
+        }
+        BindingEvent(ev, selector, exp, option) {
+            let me = this;
             if (me.CurrentBehavior instanceof TemplateListView) {
                 option = $.extend(true, {}, option);
                 option.templateSelector = selector;
@@ -7454,66 +6773,49 @@ var DomBehind;
                 me.CurrentBehavior.Columns.push(option);
             }
             return me;
-        };
-        TemplateListViewBindingBehaviorBuilder.prototype.BindingRowStyle = function (exp) {
-            var me = this;
+        }
+        BindingRowStyle(exp) {
+            let me = this;
             if (me.CurrentBehavior instanceof TemplateListView) {
                 me.CurrentBehavior.RowStyleExpression = exp;
             }
             return me;
-        };
-        TemplateListViewBindingBehaviorBuilder.prototype.BindingAlternateRowStyle = function (selector, css) {
-            var me = this;
+        }
+        BindingAlternateRowStyle(selector, css) {
+            let me = this;
             if (me.CurrentBehavior instanceof TemplateListView) {
                 me.CurrentBehavior.AlternateStyle = { Selector: selector, Css: css };
             }
             return me;
-        };
-        return TemplateListViewBindingBehaviorBuilder;
-    }(DomBehind.BindingBehaviorBuilder));
+        }
+    }
     DomBehind.TemplateListViewBindingBehaviorBuilder = TemplateListViewBindingBehaviorBuilder;
     DomBehind.BindingBehaviorBuilder.prototype.BuildTemplateItems = function (itemsSource, option) {
-        var me = this;
-        var behavior = me.Add(new TemplateListView());
+        let me = this;
+        let behavior = me.Add(new TemplateListView());
         behavior.Owner = me.Owner;
         behavior.Property = TemplateListView.ItemsSourceProperty;
         behavior.PInfo = new DomBehind.LamdaExpression(me.Owner.DataContext, itemsSource);
         behavior.BindingPolicy.Mode = TemplateListView.ItemsSourceProperty.BindingMode;
         behavior.Option = $.extend(true, {}, option);
         behavior.Columns = new Array();
-        var newMe = new TemplateListViewBindingBehaviorBuilder(me.Owner);
+        let newMe = new TemplateListViewBindingBehaviorBuilder(me.Owner);
         newMe.CurrentBehavior = me.CurrentBehavior;
         newMe.CurrentElement = me.CurrentElement;
         return newMe;
     };
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=TemplateListView.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
-    var FileBrowser = (function (_super) {
-        __extends(FileBrowser, _super);
-        function FileBrowser() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.MaximumNumberOfAjax = 1;
-            return _this;
+    class FileBrowser extends DomBehind.Data.ActionBindingBehavior {
+        constructor() {
+            super(...arguments);
+            this.MaximumNumberOfAjax = 1;
         }
-        FileBrowser.prototype.Ensure = function () {
-            var _this = this;
-            _super.prototype.Ensure.call(this);
-            var element = this.Element;
+        Ensure() {
+            super.Ensure();
+            let element = this.Element;
             element.attr("type", "file");
             element.attr("capture", "camera");
             if (this.AcceptValue) {
@@ -7525,58 +6827,56 @@ var DomBehind;
             if (this.AllowMultiFiles) {
                 element.attr("multiple", "multiple");
             }
-            element.change(function (e) {
-                var args = $.extend(true, e, {});
-                var arr = new Array();
-                $.each(e.target.files, function (i, s) {
-                    var uri = URL.createObjectURL(s);
-                    var file = $.extend(true, s, {});
+            element.change((e) => {
+                let args = $.extend(true, e, {});
+                let arr = new Array();
+                $.each(e.target.files, (i, s) => {
+                    let uri = URL.createObjectURL(s);
+                    let file = $.extend(true, s, {});
                     file.uri = uri;
                     arr.push(file);
                 });
-                _this.Files = args.files = arr;
-                _this.OnTrigger(args);
+                this.Files = args.files = arr;
+                this.OnTrigger(args);
             });
             if (this.InstanceExpression) {
                 this.InstanceExpression.SetValue(this);
             }
-        };
-        FileBrowser.prototype.UpdateAll = function () {
-            var _this = this;
+        }
+        UpdateAll() {
             if (!this.Files) {
                 this.OnCompleted({ file: null, response: null });
                 return;
             }
-            var pooler = new Pooler(this);
-            return pooler.Do().always(function () {
-                _this.OnAlways();
+            let pooler = new Pooler(this);
+            return pooler.Do().always(() => {
+                this.OnAlways();
             });
-        };
-        FileBrowser.prototype.Update = function (file) {
-            var _this = this;
-            var executor = new Executor(this, file);
+        }
+        Update(file) {
+            let executor = new Executor(this, file);
             executor.Do();
-            return executor.Pms.always(function () {
-                _this.OnAlways();
+            return executor.Pms.always(() => {
+                this.OnAlways();
             });
-        };
-        FileBrowser.prototype.OnProgress = function (e) {
-            console.trace(e.file.name + "..." + e.loaded + " / " + e.total + "  " + e.percent + " %");
+        }
+        OnProgress(e) {
+            console.trace(`${e.file.name}...${e.loaded} / ${e.total}  ${e.percent} %`);
             if (this.ProgressExpression) {
                 this.ProgressExpression(this.DataContext, e);
             }
-        };
-        FileBrowser.prototype.OnCompleted = function (e) {
+        }
+        OnCompleted(e) {
             if (e.file) {
-                console.trace(e.file.name + "...complete");
+                console.trace(`${e.file.name}...complete`);
             }
             if (this.CompletedExpression) {
                 this.CompletedExpression(this.DataContext, e);
             }
-        };
-        FileBrowser.prototype.OnError = function (e) {
+        }
+        OnError(e) {
             if (e.file) {
-                console.trace("error..." + e.file.name);
+                console.trace(`error...${e.file.name}`);
             }
             if (e.error) {
                 console.error(e.error);
@@ -7584,49 +6884,45 @@ var DomBehind;
             if (this.ErrorExpression) {
                 this.ErrorExpression(this.DataContext, e);
             }
-        };
-        FileBrowser.prototype.OnAlways = function () {
+        }
+        OnAlways() {
             if (this.AlwaysExpression) {
                 this.AlwaysExpression(this.DataContext);
             }
-        };
-        FileBrowser.SelectedFiles = DomBehind.EventBuilder.RegisterAttached("selectedFiles");
-        return FileBrowser;
-    }(DomBehind.Data.ActionBindingBehavior));
+        }
+    }
+    FileBrowser.SelectedFiles = DomBehind.EventBuilder.RegisterAttached("selectedFiles");
     DomBehind.FileBrowser = FileBrowser;
-    var Pooler = (function () {
-        function Pooler(FileBrowser) {
+    class Pooler {
+        constructor(FileBrowser) {
             this.FileBrowser = FileBrowser;
         }
-        Pooler.prototype.Do = function () {
-            var _this = this;
-            var files = this.FileBrowser.Files;
-            var chunk = parseInt(String(files.length / this.FileBrowser.MaximumNumberOfAjax));
+        Do() {
+            let files = this.FileBrowser.Files;
+            let chunk = parseInt(String(files.length / this.FileBrowser.MaximumNumberOfAjax));
             if (chunk === 0) {
                 chunk = 1;
             }
-            var pmslist = new Array();
-            var chunkList = files.Chunk(chunk);
-            $.each(chunkList, function (i, value) {
-                var e = new ChunkFlow(_this.FileBrowser, value);
+            let pmslist = new Array();
+            let chunkList = files.Chunk(chunk);
+            $.each(chunkList, (i, value) => {
+                let e = new ChunkFlow(this.FileBrowser, value);
                 pmslist.push(e.Do());
             });
             return $.when(pmslist);
-        };
-        return Pooler;
-    }());
-    var ChunkFlow = (function () {
-        function ChunkFlow(FileBrowser, Queue) {
+        }
+    }
+    class ChunkFlow {
+        constructor(FileBrowser, Queue) {
             this.FileBrowser = FileBrowser;
             this.Queue = Queue;
         }
-        ChunkFlow.prototype.Do = function () {
-            var _this = this;
-            var arr = this.Queue.Select(function (x) { return new Executor(_this.FileBrowser, x); });
-            $.each(arr, function (i, value) {
-                var nextIndex = i + 1;
+        Do() {
+            let arr = this.Queue.Select(x => new Executor(this.FileBrowser, x));
+            $.each(arr, (i, value) => {
+                let nextIndex = i + 1;
                 if (nextIndex < arr.length) {
-                    value.Pms.always(function () {
+                    value.Pms.always(() => {
                         arr[nextIndex].Do();
                     });
                 }
@@ -7634,43 +6930,41 @@ var DomBehind;
             if (0 < arr.length) {
                 arr[0].Do();
             }
-            return $.when(arr.Select(function (x) { return x.Pms; }));
-        };
-        return ChunkFlow;
-    }());
-    var Executor = (function () {
-        function Executor(FileBrowser, File) {
+            return $.when(arr.Select(x => x.Pms));
+        }
+    }
+    class Executor {
+        constructor(FileBrowser, File) {
             this.FileBrowser = FileBrowser;
             this.File = File;
             this.Dfd = $.Deferred();
             this.Pms = this.Dfd.promise();
         }
-        Executor.prototype.Do = function () {
-            var _this = this;
-            var formData = new FormData();
+        Do() {
+            let formData = new FormData();
             formData.append("userfile", this.File);
             $.ajax({
-                xhr: function () {
-                    var xhr = new XMLHttpRequest();
-                    xhr.upload.addEventListener("progress", function (evt) {
+                xhr: () => {
+                    let xhr = new XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", evt => {
                         if (evt.lengthComputable) {
-                            var percent = (evt.loaded / evt.total) * 100;
-                            _this.FileBrowser.OnProgress({
+                            let percent = (evt.loaded / evt.total) * 100;
+                            this.FileBrowser.OnProgress({
                                 loaded: evt.loaded,
                                 total: evt.total,
                                 percent: percent,
-                                file: _this.File,
+                                file: this.File,
                             });
                         }
                     }, false);
-                    xhr.addEventListener("progress", function (evt) {
+                    xhr.addEventListener("progress", evt => {
                         if (evt.lengthComputable) {
-                            var percent = (evt.loaded / evt.total) * 100;
-                            _this.FileBrowser.OnProgress({
+                            let percent = (evt.loaded / evt.total) * 100;
+                            this.FileBrowser.OnProgress({
                                 loaded: evt.loaded,
                                 total: evt.total,
                                 percent: percent,
-                                file: _this.File,
+                                file: this.File,
                             });
                         }
                     }, false);
@@ -7681,97 +6975,94 @@ var DomBehind;
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function (e) {
-                    _this.FileBrowser.OnCompleted({ response: e, file: _this.File });
-                    _this.Dfd.resolve(e);
+                success: e => {
+                    this.FileBrowser.OnCompleted({ response: e, file: this.File });
+                    this.Dfd.resolve(e);
                 },
-                error: function (x, status, error) {
-                    _this.FileBrowser.OnError({ file: _this.File, error: error });
-                    _this.Dfd.reject(error);
+                error: (x, status, error) => {
+                    this.FileBrowser.OnError({ file: this.File, error: error });
+                    this.Dfd.reject(error);
                 }
             });
-        };
-        return Executor;
-    }());
-    var FileBrowserBindingBehaviorBuilder = (function (_super) {
-        __extends(FileBrowserBindingBehaviorBuilder, _super);
-        function FileBrowserBindingBehaviorBuilder(owner) {
-            return _super.call(this, owner) || this;
         }
-        FileBrowserBindingBehaviorBuilder.prototype.AllowMultiFiles = function () {
-            var me = this;
+    }
+    class FileBrowserBindingBehaviorBuilder extends DomBehind.Data.ActionBindingBehaviorBuilder {
+        constructor(owner) {
+            super(owner);
+        }
+        AllowMultiFiles() {
+            let me = this;
             if (me.CurrentBehavior instanceof FileBrowser) {
                 me.CurrentBehavior.AllowMultiFiles = true;
             }
             return me;
-        };
-        FileBrowserBindingBehaviorBuilder.prototype.AcceptFilter = function (filter) {
-            var me = this;
+        }
+        AcceptFilter(filter) {
+            let me = this;
             if (me.CurrentBehavior instanceof FileBrowser) {
                 me.CurrentBehavior.AcceptValue = filter;
             }
             return me;
-        };
-        FileBrowserBindingBehaviorBuilder.prototype.UploadUri = function (uri) {
-            var me = this;
+        }
+        UploadUri(uri) {
+            let me = this;
             if (me.CurrentBehavior instanceof FileBrowser) {
                 me.CurrentBehavior.UploadUri = uri;
             }
             return me;
-        };
-        FileBrowserBindingBehaviorBuilder.prototype.BindingUploader = function (exp) {
-            var me = this;
+        }
+        BindingUploader(exp) {
+            let me = this;
             if (me.CurrentBehavior instanceof FileBrowser) {
                 me.CurrentBehavior.InstanceExpression = new DomBehind.LamdaExpression(me.Owner.DataContext, exp);
             }
             return me;
-        };
-        FileBrowserBindingBehaviorBuilder.prototype.BindingUploaderProgress = function (exp) {
-            var me = this;
+        }
+        BindingUploaderProgress(exp) {
+            let me = this;
             if (me.CurrentBehavior instanceof FileBrowser) {
                 me.CurrentBehavior.ProgressExpression = exp;
             }
             return me;
-        };
-        FileBrowserBindingBehaviorBuilder.prototype.BindingUploaderComplete = function (exp) {
-            var me = this;
+        }
+        BindingUploaderComplete(exp) {
+            let me = this;
             if (me.CurrentBehavior instanceof FileBrowser) {
                 me.CurrentBehavior.CompletedExpression = exp;
             }
             return me;
-        };
-        FileBrowserBindingBehaviorBuilder.prototype.BindingUploaderError = function (exp) {
-            var me = this;
+        }
+        BindingUploaderError(exp) {
+            let me = this;
             if (me.CurrentBehavior instanceof FileBrowser) {
                 me.CurrentBehavior.ErrorExpression = exp;
             }
             return me;
-        };
-        FileBrowserBindingBehaviorBuilder.prototype.BindingUploaderAlways = function (exp) {
-            var me = this;
+        }
+        BindingUploaderAlways(exp) {
+            let me = this;
             if (me.CurrentBehavior instanceof FileBrowser) {
                 me.CurrentBehavior.AlwaysExpression = exp;
             }
             return me;
-        };
-        FileBrowserBindingBehaviorBuilder.prototype.MaximumNumberOfAjax = function (number) {
-            var me = this;
+        }
+        MaximumNumberOfAjax(number) {
+            let me = this;
             if (me.CurrentBehavior instanceof FileBrowser) {
                 me.CurrentBehavior.MaximumNumberOfAjax = number;
             }
             return me;
-        };
-        return FileBrowserBindingBehaviorBuilder;
-    }(DomBehind.Data.ActionBindingBehaviorBuilder));
+        }
+    }
     DomBehind.FileBrowserBindingBehaviorBuilder = FileBrowserBindingBehaviorBuilder;
     DomBehind.BindingBehaviorBuilder.prototype.BuildFileBrowser = function (selectedEvent) {
-        var me = this;
-        var behavior = me.Add(new FileBrowser());
+        let me = this;
+        let behavior = me.Add(new FileBrowser());
         behavior.Event = FileBrowser.SelectedFiles.Create();
         behavior.Action = selectedEvent;
         behavior.ActionParameterCount = behavior.Action.length;
         behavior.AllowBubbling = false;
-        var newMe = new FileBrowserBindingBehaviorBuilder(me.Owner);
+        let newMe = new FileBrowserBindingBehaviorBuilder(me.Owner);
         newMe.CurrentBehavior = me.CurrentBehavior;
         newMe.CurrentElement = me.CurrentElement;
         return newMe;
@@ -7780,21 +7071,17 @@ var DomBehind;
 //# sourceMappingURL=FileBrowser.js.map
 var DomBehind;
 (function (DomBehind) {
-    var Breadbrumb = (function () {
-        function Breadbrumb(Selector) {
+    class Breadbrumb {
+        constructor(Selector) {
             this.Selector = Selector;
         }
-        Object.defineProperty(Breadbrumb, "AllowLocalStorage", {
-            get: function () {
-                return $.GetLocalStorage("Breadbrumb.AllowLocalStorage", true);
-            },
-            set: function (value) {
-                $.SetLocalStorage("Breadbrumb.AllowLocalStorage", value);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Breadbrumb.prototype.Parse = function (newUri, title, isRoot) {
+        static get AllowLocalStorage() {
+            return $.GetLocalStorage("Breadbrumb.AllowLocalStorage", true);
+        }
+        static set AllowLocalStorage(value) {
+            $.SetLocalStorage("Breadbrumb.AllowLocalStorage", value);
+        }
+        Parse(newUri, title, isRoot) {
             if (!newUri.toLowerCase().StartsWith("http://") &&
                 !newUri.toLowerCase().StartsWith("https://")) {
                 newUri = $.AbsoluteUri(newUri);
@@ -7802,267 +7089,289 @@ var DomBehind;
             if (Breadbrumb.AllowLocalStorage)
                 return this.ParseSessionStorage(newUri, isRoot, title);
             return this.ParseRestUri(newUri, isRoot, title);
-        };
-        Breadbrumb.prototype.ParseRestUri = function (newUri, isRoot, title) {
-            var arr = newUri.Split("?");
-            var queryString = "";
+        }
+        ParseRestUri(newUri, isRoot, title) {
+            let arr = newUri.Split("?");
+            let queryString = "";
             if (1 < arr.length) {
                 queryString = arr[1];
             }
-            var newQueryStrings = Breadbrumb.SplitQueryString(queryString);
-            var currentUri = location.href;
+            let newQueryStrings = Breadbrumb.SplitQueryString(queryString);
+            let currentUri = location.href;
             if (isRoot) {
                 currentUri = currentUri.Split("?")[0];
             }
-            var oldArr = currentUri.Split("?");
+            let oldArr = currentUri.Split("?");
             queryString = "";
             if (1 < oldArr.length) {
                 queryString = oldArr[1];
             }
-            var oldQueryStrings = Breadbrumb.SplitQueryString(queryString);
-            var stack = new Array();
-            var json = oldQueryStrings.FirstOrDefault(function (x) { return x.Key === "b"; });
+            let oldQueryStrings = Breadbrumb.SplitQueryString(queryString);
+            let stack = new Array();
+            let json = oldQueryStrings.FirstOrDefault(x => x.Key === "b");
             if (json) {
                 stack = this.ToDecompress(json.Value);
             }
             if (stack.Any()) {
                 if (oldQueryStrings.Any()) {
-                    stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                    if (!oldQueryStrings.Any(x => x.Key === 'isPop')) {
+                        stack.LastOrDefault().Uri = `${currentUri}&isPop=true`;
+                    }
+                    else {
+                        stack.LastOrDefault().Uri = `${currentUri}`;
+                    }
                 }
                 else {
-                    stack.LastOrDefault().Uri = currentUri + "?isPop=true";
+                    stack.LastOrDefault().Uri = `${currentUri}?isPop=true`;
                 }
             }
             stack.push({ Uri: newUri, Title: title });
             newQueryStrings.push({ Key: "b", Value: this.ToCompress(stack) });
-            var newQuery = newQueryStrings.Select(function (x) { return x.Key + "=" + x.Value; }).join("&");
-            var result = arr[0];
+            let newQuery = newQueryStrings.Select(x => `${x.Key}=${x.Value}`).join("&");
+            let result = arr[0];
             if (!String.IsNullOrWhiteSpace(newQuery)) {
-                result = arr[0] + "?" + newQuery;
+                result = `${arr[0]}?${newQuery}`;
             }
             if (0 < stack.length) {
                 stack.LastOrDefault().Uri = result;
             }
             return result;
-        };
-        Breadbrumb.prototype.ParseSessionStorage = function (newUri, isRoot, title) {
-            var arr = newUri.Split("?");
-            var queryString = "";
+        }
+        ParseSessionStorage(newUri, isRoot, title) {
+            let arr = newUri.Split("?");
+            let queryString = "";
             if (1 < arr.length) {
                 queryString = arr[1];
             }
-            var newQueryStrings = Breadbrumb.SplitQueryString(queryString);
-            var currentUri = location.href;
+            let newQueryStrings = Breadbrumb.SplitQueryString(queryString);
+            let currentUri = location.href;
             if (isRoot) {
                 currentUri = currentUri.Split("?")[0];
             }
-            var oldArr = currentUri.Split("?");
+            let oldArr = currentUri.Split("?");
             queryString = "";
             if (1 < oldArr.length) {
                 queryString = oldArr[1];
             }
-            var oldQueryStrings = Breadbrumb.SplitQueryString(queryString);
-            var stack = new Array();
-            var idKeyValue = oldQueryStrings.FirstOrDefault(function (x) { return x.Key === "b"; });
-            var oldId = "";
-            var newId = NewUid();
+            let oldQueryStrings = Breadbrumb.SplitQueryString(queryString);
+            let stack = new Array();
+            let idKeyValue = oldQueryStrings.FirstOrDefault(x => x.Key === "b");
+            let oldId = "";
+            let newId = NewUid();
             if (idKeyValue) {
                 oldId = idKeyValue.Value;
             }
             else {
                 oldId = NewUid();
             }
-            var json = Breadbrumb.GetLocalStorage(oldId);
+            let json = Breadbrumb.GetLocalStorage(oldId);
             if (json) {
                 stack = this.ToDecompress(json);
             }
             if (stack.Any()) {
                 if (oldQueryStrings.Any()) {
-                    stack.LastOrDefault().Uri = currentUri + "&isPop=true";
+                    if (!oldQueryStrings.Any(x => x.Key === 'isPop')) {
+                        stack.LastOrDefault().Uri = `${currentUri}&isPop=true`;
+                    }
+                    else {
+                        stack.LastOrDefault().Uri = `${currentUri}`;
+                    }
                 }
                 else {
-                    stack.LastOrDefault().Uri = currentUri + "?isPop=true";
+                    stack.LastOrDefault().Uri = `${currentUri}?isPop=true`;
                 }
             }
             stack.push({ Uri: newUri, Title: title });
             Breadbrumb.SetLocalStorage(newId, this.ToCompress(stack));
-            if (!newQueryStrings.Any(function (x) { return x.Key === "b"; })) {
+            if (!newQueryStrings.Any(x => x.Key === "b")) {
                 newQueryStrings.push({ Key: "b", Value: newId });
             }
-            var newQuery = newQueryStrings.Select(function (x) { return x.Key + "=" + x.Value; }).join("&");
-            var result = arr[0];
+            let newQuery = newQueryStrings.Select(x => `${x.Key}=${x.Value}`).join("&");
+            let result = arr[0];
             if (!String.IsNullOrWhiteSpace(newQuery)) {
-                result = arr[0] + "?" + newQuery;
+                result = `${arr[0]}?${newQuery}`;
             }
             if (0 < stack.length) {
                 stack.LastOrDefault().Uri = result;
             }
             return result;
-        };
-        Breadbrumb.prototype.ToCompress = function (input) {
-            var json = JSON.stringify(input);
-            var comp = LZString.compressToBase64(json);
+        }
+        ToCompress(input) {
+            let json = JSON.stringify(input);
+            let comp = LZString.compressToBase64(json);
             return encodeURIComponent(comp);
-        };
-        Breadbrumb.prototype.ToDecompress = function (input) {
-            var dec = decodeURIComponent(input);
-            var json = LZString.decompressFromBase64(dec);
+        }
+        ToDecompress(input) {
+            let dec = decodeURIComponent(input);
+            let json = LZString.decompressFromBase64(dec);
             return JSON.parse(json);
-        };
-        Breadbrumb.SplitQueryString = function (s) {
+        }
+        static SplitQueryString(s) {
             if (!String.IsNullOrWhiteSpace(s)) {
-                var dec = $('<div/>').html(s).text();
-                var array = dec.Split("&", StringSplitOptions.RemoveEmptyEntries);
-                var result_1 = [];
-                $.each(array, function (i, value) {
-                    var split = value.Split("=", StringSplitOptions.None);
+                let dec = $('<div/>').html(s).text();
+                let array = dec.Split("&", StringSplitOptions.RemoveEmptyEntries);
+                let result = [];
+                $.each(array, (i, value) => {
+                    let split = value.Split("=", StringSplitOptions.None);
                     if (split.length == 2) {
-                        result_1.push({ Key: split[0], Value: split[1] });
+                        result.push({ Key: split[0], Value: split[1] });
                     }
                 });
-                return result_1;
+                return result;
             }
             return new Array();
-        };
-        Breadbrumb.GetLocalStorage = function (id) {
+        }
+        static GetLocalStorage(id) {
             return $.GetLocalStorage(id, "");
-        };
-        Breadbrumb.SetLocalStorage = function (id, value) {
+        }
+        static SetLocalStorage(id, value) {
             $.SetLocalStorage(id, value);
-        };
-        Breadbrumb.prototype.Update = function () {
-            var el = $(this.Selector);
+        }
+        Update() {
+            let el = $(this.Selector);
             if (el.length === 0)
                 return;
             el.empty();
-            var uri = location.href;
-            var arr = uri.Split("?");
-            var queryString = "";
+            let uri = location.href;
+            let arr = uri.Split("?");
+            let queryString = "";
             if (1 < arr.length) {
                 queryString = arr[1];
             }
             if (String.IsNullOrWhiteSpace(queryString)) {
                 return;
             }
-            var dic = Breadbrumb.SplitQueryString(queryString);
-            var id = dic.FirstOrDefault(function (x) { return x.Key === "b"; });
+            let dic = Breadbrumb.SplitQueryString(queryString);
+            let id = dic.FirstOrDefault(x => x.Key === "b");
             if (!id) {
                 return;
             }
-            var stack = this.BuildStack(id.Value);
+            let stack = this.BuildStack(id.Value);
             if (!stack) {
                 return;
             }
-            var aList = new Array();
-            $.each(stack, function (i, value) {
+            let aList = new Array();
+            $.each(stack, (i, value) => {
                 if (i === (stack.length - 1)) {
-                    aList.push($("<a>" + value.Title + "</a>"));
+                    aList.push($(`<a>${value.Title}</a>`));
                 }
                 else {
-                    var a = $("<a href=\"javascript:void(0);\">" + value.Title + "</a>");
-                    a.click(function (e) {
-                        var newE = new Event("breadbrumbTapped");
+                    let a = $(`<a href="javascript:void(0);">${value.Title}</a>`);
+                    a.click(e => {
+                        let newE = new Event("breadbrumbTapped");
                         newE.__title = value.Title;
                         newE.__uri = value.Uri;
                         newE.__e = e;
+                        newE.__canceled = false;
                         window.dispatchEvent(newE);
-                        location.replace(value.Uri);
+                        if (typeof newE.__canceled === "boolean") {
+                            if (!newE.__canceled) {
+                                location.replace(value.Uri);
+                            }
+                        }
+                        else if (Object.IsPromise(newE.__canceled)) {
+                            let pms = newE.__canceled;
+                            pms.then(canceled => {
+                                if (!canceled) {
+                                    location.replace(value.Uri);
+                                }
+                            });
+                        }
+                        else {
+                            location.replace(value.Uri);
+                        }
                     });
                     aList.push(a);
                 }
-                aList.push($("<span> > </span>"));
+                aList.push($(`<span> > </span>`));
             });
             for (var i = 0; i < aList.length - 1; i++) {
                 el.append(aList[i]);
             }
-        };
-        Breadbrumb.prototype.BuildStack = function (s) {
+        }
+        BuildStack(s) {
             if (Breadbrumb.AllowLocalStorage) {
                 s = Breadbrumb.GetLocalStorage(s);
             }
             return this.ToDecompress(s);
-        };
-        Breadbrumb.prototype.Pop = function (count) {
-            if (count === void 0) { count = 1; }
-            var el = $(this.Selector);
+        }
+        Pop(count = 1) {
+            let el = $(this.Selector);
             if (el.length === 0)
                 return;
-            var aList = el.find("a");
-            var back = ++count;
+            let aList = el.find("a");
+            let back = ++count;
             if (aList.length <= back)
                 return;
             aList[aList.length - back].click();
-        };
-        return Breadbrumb;
-    }());
+        }
+    }
     DomBehind.Breadbrumb = Breadbrumb;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Breadbrumb.js.map
 var DomBehind;
 (function (DomBehind) {
-    var Appeal = (function () {
-        function Appeal() {
-        }
-        Appeal.Register = function (behavior) {
-            var style = $("#" + Appeal.styleIdentity);
+    class Appeal {
+        static Register(behavior) {
+            let style = $(`#${Appeal.styleIdentity}`);
             if (style.length === 0) {
-                var head = document.head || document.getElementsByTagName('head')[0];
-                var newStyle = document.createElement('style');
+                let head = document.head || document.getElementsByTagName('head')[0];
+                let newStyle = document.createElement('style');
                 head.appendChild(newStyle);
                 newStyle.type = 'text/css';
                 newStyle.appendChild(document.createTextNode(Appeal.css));
                 newStyle.setAttribute("id", Appeal.styleIdentity);
             }
-            var identity = behavior.Element.attr("appeal-identity");
+            let identity = behavior.Element.attr(`appeal-identity`);
             if (!identity) {
-                identity = "appeal-" + NewUid();
-                behavior.Element.attr("appeal-identity", identity);
+                identity = `appeal-${NewUid()}`;
+                behavior.Element.attr(`appeal-identity`, identity);
             }
-            var appeal = window[identity];
+            let appeal = window[identity];
             if (!appeal) {
                 window[identity] = appeal = new Appeal();
                 appeal.Behavior = behavior;
             }
-        };
-        Appeal.prototype.Render = function (newValue) {
-            var el = this.Behavior.Element;
-            var identity = el.attr("ripple_appeal_identity");
+        }
+        Render(newValue) {
+            let el = this.Behavior.Element;
+            let identity = el.attr("ripple_appeal_identity");
             if (!identity) {
-                identity = "ripple-" + NewUid();
+                identity = `ripple-${NewUid()}`;
                 el.attr("ripple_appeal_identity", identity);
             }
-            var pnl = $("#" + identity);
+            let pnl = $(`#${identity}`);
             if (!newValue)
                 pnl.remove();
-            var oldValueString = el.attr("ripple_appeal_value");
-            var oldValue = false;
+            let oldValueString = el.attr("ripple_appeal_value");
+            let oldValue = false;
             if (!String.IsNullOrWhiteSpace(oldValueString)) {
                 oldValue = Boolean(oldValue);
             }
-            el.attr("ripple_appeal_value", "" + newValue);
+            el.attr("ripple_appeal_value", `${newValue}`);
             if (newValue === oldValue) {
                 return;
             }
             if (!newValue) {
                 return;
             }
-            var offset = el.offset();
-            var css = {
-                "height": el.height() + "px",
-                "width": el.width() + "px",
-                "top": offset.top + "px",
-                "left": offset.left + "px",
+            let offset = el.offset();
+            let css = {
+                "height": `${el.height()}px`,
+                "width": `${el.width()}px`,
+                "top": `${offset.top}px`,
+                "left": `${offset.left}px`,
                 "position": "fixed",
                 "background-color": "transparent",
                 "border-color": "rgba(0, 90, 255, 0.4)",
                 "pointer-events": "none"
             };
-            var parent = el.closest("div");
-            var clone = el.clone().empty();
+            let parent = el.closest("div");
+            let clone = el.clone().empty();
             if (el.is("input") || el.is("select")) {
                 clone = $("<div />");
-                var h = el.height();
-                var w = el.width();
+                let h = el.height();
+                let w = el.width();
                 if (h < w) {
                     h = w;
                 }
@@ -8072,29 +7381,29 @@ var DomBehind;
                 if (h < 50) {
                     w = h = 50;
                 }
-                var top_1 = offset.top;
-                var topOffset = Number(el.css("margin-top").replace(/[^-\d\.]/g, '')) +
+                let top = offset.top;
+                let topOffset = Number(el.css("margin-top").replace(/[^-\d\.]/g, '')) +
                     Number(el.css("margin-bottom").replace(/[^-\d\.]/g, ''));
-                var left = offset.left;
-                var leftOffset = Number(el.css("margin-left").replace(/[^-\d\.]/g, '')) +
+                let left = offset.left;
+                let leftOffset = Number(el.css("margin-left").replace(/[^-\d\.]/g, '')) +
                     Number(el.css("margin-right").replace(/[^-\d\.]/g, ''));
-                if (el.is('select') && top_1 === 0 && left === 0) {
-                    var nextSpan = el.next("span");
+                if (el.is('select') && top === 0 && left === 0) {
+                    let nextSpan = el.next("span");
                     if (nextSpan.length !== 0) {
                         h = w = nextSpan.height();
                         if (h < 50) {
                             w = h = 50;
                         }
-                        var buffOffset = nextSpan.offset();
-                        top_1 = buffOffset.top + (nextSpan.height() / 2);
+                        let buffOffset = nextSpan.offset();
+                        top = buffOffset.top + (nextSpan.height() / 2);
                         left = buffOffset.left + (nextSpan.width() / 2);
                     }
                 }
                 css = $.extend(true, css, {
-                    "height": h + "px",
-                    "width": w + "px",
-                    "top": top_1 - (el.height() + topOffset) + "px",
-                    "left": left + leftOffset + "px",
+                    "height": `${h}px`,
+                    "width": `${w}px`,
+                    "top": `${top - (el.height() + topOffset)}px`,
+                    "left": `${left + leftOffset}px`,
                     "border-radius": "50%",
                     "transform": "scale(0)",
                     "background": "rgba(0, 90, 255, 0.4)",
@@ -8104,122 +7413,195 @@ var DomBehind;
             clone.css(css);
             clone.addClass("ripple_appeal");
             parent.append(clone);
-            setTimeout(function () {
+            setTimeout(() => {
                 clone.remove();
-                el.attr("ripple_appeal_value", "false");
+                el.attr("ripple_appeal_value", `false`);
             }, 9 * 1000);
-        };
-        Appeal.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("appealEnabled", null, function (x, y) {
-            var identity = x.attr("appeal-identity");
-            var timeoutHandle = x.attr("clearTimeout");
-            var appeal = window[identity];
-            if (appeal) {
-                if (timeoutHandle) {
-                    clearTimeout(Number(timeoutHandle));
-                }
-                var value = setTimeout(function () {
-                    x.attr("clearTimeout", "");
-                    appeal.Render(!!y);
-                }, 1 * 1000);
-                x.attr("clearTimeout", value);
+        }
+    }
+    Appeal.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("appealEnabled", null, (x, y) => {
+        let identity = x.attr(`appeal-identity`);
+        let timeoutHandle = x.attr(`clearTimeout`);
+        let appeal = window[identity];
+        if (appeal) {
+            if (timeoutHandle) {
+                clearTimeout(Number(timeoutHandle));
             }
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, function (behavior) {
-            Appeal.Register(behavior);
-        });
-        Appeal.styleIdentity = "appeal-style";
-        Appeal.css = "\n@keyframes rippleAppeal {\n    100% {\n        transform: scale(2);\n        border-width: 10px;\n        opacity: 0;\n    }\n}\n\n@keyframes rippleOut {\n    100% {\n        opacity: 0;\n    }\n}\n\n.ripple_appeal {\n    animation: rippleAppeal 3s linear 3\n}\n";
-        return Appeal;
-    }());
+            let value = setTimeout(() => {
+                x.attr(`clearTimeout`, "");
+                appeal.Render(!!y);
+            }, 1 * 1000);
+            x.attr(`clearTimeout`, value);
+        }
+    }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, behavior => {
+        Appeal.Register(behavior);
+    });
+    Appeal.styleIdentity = "appeal-style";
+    Appeal.css = `
+@keyframes rippleAppeal {
+    100% {
+        transform: scale(2);
+        border-width: 10px;
+        opacity: 0;
+    }
+}
+
+@keyframes rippleOut {
+    100% {
+        opacity: 0;
+    }
+}
+
+.ripple_appeal {
+    animation: rippleAppeal 3s linear 3
+}
+`;
     DomBehind.Appeal = Appeal;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Appeal.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
-    var FlipAnimation;
+    let FlipAnimation;
     (function (FlipAnimation) {
-        FlipAnimation[FlipAnimation["Flip"] = 0] = "Flip";
+        FlipAnimation[FlipAnimation["HorizontalFlip"] = 0] = "HorizontalFlip";
         FlipAnimation[FlipAnimation["Slide"] = 1] = "Slide";
     })(FlipAnimation = DomBehind.FlipAnimation || (DomBehind.FlipAnimation = {}));
-    var FlipBehavior = (function (_super) {
-        __extends(FlipBehavior, _super);
-        function FlipBehavior() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        FlipBehavior.prototype.SetValue = function (el, newValue) {
-            var oldValue = false;
-            var oldValueString = el.attr(FlipBehavior.ValueKey);
+    class FlipBehavior extends DomBehind.Data.DataBindingBehavior {
+        SetValue(el, newValue) {
+            let oldValue = false;
+            let oldValueString = el.attr(FlipBehavior.ValueKey);
             if (!String.IsNullOrWhiteSpace(oldValueString)) {
-                oldValue = Boolean(oldValueString);
+                oldValue = String.ToBoolean(oldValueString);
             }
-            else {
-                this.Option.back.addClass("hide");
-            }
-            el.attr(FlipBehavior.ValueKey, "" + newValue);
+            el.attr(FlipBehavior.ValueKey, `${newValue}`);
             if (newValue === oldValue)
                 return;
-            if (newValue) {
+            if (this.Option.animation === FlipAnimation.HorizontalFlip) {
+                this.HorizontalFlip(newValue);
+            }
+            else {
+                this.Slide(newValue);
+            }
+        }
+        HorizontalFlip(isBack) {
+            if (!this.Option.container.hasClass("flip-container")) {
+                this.Option.container.addClass("flip-container");
+            }
+            if (!this.Option.front.hasClass("flip-item")) {
+                this.Option.front.addClass("flip-item");
+            }
+            if (!this.Option.back.hasClass("flip-item")) {
+                this.Option.back.addClass("flip-item");
+            }
+            if (!this.Option.back.hasClass("flip-horizontal-back")) {
+                this.Option.back.addClass("flip-horizontal-back");
+            }
+            if (isBack) {
+                this.Option.container.addClass("flip-horizontal");
+            }
+            else {
+                this.Option.container.removeClass("flip-horizontal");
+            }
+        }
+        Slide(isBack) {
+            if (isBack) {
                 this.Option.front.removeClass("flip-slide-in");
-                this.Option.front.addClass("hide");
-                this.Option.back.removeClass("hide");
+                this.Option.front.addClass("hidden");
+                this.Option.back.removeClass("hidden");
                 this.Option.back.addClass("flip-slide-in");
             }
             else {
-                this.Option.front.removeClass("hide");
+                this.Option.front.removeClass("hidden");
                 this.Option.front.addClass("flip-slide-in");
                 this.Option.back.removeClass("flip-slide-in");
-                this.Option.back.addClass("hide");
+                this.Option.back.addClass("hidden");
             }
-        };
-        FlipBehavior.Register = function (behavior) {
-            var identity = "id-" + NewUid();
-            behavior.Option.front.attr(FlipBehavior.IdentityKey, identity);
+        }
+        static Register(behavior) {
+            let identity = `id-${NewUid()}`;
+            behavior.Option.container.attr(FlipBehavior.IdentityKey, identity);
             window[identity] = behavior;
-            var style = $("#" + FlipBehavior.cssIdentity);
+            let style = $(`#${FlipBehavior.cssIdentity}`);
             if (style.length === 0) {
-                var head = document.head || document.getElementsByTagName('head')[0];
-                var newStyle = document.createElement('style');
+                let head = document.head || document.getElementsByTagName('head')[0];
+                let newStyle = document.createElement('style');
                 head.appendChild(newStyle);
                 newStyle.type = 'text/css';
                 newStyle.appendChild(document.createTextNode(FlipBehavior.css));
                 newStyle.setAttribute("id", FlipBehavior.cssIdentity);
             }
-        };
-        FlipBehavior.IdentityKey = "flip-identity";
-        FlipBehavior.IsFlipProperty = DomBehind.Data.DependencyProperty.RegisterAttached("isflip", function (el) {
-        }, function (el, newValue) {
-            var identity = el.attr(FlipBehavior.IdentityKey);
-            var behavior = window[identity];
-            if (behavior) {
-                behavior.SetValue(el, newValue);
-            }
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        FlipBehavior.ValueKey = "flip-value";
-        FlipBehavior.css = "\n@keyframes kf-flip-slide-in {\n  0% {\n    opacity: 0;\n    transform: translateX(10px);\n  }\n  100% {\n    opacity: 1;\n    transform: translateX(0);\n  }\n}\n.flip-slide-in {\n    animation: kf-flip-slide-in 1s linear 1\n}\n\n@keyframes kf-flip-slide-out {\n  0% {\n    opacity: 1;\n    transform: translateX(0);\n  }\n  100% {\n    opacity: 0;\n    transform: translateX(-50px);\n  }\n}\n.flip-slide-out {\n    animation: kf-flip-slide-out 1s linear 1\n}\n";
-        FlipBehavior.cssIdentity = "flip-style";
-        return FlipBehavior;
-    }(DomBehind.Data.DataBindingBehavior));
-    DomBehind.FlipBehavior = FlipBehavior;
-    var FlipBindingBehaviorBuilder = (function (_super) {
-        __extends(FlipBindingBehaviorBuilder, _super);
-        function FlipBindingBehaviorBuilder(owner) {
-            return _super.call(this, owner) || this;
         }
-        FlipBindingBehaviorBuilder.prototype.BindingFlip = function (exp, option) {
-            var me = this;
-            var behavior = me.CurrentBehavior;
+    }
+    FlipBehavior.IdentityKey = "flip-identity";
+    FlipBehavior.IsFlipProperty = DomBehind.Data.DependencyProperty.RegisterAttached("isflip", el => {
+    }, (el, newValue) => {
+        let identity = el.attr(FlipBehavior.IdentityKey);
+        let behavior = window[identity];
+        if (behavior) {
+            behavior.SetValue(el, newValue);
+        }
+    }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, (b) => {
+        if (b.Option.animation === FlipAnimation.Slide)
+            b.Option.back.addClass("hidden");
+    });
+    FlipBehavior.ValueKey = "flip-value";
+    FlipBehavior.css = `
+@keyframes kf-flip-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.flip-slide-in {
+    animation: kf-flip-slide-in 1s linear 1
+}
+
+@keyframes kf-flip-slide-out {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+}
+.flip-slide-out {
+    animation: kf-flip-slide-out 1s linear 1
+}
+
+
+
+.flip-container {
+    transition: transform 1s;
+    transform-style: preserve-3d;
+    position: relative; 
+}
+.flip-item {
+    position: absolute;
+    backface-visibility: hidden;
+}
+.flip-horizontal {
+    transform: rotateY(180deg);
+}
+.flip-horizontal-back {
+    transform: rotateY(180deg);
+}
+
+`;
+    FlipBehavior.cssIdentity = `flip-style`;
+    DomBehind.FlipBehavior = FlipBehavior;
+    class FlipBindingBehaviorBuilder extends DomBehind.BindingBehaviorBuilder {
+        constructor(owner) {
+            super(owner);
+        }
+        BindingFlip(exp, option) {
+            let me = this;
+            let behavior = me.CurrentBehavior;
             if (behavior instanceof FlipBehavior) {
                 if (option) {
                     behavior.Option = $.extend(true, behavior.Option, option);
@@ -8229,54 +7611,56 @@ var DomBehind;
                 behavior.Marks = [behavior.PInfo.MemberPath];
             }
             return me;
-        };
-        return FlipBindingBehaviorBuilder;
-    }(DomBehind.BindingBehaviorBuilder));
+        }
+    }
     DomBehind.FlipBindingBehaviorBuilder = FlipBindingBehaviorBuilder;
-    DomBehind.BindingBehaviorBuilder.prototype.FlipElement = function (frontSelector, backSelector) {
-        var me = this;
-        var frontElement = me.Owner.Container.find(frontSelector);
-        if (frontElement.length === 0) {
-            frontElement = $(frontSelector);
-        }
-        var backElement = me.Owner.Container.find(backSelector);
-        if (backElement.length === 0) {
-            backElement = $(backSelector);
-        }
-        me.CurrentElement = frontElement;
-        var behavior = me.Add(new FlipBehavior());
-        behavior.Option = {
-            front: frontElement,
-            back: backElement,
+    DomBehind.BindingBehaviorBuilder.prototype.FlipElement =
+        function (containerSelector, frontSelector, backSelector) {
+            let me = this;
+            let container = me.Owner.Container.find(containerSelector);
+            if (container.length === 0) {
+                container = $(containerSelector);
+            }
+            let frontElement = me.Owner.Container.find(frontSelector);
+            if (frontElement.length === 0) {
+                frontElement = $(frontSelector);
+            }
+            let backElement = me.Owner.Container.find(backSelector);
+            if (backElement.length === 0) {
+                backElement = $(backSelector);
+            }
+            me.CurrentElement = container;
+            let behavior = me.Add(new FlipBehavior());
+            behavior.Option = {
+                container: container,
+                front: frontElement,
+                back: backElement,
+                animation: FlipAnimation.Slide,
+            };
+            FlipBehavior.Register(behavior);
+            let newMe = new FlipBindingBehaviorBuilder(me.Owner);
+            newMe.CurrentElement = me.CurrentElement;
+            newMe.CurrentBehavior = me.CurrentBehavior;
+            return newMe;
         };
-        FlipBehavior.Register(behavior);
-        var newMe = new FlipBindingBehaviorBuilder(me.Owner);
-        newMe.CurrentElement = me.CurrentElement;
-        newMe.CurrentBehavior = me.CurrentBehavior;
-        return newMe;
-    };
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Flip.js.map
 var DomBehind;
 (function (DomBehind) {
-    var Application = (function () {
-        function Application() {
+    class Application {
+        constructor() {
             this._navigator = new DomBehind.Navigation.DefaultNavigator();
         }
-        Object.defineProperty(Application, "Current", {
-            get: function () {
-                return Application._app;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Application.Resolve = function () {
+        static get Current() {
+            return Application._app;
+        }
+        static Resolve() {
             if (Application._app)
                 return;
-            var me = this;
+            let me = this;
             $(document).ready(function () {
-                var appFactory = new DomBehind.TypedFactory(me);
-                var app = appFactory.CreateInstance();
+                let appFactory = new DomBehind.TypedFactory(me);
+                let app = appFactory.CreateInstance();
                 Application._app = app;
                 window.history.pushState(null, "", window.location.href);
                 window.onpopstate = function () {
@@ -8284,13 +7668,9 @@ var DomBehind;
                     Application.Current.OnBrowserBack();
                 };
             });
-        };
-        Application.prototype.OnBrowserBack = function () { };
-        Application.prototype.SafeAction = function (func, context) {
-            var args = [];
-            for (var _i = 2; _i < arguments.length; _i++) {
-                args[_i - 2] = arguments[_i];
-            }
+        }
+        OnBrowserBack() { }
+        SafeAction(func, context, ...args) {
             try {
                 if (context) {
                     return $.proxy(func, context, args);
@@ -8302,66 +7682,48 @@ var DomBehind;
             catch (e) {
                 this.UnhandledException(e);
             }
-        };
-        Object.defineProperty(Application.prototype, "DefaultActionPolicy", {
-            get: function () {
-                return [];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Application.prototype, "Navigator", {
-            get: function () {
-                return this._navigator;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return Application;
-    }());
+        }
+        get DefaultActionPolicy() {
+            return [];
+        }
+        get Navigator() {
+            return this._navigator;
+        }
+    }
     DomBehind.Application = Application;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Application.js.map
 var DomBehind;
 (function (DomBehind) {
-    var BizView = (function () {
-        function BizView() {
+    class BizView {
+        constructor() {
             this._disposed = false;
         }
-        Object.defineProperty(BizView.prototype, "Container", {
-            get: function () {
-                return this._container;
-            },
-            set: function (value) {
-                if (this._container !== value) {
-                    if (this._container) {
-                        this._container.empty();
-                        this._container = null;
-                    }
-                    this._container = value;
+        get Container() {
+            return this._container;
+        }
+        set Container(value) {
+            if (this._container !== value) {
+                if (this._container) {
+                    this._container.empty();
+                    this._container = null;
                 }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(BizView.prototype, "DataContext", {
-            get: function () {
-                return this._dataContext;
-            },
-            set: function (value) {
-                if (this._dataContext !== value) {
-                    this._dataContext = value;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        BizView.prototype.OnDataContextPropertyChanged = function (sender, e) {
+                this._container = value;
+            }
+        }
+        get DataContext() {
+            return this._dataContext;
+        }
+        set DataContext(value) {
+            if (this._dataContext !== value) {
+                this._dataContext = value;
+            }
+        }
+        OnDataContextPropertyChanged(sender, e) {
             this.UpdateTarget(e.Name);
-        };
-        BizView.prototype.ViewLoaded = function (responseText, textStatus, XMLHttpRequest) { };
-        BizView.prototype.Ensure = function () {
-            var _this = this;
+        }
+        ViewLoaded(responseText, textStatus, XMLHttpRequest) { }
+        Ensure() {
             if (!this.DataContext)
                 return;
             var viewModel = this.DataContext;
@@ -8377,78 +7739,75 @@ var DomBehind;
             if (this.DependencyValidateSetup) {
                 this.DependencyValidateSetup();
             }
-            var e = null;
+            let e = null;
             if (!viewModel.Initialized) {
                 viewModel.Initialized = true;
                 e = this.Container.Raise(DomBehind.UIElement.Initialize);
             }
-            var activate = function () {
-                _this.UpdateTarget();
-                _this.Container.Raise(DomBehind.UIElement.Activate);
+            let activate = () => {
+                this.UpdateTarget();
+                this.Container.Raise(DomBehind.UIElement.Activate);
             };
             if (e && Object.IsPromise(e.result)) {
-                var pms = e.result;
-                pms.always(function () { return activate(); });
+                let pms = e.result;
+                pms.always(() => activate());
             }
             else {
                 activate();
             }
-        };
-        BizView.prototype.UnSubscribe = function () {
-        };
-        BizView.prototype.Subscribe = function () {
-        };
-        BizView.prototype.CreateBindingBuilder = function () {
-            var builder = new DomBehind.BindingBehaviorBuilder(this);
-            builder.Element(this.Container).BindingAction(DomBehind.UIElement.Initialize, function (vm) { return vm.Initialize(); });
-            builder.Element(this.Container).BindingAction(DomBehind.UIElement.Activate, function (vm) { return vm.Activate(); });
+        }
+        UnSubscribe() {
+        }
+        Subscribe() {
+        }
+        CreateBindingBuilder() {
+            let builder = new DomBehind.BindingBehaviorBuilder(this);
+            builder.Element(this.Container).BindingAction(DomBehind.UIElement.Initialize, vm => vm.Initialize());
+            builder.Element(this.Container).BindingAction(DomBehind.UIElement.Activate, vm => vm.Activate());
             return builder;
-        };
-        BizView.prototype.UpdateTarget = function (mark) {
+        }
+        UpdateTarget(mark) {
             if (this.BindingBehaviors)
                 this.BindingBehaviors.UpdateTarget(mark);
-        };
-        BizView.prototype.UpdateSource = function (mark) {
+        }
+        UpdateSource(mark) {
             if (this.BindingBehaviors)
                 this.BindingBehaviors.UpdateSource(mark);
-        };
-        BizView.prototype.Validate = function (mark) {
-            var result = true;
+        }
+        Validate(mark) {
+            let result = true;
             if (this.BindingBehaviors) {
                 this.RemoveValidator(mark);
-                $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), function (i, behavior) {
+                $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), (i, behavior) => {
                     if (!behavior.BindingPolicy.Validators.Validate()) {
                         result = false;
                     }
                 });
-                if (result) {
-                    this.RemoveValidator(mark);
-                }
             }
             if (this.DependencyValidate) {
                 this.DependencyValidate(mark);
             }
             return result;
-        };
-        BizView.prototype.RemoveValidator = function (mark) {
-            $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), function (i, value) {
+        }
+        RemoveValidator(mark) {
+            $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), (i, value) => {
                 value.BindingPolicy.Validators.RemoveValidator();
             });
             this.Container.ClearCustomError();
             if (this.DependencyValidateClear) {
                 this.DependencyValidateClear(mark);
             }
-        };
-        BizView.prototype.ClearValidator = function (mark) {
-            $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), function (i, value) {
+        }
+        ClearValidator(mark) {
+            $.each(this.BindingBehaviors.ListDataBindingBehavior(mark), (i, value) => {
                 value.BindingPolicy.Validators.ClearValidator();
             });
             this.Container.ClearCustomError();
             if (this.DependencyValidateClear) {
                 this.DependencyValidateClear(mark);
             }
-        };
-        BizView.prototype.Dispose = function () {
+        }
+        Dispose() {
             if (!this._disposed) {
                 this.UnSubscribe();
                 if (this.BindingBehaviors) {
@@ -8468,114 +7827,86 @@ var DomBehind;
                 }
             }
             this._disposed = true;
-        };
-        return BizView;
-    }());
+        }
+    }
     DomBehind.BizView = BizView;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=BizView.js.map
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DomBehind;
 (function (DomBehind) {
-    var BizViewModel = (function (_super) {
-        __extends(BizViewModel, _super);
-        function BizViewModel() {
-            var _this = _super.call(this) || this;
-            _this.Initialized = false;
-            DomBehind.Locator.Push(_this);
-            return _this;
+    class BizViewModel extends DomBehind.NotifiableImp {
+        constructor() {
+            super();
+            this.Initialized = false;
+            DomBehind.Locator.Push(this);
         }
-        BizViewModel.prototype.NotifyEvent = function (event, args) {
+        NotifyEvent(event, args) {
             if (event)
                 event.Raise(this, args);
-        };
-        Object.defineProperty(BizViewModel.prototype, "Title", {
-            get: function () {
-                return this._title;
-            },
-            set: function (value) {
-                this._title = value;
-                document.title = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(BizViewModel.prototype, "IsVisible", {
-            get: function () {
-                var view = this.View;
-                if (!view)
-                    return undefined;
-                var container = view.Container;
-                if (!container)
-                    return undefined;
-                return container.css("display") !== "none";
-            },
-            set: function (value) {
-                var view = this.View;
-                if (!view)
-                    return;
-                var container = view.Container;
-                if (!container)
-                    return;
-                container.css("display", value ? "display" : "none");
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(BizViewModel.prototype, "View", {
-            get: function () {
-                return this._view;
-            },
-            set: function (value) {
-                if (this._view !== value) {
-                    this._view = value;
-                    this.OnViewChanged();
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        BizViewModel.prototype.OnViewChanged = function () {
-        };
-        BizViewModel.prototype.Activate = function () { };
-        BizViewModel.prototype.UpdateTarget = function (mark) {
+        }
+        get Title() {
+            return this._title;
+        }
+        set Title(value) {
+            this._title = value;
+            document.title = value;
+        }
+        get IsVisible() {
+            let view = this.View;
+            if (!view)
+                return undefined;
+            let container = view.Container;
+            if (!container)
+                return undefined;
+            return container.css("display") !== "none";
+        }
+        set IsVisible(value) {
+            let view = this.View;
+            if (!view)
+                return;
+            let container = view.Container;
+            if (!container)
+                return;
+            container.css("display", value ? "display" : "none");
+        }
+        get View() {
+            return this._view;
+        }
+        set View(value) {
+            if (this._view !== value) {
+                this._view = value;
+                this.OnViewChanged();
+            }
+        }
+        OnViewChanged() {
+        }
+        Activate() { }
+        UpdateTarget(mark) {
             if (this.View) {
                 this.View.UpdateTarget(mark);
             }
-        };
-        BizViewModel.prototype.UpdateSource = function (mark) {
+        }
+        UpdateSource(mark) {
             if (this.View) {
                 this.View.UpdateSource(mark);
             }
-        };
-        BizViewModel.prototype.Validate = function (mark) {
-            var result = false;
+        }
+        Validate(mark) {
+            let result = false;
             if (this.View) {
                 result = this.View.Validate(mark);
             }
             return result;
-        };
-        BizViewModel.prototype.ClearValidation = function (mark) {
+        }
+        ClearValidation(mark) {
             this.View.ClearValidator(mark);
-        };
-        BizViewModel.prototype.LastErrors = function (mark) {
-            var result = [];
-            $.each(this.View.BindingBehaviors.ListDataBindingBehavior(mark), function (i, behavior) {
+        }
+        LastErrors(mark) {
+            let result = [];
+            $.each(this.View.BindingBehaviors.ListDataBindingBehavior(mark), (i, behavior) => {
                 if (behavior.BindingPolicy &&
                     behavior.BindingPolicy.Validators) {
-                    $.each(behavior.BindingPolicy.Validators.toArray(), function (x, v) {
+                    $.each(behavior.BindingPolicy.Validators.toArray(), (x, v) => {
                         if (v.HasError) {
                             result.push(v);
                         }
@@ -8583,107 +7914,92 @@ var DomBehind;
                 }
             });
             return result;
-        };
-        BizViewModel.prototype.ThrownValidate = function (mark) {
-            var result = this.Validate(mark);
+        }
+        ThrownValidate(mark) {
+            let result = this.Validate(mark);
             if (result)
                 return;
-            var lastErrors = this.LastErrors(mark).Select(function (x) { return new DomBehind.ApplicationException(x.Message); });
+            let lastErrors = this.LastErrors(mark).Select(x => new DomBehind.ApplicationException(x.Message));
             throw new DomBehind.ApplicationAggregateException(lastErrors);
-        };
-        BizViewModel.prototype.WaitingOverlay = function (func, handled, image) {
+        }
+        WaitingOverlay(func, handled, image) {
             var overlayPolocy = new DomBehind.Data.WindowWaitingOverlayActionPolicy();
             if (image) {
                 overlayPolocy.Option.Image = image;
             }
             return this.SafeAction(func, handled, overlayPolocy);
-        };
-        BizViewModel.prototype.SafeAction = function (func, handled) {
-            var policies = [];
-            for (var _i = 2; _i < arguments.length; _i++) {
-                policies[_i - 2] = arguments[_i];
-            }
+        }
+        SafeAction(func, handled, ...policies) {
             var behavior = new DomBehind.Data.ActionBindingBehavior();
             var list = [];
             if (!handled) {
                 list.push(new DomBehind.Data.ExceptionHandlingActionPolicy());
             }
             if (policies) {
-                $.each(policies, function (i, value) { return list.push(value); });
+                $.each(policies, (i, value) => list.push(value));
             }
             var invoker = behavior.CreateActionInvoker(list);
             return invoker.Do(func);
-        };
-        BizViewModel.prototype.Catch = function (ex) {
+        }
+        Catch(ex) {
             if (ex.Data instanceof DomBehind.AjaxException) {
             }
-        };
-        Object.defineProperty(BizViewModel.prototype, "Navigator", {
-            get: function () {
-                return DomBehind.Application.Current.Navigator;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(BizViewModel.prototype, "IsEnabled", {
-            get: function () {
-                return this.GetProperty("IsEnabled", true);
-            },
-            set: function (value) {
-                this.SetProperty("IsEnabled", value);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        BizViewModel.prototype.ShowInfomation = function (message, title) {
+        }
+        get Navigator() {
+            return DomBehind.Application.Current.Navigator;
+        }
+        get IsEnabled() {
+            return this.GetProperty("IsEnabled", true);
+        }
+        set IsEnabled(value) {
+            this.SetProperty("IsEnabled", value);
+        }
+        ShowInfomation(message, title) {
             DomBehind.MessaageBox.ShowMessage(message, title, DomBehind.MessageStatus.Infomation);
-        };
-        BizViewModel.prototype.ShowWarning = function (message, title) {
+        }
+        ShowWarning(message, title) {
             DomBehind.MessaageBox.ShowMessage(message, title, DomBehind.MessageStatus.Warning);
-        };
-        BizViewModel.prototype.ShowError = function (message, title) {
+        }
+        ShowError(message, title) {
             DomBehind.MessaageBox.ShowMessage(message, title, DomBehind.MessageStatus.Error);
-        };
-        BizViewModel.prototype.ShowMessage = function (message, title, status) {
+        }
+        ShowMessage(message, title, status) {
             DomBehind.MessaageBox.ShowMessage(message, title, status);
-        };
-        BizViewModel.prototype.ShowYesNo = function (message, title, option) {
+        }
+        ShowYesNo(message, title, option) {
             DomBehind.MessaageBox.ShowYesNo(message, title, option);
-        };
-        BizViewModel.prototype.ShowOkCancel = function (message, title, option) {
+        }
+        ShowOkCancel(message, title, option) {
             DomBehind.MessaageBox.ShowOkCancel(message, title, option);
-        };
-        BizViewModel.prototype.Dispose = function () {
+        }
+        Dispose() {
             if (!this._disposed) {
-                _super.prototype.Dispose.call(this);
+                super.Dispose();
             }
-        };
-        return BizViewModel;
-    }(DomBehind.NotifiableImp));
+        }
+    }
     DomBehind.BizViewModel = BizViewModel;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=BizViewModel.js.map
-var annotationCollection = (function () {
-    function annotationCollection() {
+class annotationCollection {
+    constructor() {
         this.lazyList = [];
     }
-    annotationCollection.prototype.Any = function (selector, resolveViewType, resolveViewModelType) {
-        return this.lazyList.Any(function (x) {
-            return x.Selector === selector &&
-                x.ResolveViewType === resolveViewType &&
-                x.ResolveViewModelType === resolveViewModelType;
-        });
-    };
-    annotationCollection.prototype.Add = function (selector, resolveViewType, resolveViewModelType) {
+    Any(selector, resolveViewType, resolveViewModelType) {
+        return this.lazyList.Any(x => x.Selector === selector &&
+            x.ResolveViewType === resolveViewType &&
+            x.ResolveViewModelType === resolveViewModelType);
+    }
+    Add(selector, resolveViewType, resolveViewModelType) {
         this.lazyList.push({
             Selector: selector,
             ResolveViewType: resolveViewType,
             ResolveViewModelType: resolveViewModelType
         });
-    };
-    annotationCollection.prototype.Remove = function (selector, resolveViewType, resolveViewModelType) {
-        var newArray = [];
-        $.each(this.lazyList, function (i, x) {
+    }
+    Remove(selector, resolveViewType, resolveViewModelType) {
+        let newArray = [];
+        $.each(this.lazyList, (i, x) => {
             if (!(x.Selector === selector &&
                 x.ResolveViewType === x.ResolveViewType &&
                 x.ResolveViewModelType === x.ResolveViewModelType)) {
@@ -8691,29 +8007,27 @@ var annotationCollection = (function () {
             }
         });
         this.lazyList = newArray;
-    };
-    annotationCollection.prototype.ToArray = function () {
-        var newArray = [];
-        $.each(this.lazyList, function (i, x) { return newArray.push(x); });
+    }
+    ToArray() {
+        let newArray = [];
+        $.each(this.lazyList, (i, x) => newArray.push(x));
         return newArray;
-    };
-    annotationCollection.prototype.Pop = function (peek) {
-        var _this = this;
-        $.each(this.ToArray(), function (i, each) {
+    }
+    Pop(peek) {
+        $.each(this.ToArray(), (i, each) => {
             if (!peek) {
-                _this.Remove(each.Selector, each.ResolveViewType, each.ResolveViewModelType);
+                this.Remove(each.Selector, each.ResolveViewType, each.ResolveViewModelType);
             }
             $.BindingAnnotation(each.Selector, each.ResolveViewType, each.ResolveViewModelType);
         });
-    };
-    return annotationCollection;
-}());
+    }
+}
 var __lazyCollection = new annotationCollection();
 $.BindingAnnotation = function (selector, resolveViewType, resolveViewModelType) {
-    var d = $.Deferred();
-    var view = $(selector);
+    let d = $.Deferred();
+    let view = $(selector);
     view.ready(function (e) {
-        var ele = $(selector);
+        let ele = $(selector);
         if (ele.length === 0) {
             if (!__lazyCollection.Any(selector, resolveViewType, resolveViewModelType)) {
                 __lazyCollection.Add(selector, resolveViewType, resolveViewModelType);
@@ -8721,11 +8035,11 @@ $.BindingAnnotation = function (selector, resolveViewType, resolveViewModelType)
             d.reject();
             return;
         }
-        var viewFactory = new DomBehind.TypedFactory(resolveViewType());
-        var viewModelFactory = new DomBehind.TypedFactory(resolveViewModelType());
-        var behavior = new DomBehind.Data.ViewViewModelBindingBehavior();
-        behavior.GetView = function (x) { return viewFactory.CreateInstance(); };
-        behavior.GetViewModel = function (x) { return viewModelFactory.CreateInstance(); };
+        let viewFactory = new DomBehind.TypedFactory(resolveViewType());
+        let viewModelFactory = new DomBehind.TypedFactory(resolveViewModelType());
+        let behavior = new DomBehind.Data.ViewViewModelBindingBehavior();
+        behavior.GetView = x => viewFactory.CreateInstance();
+        behavior.GetViewModel = x => viewModelFactory.CreateInstance();
         behavior.Element = $(selector);
         behavior.Ensure();
         ele.trigger("RegisteredViewViewModel", behavior);
@@ -8736,22 +8050,20 @@ $.BindingAnnotation = function (selector, resolveViewType, resolveViewModelType)
 //# sourceMappingURL=BindingAnnotation.js.map
 var DomBehind;
 (function (DomBehind) {
-    var Locator = (function () {
-        function Locator() {
-        }
-        Locator.Push = function (ins) {
+    class Locator {
+        static Push(ins) {
             Locator._container.push(ins);
-        };
-        Locator.ToArray = function () {
-            var array = [];
-            $.each(Locator._container, function (i, each) {
+        }
+        static ToArray() {
+            let array = [];
+            $.each(Locator._container, (i, each) => {
                 array.push(each);
             });
             return array;
-        };
-        Locator.List = function (typeT, predicate) {
-            var array = [];
-            $.each(Locator._container, function (i, each) {
+        }
+        static List(typeT, predicate) {
+            let array = [];
+            $.each(Locator._container, (i, each) => {
                 if (each instanceof typeT) {
                     if (!predicate) {
                         array.push(each);
@@ -8762,10 +8074,10 @@ var DomBehind;
                 }
             });
             return array;
-        };
-        Locator.First = function (typeT, predicate) {
-            var result;
-            $.each(Locator._container, function (i, each) {
+        }
+        static First(typeT, predicate) {
+            let result;
+            $.each(Locator._container, (i, each) => {
                 if (each instanceof typeT) {
                     if (!predicate) {
                         result = each;
@@ -8778,10 +8090,10 @@ var DomBehind;
                 }
             });
             return result;
-        };
-        Locator.Remove = function (typeT, predicate) {
-            var array = [];
-            $.each(Locator._container, function (i, each) {
+        }
+        static Remove(typeT, predicate) {
+            let array = [];
+            $.each(Locator._container, (i, each) => {
                 if (each instanceof typeT) {
                     if (!(!predicate || predicate(each))) {
                         array.push(each);
@@ -8792,31 +8104,30 @@ var DomBehind;
                 }
             });
             Locator._container = array;
-        };
-        Locator.Clear = function () {
+        }
+        static Clear() {
             Locator._container = [];
-        };
-        Locator._container = [];
-        return Locator;
-    }());
+        }
+    }
+    Locator._container = [];
     DomBehind.Locator = Locator;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Locator.js.map
 $.validator.setDefaults({
     ignore: "",
     errorPlacement: function (error, element) {
-        var id = element.attr("id");
+        let id = element.attr("id");
         if (id) {
-            var pre = element.prevAll("[for=\"" + id + "\"]");
+            let pre = element.prevAll(`[for="${id}"]`);
             if (pre.length != 0) {
                 error.insertAfter(pre);
             }
-            var post = element.nextAll("[for=\"" + id + "\"]");
+            let post = element.nextAll(`[for="${id}"]`);
             if (post.length != 0) {
                 error.insertAfter(post);
             }
-            var form = element.closest("form");
-            var closet = form.find("[for=\"" + id + "\"]");
+            let form = element.closest("form");
+            let closet = form.find(`[for="${id}"]`);
             if (closet.length != 0) {
                 error.insertAfter(closet);
             }
@@ -8829,8 +8140,8 @@ $.validator.setDefaults({
 var DomBehind;
 (function (DomBehind) {
     DomBehind.BizView.prototype.DependencyValidateSetup = function () {
-        var me = this;
-        var container = me.Container;
+        let me = this;
+        let container = me.Container;
         if (!container) {
             return;
         }
@@ -8843,40 +8154,40 @@ var DomBehind;
         if (container.length == 0) {
             console.trace("Validation using setCustomValidity must be enclosed in a form tag.");
         }
-        $.each(me.BindingBehaviors.ListDataBindingBehavior(), function (i, behavior) {
-            $.each(behavior.BindingPolicy.Validators.toArray(), function (k, validator) {
-                var el = behavior.Element;
-                var identity = el.attr("identity");
+        $.each(me.BindingBehaviors.ListDataBindingBehavior(), (i, behavior) => {
+            $.each(behavior.BindingPolicy.Validators.toArray(), (k, validator) => {
+                let el = behavior.Element;
+                let identity = el.attr("identity");
                 if (!el.attr("identity")) {
                     identity = NewUid().Replace("-", "");
                     el.attr("identity", identity);
                 }
-                var cls = "cls-" + identity;
+                let cls = `cls-${identity}`;
                 if (!el.hasClass(cls)) {
                     el.addClass(cls);
                 }
-                var name = el.attr("name");
+                let name = el.attr("name");
                 if (String.IsNullOrWhiteSpace(name)) {
-                    el.attr("name", "name-" + identity);
+                    el.attr("name", `name-${identity}`);
                 }
-                var funcName = "func-" + identity;
-                var o = JSON.parse("{ \"" + funcName + "\": { \"" + funcName + "\": true }  }");
+                let funcName = `func-${identity}`;
+                let o = JSON.parse(`{ "${funcName}": { "${funcName}": true }  }`);
                 $.validator.addClassRules(cls, o);
                 if (validator instanceof DomBehind.Validation.RequiredValidator) {
-                    var requiredFunc = $.validator.methods.required;
+                    let requiredFunc = $.validator.methods.required;
                     if (validator.Message) {
-                        $.validator.addMethod("" + funcName, requiredFunc, validator.Message);
+                        $.validator.addMethod(`${funcName}`, requiredFunc, validator.Message);
                     }
                     else {
-                        $.validator.addMethod("" + funcName, requiredFunc, "必須項目です");
+                        $.validator.addMethod(`${funcName}`, requiredFunc, "必須項目です");
                     }
                 }
             });
         });
     };
     DomBehind.BizView.prototype.DependencyValidate = function (mark) {
-        var me = this;
-        var container = me.Container;
+        let me = this;
+        let container = me.Container;
         if (!container) {
             return;
         }
@@ -8888,9 +8199,9 @@ var DomBehind;
         }
         if (container.length == 0)
             return;
-        $.each(me.BindingBehaviors.ListDataBindingBehavior(mark), function (i, behavior) {
-            $.each(behavior.BindingPolicy.Validators.toArray(), function (k, validator) {
-                var el = behavior.Element;
+        $.each(me.BindingBehaviors.ListDataBindingBehavior(mark), (i, behavior) => {
+            $.each(behavior.BindingPolicy.Validators.toArray(), (k, validator) => {
+                let el = behavior.Element;
                 if (validator instanceof DomBehind.Validation.RequiredValidator) {
                     if (el.attr(validator.Attribute)) {
                         el.removeAttr(validator.Attribute);
@@ -8901,8 +8212,8 @@ var DomBehind;
         });
     };
     DomBehind.BizView.prototype.DependencyValidateClear = function (mark) {
-        var me = this;
-        var container = me.Container;
+        let me = this;
+        let container = me.Container;
         if (!container) {
             return;
         }
@@ -8914,7 +8225,7 @@ var DomBehind;
         }
         if (container.length == 0)
             return;
-        var jqueryValidator = container.validate();
+        let jqueryValidator = container.validate();
         if (jqueryValidator) {
             jqueryValidator.resetForm();
         }

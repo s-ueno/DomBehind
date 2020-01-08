@@ -61,15 +61,38 @@
         private static _extractor_Minified = new RegExp("return (.*)}");
         private static NameOf(expression: any): string {
             // console.info(`★${expression}`);
-            let m = LamdaExpression._extractor_Minified.exec(expression + "");            
-            let s = m[1].trim();
-            // console.info(`★${s}`);
-            if (s.charAt(s.length - 1) === "}" || 
-                s.charAt(s.length - 1) === ";" ) {
-                m = LamdaExpression._extractor.exec(expression + "");
-                s = m[1];
+
+            let result = "";
+
+            if (LamdaExpression.IsSupportES6()) {
+                
+                result = expression.toString();
+
+            } else {
+                try {
+                    let m = LamdaExpression._extractor_Minified.exec(expression + "");
+                    let s = m[1].trim();
+                    // console.info(`★${s}`);
+                    if (s.charAt(s.length - 1) === "}" ||
+                        s.charAt(s.length - 1) === ";") {
+                        m = LamdaExpression._extractor.exec(expression + "");
+                        s = m[1];
+                    }
+                    result = s;
+                } catch (e) {
+                }
             }
-            return s;
+            return result;
+        }
+
+        private static IsSupportES6() {
+            let result = false;
+            try {
+                let k = new Map();
+                result = true;
+            } catch (e) {
+            }
+            return result;
         }
 
         public Dispose(): void {

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>DomBehind.Plugin.W2UI</id>
-    <version>1.0.21</version>
+    <version>1.0.24</version>
     <title>DOM Behind Plugin W2UI</title>
     <authors>uEN</authors>
     <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
@@ -14,7 +14,7 @@
     <releaseNotes>
     </releaseNotes>
     <dependencies>
-      <dependency id="DomBehind" version="1.0.7"></dependency>
+      <dependency id="DomBehind" version="1.1.82"></dependency>
       <dependency id="jQuery" version="3.1.1"></dependency>
       <dependency id="jquery.TypeScript.DefinitelyTyped" version="1.5.1"></dependency>
     </dependencies>

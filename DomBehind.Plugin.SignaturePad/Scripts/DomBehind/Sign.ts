@@ -8,7 +8,7 @@
         color?: string;
     }
 
-    export class Sign extends DomBehind.Data.BindingBehavior {
+    export class Sign extends Data.RelativeDataBindingBehavior {
 
         public static InstanceProperty: Data.DependencyProperty
             = Data.DependencyProperty.RegisterAttached("Instance",

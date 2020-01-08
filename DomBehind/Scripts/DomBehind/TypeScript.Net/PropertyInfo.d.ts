@@ -14,6 +14,7 @@ declare namespace DomBehind {
         private static _extractor;
         private static _extractor_Minified;
         private static NameOf;
+        private static IsSupportES6;
         Dispose(): void;
         static Path<T>(exp: (x: T) => any): string;
         static GetValueCore(dataContext: any, lamda: (x: any) => any): any;

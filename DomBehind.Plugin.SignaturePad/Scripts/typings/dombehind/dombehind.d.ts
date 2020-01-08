@@ -311,10 +311,10 @@ declare namespace DomBehind {
         UpdateSource(mark?: string): void;
         Validate(mark?: string): boolean;
         ClearValidation(mark?: string): void;
-        protected LastErrors(mark?: string): string[];
+        protected LastErrors(mark?: string): DomBehind.Validation.Validator[];
         protected ThrownValidate(mark?: string): void;
-        protected WaitingOverlay(func: Function, image?: string): any;
-        protected SafeAction(func: Function, ...policies: Data.ActionPolicy[]): any;
+        protected WaitingOverlay(func: Function, handled?: boolean, image?: string): any;
+        protected SafeAction(func: Function, handled?: boolean, ...policies: Data.ActionPolicy[]): any;
         Catch(ex: Data.ActionPolicyExceptionEventArgs): void;
         protected readonly Navigator: Navigation.INavigator;
         IsEnabled: boolean;
@@ -341,6 +341,7 @@ declare namespace DomBehind {
         constructor(ctor: TypedConstructor<T>, db: string);
         DbName: string;
         TableName: string;
+        Drop(): JQueryPromise<any>;
         List(): JQueryPromise<T[]>;
         Truncate(): JQueryPromise<any>;
         FindRowAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T>;
@@ -371,7 +372,7 @@ declare namespace DomBehind {
         static AddService(context: string, getType: () => any, priority?: number): void;
         static RemoveService(context: string): void;
         static GetService<T>(context: string): T;
-        static CreateInstance<T>(resolveType: () => any): {};
+        static CreateInstance<T>(resolveType: () => any): unknown;
     }
 }
 
@@ -383,6 +384,18 @@ declare namespace DomBehind {
         private _ctor;
         constructor(_ctor: TypedConstructor<T>);
         CreateInstance(): T;
+    }
+}
+
+declare namespace DomBehind {
+    class Appeal {
+        static _clearTimeout: any;
+        static IsEnabledProperty: Data.DependencyProperty;
+        private static styleIdentity;
+        private static css;
+        static Register(behavior: Data.DataBindingBehavior): void;
+        protected Behavior: Data.DataBindingBehavior;
+        protected Render(newValue: boolean): void;
     }
 }
 
@@ -478,6 +491,39 @@ declare namespace DomBehind {
     }
     interface BindingBehaviorBuilder<T> {
         BuildFileBrowser(selectedEvent?: (x: T, args: ISelectedFiles) => void): FileBrowserBindingBehaviorBuilder<T>;
+    }
+}
+
+declare namespace DomBehind {
+    enum FlipAnimation {
+        HorizontalFlip = 0,
+        Slide = 1
+    }
+    interface IFlipOption {
+        container?: JQuery;
+        front?: JQuery;
+        back?: JQuery;
+        fit?: boolean;
+        animation?: FlipAnimation;
+    }
+    class FlipBehavior extends Data.DataBindingBehavior {
+        Option: IFlipOption;
+        static readonly IdentityKey = "flip-identity";
+        static readonly IsFlipProperty: Data.DependencyProperty;
+        private static readonly ValueKey;
+        protected SetValue(el: JQuery, newValue: boolean): void;
+        protected HorizontalFlip(isBack: boolean): void;
+        protected Slide(isBack: boolean): void;
+        private static readonly css;
+        private static readonly cssIdentity;
+        static Register(behavior: FlipBehavior): void;
+    }
+    class FlipBindingBehaviorBuilder<T> extends BindingBehaviorBuilder<T> {
+        constructor(owner: BizView);
+        BindingFlip(exp: (owner: T) => boolean, option?: IFlipOption): BindingBehaviorBuilder<T>;
+    }
+    interface BindingBehaviorBuilder<T> {
+        FlipElement(containerSelector: string, frontSelector: string, backSelector: string): FlipBindingBehaviorBuilder<T>;
     }
 }
 
@@ -777,10 +823,18 @@ declare namespace DomBehind {
         static Click: IEventBuilder;
         static Enter: IEventBuilder;
         static Keydown: IEventBuilder;
+        static FocusIn: IEventBuilder;
         static LostFocus: IEventBuilder;
         static Initialize: IEventBuilder;
         static Activate: IEventBuilder;
         static ModalClosing: IEventBuilder;
+        static EnabledChanged: IEventBuilder;
+        static RaiseEnabledChanged(element: JQuery, isEnabled: boolean): void;
+    }
+    interface BindingBehaviorBuilder<T> {
+        ClearValueWhenDisabled(option?: {
+            clearAction?: (owner?: T, value?: any, element?: JQuery) => any;
+        }): any;
     }
 }
 
@@ -817,6 +871,7 @@ declare namespace DomBehind.Data {
         Element: JQuery;
         BindingPolicy: BindingPolicy;
         Priolity: number;
+        AdditionalInfo: collections.LinkedDictionary<string, any>;
         abstract Ensure(): void;
         Dispose(): void;
         protected _disposed: boolean;
@@ -840,6 +895,10 @@ declare namespace DomBehind {
         BindingViewViewModel(view: (x: T) => BizView, viewModel: (x: T) => BizViewModel): BindingBehaviorBuilder<T>;
         BindingAction(event: IEventBuilder, action: (x: T) => any): BindingBehaviorBuilder<T>;
         BindingAction(event: IEventBuilder, action: (x: T, args: any) => void): BindingBehaviorBuilder<T>;
+        BindingActionWithOption(event: IEventBuilder, action: (x: T, args: any) => void, option?: {
+            allowBubbling?: boolean;
+            args?: any;
+        }): BindingBehaviorBuilder<T>;
         Add<TBehavior extends Data.BindingBehavior>(behavior: TBehavior): TBehavior;
     }
     class SimpleConverter implements DomBehind.IValueConverter {
@@ -876,7 +935,6 @@ declare namespace DomBehind.Data {
         PInfo: PropertyInfo;
         private _pinfo;
         Marks: string[];
-        AdditionalInfo: collections.LinkedDictionary<string, any>;
         readonly ValueCore: any;
         UpdateSourceEvent: IEvent;
         UpdateSource(): void;
@@ -915,6 +973,23 @@ declare namespace DomBehind.Data {
         readonly Ensure: (behavior: DataBindingBehavior) => void;
         private _ensure;
         static RegisterAttached(propertyName: string, getValue: (jQuery: JQuery) => any, setValue: (jQuery: JQuery, value: any, caller?: any) => void, defaultUpdateSourceTrigger?: UpdateSourceTrigger, mode?: BindingMode, ensure?: (behavior: DataBindingBehavior) => void): DependencyProperty;
+    }
+}
+
+declare namespace DomBehind.Data {
+    class RelativeDataBindingBehavior extends DataBindingBehavior {
+        private _currentElement;
+        protected CurrentElement: JQuery;
+        protected Unsubscribe(value: JQuery): void;
+        protected Subscribe(value: JQuery): void;
+        protected Bindings: List<{
+            Binding: BindingBehavior;
+            Selector: string;
+        }>;
+        readonly LastBinding: Data.BindingBehavior;
+        UpdateTarget(): void;
+        UpdateSource(): void;
+        AddBinding<T extends Data.BindingBehavior>(binding: T, selector: string): T;
     }
 }
 
@@ -1073,6 +1148,17 @@ interface JQueryStatic {
     SetRootUri(uri: string): void;
     GetRootUri(): string;
     AbsoluteUri(uri: string): string;
+    ClientDetection(): {
+        OS?: string;
+        OSVersion?: string;
+        Browser?: string;
+        BrowserMajorVersion?: string;
+        IsMobile?: boolean;
+        FlashVersion?: string;
+        AllowCookies?: boolean;
+        Screen?: string;
+        UserAgent?: string;
+    };
 }
 declare const z_indexKey: string;
 declare const w_dynamicPrefix: string;
@@ -1082,7 +1168,8 @@ interface JQuery {
     SetCustomError(errorMessage: string): void;
     ClearCustomError(): void;
     CheckValidity(allChildren?: boolean): void;
-    Raise(event: DomBehind.IEventBuilder): JQueryEventObject;
+    Raise(event: DomBehind.IEventBuilder, ensure?: (x: JQueryEventObject) => void): JQueryEventObject;
+    Equals(ele: JQuery): boolean;
 }
 
 interface ObjectConstructor {
@@ -1099,6 +1186,7 @@ interface StringConstructor {
     IsNullOrEmpty(str: string): boolean;
     IsNullOrWhiteSpace(str: string): boolean;
     Split(value: string, separator: string): string[];
+    ToBoolean(value: string, defaultValue?: boolean): boolean;
 }
 declare enum StringSplitOptions {
     None = 0,
@@ -1117,8 +1205,6 @@ interface String {
     StartsWith(s: string): boolean;
     EndsWith(s: string): boolean;
 }
-
-
 
 declare namespace DomBehind.Navigation {
     class DefaultNavigator implements INavigator {
@@ -1157,7 +1243,6 @@ declare namespace DomBehind.Navigation {
         Reload(forcedReload?: boolean): any;
     }
 }
-
 
 declare namespace DomBehind {
     enum PoolType {
@@ -1405,14 +1490,14 @@ declare namespace DomBehind {
         protected source: T;
         static Register<T>(target: T, ...marks: string[]): Observable<T>;
         static RegisterAttached<T>(target: T, option?: {
-            wrapper?: (value: any) => any;
+            wrapper?: (value: any, name?: string) => any;
             marks?: string[];
         }): Observable<T>;
         PropertyChanging: TypedEvent<PropertyChangingEventArgs>;
         PropertyChanged: TypedEvent<PropertyChangedEventArgs>;
-        protected Wrapper: (value: any) => any;
+        protected Wrapper: (value: any, name: string) => any;
         constructor(source: T, option?: {
-            wrapper?: (value: any) => any;
+            wrapper?: (value: any, name?: string) => any;
             marks?: string[];
         });
         protected Recurcive(source: any, name: string, parentName: string): void;
@@ -1495,6 +1580,26 @@ declare namespace DomBehind {
 }
 
 declare namespace DomBehind.Validation {
+    class PipelineValidator extends DomBehind.Validation.Validator {
+        constructor();
+        protected Validators: DomBehind.Validation.Validator[];
+        Error: DomBehind.Validation.Validator;
+        Validate(value: any): boolean;
+        Apply(): void;
+        RemoveValidation(): void;
+        ClearValidation(): void;
+        AddValidation(): void;
+        AddValidator(validator: DomBehind.Validation.Validator): void;
+        Dispose(): void;
+    }
+}
+declare namespace DomBehind {
+    interface BindingBehaviorBuilder<T> {
+        AddPipelineValidator(validator: Validation.Validator): BindingBehaviorBuilder<T>;
+    }
+}
+
+declare namespace DomBehind.Validation {
     class RegexValidator extends Validator {
         constructor();
         RemoveValidation(): void;
@@ -1559,13 +1664,6 @@ declare namespace DomBehind.Validation {
         protected _disposed: boolean;
     }
 }
-
-
-
-
-
-
-
 
 declare namespace DomBehind.Web {
     class PlainXMLHttpRequestWorker extends Threading.WorkerWrapper {

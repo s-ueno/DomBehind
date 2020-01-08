@@ -34,61 +34,11 @@ namespace DomBehind {
     }
 
     export class TemplatePopup
-        extends Data.DataBindingBehavior
+        extends Data.RelativeDataBindingBehavior
         implements IPopupController {
 
         public Option: IPopupOption;
         public TitleExpression: LamdaExpression;
-
-        private _currentElement: JQuery;
-        protected get CurrentElement(): JQuery {
-            return this._currentElement;
-        }
-        protected set CurrentElement(newValue: JQuery) {
-            if (this._currentElement === newValue) return;
-
-            if (this._currentElement) {
-                this.Unsubscribe(this._currentElement);
-            }
-
-            this._currentElement = newValue;
-
-            if (newValue) {
-                this.Subscribe(newValue);
-            }
-        }
-        protected Unsubscribe(value: JQuery) {
-            if (!this.Bindings) return;
-
-            $.each(this.Bindings.toArray(), (i, each) => {
-                let binding: Data.BindingBehavior = each.Binding;
-                binding.Element.off();
-                if (binding instanceof Data.ActionBindingBehavior) {
-                    binding.Event.Clear();
-                }
-            });
-        }
-        protected Subscribe(value: JQuery) {
-            if (!this.Bindings) return;
-
-            $.each(this.Bindings.toArray(), (i, each) => {
-                let binding: Data.BindingBehavior = each.Binding;
-                let selector: string = each.Selector;
-
-                let el = value.find(selector);
-                if (el) {
-                    binding.Element = el;
-                    binding.Ensure();
-                }
-            });
-        }
-
-        protected Bindings = new List<{ Binding: Data.BindingBehavior, Selector: string }>();
-
-        public get LastBinding(): Data.BindingBehavior {
-            let b = this.Bindings.last();
-            return b ? b.Binding : null;
-        }
 
         public Close() {
             w2popup.close();
@@ -124,29 +74,6 @@ namespace DomBehind {
             return option;
         }
 
-        public /* override */  UpdateTarget() {
-            if (!this.Bindings) return;
-            $.each(this.Bindings.toArray(), (i, value) => {
-                if (value.Binding instanceof Data.DataBindingBehavior) {
-                    value.Binding.UpdateTarget();
-                }
-            });
-        }
-
-        public /* override */ UpdateSource() {
-            if (!this.Bindings) return;
-            $.each(this.Bindings.toArray(), (i, value) => {
-                if (value.Binding instanceof Data.DataBindingBehavior) {
-                    value.Binding.UpdateSource();
-                }
-            });
-        }
-
-        public AddBinding<T extends Data.BindingBehavior>(binding: T, selector: string): T {
-            this.Bindings.add({ Binding: binding, Selector: selector });
-            return binding;
-        }
-
         protected FindTemplate(jtemplate: JQuery): JQuery {
             let support = ("content" in document.createElement("template"));
             if (support) {
@@ -163,7 +90,6 @@ namespace DomBehind {
 
     export class PopupTemplateBindingBuilder<T> extends Data.DataBindingBehaviorBuilder<T> {
 
-
         public Element(value: any): PopupTemplateBindingBuilder<T> {
             let me: PopupTemplateBindingBuilder<any> = this;
             me.CurrentSelector = value;
@@ -178,7 +104,7 @@ namespace DomBehind {
         ): PopupTemplateBindingBuilder<T> {
 
             let me: PopupTemplateBindingBuilder<any> = this;
-            if (me.CurrentBehavior instanceof TemplatePopup) {
+            if (me.CurrentBehavior instanceof Data.RelativeDataBindingBehavior) {
 
                 let bkBehavior = me.CurrentBehavior;
                 let bkElement = me.CurrentElement;

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>DomBehind.Plugin.JQueryUI</id>
-    <version>1.0.18</version>
+    <version>1.0.20</version>
     <title>DOM Behind Plugin JQueryUI</title>
     <authors>uEN</authors>
     <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
@@ -14,7 +14,7 @@
     <releaseNotes>
     </releaseNotes>
     <dependencies>
-      <dependency id="DomBehind" version="1.0.9"></dependency>
+      <dependency id="DomBehind" version="1.1.75"></dependency>
       <dependency id="jQuery" version="3.1.1"></dependency>
       <dependency id="jquery.TypeScript.DefinitelyTyped" version="3.1.2"></dependency>
       

@@ -2,17 +2,17 @@
 <package >
   <metadata>
     <id>DomBehind</id>
-    <version>1.1.72</version>
+    <version>1.1.82</version>
     <title>DOM Behind</title>
     <authors>uEN</authors>
     <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/s-ueno/DomBehind</projectUrl>
+    <projectUrl>https://github.com8/s-ueno/DomBehind</projectUrl>
     <tags>typescript javascript jquery mvvm</tags>
     <description>
-      This is a component oriented programming approach when building a front end with JavaScript, TypeScript
+      This is a component oriented programming approach when building a front end with TypeScript
     </description>
     <releaseNotes>
-      ・
+      ・ECMAScript2019 / ES2015
     </releaseNotes>
     <dependencies>
       <dependency id="jQuery" version="3.3.1"></dependency>

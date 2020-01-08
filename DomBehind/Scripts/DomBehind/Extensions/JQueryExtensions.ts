@@ -1,4 +1,5 @@
-﻿interface JQueryStatic {
+﻿
+interface JQueryStatic {
 
     GenerateZIndex(): number;
 
@@ -30,8 +31,17 @@
         Screen?: string,
         UserAgent?: string
     };
+
+    ToPromise<T>(pms: JQueryPromise<T>): Promise<T>;
 }
 
+$.ToPromise = function (pms: JQueryPromise<any>) {
+    let p = new Promise<any>((resolve, reject) => {
+        pms.done(x => resolve(x))
+            .fail(x => reject(x));
+    });
+    return p;
+}
 
 const z_indexKey: string = "z_indexKey";
 $.GenerateZIndex = function () {

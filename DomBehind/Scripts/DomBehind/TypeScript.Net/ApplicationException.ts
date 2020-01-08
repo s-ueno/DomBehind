@@ -1,7 +1,6 @@
 ﻿namespace DomBehind {
     export class ApplicationException extends Exception {
         constructor(public Message?: string) {
-            super();
             super(Message);
         }
         public /* virtual */ ToString(): string { return this.Message; }

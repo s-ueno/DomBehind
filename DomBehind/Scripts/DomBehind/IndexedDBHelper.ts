@@ -42,6 +42,10 @@
             return d.promise();
         }
 
+        public DropAsync(): Promise<any> {
+            return $.ToPromise(this.Drop());
+        }
+
         public List(): JQueryPromise<T[]> {
             let d = $.Deferred<any>();
             let db = this.Open();
@@ -70,6 +74,11 @@
             return d.promise();
         }
 
+        public ListAsync(): Promise<T[]> {
+            return $.ToPromise(this.List());
+        }
+
+
         public Truncate() {
             let d = $.Deferred<any>();
             let db = this.Open();
@@ -95,16 +104,25 @@
             return d.promise();
         }
 
-        public FindRowAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T> {
+        public TruncateAsync() {
+            return $.ToPromise(this.Truncate());
+        }
+
+
+        public FindRow(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T> {
             let d = $.Deferred<any>();
-            this.FindRowsAsync(exp, value).done(x => {
+            this.FindRows(exp, value).done(x => {
                 d.resolve(x.FirstOrDefault());
             }).fail(x => {
                 d.reject(x);
             });
             return d.promise();
         }
-        public FindRowsAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T[]> {
+        public FindRowAsync(exp: (obj: T) => string | number, value: string | number): Promise<T> {
+            return $.ToPromise(this.FindRow(exp, value));
+        }
+
+        public FindRows(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T[]> {
             let path = LamdaExpression.Path(exp);
             let d = $.Deferred<any>();
             let db = this.Open();
@@ -143,6 +161,10 @@
             });
             return d.promise();
         }
+        public FindRowsAsync(exp: (obj: T) => string | number, value: string | number): Promise<T[]> {
+            return $.ToPromise(this.FindRows(exp, value));
+        }
+
 
         protected FetchCursor(indexStore: IDBIndex, value: string | number, d: JQueryDeferred<any>) {
             let list = new List<T>();
@@ -166,7 +188,7 @@
             };
         }
 
-        public UpsertAsync(entity: T | Array<T>, primaryKey?: (obj: T) => string | number): JQueryPromise<any> {
+        public Upsert(entity: T | Array<T>, primaryKey?: (obj: T) => string | number): JQueryPromise<any> {
             let path: string;
             if (primaryKey) {
                 path = LamdaExpression.Path(primaryKey);
@@ -189,7 +211,7 @@
                         // 
                         newStore.transaction.oncomplete = e => {
                             newDb.close();
-                            this.UpsertAsync(entity, primaryKey).done(x => d.resolve()).fail(x => d.reject(x));
+                            this.Upsert(entity, primaryKey).done(x => d.resolve()).fail(x => d.reject(x));
                         };
                     });
                     return;
@@ -213,9 +235,11 @@
             return d.promise();
         }
 
+        public UpsertAsync(entity: T | Array<T>, primaryKey?: (obj: T) => string | number): Promise<any> {
+            return $.ToPromise(this.Upsert(entity, primaryKey));
+        }
 
-
-        public DeleteAsync(entity: T | Array<T>): JQueryPromise<any> {
+        public Delete(entity: T | Array<T>): JQueryPromise<any> {
             let d = $.Deferred<any>();
             let db = this.Open();
 
@@ -248,6 +272,9 @@
             return d.promise();
         }
 
+        public DeleteAsync(entity: T | Array<T>): Promise<any> {
+            return $.ToPromise(this.Delete(entity));
+        }
 
         protected Open(): JQueryPromise<IDBDatabase> {
             let d = $.Deferred<any>();
@@ -270,6 +297,16 @@
 
             return d.promise();
         }
+
+        protected OpenAsync(): Promise<IDBDatabase> {
+            let pms = this.Open();
+            var p = new Promise<IDBDatabase>((resolve, reject) => {
+                pms.done(x => resolve(x))
+                    .fail(x => reject(x));
+            });
+            return p;
+        }
+
 
         protected Upgrade(version: number, action: (db: any) => void) {
             // let d = $.Deferred<any>();

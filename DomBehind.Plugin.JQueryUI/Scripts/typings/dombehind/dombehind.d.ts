@@ -496,10 +496,11 @@ declare namespace DomBehind {
 
 declare namespace DomBehind {
     enum FlipAnimation {
-        Flip = 0,
+        HorizontalFlip = 0,
         Slide = 1
     }
     interface IFlipOption {
+        container?: JQuery;
         front?: JQuery;
         back?: JQuery;
         fit?: boolean;
@@ -511,6 +512,8 @@ declare namespace DomBehind {
         static readonly IsFlipProperty: Data.DependencyProperty;
         private static readonly ValueKey;
         protected SetValue(el: JQuery, newValue: boolean): void;
+        protected HorizontalFlip(isBack: boolean): void;
+        protected Slide(isBack: boolean): void;
         private static readonly css;
         private static readonly cssIdentity;
         static Register(behavior: FlipBehavior): void;
@@ -520,7 +523,7 @@ declare namespace DomBehind {
         BindingFlip(exp: (owner: T) => boolean, option?: IFlipOption): BindingBehaviorBuilder<T>;
     }
     interface BindingBehaviorBuilder<T> {
-        FlipElement(frontSelector: string, backSelector: string): FlipBindingBehaviorBuilder<T>;
+        FlipElement(containerSelector: string, frontSelector: string, backSelector: string): FlipBindingBehaviorBuilder<T>;
     }
 }
 
@@ -829,8 +832,8 @@ declare namespace DomBehind {
         static RaiseEnabledChanged(element: JQuery, isEnabled: boolean): void;
     }
     interface BindingBehaviorBuilder<T> {
-        ClearLastBindingValueWhenDisabled(option?: {
-            clearAction?: (owner: T, value: any) => any;
+        ClearValueWhenDisabled(option?: {
+            clearAction?: (owner?: T, value?: any, element?: JQuery) => any;
         }): any;
     }
 }
@@ -1149,6 +1152,7 @@ interface JQuery {
     ClearCustomError(): void;
     CheckValidity(allChildren?: boolean): void;
     Raise(event: DomBehind.IEventBuilder, ensure?: (x: JQueryEventObject) => void): JQueryEventObject;
+    Equals(ele: JQuery): boolean;
 }
 
 interface ObjectConstructor {
@@ -1165,6 +1169,7 @@ interface StringConstructor {
     IsNullOrEmpty(str: string): boolean;
     IsNullOrWhiteSpace(str: string): boolean;
     Split(value: string, separator: string): string[];
+    ToBoolean(value: string, defaultValue?: boolean): boolean;
 }
 declare enum StringSplitOptions {
     None = 0,

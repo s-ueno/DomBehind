@@ -52,6 +52,7 @@
       "Scripts/DomBehind/Data/BindingPolicy.js",
       "Scripts/DomBehind/Data/BindingBehavior.js",
       "Scripts/DomBehind/Data/DataBindingBehavior.js",
+      "Scripts/DomBehind/Data/RelativeDataBindingBehavior.js",
       "Scripts/DomBehind/Data/ActionBindingBehavior.js",
       "Scripts/DomBehind/Data/ViewViewModelBindingBehavior.js",
       "Scripts/DomBehind/Data/BindingBehaviorCollection.js",

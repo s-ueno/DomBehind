@@ -2,25 +2,25 @@ var DomBehind;
 (function (DomBehind) {
     var Controls;
     (function (Controls) {
-        var Dropdown = (function () {
-            function Dropdown() {
+        class Dropdown {
+            constructor() {
                 this._engaged = false;
             }
-            Dropdown.Register = function (behavior) {
+            static Register(behavior) {
                 if (!behavior.Element)
                     return;
-            };
-            Dropdown.Rebuild = function (el, list) {
-                var newArray = list.ToArray();
+            }
+            static Rebuild(el, list) {
+                let newArray = list.ToArray();
                 if (newArray.SequenceEqual(list.__oldArray)) {
                     return false;
                 }
                 list.__oldArray = newArray;
-                $.each(newArray, function (i, each) {
+                $.each(newArray, (i, each) => {
                     each.recid = i;
                 });
-                var items = newArray.Select(function (x) {
-                    var text = x;
+                let items = newArray.Select(x => {
+                    let text = x;
                     if (list.DisplayMemberPath) {
                         text = x[list.DisplayMemberPath];
                     }
@@ -30,72 +30,71 @@ var DomBehind;
                         obj: x,
                     };
                 });
-                var options = {
+                let options = {
                     items: items,
                     selected: {},
                 };
                 if (list.Current != null) {
-                    var id_1 = list.Current.recid;
-                    var obj = items.FirstOrDefault(function (x) { return x.id === id_1; });
+                    let id = list.Current.recid;
+                    let obj = items.FirstOrDefault(x => x.id === id);
                     options.selected = obj;
                 }
                 el.w2field('list', options);
                 return true;
-            };
-            Dropdown.prototype.OnCurrentChanged = function (sender, e) {
+            }
+            OnCurrentChanged(sender, e) {
                 if (this._engaged)
                     return;
-                var dd = sender.__element;
-                var el = dd.Element;
+                let dd = sender.__element;
+                let el = dd.Element;
                 if (String.IsNullOrWhiteSpace(e.Name)) {
                     Dropdown.Rebuild(el, sender);
                     el.data('w2field').refresh();
                 }
                 else if (e.Name === "Current") {
-                    var list = el.data('w2field');
-                    var id_2 = sender.Current.recid;
-                    var items = list.options.items;
+                    let list = el.data('w2field');
+                    let id = sender.Current.recid;
+                    let items = list.options.items;
                     if (items instanceof Array) {
-                        var obj = items.FirstOrDefault(function (x) { return x.id === id_2; });
+                        let obj = items.FirstOrDefault(x => x.id === id);
                         el.data('selected', obj);
                         list.refresh();
                     }
                 }
-            };
-            Dropdown.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", function (el) {
-            }, function (el, newValue) {
-                if (newValue instanceof DomBehind.Data.ListCollectionView) {
-                    if (!Dropdown.Rebuild(el, newValue))
-                        return;
-                    var dd_1 = newValue.__element;
-                    if (!dd_1) {
-                        dd_1 = newValue.__element = new Dropdown();
-                    }
-                    dd_1.Element = el;
-                    dd_1.Items = newValue;
-                    var list = el.data('w2field');
-                    list.refresh();
-                    list.__Dropdown = dd_1;
-                    el.off('change');
-                    el.on('change', function (e) {
-                        var selectedId = el.data("selected").id;
-                        dd_1._engaged = true;
-                        try {
-                            var current = newValue.ToArray().FirstOrDefault(function (x) { return x.recid == selectedId; });
-                            dd_1.Items.Select(current);
-                        }
-                        finally {
-                            dd_1._engaged = false;
-                        }
-                    });
-                    newValue.PropertyChanged.RemoveHandler(dd_1.OnCurrentChanged);
-                    newValue.PropertyChanged.AddHandler(dd_1.OnCurrentChanged);
+            }
+        }
+        Dropdown.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", el => {
+        }, (el, newValue) => {
+            if (newValue instanceof DomBehind.Data.ListCollectionView) {
+                if (!Dropdown.Rebuild(el, newValue))
+                    return;
+                let dd = newValue.__element;
+                if (!dd) {
+                    dd = newValue.__element = new Dropdown();
                 }
-            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, function (behavior) {
-                Dropdown.Register(behavior);
-            });
-            return Dropdown;
-        }());
+                dd.Element = el;
+                dd.Items = newValue;
+                let list = el.data('w2field');
+                list.refresh();
+                list.__Dropdown = dd;
+                el.off('change');
+                el.on('change', e => {
+                    let selectedId = el.data("selected").id;
+                    dd._engaged = true;
+                    try {
+                        let current = newValue.ToArray().FirstOrDefault(x => x.recid == selectedId);
+                        dd.Items.Select(current);
+                    }
+                    finally {
+                        dd._engaged = false;
+                    }
+                });
+                newValue.PropertyChanged.RemoveHandler(dd.OnCurrentChanged);
+                newValue.PropertyChanged.AddHandler(dd.OnCurrentChanged);
+            }
+        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, behavior => {
+            Dropdown.Register(behavior);
+        });
         Controls.Dropdown = Dropdown;
     })(Controls = DomBehind.Controls || (DomBehind.Controls = {}));
 })(DomBehind || (DomBehind = {}));

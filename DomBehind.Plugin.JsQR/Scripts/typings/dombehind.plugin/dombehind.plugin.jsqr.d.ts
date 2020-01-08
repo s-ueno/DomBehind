@@ -11,7 +11,12 @@ declare namespace DomBehind {
             Height: number;
         };
         readonly DefaultMarkColor: string;
+        readonly ActiveCamera: boolean;
+        private activeCamera;
+        private stream?;
         Ensure(): void;
+        StartCamera(): void;
+        StopCamera(): void;
         private DrawLine;
     }
     interface QRCodeReaderOption {
@@ -39,5 +44,6 @@ declare namespace DomBehind {
     }
     interface BindingBehaviorBuilder<T> {
         BuildQRCodeReader<TRow>(option: QRCodeReaderOption): BindingBehaviorBuilder<TRow>;
+        ActiveCamera(binding: (row: T) => BindingBehaviorBuilder<T>): any;
     }
 }

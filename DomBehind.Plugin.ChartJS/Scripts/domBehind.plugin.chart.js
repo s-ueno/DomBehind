@@ -4,7 +4,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -17,6 +17,11 @@ var DomBehind;
     (function (ChartType) {
         ChartType[ChartType["Bar"] = 0] = "Bar";
         ChartType[ChartType["Line"] = 1] = "Line";
+        ChartType[ChartType["Radar"] = 2] = "Radar";
+        ChartType[ChartType["Pie"] = 3] = "Pie";
+        ChartType[ChartType["PolarArea"] = 4] = "PolarArea";
+        ChartType[ChartType["Bubble"] = 5] = "Bubble";
+        ChartType[ChartType["Scatter"] = 6] = "Scatter";
     })(ChartType = DomBehind.ChartType || (DomBehind.ChartType = {}));
     var ColorGenerator = (function () {
         function ColorGenerator() {
@@ -149,8 +154,22 @@ var DomBehind;
             if (!Object.IsNullOrUndefined(this.Responsive)) {
                 settings.options.responsive = this.Responsive;
             }
-            settings.options.tooltips = this.Tooltips;
-            settings.options.hover = this.Hover;
+            if (!Object.IsNullOrUndefined(this.Tooltips)) {
+                settings.options.tooltips = this.Tooltips;
+            }
+            else {
+                settings.options.tooltips = {
+                    mode: "index",
+                };
+            }
+            if (!Object.IsNullOrUndefined(this.Hover)) {
+                settings.options.hover = this.Hover;
+            }
+            else {
+                settings.options.hover = {
+                    mode: "nearest"
+                };
+            }
             this.Element.empty();
             var canvas = this.Element[0];
             this.Chart = new Chart(canvas.getContext("2d"), settings);
@@ -162,11 +181,34 @@ var DomBehind;
             else if (this.Type === ChartType.Line) {
                 return "line";
             }
+            else if (this.Type === ChartType.Radar) {
+                return "radar";
+            }
+            else if (this.Type === ChartType.Pie) {
+                return "pie";
+            }
+            else if (this.Type === ChartType.PolarArea) {
+                return "polarArea";
+            }
+            else if (this.Type === ChartType.Bubble) {
+                return "bubble";
+            }
+            else if (this.Type === ChartType.Scatter) {
+                return "scatter";
+            }
         };
         ChartBehavior.prototype.Labels = function () {
-            if (this.Expression.lineLabels) {
-                return this.Expression.lineLabels(this.DataContext);
+            var arr = new Array();
+            if (this.Expression.label) {
+                var items = this.ItemsSource.ToArray();
+                if (items.length !== 0) {
+                    for (var i = 0; i < items.length; i++) {
+                        var row = items[i];
+                        arr.push(this.Expression.label(row));
+                    }
+                }
             }
+            return arr;
         };
         ChartBehavior.prototype.DataSets = function () {
             if (!this.ItemsSource)
@@ -175,31 +217,35 @@ var DomBehind;
             if (items.length === 0)
                 return null;
             var datasets = new Array();
+            var schema = {};
+            var schemaData = new Array();
+            var backgroundColorList = new Array();
+            var borderColorList = new Array();
             for (var i = 0; i < items.length; i++) {
                 var data = items[i];
                 if (Object.IsNullOrUndefined(data))
                     return;
-                var schema = {};
-                if (this.Expression.label) {
-                    var label = this.Expression.label(data);
-                    if (label) {
-                        schema.label = label;
-                    }
+                if (this.Expression.data) {
+                    schemaData.push(this.Expression.data(data));
                 }
                 var color = this.Colors.Pop(this.Type);
-                schema.backgroundColor = color.background;
-                schema.borderColor = color.border;
                 if (this.Expression.backgroundColor) {
                     var backgroundColor = this.Expression.backgroundColor(data);
                     if (backgroundColor) {
-                        schema.backgroundColor = backgroundColor;
+                        backgroundColorList.push(backgroundColor);
                     }
+                }
+                else {
+                    backgroundColorList.push(color.background);
                 }
                 if (this.Expression.borderColor) {
                     var borderColor = this.Expression.backgroundColor(data);
                     if (borderColor) {
-                        schema.borderColor = borderColor;
+                        borderColorList.push(borderColor);
                     }
+                }
+                else {
+                    borderColorList.push(color.border);
                 }
                 if (this.Expression.fill) {
                     var fill = this.Expression.fill(data);
@@ -210,11 +256,11 @@ var DomBehind;
                 else {
                     schema.fill = false;
                 }
-                if (this.Expression.data) {
-                    schema.data = this.Expression.data(data);
-                }
-                datasets.push(schema);
             }
+            schema.data = schemaData;
+            schema.backgroundColor = backgroundColorList;
+            schema.borderColor = borderColorList;
+            datasets.push(schema);
             return datasets;
         };
         ChartBehavior.prototype.ParseScales = function () {
@@ -364,24 +410,17 @@ var DomBehind;
             }
             return me;
         };
-        ChartBindingBehaviorBuilder.prototype.BindingValues = function (exp) {
+        ChartBindingBehaviorBuilder.prototype.BindingLabel = function (exp) {
+            var me = this;
+            if (me.CurrentBehavior instanceof ChartBehavior) {
+                me.CurrentBehavior.Expression.label = exp;
+            }
+            return me;
+        };
+        ChartBindingBehaviorBuilder.prototype.BindingValue = function (exp) {
             var me = this;
             if (me.CurrentBehavior instanceof ChartBehavior) {
                 me.CurrentBehavior.Expression.data = exp;
-            }
-            return me;
-        };
-        ChartBindingBehaviorBuilder.prototype.BindingValueDescription = function (exp) {
-            var me = this;
-            if (me.CurrentBehavior instanceof ChartBehavior) {
-                me.CurrentBehavior.Expression.labels = exp;
-            }
-            return me;
-        };
-        ChartBindingBehaviorBuilder.prototype.BindingValueTitles = function (exp) {
-            var me = this;
-            if (me.CurrentBehavior instanceof ChartBehavior) {
-                me.CurrentBehavior.Expression.lineLabels = exp;
             }
             return me;
         };
@@ -395,6 +434,19 @@ var DomBehind;
         return ChartBindingBehaviorBuilder;
     }(DomBehind.BindingBehaviorBuilder));
     DomBehind.ChartBindingBehaviorBuilder = ChartBindingBehaviorBuilder;
+    DomBehind.BindingBehaviorBuilder.prototype.BuildChart = function (itemsSource, type, option) {
+        var me = this;
+        var behavior = me.Add(new ChartBehavior());
+        behavior.Property = ChartBehavior.ItemsSourceProperty;
+        behavior.PInfo = new DomBehind.LamdaExpression(me.Owner.DataContext, itemsSource);
+        behavior.Expression = {};
+        behavior.Type = type;
+        behavior.Option = option;
+        var newMe = new ChartBindingBehaviorBuilder(me.Owner);
+        newMe.CurrentBehavior = me.CurrentBehavior;
+        newMe.CurrentElement = me.CurrentElement;
+        return newMe;
+    };
     DomBehind.BindingBehaviorBuilder.prototype.BuildChartOfLine = function (itemsSource, option) {
         var me = this;
         var behavior = me.Add(new ChartBehavior());

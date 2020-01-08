@@ -41,11 +41,11 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptTarget>ES2015</TypeScriptTarget>
     <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
     <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
     <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
-    <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
+    <TypeScriptModuleKind>ES6</TypeScriptModuleKind>
     <TypeScriptRemoveComments>True</TypeScriptRemoveComments>
     <TypeScriptOutFile />
     <TypeScriptOutDir />
@@ -65,13 +65,13 @@
     <Content Include="Scripts\dombehind.min.js.map">
       <DependentUpon>dombehind.min.js</DependentUpon>
     </Content>
-    <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\dombehind.js" />
     <Content Include="Scripts\dombehind.min.js">
       <DependentUpon>dombehind.js</DependentUpon>
     </Content>
     <Content Include="Scripts\DomBehind\Polyfill\template.js" />
     <Content Include="Scripts\DomBehind\TypeScript.Net\READ ME.txt" />
+    <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
@@ -134,6 +134,7 @@
     <TypeScriptCompile Include="Scripts\DomBehind\Data\DataBindingBehavior.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Data\DataBindingBehaviorBuilder.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Data\DependencyProperty.ts" />
+    <TypeScriptCompile Include="Scripts\DomBehind\Data\RelativeDataBindingBehavior.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Data\ViewViewModelBindingBehavior.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Extensions\EnumerableExtensions.ts" />
     <TypeScriptCompile Include="Scripts\DomBehind\Extensions\JQueryExtensions.ts" />

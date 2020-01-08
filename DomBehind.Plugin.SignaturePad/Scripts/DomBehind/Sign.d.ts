@@ -8,7 +8,7 @@ declare namespace DomBehind {
         image?: SignSaveImage;
         color?: string;
     }
-    class Sign extends DomBehind.Data.BindingBehavior {
+    class Sign extends Data.RelativeDataBindingBehavior {
         static InstanceProperty: Data.DependencyProperty;
         protected Option: ISignOption<any>;
         SetOption(option: ISignOption<any>): void;

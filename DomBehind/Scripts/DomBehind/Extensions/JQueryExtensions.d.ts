@@ -22,6 +22,7 @@ interface JQueryStatic {
         Screen?: string;
         UserAgent?: string;
     };
+    ToPromise<T>(pms: JQueryPromise<T>): Promise<T>;
 }
 declare const z_indexKey: string;
 declare const w_dynamicPrefix: string;
