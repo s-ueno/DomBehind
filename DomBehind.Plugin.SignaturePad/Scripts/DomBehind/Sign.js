@@ -27,8 +27,10 @@ var DomBehind;
             this.Element.append(dom);
             this.Canvas = dom[0];
             this.SignaturePad = new SignaturePad(this.Canvas);
-            this.Refresh();
             this.Resize();
+            dom.ready(() => {
+                this.Refresh();
+            });
         }
         CreateImageToBlob() {
             return this.CreateImage(true);
@@ -139,10 +141,44 @@ var DomBehind;
     }, (el, newValue) => {
     }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
     DomBehind.Sign = Sign;
+    class SignBindingBuilder extends DomBehind.Data.DataBindingBehaviorBuilder {
+        Binding(property, bindingExpression, mode, updateTrigger) {
+            let me = this;
+            if (me.CurrentBehavior instanceof DomBehind.Data.RelativeDataBindingBehavior) {
+                let bkBehavior = me.CurrentBehavior;
+                let bkElement = me.CurrentElement;
+                let behavior = me.CurrentBehavior.AddBinding(new DomBehind.Data.DataBindingBehavior(), me.CurrentSelector);
+                behavior.DataContext = me.CurrentBehavior.DataContext;
+                behavior.Property = property;
+                behavior.PInfo = new DomBehind.LamdaExpression(this.Owner.DataContext, bindingExpression);
+                behavior.BindingPolicy.Trigger = !Object.IsNullOrUndefined(updateTrigger) ? updateTrigger : property.UpdateSourceTrigger;
+                behavior.BindingPolicy.Mode = !Object.IsNullOrUndefined(mode) ? mode : property.BindingMode;
+                me.CurrentBehavior = bkBehavior;
+                me.CurrentElement = bkElement;
+            }
+            else {
+                me.Binding(property, bindingExpression, mode, updateTrigger);
+            }
+            return me;
+        }
+    }
+    DomBehind.SignBindingBuilder = SignBindingBuilder;
     DomBehind.BindingBehaviorBuilder.prototype.BuildSign = function (option) {
         let me = this;
-        let behavior = me.Add(new Sign());
-        behavior.SetOption(option);
-        return me;
+        if (me.CurrentBehavior instanceof DomBehind.Data.RelativeDataBindingBehavior) {
+            let behavior = me.CurrentBehavior.AddBinding(new Sign(), me.CurrentSelector);
+            behavior.DataContext = me.CurrentBehavior.DataContext;
+            behavior.Element = me.CurrentElement;
+            behavior.SetOption(option);
+        }
+        else {
+            let behavior = me.Add(new Sign());
+            behavior.SetOption(option);
+        }
+        let newMe = new SignBindingBuilder(me.Owner);
+        newMe.CurrentBehavior = me.CurrentBehavior;
+        newMe.CurrentElement = me.CurrentElement;
+        newMe.CurrentSelector = me.CurrentSelector;
+        return newMe;
     };
 })(DomBehind || (DomBehind = {}));

@@ -27,7 +27,10 @@ declare namespace DomBehind {
         Refresh(): void;
         protected Resize(): void;
     }
+    class SignBindingBuilder<T> extends Data.DataBindingBehaviorBuilder<T> {
+        Binding<P>(property: Data.DependencyProperty, bindingExpression: (x: T) => P, mode?: Data.BindingMode, updateTrigger?: Data.UpdateSourceTrigger): SignBindingBuilder<T>;
+    }
     interface BindingBehaviorBuilder<T> {
-        BuildSign(option?: ISignOption<T>): BindingBehaviorBuilder<T>;
+        BuildSign(option?: ISignOption<T>): SignBindingBuilder<T>;
     }
 }
