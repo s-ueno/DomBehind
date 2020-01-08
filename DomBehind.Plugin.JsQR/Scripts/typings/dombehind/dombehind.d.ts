@@ -342,14 +342,22 @@ declare namespace DomBehind {
         DbName: string;
         TableName: string;
         Drop(): JQueryPromise<any>;
+        DropAsync(): Promise<any>;
         List(): JQueryPromise<T[]>;
+        ListAsync(): Promise<T[]>;
         Truncate(): JQueryPromise<any>;
-        FindRowAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T>;
-        FindRowsAsync(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T[]>;
+        TruncateAsync(): Promise<any>;
+        FindRow(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T>;
+        FindRowAsync(exp: (obj: T) => string | number, value: string | number): Promise<T>;
+        FindRows(exp: (obj: T) => string | number, value: string | number): JQueryPromise<T[]>;
+        FindRowsAsync(exp: (obj: T) => string | number, value: string | number): Promise<T[]>;
         protected FetchCursor(indexStore: IDBIndex, value: string | number, d: JQueryDeferred<any>): void;
-        UpsertAsync(entity: T | Array<T>, primaryKey?: (obj: T) => string | number): JQueryPromise<any>;
-        DeleteAsync(entity: T | Array<T>): JQueryPromise<any>;
+        Upsert(entity: T | Array<T>, primaryKey?: (obj: T) => string | number): JQueryPromise<any>;
+        UpsertAsync(entity: T | Array<T>, primaryKey?: (obj: T) => string | number): Promise<any>;
+        Delete(entity: T | Array<T>): JQueryPromise<any>;
+        DeleteAsync(entity: T | Array<T>): Promise<any>;
         protected Open(): JQueryPromise<IDBDatabase>;
+        protected OpenAsync(): Promise<IDBDatabase>;
         protected Upgrade(version: number, action: (db: any) => void): void;
     }
 }
@@ -372,7 +380,7 @@ declare namespace DomBehind {
         static AddService(context: string, getType: () => any, priority?: number): void;
         static RemoveService(context: string): void;
         static GetService<T>(context: string): T;
-        static CreateInstance<T>(resolveType: () => any): {};
+        static CreateInstance<T>(resolveType: () => any): unknown;
     }
 }
 
@@ -977,6 +985,23 @@ declare namespace DomBehind.Data {
 }
 
 declare namespace DomBehind.Data {
+    class RelativeDataBindingBehavior extends DataBindingBehavior {
+        private _currentElement;
+        protected CurrentElement: JQuery;
+        protected Unsubscribe(value: JQuery): void;
+        protected Subscribe(value: JQuery): void;
+        protected Bindings: List<{
+            Binding: BindingBehavior;
+            Selector: string;
+        }>;
+        readonly LastBinding: Data.BindingBehavior;
+        UpdateTarget(): void;
+        UpdateSource(): void;
+        AddBinding<T extends Data.BindingBehavior>(binding: T, selector: string): T;
+    }
+}
+
+declare namespace DomBehind.Data {
     class ViewViewModelBindingBehavior extends BindingBehavior {
         GetView: (x: any) => BizView;
         GetViewModel: (x: any) => BizViewModel;
@@ -1142,6 +1167,7 @@ interface JQueryStatic {
         Screen?: string;
         UserAgent?: string;
     };
+    ToPromise<T>(pms: JQueryPromise<T>): Promise<T>;
 }
 declare const z_indexKey: string;
 declare const w_dynamicPrefix: string;
@@ -1505,6 +1531,7 @@ declare namespace DomBehind {
         private static _extractor;
         private static _extractor_Minified;
         private static NameOf;
+        private static IsSupportES6;
         Dispose(): void;
         static Path<T>(exp: (x: T) => any): string;
         static GetValueCore(dataContext: any, lamda: (x: any) => any): any;

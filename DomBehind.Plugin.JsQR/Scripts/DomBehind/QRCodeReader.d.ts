@@ -1,22 +1,50 @@
 declare namespace DomBehind {
     class QRCodeReader extends Data.BindingBehavior {
-        constructor();
         Option: QRCodeReaderOption;
+        /**
+         * フレームレートのデフォルト値
+         */
         readonly DefaultFrameRate: {
             Min: number;
             Max: number;
         };
+        /**
+         * カメラ解像度のデフォルト値
+         */
         readonly DefaultResolution: {
             Width: number;
             Height: number;
         };
+        /**
+         * マークのデフォルト色
+         */
         readonly DefaultMarkColor: string;
+        /**
+         * カメラが起動中かどうかを表します
+         */
         readonly ActiveCamera: boolean;
         private activeCamera;
+        /**
+         * カメラ映像の取得元ストリーム
+         * ※ カメラ停止中はnullが入るので、Nullチェックした上で使うこと。
+         */
         private stream?;
         Ensure(): void;
+        /**
+         * カメラを起動します
+         */
         StartCamera(): void;
+        /**
+         * カメラを停止します
+         */
         StopCamera(): void;
+        /**
+         * Canvasに直線を描画します
+         * @param canvasCtx Canvas描画コンテキスト(2D)
+         * @param begin 開始地点
+         * @param end 終了地点
+         * @param color 直線の色
+         */
         private DrawLine;
     }
     interface QRCodeReaderOption {

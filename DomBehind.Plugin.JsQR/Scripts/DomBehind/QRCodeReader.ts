@@ -1,8 +1,5 @@
 ﻿namespace DomBehind {
     export class QRCodeReader extends Data.BindingBehavior {
-        constructor() {
-            super();
-        }
 
         public Option: QRCodeReaderOption;
 
@@ -135,7 +132,16 @@
          * @param end 終了地点
          * @param color 直線の色
          */
-        private DrawLine(canvasCtx: CanvasRenderingContext2D, begin: locator.Point, end: locator.Point, color: string): void {
+        private DrawLine(canvasCtx: CanvasRenderingContext2D,
+            begin: {
+                x: number;
+                y: number;
+            },
+            end: {
+                x: number;
+                y: number;
+            },
+            color: string): void {
             canvasCtx.beginPath();
             canvasCtx.moveTo(begin.x, begin.y);
             canvasCtx.lineTo(end.x, end.y);

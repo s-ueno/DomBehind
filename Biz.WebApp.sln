@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gallery.Facade", "Gallery\d
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gallery.WebApp", "Gallery\dotnet\Gallery.WebApp\Gallery.WebApp.csproj", "{0E86CB78-BBD6-40EB-800C-DD7037643566}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomBehind.Plugin.JsQR", "DomBehind.Plugin.JsQR\DomBehind.Plugin.JsQR.csproj", "{722A569F-6058-4F70-80C7-76ED226A1DD2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{0E86CB78-BBD6-40EB-800C-DD7037643566}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E86CB78-BBD6-40EB-800C-DD7037643566}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E86CB78-BBD6-40EB-800C-DD7037643566}.Release|Any CPU.Build.0 = Release|Any CPU
+		{722A569F-6058-4F70-80C7-76ED226A1DD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{722A569F-6058-4F70-80C7-76ED226A1DD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{722A569F-6058-4F70-80C7-76ED226A1DD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{722A569F-6058-4F70-80C7-76ED226A1DD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,6 +106,7 @@ Global
 		{04315E2A-2F45-44C2-A28E-B4EEE0E556BD} = {B899E4C4-DD87-4204-A5D2-3AB7CA22E3AF}
 		{DC1B8559-6C05-40F2-A2EB-2BD8B7F4D22F} = {B899E4C4-DD87-4204-A5D2-3AB7CA22E3AF}
 		{0E86CB78-BBD6-40EB-800C-DD7037643566} = {B899E4C4-DD87-4204-A5D2-3AB7CA22E3AF}
+		{722A569F-6058-4F70-80C7-76ED226A1DD2} = {8A34D678-C6BF-4705-9944-83E258B4A9E1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {88D7B35B-17E9-443D-8E03-A3327E1620AE}

@@ -2,23 +2,23 @@
 <package >
   <metadata>
     <id>DomBehind.Plugin.JsQR</id>
-    <version>1.0.30</version>
-    <title>DOM Behind Plugin JsQR</title>
-    <authors>Hashihiro</authors>
-    <licenseUrl>https://github.com/s-ueno/DomBehind/tree/master/DomBehind.Plugin.JsQR/LICENSE</licenseUrl>
+    <version>1.1.0</version>
+    <title>DOM Behind Plugin jsqr</title>
+    <authors>uEN</authors>
+    <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/s-ueno/DomBehind</projectUrl>
     <tags>typescript javascript jquery mvvm</tags>
     <description>
-      Add QRCode reader creation bind function to "DomBehind" using "JsQR"
+      Add calendar creation bind function to "DomBehind" using "jsqr"
     </description>
     <releaseNotes>
     </releaseNotes>
     <dependencies>
-      <dependency id="DomBehind" version="1.0.7"></dependency>
+      <dependency id="DomBehind" version="1.1.82"></dependency>      
     </dependencies>
   </metadata>
   <files>
-    <file src="Scripts/domBehind.plugin.jsqr.js" target="Content/Scripts/" />
-    <file src="Scripts/typings/dombehind.plugin/dombehind.plugin.jsqr.d.ts" target="Content/Scripts/typings/dombehind.plugin/" />
+    <file src="Scripts/dombehind.plugin.jsqr.js" target="Content/Scripts/" />
+    <file src="Scripts/typings/dombehind.plugin/dombehind.plugin.jsqr.d.ts" target="Content/Scripts/typings/dombehind.plugin" />
   </files>
 </package>
