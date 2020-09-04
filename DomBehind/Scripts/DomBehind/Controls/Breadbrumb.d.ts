@@ -2,7 +2,8 @@ declare namespace DomBehind {
     class Breadbrumb {
         Selector: string;
         constructor(Selector: string);
-        static AllowLocalStorage: boolean;
+        static get AllowLocalStorage(): boolean;
+        static set AllowLocalStorage(value: boolean);
         Parse(newUri: string, title: string, isRoot?: boolean): string;
         protected ParseRestUri(newUri: string, isRoot: boolean, title: string): string;
         protected ParseSessionStorage(newUri: string, isRoot: boolean, title: string): string;

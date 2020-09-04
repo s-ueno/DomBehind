@@ -4,8 +4,8 @@ declare namespace DomBehind {
         TextStatus?: string;
         ErrorThrown?: string;
         constructor(JqXHR?: JQueryXHR, TextStatus?: string, ErrorThrown?: string);
-        readonly ErrorStatus: number;
-        readonly ErrorTitle: string;
+        get ErrorStatus(): number;
+        get ErrorTitle(): string;
         ToString(): string;
     }
 }

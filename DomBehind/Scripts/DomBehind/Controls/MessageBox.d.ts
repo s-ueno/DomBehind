@@ -21,7 +21,7 @@ declare namespace DomBehind {
         }): void;
         static BuiltIn<T>(lazy: () => TypedConstructor<T>): void;
         private static _lazy;
-        private static readonly Container;
+        private static get Container();
         private static _container;
     }
     interface IMessageContainer {

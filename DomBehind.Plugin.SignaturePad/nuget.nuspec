@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>DomBehind.Plugin.SignaturePad</id>
-    <version>1.0.13</version>
+    <version>2.0.0</version>
     <title>DOM Behind Plugin signature_pad</title>
     <authors>uEN</authors>
     <licenseUrl>https://github.com/s-ueno/DomBehind/blob/master/LICENSE</licenseUrl>

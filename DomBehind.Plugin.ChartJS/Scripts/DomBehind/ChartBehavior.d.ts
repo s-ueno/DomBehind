@@ -26,13 +26,14 @@ declare namespace DomBehind {
         Type: ChartType;
         Option: ChartOptions;
         private _items;
-        ItemsSource: Data.ListCollectionView;
+        get ItemsSource(): Data.ListCollectionView;
+        set ItemsSource(value: Data.ListCollectionView);
         protected ReBuildChart(): void;
         protected ParseType(): "line" | "bar" | "radar" | "pie" | "polarArea" | "bubble" | "scatter";
         protected Labels(): string[];
         protected DataSets(): ChartDataSets[];
         protected ParseScales(): ChartScales;
-        protected readonly DefaultOption: ChartOptions;
+        protected get DefaultOption(): ChartOptions;
         Instance: LamdaExpression;
         Chart: Chart;
         ChartTitle: string;

@@ -2,10 +2,13 @@ declare namespace DomBehind {
     abstract class BizViewModel extends NotifiableImp implements Data.IExceptionHandling {
         constructor();
         protected NotifyEvent<TEvent>(event: TypedEvent<TEvent>, args: TEvent): void;
-        Title: string;
+        get Title(): string;
+        set Title(value: string);
         private _title;
-        IsVisible: boolean;
-        View: BizView;
+        get IsVisible(): boolean;
+        set IsVisible(value: boolean);
+        get View(): BizView;
+        set View(value: BizView);
         private _view;
         protected OnViewChanged(): void;
         Initialized: boolean;
@@ -20,8 +23,9 @@ declare namespace DomBehind {
         protected WaitingOverlay(func: Function, handled?: boolean, image?: string): any;
         protected SafeAction(func: Function, handled?: boolean, ...policies: Data.ActionPolicy[]): any;
         Catch(ex: Data.ActionPolicyExceptionEventArgs): void;
-        protected readonly Navigator: Navigation.INavigator;
-        IsEnabled: boolean;
+        protected get Navigator(): Navigation.INavigator;
+        get IsEnabled(): boolean;
+        set IsEnabled(value: boolean);
         ShowInfomation(message: string, title?: string): void;
         ShowWarning(message: string, title?: string): void;
         ShowError(message: string, title?: string): void;

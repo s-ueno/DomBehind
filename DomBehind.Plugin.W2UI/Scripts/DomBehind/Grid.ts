@@ -309,7 +309,9 @@
                 }
             };
 
-            w2GridOption.onDblClick = e => this.OnDoubleClick(this.DataContext, e);
+            w2GridOption.onDblClick = e => {
+                this.OnDoubleClick(this.DataContext, e);
+            }
             if (this.GridOption.footerOption) {
                 w2GridOption.show.footer = true;
             }
@@ -455,9 +457,26 @@
                 if (grid) {
                     let recId = e.recid;
                     let obj = grid.get(recId);
-
                     this.SuppressListCollectionViewAction(x => x.Current = obj);
                     this.GridOption.onDoubleClick(sender, obj);
+
+
+                    //if (!Object.IsNullOrUndefined(recId)) {
+                    //    let selectedRows = grid.getSelection();
+                    //    // TODO  
+
+                    //    // let obj = grid.get(recId);
+                    //    // this.SuppressListCollectionViewAction(x => x.Current = obj);
+                    //    // this.GridOption.onDoubleClick(sender, obj);
+
+                    //} else {
+
+                    //    let obj = grid.get(recId);
+                    //    this.SuppressListCollectionViewAction(x => x.Current = obj);
+                    //    this.GridOption.onDoubleClick(sender, obj);
+                    //}
+
+
                 }
             }
         }
@@ -809,7 +828,7 @@
          * @param styleBinding　style属性値の文字列を示すプロパティ先をラムダで指定します。
          * 
          */
-        public RowStyleBinding(styleBinding: (row: T) => any, convertTarget?:(obj: any) => string): W2GridBindingBehaviorBuilder<T> {
+        public RowStyleBinding(styleBinding: (row: T) => any, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T> {
             let gridBehavior: W2GridBindingBehavior = this.CurrentBehavior as W2GridBindingBehavior;
             gridBehavior.RowStyleBindingConverter = convertTarget;
             gridBehavior.RowStyleBinding = styleBinding;
@@ -840,7 +859,7 @@
          *  
          * @param cellStyleBinding style属性値の文字列を示すプロパティ先をラムダで指定します。ただし、列を示すJSON形式です
          */
-        public CellStyleBinding(cellStyleBinding: (row: T) => any, convertTarget?:(obj: any) => string): W2GridBindingBehaviorBuilder<T> {
+        public CellStyleBinding(cellStyleBinding: (row: T) => any, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T> {
             let gridBehavior: W2GridBindingBehavior = this.CurrentBehavior as W2GridBindingBehavior;
             gridBehavior.CellStyleBindingConverter = convertTarget;
             gridBehavior.CellStyleBinding = cellStyleBinding;

@@ -22,7 +22,7 @@
 
                     if (newValue === oldValue) return;
 
-                    UIElement.RaiseEnabledChanged(el, newValue);                     
+                    UIElement.RaiseEnabledChanged(el, newValue);
                 },
                 Data.UpdateSourceTrigger.Explicit,
                 Data.BindingMode.OneWay
@@ -170,9 +170,14 @@
         }
 
         public OnCurrentChanged(sender: Data.ListCollectionView, e: PropertyChangedEventArgs) {
-            if (this._engaged) return;
+            // ES6 で this がそのままトランスパイルされた結果、実行時コンテキストがES5から変わった。
+            // if (this._engaged) return;
 
             let me: Selectmenu = (<any>sender).__widget
+            if (me && me._engaged) {
+                return;
+            }
+
             let el = me.Element;
             // プロパティ未指定の場合は、リフレッシュする
             if (String.IsNullOrWhiteSpace(e.Name)) {

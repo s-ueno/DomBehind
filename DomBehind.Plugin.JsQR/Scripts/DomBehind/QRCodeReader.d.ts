@@ -4,25 +4,25 @@ declare namespace DomBehind {
         /**
          * フレームレートのデフォルト値
          */
-        readonly DefaultFrameRate: {
+        get DefaultFrameRate(): {
             Min: number;
             Max: number;
         };
         /**
          * カメラ解像度のデフォルト値
          */
-        readonly DefaultResolution: {
+        get DefaultResolution(): {
             Width: number;
             Height: number;
         };
         /**
          * マークのデフォルト色
          */
-        readonly DefaultMarkColor: string;
+        get DefaultMarkColor(): string;
         /**
          * カメラが起動中かどうかを表します
          */
-        readonly ActiveCamera: boolean;
+        get ActiveCamera(): boolean;
         private activeCamera;
         /**
          * カメラ映像の取得元ストリーム

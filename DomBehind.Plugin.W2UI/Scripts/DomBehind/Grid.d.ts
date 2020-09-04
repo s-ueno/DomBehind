@@ -93,10 +93,10 @@ declare namespace DomBehind {
         RowClassBindingConverter: (obj: any) => string;
         RowStyleBindingConverter: (obj: any) => string;
         CellStyleBindingConverter: (obj: any) => string;
-        protected readonly IsMultiSelect: boolean;
+        protected get IsMultiSelect(): boolean;
         protected GenerateRecId(): number;
         private __id;
-        readonly SelectedObject: any;
+        get SelectedObject(): any;
         AddColumn(binding: IColumnBinding<any>): void;
         Ensure(): void;
         protected SuppressListCollectionViewAction(action: (lc: Data.ListCollectionView) => void): void;
@@ -117,7 +117,7 @@ declare namespace DomBehind {
     }
     class W2GridBindingBehaviorBuilder<T> extends BindingBehaviorBuilder<T> {
         constructor(owner: BizView);
-        protected readonly DefaultOption: IColumnBindingOption;
+        protected get DefaultOption(): IColumnBindingOption;
         ColumnBinding(title: string, binding: (row: T) => any, option?: IColumnBinding<T>): W2GridBindingBehaviorBuilder<T>;
         RowStyleBinding(styleBinding: (row: T) => any, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;
         RowCssBinding(classBinding: (row: T) => any, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;

@@ -6,10 +6,10 @@ declare namespace DomBehind.Data {
         Done(): void;
         Fail(ex: ActionPolicyExceptionEventArgs): void;
         protected SetCustomError(vex: Validation.ValidationException): void;
-        protected readonly Supported: boolean;
-        protected readonly ViewModel: BizViewModel;
-        protected readonly View: BizView;
-        protected readonly Owner: JQuery;
+        protected get Supported(): boolean;
+        protected get ViewModel(): BizViewModel;
+        protected get View(): BizView;
+        protected get Owner(): JQuery;
         Always(): void;
     }
 }

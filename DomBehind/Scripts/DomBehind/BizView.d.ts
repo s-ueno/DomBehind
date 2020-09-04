@@ -1,9 +1,11 @@
 declare namespace DomBehind {
     abstract class BizView implements IDisposable {
-        Container: JQuery;
+        get Container(): JQuery;
+        set Container(value: JQuery);
         private _container;
-        DataContext: any;
+        get DataContext(): any;
         private _dataContext;
+        set DataContext(value: any);
         abstract BuildBinding(): void;
         OnDataContextPropertyChanged(sender: any, e: PropertyChangedEventArgs): void;
         ViewLoaded(responseText: string, textStatus: string, XMLHttpRequest: XMLHttpRequest): void;

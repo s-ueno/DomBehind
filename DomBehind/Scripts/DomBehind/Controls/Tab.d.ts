@@ -25,9 +25,9 @@ declare namespace DomBehind.Controls {
         class BindingOption {
             protected Parent: Tab;
             constructor(Parent: Tab);
-            readonly HeaderContainer: JQuery;
+            get HeaderContainer(): JQuery;
             Header: JQuery;
-            readonly ContentContainer: JQuery;
+            get ContentContainer(): JQuery;
             Content: JQuery;
             Option: OptionInternal;
             Source: Data.ListCollectionView;

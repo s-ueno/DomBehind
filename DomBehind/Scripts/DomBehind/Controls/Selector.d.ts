@@ -18,7 +18,8 @@ declare namespace DomBehind.Controls {
         protected OnUpdateTarget(sender: Data.DataBindingBehavior, data: any): void;
         protected OnDataSourcePropertyChanged(sender: Data.ListCollectionView, e: PropertyChangedEventArgs): void;
         protected Render(source: Data.ListCollectionView): void;
-        protected Multiple: boolean;
+        protected get Multiple(): boolean;
+        protected set Multiple(value: boolean);
         protected RenderOption(element: JQuery, source: Data.ListCollectionView, value: any): void;
         protected EnsureDisplayMemberPath(path: string): IDisplayMemberPath;
         protected EnsureElement(option: JQuery): ISelectableElement;

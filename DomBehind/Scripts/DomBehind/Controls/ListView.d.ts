@@ -15,11 +15,12 @@ declare namespace DomBehind {
     }
     class ListView extends Data.DataBindingBehavior {
         static ItemsSourceProperty: Data.DependencyProperty;
-        ItemsSource: Data.ListCollectionView;
+        set ItemsSource(newValue: Data.ListCollectionView);
         Clear(): void;
+        get ItemsSource(): Data.ListCollectionView;
         private _items;
         TableOption: ITableOption;
-        protected readonly DefaultTableOption: ITableOption;
+        protected get DefaultTableOption(): ITableOption;
         Ensure(): void;
         protected TableId: string;
         protected HeaderId: string;

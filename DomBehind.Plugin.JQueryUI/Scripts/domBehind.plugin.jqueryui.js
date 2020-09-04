@@ -58,9 +58,10 @@ var DomBehind;
                 widget.selectmenu("refresh");
             }
             OnCurrentChanged(sender, e) {
-                if (this._engaged)
-                    return;
                 let me = sender.__widget;
+                if (me && me._engaged) {
+                    return;
+                }
                 let el = me.Element;
                 if (String.IsNullOrWhiteSpace(e.Name)) {
                     Selectmenu.Rebuild(el, sender);

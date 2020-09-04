@@ -7,7 +7,7 @@ declare namespace DomBehind.Validation {
         Attribute: string;
         HasError: boolean;
         AttributeExpression: any;
-        readonly AttributeValue: string | number;
+        get AttributeValue(): string | number;
         protected ParseAttributeValue(): any;
         OnValidationg(): void;
         Apply(): void;

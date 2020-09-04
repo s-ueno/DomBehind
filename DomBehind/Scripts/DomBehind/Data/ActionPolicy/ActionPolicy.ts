@@ -36,30 +36,24 @@
                     result = this.NextPolicy.Do(func);
                 }
 
-                if (!Object.IsPromise(result)) {
-                    this.Done();
-                    this.Always();
-                    return result;
-                } else if (result instanceof Promise) {
-                    let dfd = $.Deferred();
-
-                    result.then(x => {
-                        this.Done();
-                        this.Always();
-                        dfd.resolve(x);
-                    }).catch(x => {
-                        let ex = new ActionPolicyExceptionEventArgs(this, x);
-                        this.Fail(ex);
-                        this.Always();
-
-                        if (!ex.Handled) {
-                            dfd.reject(ex);
-                        } else {
-                            dfd.reject(x);
-                        }
+                if (result instanceof Promise) {
+                    return new Promise((resolve, reject) => {
+                        result.then(() => {
+                            this.Done();
+                            this.Always();
+                            resolve();
+                        }).catch(x => {
+                            let ex = new ActionPolicyExceptionEventArgs(this, x);
+                            this.Fail(ex);
+                            this.Always();
+                            if (!ex.Handled) {
+                                reject(x);
+                            }
+                        });
                     });
-                    return dfd.promise();
-                } else {
+                }
+
+                if (Object.IsPromise(result)) {
                     let p: JQueryPromise<any> = result;
                     p.done(() => {
                         this.Done();
@@ -69,11 +63,15 @@
                         this.Fail(ex);
                         this.Always();
                         if (!ex.Handled) {
-                            return ex;
+                            return x;
                         }
                     });
                     return p;
                 }
+
+                this.Done();
+                this.Always();
+                return result;
             }
             catch (e) {
                 let ex = new ActionPolicyExceptionEventArgs(this, e);

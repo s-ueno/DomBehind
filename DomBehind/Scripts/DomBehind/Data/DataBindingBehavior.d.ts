@@ -1,10 +1,11 @@
 declare namespace DomBehind.Data {
     class DataBindingBehavior extends BindingBehavior {
         Property: Data.DependencyProperty;
-        PInfo: PropertyInfo;
+        get PInfo(): PropertyInfo;
+        set PInfo(newValue: PropertyInfo);
         private _pinfo;
         Marks: string[];
-        readonly ValueCore: any;
+        get ValueCore(): any;
         UpdateSourceEvent: IEvent;
         UpdateSource(): void;
         UpdateTargetEvent: IEvent;

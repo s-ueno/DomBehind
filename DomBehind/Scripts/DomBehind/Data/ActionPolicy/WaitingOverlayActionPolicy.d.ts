@@ -14,7 +14,7 @@ declare namespace DomBehind.Data {
     }
     abstract class WaitingOverlayActionPolicy extends ActionPolicy {
         constructor(option?: IWaitingOverlayOption);
-        readonly Option: IWaitingOverlayOption;
+        get Option(): IWaitingOverlayOption;
         private _option;
         Priority(): number;
         private _priority;

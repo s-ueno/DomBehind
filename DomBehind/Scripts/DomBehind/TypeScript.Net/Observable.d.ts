@@ -14,7 +14,7 @@ declare namespace DomBehind {
             marks?: string[];
         });
         protected Recurcive(source: any, name: string, parentName: string): void;
-        readonly Source: T;
+        get Source(): T;
         protected CreateDescriptor(notifibleName: string, value: any): PropertyDescriptor;
     }
 }

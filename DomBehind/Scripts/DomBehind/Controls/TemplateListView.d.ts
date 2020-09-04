@@ -35,13 +35,13 @@ declare namespace DomBehind {
             Selector: string;
             Css: string;
         };
-        ItemsSource: Data.ListCollectionView;
+        set ItemsSource(newValue: Data.ListCollectionView);
         private FindTemplate;
         RemoveAll(): void;
         ClearSortMarks(): void;
         Ensure(): void;
         protected OnColumnClick(e: JQueryEventObject, header: string): void;
-        protected readonly DefaultOption: ITemplateListViewOption<any>;
+        protected get DefaultOption(): ITemplateListViewOption<any>;
     }
     class TemplateListViewBindingBehaviorBuilder<TOwner, TRow> extends BindingBehaviorBuilder<TRow> {
         constructor(owner: BizView);

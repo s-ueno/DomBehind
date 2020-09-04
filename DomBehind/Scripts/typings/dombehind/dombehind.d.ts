@@ -239,14 +239,14 @@ declare module collections {
 
 declare namespace DomBehind {
     abstract class Application {
-        static readonly Current: Application;
+        static get Current(): Application;
         private static _app;
         static Resolve(): void;
         protected OnBrowserBack(): void;
         SafeAction(func: Function, context?: any, ...args: any[]): any;
         abstract UnhandledException(error: any): void;
-        readonly DefaultActionPolicy: Data.ActionPolicy[];
-        readonly Navigator: Navigation.INavigator;
+        get DefaultActionPolicy(): Data.ActionPolicy[];
+        get Navigator(): Navigation.INavigator;
         private _navigator;
     }
 }
@@ -272,10 +272,12 @@ declare namespace DomBehind {
 
 declare namespace DomBehind {
     abstract class BizView implements IDisposable {
-        Container: JQuery;
+        get Container(): JQuery;
+        set Container(value: JQuery);
         private _container;
-        DataContext: any;
+        get DataContext(): any;
         private _dataContext;
+        set DataContext(value: any);
         abstract BuildBinding(): void;
         OnDataContextPropertyChanged(sender: any, e: PropertyChangedEventArgs): void;
         ViewLoaded(responseText: string, textStatus: string, XMLHttpRequest: XMLHttpRequest): void;
@@ -298,10 +300,13 @@ declare namespace DomBehind {
     abstract class BizViewModel extends NotifiableImp implements Data.IExceptionHandling {
         constructor();
         protected NotifyEvent<TEvent>(event: TypedEvent<TEvent>, args: TEvent): void;
-        Title: string;
+        get Title(): string;
+        set Title(value: string);
         private _title;
-        IsVisible: boolean;
-        View: BizView;
+        get IsVisible(): boolean;
+        set IsVisible(value: boolean);
+        get View(): BizView;
+        set View(value: BizView);
         private _view;
         protected OnViewChanged(): void;
         Initialized: boolean;
@@ -316,8 +321,9 @@ declare namespace DomBehind {
         protected WaitingOverlay(func: Function, handled?: boolean, image?: string): any;
         protected SafeAction(func: Function, handled?: boolean, ...policies: Data.ActionPolicy[]): any;
         Catch(ex: Data.ActionPolicyExceptionEventArgs): void;
-        protected readonly Navigator: Navigation.INavigator;
-        IsEnabled: boolean;
+        protected get Navigator(): Navigation.INavigator;
+        get IsEnabled(): boolean;
+        set IsEnabled(value: boolean);
         ShowInfomation(message: string, title?: string): void;
         ShowWarning(message: string, title?: string): void;
         ShowError(message: string, title?: string): void;
@@ -411,7 +417,8 @@ declare namespace DomBehind {
     class Breadbrumb {
         Selector: string;
         constructor(Selector: string);
-        static AllowLocalStorage: boolean;
+        static get AllowLocalStorage(): boolean;
+        static set AllowLocalStorage(value: boolean);
         Parse(newUri: string, title: string, isRoot?: boolean): string;
         protected ParseRestUri(newUri: string, isRoot: boolean, title: string): string;
         protected ParseSessionStorage(newUri: string, isRoot: boolean, title: string): string;
@@ -583,11 +590,12 @@ declare namespace DomBehind {
     }
     class ListView extends Data.DataBindingBehavior {
         static ItemsSourceProperty: Data.DependencyProperty;
-        ItemsSource: Data.ListCollectionView;
+        set ItemsSource(newValue: Data.ListCollectionView);
         Clear(): void;
+        get ItemsSource(): Data.ListCollectionView;
         private _items;
         TableOption: ITableOption;
-        protected readonly DefaultTableOption: ITableOption;
+        protected get DefaultTableOption(): ITableOption;
         Ensure(): void;
         protected TableId: string;
         protected HeaderId: string;
@@ -627,7 +635,7 @@ declare namespace DomBehind {
         }): void;
         static BuiltIn<T>(lazy: () => TypedConstructor<T>): void;
         private static _lazy;
-        private static readonly Container;
+        private static get Container();
         private static _container;
     }
     interface IMessageContainer {
@@ -685,7 +693,8 @@ declare namespace DomBehind.Controls {
         protected OnUpdateTarget(sender: Data.DataBindingBehavior, data: any): void;
         protected OnDataSourcePropertyChanged(sender: Data.ListCollectionView, e: PropertyChangedEventArgs): void;
         protected Render(source: Data.ListCollectionView): void;
-        protected Multiple: boolean;
+        protected get Multiple(): boolean;
+        protected set Multiple(value: boolean);
         protected RenderOption(element: JQuery, source: Data.ListCollectionView, value: any): void;
         protected EnsureDisplayMemberPath(path: string): IDisplayMemberPath;
         protected EnsureElement(option: JQuery): ISelectableElement;
@@ -736,9 +745,9 @@ declare namespace DomBehind.Controls {
         class BindingOption {
             protected Parent: Tab;
             constructor(Parent: Tab);
-            readonly HeaderContainer: JQuery;
+            get HeaderContainer(): JQuery;
             Header: JQuery;
-            readonly ContentContainer: JQuery;
+            get ContentContainer(): JQuery;
             Content: JQuery;
             Option: OptionInternal;
             Source: Data.ListCollectionView;
@@ -787,13 +796,13 @@ declare namespace DomBehind {
             Selector: string;
             Css: string;
         };
-        ItemsSource: Data.ListCollectionView;
+        set ItemsSource(newValue: Data.ListCollectionView);
         private FindTemplate;
         RemoveAll(): void;
         ClearSortMarks(): void;
         Ensure(): void;
         protected OnColumnClick(e: JQueryEventObject, header: string): void;
-        protected readonly DefaultOption: ITemplateListViewOption<any>;
+        protected get DefaultOption(): ITemplateListViewOption<any>;
     }
     class TemplateListViewBindingBehaviorBuilder<TOwner, TRow> extends BindingBehaviorBuilder<TRow> {
         constructor(owner: BizView);
@@ -857,7 +866,7 @@ declare namespace DomBehind.Data {
         Ensure(): void;
         OnTrigger(e: any): void;
         ActionPolicyCollection: ActionPolicy[];
-        protected readonly ActionInvoker: ActionPolicy;
+        protected get ActionInvoker(): ActionPolicy;
         private _actionInvoker;
         CreateActionInvoker(policies: ActionPolicy[]): ActionPolicy;
         protected Do(sender: any, e: any): void;
@@ -868,7 +877,7 @@ declare namespace DomBehind.Data {
 declare namespace DomBehind.Data {
     class ActionBindingBehaviorBuilder<T> extends BindingBehaviorBuilder<T> {
         constructor(owner: BizView);
-        protected readonly Behavior: Data.ActionBindingBehavior;
+        protected get Behavior(): Data.ActionBindingBehavior;
         ActionPolicy(...policies: Data.ActionPolicy[]): ActionBindingBehaviorBuilder<T>;
     }
 }
@@ -940,10 +949,11 @@ declare namespace DomBehind.Data {
 declare namespace DomBehind.Data {
     class DataBindingBehavior extends BindingBehavior {
         Property: Data.DependencyProperty;
-        PInfo: PropertyInfo;
+        get PInfo(): PropertyInfo;
+        set PInfo(newValue: PropertyInfo);
         private _pinfo;
         Marks: string[];
-        readonly ValueCore: any;
+        get ValueCore(): any;
         UpdateSourceEvent: IEvent;
         UpdateSource(): void;
         UpdateTargetEvent: IEvent;
@@ -958,7 +968,7 @@ declare namespace DomBehind.Data {
 declare namespace DomBehind.Data {
     class DataBindingBehaviorBuilder<T> extends BindingBehaviorBuilder<T> {
         constructor(owner: BizView);
-        protected readonly Behavior: Data.DataBindingBehavior;
+        protected get Behavior(): Data.DataBindingBehavior;
         PartialMark(...mark: string[]): DataBindingBehaviorBuilder<T>;
         Converter(converter: IValueConverter): DataBindingBehaviorBuilder<T>;
         AddValidator<T extends Validation.Validator>(validator: T): T;
@@ -968,17 +978,17 @@ declare namespace DomBehind.Data {
 declare namespace DomBehind.Data {
     class DependencyProperty {
         constructor(name: string);
-        readonly PropertyName: string;
+        get PropertyName(): string;
         private _propertyName;
-        readonly GetValue: (jQuery: JQuery) => any;
+        get GetValue(): (jQuery: JQuery) => any;
         private _getter;
-        readonly SetValue: (jQuery: JQuery, value: any, caller?: any) => void;
+        get SetValue(): (jQuery: JQuery, value: any, caller?: any) => void;
         private _setter;
-        readonly UpdateSourceTrigger: UpdateSourceTrigger;
+        get UpdateSourceTrigger(): UpdateSourceTrigger;
         private _updateSourceTrigger;
-        readonly BindingMode: BindingMode;
+        get BindingMode(): BindingMode;
         private _bindingMode;
-        readonly Ensure: (behavior: DataBindingBehavior) => void;
+        get Ensure(): (behavior: DataBindingBehavior) => void;
         private _ensure;
         static RegisterAttached(propertyName: string, getValue: (jQuery: JQuery) => any, setValue: (jQuery: JQuery, value: any, caller?: any) => void, defaultUpdateSourceTrigger?: UpdateSourceTrigger, mode?: BindingMode, ensure?: (behavior: DataBindingBehavior) => void): DependencyProperty;
     }
@@ -987,14 +997,15 @@ declare namespace DomBehind.Data {
 declare namespace DomBehind.Data {
     class RelativeDataBindingBehavior extends DataBindingBehavior {
         private _currentElement;
-        protected CurrentElement: JQuery;
+        protected get CurrentElement(): JQuery;
+        protected set CurrentElement(newValue: JQuery);
         protected Unsubscribe(value: JQuery): void;
         protected Subscribe(value: JQuery): void;
         protected Bindings: List<{
             Binding: BindingBehavior;
             Selector: string;
         }>;
-        readonly LastBinding: Data.BindingBehavior;
+        get LastBinding(): Data.BindingBehavior;
         UpdateTarget(): void;
         UpdateSource(): void;
         AddBinding<T extends Data.BindingBehavior>(binding: T, selector: string): T;
@@ -1073,10 +1084,10 @@ declare namespace DomBehind.Data {
         Done(): void;
         Fail(ex: ActionPolicyExceptionEventArgs): void;
         protected SetCustomError(vex: Validation.ValidationException): void;
-        protected readonly Supported: boolean;
-        protected readonly ViewModel: BizViewModel;
-        protected readonly View: BizView;
-        protected readonly Owner: JQuery;
+        protected get Supported(): boolean;
+        protected get ViewModel(): BizViewModel;
+        protected get View(): BizView;
+        protected get Owner(): JQuery;
         Always(): void;
     }
 }
@@ -1097,7 +1108,7 @@ declare namespace DomBehind.Data {
     }
     abstract class WaitingOverlayActionPolicy extends ActionPolicy {
         constructor(option?: IWaitingOverlayOption);
-        readonly Option: IWaitingOverlayOption;
+        get Option(): IWaitingOverlayOption;
         private _option;
         Priority(): number;
         private _priority;
@@ -1270,10 +1281,10 @@ declare namespace DomBehind.Threading {
 
 declare namespace DomBehind.Threading {
     abstract class WorkerWrapper {
-        protected readonly Thread: Worker;
+        protected get Thread(): Worker;
         private _thread;
         Load(): void;
-        protected readonly WorkerScript: string;
+        protected get WorkerScript(): string;
         PoolType: PoolType;
         Do(arg: any): JQueryPromise<any>;
         Terminate(): void;
@@ -1286,8 +1297,8 @@ declare namespace DomBehind {
         TextStatus?: string;
         ErrorThrown?: string;
         constructor(JqXHR?: JQueryXHR, TextStatus?: string, ErrorThrown?: string);
-        readonly ErrorStatus: number;
-        readonly ErrorTitle: string;
+        get ErrorStatus(): number;
+        get ErrorTitle(): string;
         ToString(): string;
     }
 }
@@ -1346,7 +1357,8 @@ declare namespace DomBehind {
         Ensure(behavior: any): any;
     }
     class TypedEvent<T> implements IEvent {
-        EventName: string;
+        get EventName(): string;
+        set EventName(value: string);
         private _eventName;
         private handlers;
         AddHandler(handler: {
@@ -1369,7 +1381,7 @@ declare namespace DomBehind {
     class EventBuilder<T> implements IEventBuilder {
         constructor(eventName: string);
         Create(): IEvent;
-        readonly EventName: string;
+        get EventName(): string;
         private _eventName;
         static RegisterAttached<T>(eventName?: string, ensure?: (behavior: any) => void): IEventBuilder;
         private ensureHandler;
@@ -1444,7 +1456,8 @@ declare namespace DomBehind.Data {
         protected Source: collections.LinkedList<any>;
         protected List: collections.LinkedList<any>;
         private _current;
-        Current: any;
+        get Current(): any;
+        set Current(value: any);
         OnCurrentChanging(): CancelEventArgs;
         CurrentChanging: TypedEvent<CancelEventArgs>;
         OnCurrentChanged(): void;
@@ -1510,7 +1523,7 @@ declare namespace DomBehind {
             marks?: string[];
         });
         protected Recurcive(source: any, name: string, parentName: string): void;
-        readonly Source: T;
+        get Source(): T;
         protected CreateDescriptor(notifibleName: string, value: any): PropertyDescriptor;
     }
 }
@@ -1649,7 +1662,7 @@ declare namespace DomBehind.Validation {
         Attribute: string;
         HasError: boolean;
         AttributeExpression: any;
-        readonly AttributeValue: string | number;
+        get AttributeValue(): string | number;
         protected ParseAttributeValue(): any;
         OnValidationg(): void;
         Apply(): void;
@@ -1677,17 +1690,17 @@ declare namespace DomBehind.Validation {
 
 declare namespace DomBehind.Web {
     class PlainXMLHttpRequestWorker extends Threading.WorkerWrapper {
-        protected readonly WorkerScript: string;
+        protected get WorkerScript(): string;
     }
 }
 
 declare namespace DomBehind.Web {
     abstract class WebService<TRequest, TResponse> {
-        protected abstract readonly Url: string;
+        protected abstract get Url(): string;
         Timeout: number;
         Execute(request?: TRequest): TResponse;
         ExecuteAsync(request?: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
         ExecuteAjax(request?: TRequest, option?: JQueryAjaxSettings): JQueryPromise<TResponse>;
-        protected readonly DefaultPostSetting: JQueryAjaxSettings;
+        protected get DefaultPostSetting(): JQueryAjaxSettings;
     }
 }

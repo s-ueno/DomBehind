@@ -13,6 +13,10 @@
         public static InstanceProperty: Data.DependencyProperty
             = Data.DependencyProperty.RegisterAttached("Instance",
                 el => {
+                    if (Object.IsNullOrUndefined(el)) {
+                        return;
+                    }
+
                     let identity = el.attr("id");
                     if (!identity) {
                         return null;
@@ -224,6 +228,8 @@
             behavior.SetOption(option);
         } else {
             let behavior = me.Add(new Sign());
+            behavior.DataContext = me.CurrentBehavior.DataContext;
+            behavior.Element = me.CurrentElement;
             behavior.SetOption(option);
         }
 

@@ -280,7 +280,9 @@ var DomBehind;
                     }
                 }
             };
-            w2GridOption.onDblClick = e => this.OnDoubleClick(this.DataContext, e);
+            w2GridOption.onDblClick = e => {
+                this.OnDoubleClick(this.DataContext, e);
+            };
             if (this.GridOption.footerOption) {
                 w2GridOption.show.footer = true;
             }

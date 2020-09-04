@@ -5,7 +5,8 @@ declare namespace DomBehind.Data {
         protected Source: collections.LinkedList<any>;
         protected List: collections.LinkedList<any>;
         private _current;
-        Current: any;
+        get Current(): any;
+        set Current(value: any);
         OnCurrentChanging(): CancelEventArgs;
         CurrentChanging: TypedEvent<CancelEventArgs>;
         OnCurrentChanged(): void;

@@ -14,7 +14,8 @@ declare namespace DomBehind {
         Ensure(behavior: any): any;
     }
     class TypedEvent<T> implements IEvent {
-        EventName: string;
+        get EventName(): string;
+        set EventName(value: string);
         private _eventName;
         private handlers;
         AddHandler(handler: {
@@ -37,7 +38,7 @@ declare namespace DomBehind {
     class EventBuilder<T> implements IEventBuilder {
         constructor(eventName: string);
         Create(): IEvent;
-        readonly EventName: string;
+        get EventName(): string;
         private _eventName;
         static RegisterAttached<T>(eventName?: string, ensure?: (behavior: any) => void): IEventBuilder;
         private ensureHandler;

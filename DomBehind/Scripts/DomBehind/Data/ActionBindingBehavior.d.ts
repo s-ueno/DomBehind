@@ -9,7 +9,7 @@ declare namespace DomBehind.Data {
         Ensure(): void;
         OnTrigger(e: any): void;
         ActionPolicyCollection: ActionPolicy[];
-        protected readonly ActionInvoker: ActionPolicy;
+        protected get ActionInvoker(): ActionPolicy;
         private _actionInvoker;
         CreateActionInvoker(policies: ActionPolicy[]): ActionPolicy;
         protected Do(sender: any, e: any): void;

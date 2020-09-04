@@ -12,7 +12,7 @@ declare namespace DomBehind {
         static InstanceProperty: Data.DependencyProperty;
         protected Option: ISignOption<any>;
         SetOption(option: ISignOption<any>): void;
-        protected readonly DefaultOption: ISignOption<any>;
+        protected get DefaultOption(): ISignOption<any>;
         Identity: string;
         protected SignaturePad: SignaturePad;
         protected Canvas: HTMLCanvasElement;

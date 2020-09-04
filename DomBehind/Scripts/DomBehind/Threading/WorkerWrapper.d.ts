@@ -1,9 +1,9 @@
 declare namespace DomBehind.Threading {
     abstract class WorkerWrapper {
-        protected readonly Thread: Worker;
+        protected get Thread(): Worker;
         private _thread;
         Load(): void;
-        protected readonly WorkerScript: string;
+        protected get WorkerScript(): string;
         PoolType: PoolType;
         Do(arg: any): JQueryPromise<any>;
         Terminate(): void;

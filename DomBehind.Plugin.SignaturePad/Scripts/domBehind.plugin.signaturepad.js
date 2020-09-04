@@ -132,6 +132,9 @@ var DomBehind;
         }
     }
     Sign.InstanceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("Instance", el => {
+        if (Object.IsNullOrUndefined(el)) {
+            return;
+        }
         let identity = el.attr("id");
         if (!identity) {
             return null;
@@ -173,6 +176,8 @@ var DomBehind;
         }
         else {
             let behavior = me.Add(new Sign());
+            behavior.DataContext = me.CurrentBehavior.DataContext;
+            behavior.Element = me.CurrentElement;
             behavior.SetOption(option);
         }
         let newMe = new SignBindingBuilder(me.Owner);
