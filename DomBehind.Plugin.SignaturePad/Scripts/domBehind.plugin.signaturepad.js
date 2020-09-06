@@ -151,6 +151,9 @@ var DomBehind;
                 let bkBehavior = me.CurrentBehavior;
                 let bkElement = me.CurrentElement;
                 let behavior = me.CurrentBehavior.AddBinding(new DomBehind.Data.DataBindingBehavior(), me.CurrentSelector);
+                if (!me.CurrentSelector) {
+                    behavior.Element = bkElement;
+                }
                 behavior.DataContext = me.CurrentBehavior.DataContext;
                 behavior.Property = property;
                 behavior.PInfo = new DomBehind.LamdaExpression(this.Owner.DataContext, bindingExpression);

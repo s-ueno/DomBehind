@@ -200,6 +200,9 @@
                 let bkElement = me.CurrentElement;
 
                 let behavior = me.CurrentBehavior.AddBinding(new Data.DataBindingBehavior(), me.CurrentSelector);
+                if (!me.CurrentSelector) {
+                    behavior.Element = bkElement;
+                }
                 behavior.DataContext = me.CurrentBehavior.DataContext;
                 behavior.Property = property;
                 behavior.PInfo = new LamdaExpression(this.Owner.DataContext, bindingExpression);
