@@ -202,6 +202,8 @@
                 let behavior = me.CurrentBehavior.AddBinding(new Data.DataBindingBehavior(), me.CurrentSelector);
                 if (!me.CurrentSelector) {
                     behavior.Element = bkElement;
+                } else {
+                    behavior.Element = me.Owner.Container.find(me.CurrentSelector);
                 }
                 behavior.DataContext = me.CurrentBehavior.DataContext;
                 behavior.Property = property;
@@ -232,7 +234,11 @@
         } else {
             let behavior = me.Add(new Sign());
             behavior.DataContext = me.CurrentBehavior.DataContext;
-            behavior.Element = me.CurrentElement;
+            if (me.CurrentSelector) {
+                behavior.Element = me.Owner.Container.find(me.CurrentSelector);
+            } else {
+                behavior.Element = me.CurrentElement;
+            }
             behavior.SetOption(option);
         }
 
