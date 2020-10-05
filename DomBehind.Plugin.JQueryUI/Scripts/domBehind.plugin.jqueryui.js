@@ -2,204 +2,235 @@ var DomBehind;
 (function (DomBehind) {
     var Controls;
     (function (Controls) {
-        class Selectmenu {
-            constructor() {
+        var Selectmenu = /** @class */ (function () {
+            function Selectmenu() {
                 this._engaged = false;
             }
-            static Register(behavior) {
-                let el = behavior.Element;
-                let value = el.data("native-menu");
+            Selectmenu.Register = function (behavior) {
+                var el = behavior.Element;
+                var value = el.data("native-menu");
                 if (String.IsNullOrWhiteSpace(value)) {
                     el.data("native-menu", "false");
                 }
-            }
-            static Rebuild(el, list) {
-                let newArray = list.ToArray();
+            };
+            Selectmenu.Rebuild = function (el, list) {
+                var newArray = list.ToArray();
                 if (newArray.SequenceEqual(list.__oldArray)) {
                     return false;
                 }
                 el.empty();
-                let identity = el.data("menu_identity");
+                var identity = el.data("menu_identity");
                 if (!identity) {
-                    identity = `menu_${NewUid()}`;
+                    identity = "menu_" + NewUid();
                     el.data("menu_identity", identity);
                 }
-                let oldArray = list.__oldArray;
+                var oldArray = list.__oldArray;
                 list.__oldArray = newArray;
-                let index = 0;
-                let items = newArray.Select(x => {
+                var index = 0;
+                var items = newArray.Select(function (x) {
                     if (Object.IsNullOrUndefined(x))
                         return null;
-                    x.recid = `${identity}_${++index}`;
-                    let text;
+                    x.recid = identity + "_" + ++index;
+                    var text;
                     if (list.DisplayMemberPath) {
                         text = x[list.DisplayMemberPath];
                     }
                     else {
                         text = x.toString();
                     }
-                    let newVal = {
+                    var newVal = {
                         id: x.recid,
                         text: text,
                         obj: x,
                     };
-                    el.append(`<option value="${newVal.id}">${newVal.text}</option>`);
+                    el.append("<option value=\"" + newVal.id + "\">" + newVal.text + "</option>");
                     return newVal;
                 });
                 Selectmenu.UpdateCurrent(el, list);
                 return true;
-            }
-            static UpdateCurrent(el, list) {
-                let widget = el.selectmenu();
+            };
+            Selectmenu.UpdateCurrent = function (el, list) {
+                var widget = el.selectmenu();
                 if (list.Current != null) {
-                    let id = list.Current.recid;
+                    var id = list.Current.recid;
                     widget.val(id);
                 }
                 widget.selectmenu("refresh");
-            }
-            OnCurrentChanged(sender, e) {
-                let me = sender.__widget;
+            };
+            Selectmenu.prototype.OnCurrentChanged = function (sender, e) {
+                // ES6 で this がそのままトランスパイルされた結果、実行時コンテキストがES5から変わった。
+                // if (this._engaged) return;
+                var me = sender.__widget;
                 if (me && me._engaged) {
                     return;
                 }
-                let el = me.Element;
+                var el = me.Element;
+                // プロパティ未指定の場合は、リフレッシュする
                 if (String.IsNullOrWhiteSpace(e.Name)) {
                     Selectmenu.Rebuild(el, sender);
                 }
                 else if (e.Name === "Current") {
                     Selectmenu.UpdateCurrent(el, sender);
                 }
-            }
-        }
-        Selectmenu.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("_disabled", el => {
-        }, (el, newValue) => {
-            if (Object.IsNullOrUndefined(el))
-                return;
-            let oldValueString = el.attr("selectMenu_oldIsEnabled");
-            let oldValue = oldValueString === "false" ? false : true;
-            try {
-                el.attr("selectMenu_oldIsEnabled", newValue);
-                el.selectmenu("option", "disabled", newValue === false);
-            }
-            catch (e) {
-                el.attr("_disabled", newValue === false ? "true" : "false");
-            }
-            if (newValue === oldValue)
-                return;
-            DomBehind.UIElement.RaiseEnabledChanged(el, newValue);
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
-        Selectmenu.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", el => {
-        }, (el, newValue) => {
-            if (newValue instanceof DomBehind.Data.ListCollectionView) {
-                if (!Selectmenu.Rebuild(el, newValue))
+            };
+            Selectmenu.IsEnabledProperty = DomBehind.Data.DependencyProperty.RegisterAttached("_disabled", function (el) {
+                // oneway
+            }, function (el, newValue) {
+                if (Object.IsNullOrUndefined(el))
                     return;
-                let sm = newValue.__widget;
-                if (!sm) {
-                    sm = newValue.__widget = new Selectmenu();
+                var oldValueString = el.attr("selectMenu_oldIsEnabled");
+                var oldValue = oldValueString === "false" ? false : true;
+                try {
+                    el.attr("selectMenu_oldIsEnabled", newValue);
+                    el.selectmenu("option", "disabled", newValue === false);
                 }
-                let disabled = false;
-                if (el.attr("_disabled") === "true") {
-                    disabled = true;
+                catch (e) {
+                    // selectmenu before initilize
+                    el.attr("_disabled", newValue === false ? "true" : "false");
                 }
-                let option = {
-                    change: e => {
-                        let recId = el.val();
-                        sm._engaged = true;
-                        try {
-                            if (sm.Items) {
-                                if (Object.IsNullOrUndefined(recId) || recId === "undefined") {
-                                    let selectedText = el.find(":selected").text();
-                                    let e = new DomBehind.CancelEventArgs(false);
-                                    sm.Items.CurrentChanging.Raise(sm.Items, e);
-                                    if (!e.Cancel) {
-                                        sm.Items.Begin();
-                                        sm.Items.Current = selectedText;
-                                        sm.Items.End();
-                                        sm.Items.CurrentChanged.Raise(sm.Items, new DomBehind.PropertyChangedEventArgs("Current"));
+                if (newValue === oldValue)
+                    return;
+                DomBehind.UIElement.RaiseEnabledChanged(el, newValue);
+            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+            Selectmenu.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", function (el) {
+            }, function (el, newValue) {
+                if (newValue instanceof DomBehind.Data.ListCollectionView) {
+                    if (!Selectmenu.Rebuild(el, newValue))
+                        return;
+                    // 
+                    var sm_1 = newValue.__widget;
+                    if (!sm_1) {
+                        sm_1 = newValue.__widget = new Selectmenu();
+                    }
+                    var disabled = false;
+                    if (el.attr("_disabled") === "true") {
+                        disabled = true;
+                    }
+                    var option = {
+                        change: function (e) {
+                            var recId = el.val();
+                            sm_1._engaged = true;
+                            try {
+                                if (sm_1.Items) {
+                                    // IDがない　＝　文字配列直バインドでも、カレント変更通知イベントを飛ばす
+                                    if (Object.IsNullOrUndefined(recId) || recId === "undefined") {
+                                        // 文字を取得
+                                        var selectedText = el.find(":selected").text();
+                                        var e_1 = new DomBehind.CancelEventArgs(false);
+                                        sm_1.Items.CurrentChanging.Raise(sm_1.Items, e_1);
+                                        // キャンセルしない
+                                        if (!e_1.Cancel) {
+                                            sm_1.Items.Begin();
+                                            sm_1.Items.Current = selectedText;
+                                            sm_1.Items.End();
+                                            sm_1.Items.CurrentChanged.Raise(sm_1.Items, new DomBehind.PropertyChangedEventArgs("Current"));
+                                        }
+                                    }
+                                    else {
+                                        var current = sm_1.Items.ToArray().FirstOrDefault(function (x) { return x.recid === recId; });
+                                        sm_1.Items.Select(current);
                                     }
                                 }
-                                else {
-                                    let current = sm.Items.ToArray().FirstOrDefault(x => x.recid === recId);
-                                    sm.Items.Select(current);
-                                }
                             }
+                            finally {
+                                sm_1._engaged = false;
+                            }
+                        },
+                        classes: {
+                            "ui-selectmenu-menu": "jqueryui-highlight"
                         }
-                        finally {
-                            sm._engaged = false;
-                        }
-                    },
-                    classes: {
-                        "ui-selectmenu-menu": "jqueryui-highlight"
+                    };
+                    // ドロップダウン構築前にdisable設定ある場合
+                    if (disabled) {
+                        option.disabled = true;
                     }
-                };
-                if (disabled) {
-                    option.disabled = true;
+                    sm_1.Element = el.selectmenu(option);
+                    sm_1.Element.selectmenu("refresh");
+                    sm_1.Items = newValue;
+                    newValue.PropertyChanged.RemoveHandler(sm_1.OnCurrentChanged);
+                    newValue.PropertyChanged.AddHandler(sm_1.OnCurrentChanged);
                 }
-                sm.Element = el.selectmenu(option);
-                sm.Element.selectmenu("refresh");
-                sm.Items = newValue;
-                newValue.PropertyChanged.RemoveHandler(sm.OnCurrentChanged);
-                newValue.PropertyChanged.AddHandler(sm.OnCurrentChanged);
-            }
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, behavior => {
-            Selectmenu.Register(behavior);
-        });
+            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, function (behavior) {
+                Selectmenu.Register(behavior);
+            });
+            return Selectmenu;
+        }());
         Controls.Selectmenu = Selectmenu;
     })(Controls = DomBehind.Controls || (DomBehind.Controls = {}));
 })(DomBehind || (DomBehind = {}));
-
+//# sourceMappingURL=Selectmenu.js.map
 var DomBehind;
 (function (DomBehind) {
     var Controls;
     (function (Controls) {
-        class Tooltip {
-        }
-        Tooltip.TextProperty = DomBehind.Data.DependencyProperty.RegisterAttached("title", x => x.attr("title"), (x, y) => {
-            let element = x;
-            if (x.attr("type") === "checkbox") {
-                let parent = x.closest("label");
-                parent.tooltip();
-                parent.attr("title", y);
+        var Tooltip = /** @class */ (function () {
+            function Tooltip() {
             }
-            else {
-                x.tooltip();
-                x.attr("title", y);
-            }
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+            Tooltip.TextProperty = DomBehind.Data.DependencyProperty.RegisterAttached("title", function (x) { return x.attr("title"); }, function (x, y) {
+                var element = x;
+                if (x.attr("type") === "checkbox") {
+                    var parent_1 = x.closest("label");
+                    parent_1.tooltip();
+                    parent_1.attr("title", y);
+                }
+                else {
+                    x.tooltip();
+                    x.attr("title", y);
+                }
+            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
+            return Tooltip;
+        }());
         Controls.Tooltip = Tooltip;
     })(Controls = DomBehind.Controls || (DomBehind.Controls = {}));
 })(DomBehind || (DomBehind = {}));
-
+//# sourceMappingURL=Tooltip.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var DomBehind;
 (function (DomBehind) {
-    let SuggestSource;
+    var SuggestSource;
     (function (SuggestSource) {
         SuggestSource[SuggestSource["Google"] = 0] = "Google";
         SuggestSource[SuggestSource["Amazon"] = 1] = "Amazon";
         SuggestSource[SuggestSource["Array"] = 2] = "Array";
         SuggestSource[SuggestSource["Custom"] = 3] = "Custom";
     })(SuggestSource = DomBehind.SuggestSource || (DomBehind.SuggestSource = {}));
-    class Suggest extends DomBehind.Data.BindingBehavior {
-        constructor() {
-            super();
-            this.Source = SuggestSource.Google;
+    var Suggest = /** @class */ (function (_super) {
+        __extends(Suggest, _super);
+        function Suggest() {
+            var _this = _super.call(this) || this;
+            _this.Source = SuggestSource.Google;
+            return _this;
         }
-        Ensure() {
+        Suggest.prototype.Ensure = function () {
+            var _this = this;
             if (this.Source === SuggestSource.Google) {
-                this.CustomSource = (request, response) => {
+                this.CustomSource = function (request, response) {
                     $.ajax({
                         url: "http://www.google.com/complete/search",
                         data: { hl: 'ja', client: 'firefox', q: request.term },
                         dataType: "jsonp",
                         type: "GET",
                         success: function (data) {
+                            //alert(data);
                             response(data[1]);
                         }
                     });
                 };
             }
             else if (this.Source === SuggestSource.Amazon) {
-                this.CustomSource = (request, response) => {
+                this.CustomSource = function (request, response) {
                     $.ajax({
                         url: "http://completion.amazon.co.jp/search/complete",
                         data: { mkt: '6', method: 'completion', 'search-alias': 'aps', q: request.term },
@@ -212,36 +243,37 @@ var DomBehind;
                 };
             }
             else if (this.Source == SuggestSource.Array) {
-                this.CustomSource = (request, response) => {
-                    response(this.Option.array.Where(x => this.Option.customFilter(x, request.term)));
+                this.CustomSource = function (request, response) {
+                    response(_this.Option.array.Where(function (x) { return _this.Option.customFilter(x, request.term); }));
                 };
             }
-            let option = {
-                source: (request, response) => this.CustomSource(request, response),
+            var option = {
+                source: function (request, response) { return _this.CustomSource(request, response); },
                 delay: this.Delay,
                 minLength: this.Option.minLength,
             };
             if (this.Option.customSelectAction) {
-                this.SelectAction = (ev, ui) => {
-                    let val = this.Option.customSelectAction(ui);
-                    this.Element.val(val);
+                this.SelectAction = function (ev, ui) {
+                    var val = _this.Option.customSelectAction(ui);
+                    _this.Element.val(val);
                 };
                 option = $.extend(true, option, {
                     select: this.SelectAction,
                 });
             }
-            let suggest = this.Element.autocomplete(option);
+            var suggest = this.Element.autocomplete(option);
             if (this.Option && this.Option.isShow) {
-                this.Element.focusin(() => {
-                    this.Element.autocomplete('search', this.Element.val());
+                this.Element.focusin(function () {
+                    _this.Element.autocomplete('search', _this.Element.val());
                 });
             }
-        }
-    }
+        };
+        return Suggest;
+    }(DomBehind.Data.BindingBehavior));
     DomBehind.Suggest = Suggest;
     DomBehind.BindingBehaviorBuilder.prototype.BuildSuggest = function (source, delay, option) {
-        let me = this;
-        let behavior = me.Add(new Suggest());
+        var me = this;
+        var behavior = me.Add(new Suggest());
         if (source) {
             behavior.Source = source;
         }
@@ -254,3 +286,4 @@ var DomBehind;
         return me;
     };
 })(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Suggest.js.map

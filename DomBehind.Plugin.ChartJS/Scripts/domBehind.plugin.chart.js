@@ -23,12 +23,15 @@ var DomBehind;
         ChartType[ChartType["Bubble"] = 5] = "Bubble";
         ChartType[ChartType["Scatter"] = 6] = "Scatter";
     })(ChartType = DomBehind.ChartType || (DomBehind.ChartType = {}));
-    var ColorGenerator = (function () {
+    var ColorGenerator = /** @class */ (function () {
         function ColorGenerator() {
             this.Index = 0;
+            // デフォルト色にメトロカラー
+            // https://www.colordic.org/m/ 
             this.Colors = [
                 "#f39700",
                 "#e60012",
+                // "#9caeb7", /* 日比谷線シルバーHibiya Line Silver */
                 "#00a7db",
                 "#009944",
                 "#d7c447",
@@ -94,7 +97,7 @@ var DomBehind;
         };
         return ColorGenerator;
     }());
-    var ChartBehavior = (function (_super) {
+    var ChartBehavior = /** @class */ (function (_super) {
         __extends(ChartBehavior, _super);
         function ChartBehavior() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -124,6 +127,7 @@ var DomBehind;
             },
             set: function (value) {
                 if (this._items) {
+                    // hack 古いインスタンスに紐つけられたデリゲードを丸ごと削除
                     this._items.CurrentChanged.Clear();
                     this._items.CurrentChanging.Clear();
                     this._items.PropertyChanged.Clear();
@@ -133,7 +137,7 @@ var DomBehind;
                 this._items = value;
                 this.ReBuildChart();
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         ChartBehavior.prototype.ReBuildChart = function () {
@@ -298,10 +302,11 @@ var DomBehind;
                     },
                 };
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         ChartBehavior.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemssource", function (el) {
+            // one way
         }, function (el, newValue) {
             var id = el.attr("id");
             if (!id)
@@ -314,7 +319,7 @@ var DomBehind;
         return ChartBehavior;
     }(DomBehind.Data.DataBindingBehavior));
     DomBehind.ChartBehavior = ChartBehavior;
-    var ChartBindingBehaviorBuilder = (function (_super) {
+    var ChartBindingBehaviorBuilder = /** @class */ (function (_super) {
         __extends(ChartBindingBehaviorBuilder, _super);
         function ChartBindingBehaviorBuilder() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -461,3 +466,4 @@ var DomBehind;
         return newMe;
     };
 })(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=ChartBehavior.js.map

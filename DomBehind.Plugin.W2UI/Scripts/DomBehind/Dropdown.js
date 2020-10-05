@@ -2,25 +2,25 @@ var DomBehind;
 (function (DomBehind) {
     var Controls;
     (function (Controls) {
-        class Dropdown {
-            constructor() {
+        var Dropdown = /** @class */ (function () {
+            function Dropdown() {
                 this._engaged = false;
             }
-            static Register(behavior) {
+            Dropdown.Register = function (behavior) {
                 if (!behavior.Element)
                     return;
-            }
-            static Rebuild(el, list) {
-                let newArray = list.ToArray();
+            };
+            Dropdown.Rebuild = function (el, list) {
+                var newArray = list.ToArray();
                 if (newArray.SequenceEqual(list.__oldArray)) {
                     return false;
                 }
                 list.__oldArray = newArray;
-                $.each(newArray, (i, each) => {
+                $.each(newArray, function (i, each) {
                     each.recid = i;
                 });
-                let items = newArray.Select(x => {
-                    let text = x;
+                var items = newArray.Select(function (x) {
+                    var text = x;
                     if (list.DisplayMemberPath) {
                         text = x[list.DisplayMemberPath];
                     }
@@ -30,71 +30,83 @@ var DomBehind;
                         obj: x,
                     };
                 });
-                let options = {
+                var options = {
                     items: items,
                     selected: {},
                 };
                 if (list.Current != null) {
-                    let id = list.Current.recid;
-                    let obj = items.FirstOrDefault(x => x.id === id);
+                    var id_1 = list.Current.recid;
+                    var obj = items.FirstOrDefault(function (x) { return x.id === id_1; });
                     options.selected = obj;
                 }
                 el.w2field('list', options);
                 return true;
-            }
-            OnCurrentChanged(sender, e) {
+            };
+            Dropdown.prototype.OnCurrentChanged = function (sender, e) {
                 if (this._engaged)
                     return;
-                let dd = sender.__element;
-                let el = dd.Element;
+                // プログラム上(ViewModel)からの反映を、Viewへ適用する
+                var dd = sender.__element;
+                var el = dd.Element;
+                // プロパティ未指定の場合は、リフレッシュする
                 if (String.IsNullOrWhiteSpace(e.Name)) {
                     Dropdown.Rebuild(el, sender);
                     el.data('w2field').refresh();
                 }
                 else if (e.Name === "Current") {
-                    let list = el.data('w2field');
-                    let id = sender.Current.recid;
-                    let items = list.options.items;
+                    // カレント行が変更されたので、選択状態とする
+                    var list = el.data('w2field');
+                    var id_2 = sender.Current.recid;
+                    var items = list.options.items;
                     if (items instanceof Array) {
-                        let obj = items.FirstOrDefault(x => x.id === id);
+                        var obj = items.FirstOrDefault(function (x) { return x.id === id_2; });
                         el.data('selected', obj);
                         list.refresh();
                     }
                 }
-            }
-        }
-        Dropdown.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", el => {
-        }, (el, newValue) => {
-            if (newValue instanceof DomBehind.Data.ListCollectionView) {
-                if (!Dropdown.Rebuild(el, newValue))
-                    return;
-                let dd = newValue.__element;
-                if (!dd) {
-                    dd = newValue.__element = new Dropdown();
+            };
+            Dropdown.ItemsSourceProperty = DomBehind.Data.DependencyProperty.RegisterAttached("itemsSource", function (el) {
+                // UpdateSource
+                // oneway なので、未実装で良い
+            }, function (el, newValue) {
+                // UpdaateTarget
+                if (newValue instanceof DomBehind.Data.ListCollectionView) {
+                    if (!Dropdown.Rebuild(el, newValue))
+                        return;
+                    // 
+                    var dd_1 = newValue.__element;
+                    if (!dd_1) {
+                        dd_1 = newValue.__element = new Dropdown();
+                    }
+                    dd_1.Element = el;
+                    dd_1.Items = newValue;
+                    var list = el.data('w2field');
+                    list.refresh();
+                    list.__Dropdown = dd_1;
+                    // UI上からの変更をデータソースへ反映する
+                    el.off('change');
+                    el.on('change', function (e) {
+                        var selectedId = el.data("selected").id;
+                        dd_1._engaged = true;
+                        try {
+                            // dd.Items.Begin();
+                            var current = newValue.ToArray().FirstOrDefault(function (x) { return x.recid == selectedId; });
+                            dd_1.Items.Select(current);
+                            // dd.Items.End();
+                        }
+                        finally {
+                            dd_1._engaged = false;
+                        }
+                    });
+                    newValue.PropertyChanged.RemoveHandler(dd_1.OnCurrentChanged);
+                    newValue.PropertyChanged.AddHandler(dd_1.OnCurrentChanged);
                 }
-                dd.Element = el;
-                dd.Items = newValue;
-                let list = el.data('w2field');
-                list.refresh();
-                list.__Dropdown = dd;
-                el.off('change');
-                el.on('change', e => {
-                    let selectedId = el.data("selected").id;
-                    dd._engaged = true;
-                    try {
-                        let current = newValue.ToArray().FirstOrDefault(x => x.recid == selectedId);
-                        dd.Items.Select(current);
-                    }
-                    finally {
-                        dd._engaged = false;
-                    }
-                });
-                newValue.PropertyChanged.RemoveHandler(dd.OnCurrentChanged);
-                newValue.PropertyChanged.AddHandler(dd.OnCurrentChanged);
-            }
-        }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, behavior => {
-            Dropdown.Register(behavior);
-        });
+            }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay, function (behavior) {
+                Dropdown.Register(behavior);
+            });
+            return Dropdown;
+        }());
         Controls.Dropdown = Dropdown;
     })(Controls = DomBehind.Controls || (DomBehind.Controls = {}));
 })(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Dropdown.js.map

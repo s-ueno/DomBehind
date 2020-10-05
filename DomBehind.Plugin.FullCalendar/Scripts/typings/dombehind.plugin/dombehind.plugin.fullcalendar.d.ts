@@ -58,8 +58,8 @@ declare namespace DomBehind {
         protected ParseCalendarViewMode(status: CalendarViewMode): string;
         protected ParseScrollTime(hour: number): any;
         protected ParseSlotDuration(minute: number): any;
-        protected readonly DefaultOption: ICalendarOption<any>;
-        ItemsSource: Data.ListCollectionView;
+        protected get DefaultOption(): ICalendarOption<any>;
+        set ItemsSource(newValue: Data.ListCollectionView);
         RemoveAll(): void;
         CalendarBindings: {
             [key: string]: CalendarOption;

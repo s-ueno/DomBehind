@@ -1,6 +1,6 @@
 var DomBehind;
 (function (DomBehind) {
-    var Wysiwyg = (function () {
+    var Wysiwyg = /** @class */ (function () {
         function Wysiwyg() {
         }
         Wysiwyg.HtmlProperty = DomBehind.Data.DependencyProperty.RegisterAttached("html", function (el) {
@@ -129,6 +129,16 @@ var DomBehind;
             el.wysiwyg({
                 toolbarSelector: '[data-target="#' + id + '"]',
             });
+            //tb.find('[data-toggle="dropdown"]').each((i, el) => {
+            //    let parent = $(el.parentElement)
+            //    if (parent.hasClass("btn-group")) {
+            //        parent.click(e => {
+            //            let a = $(e.target);
+            //            let me = a.closest("div.btn-group");
+            //            me.toggleClass("open");
+            //        });
+            //    }
+            //});
             if (html) {
                 var behavior = me.Add(new DomBehind.Data.DataBindingBehavior());
                 behavior.Property = Wysiwyg.HtmlProperty;
@@ -146,3 +156,4 @@ var DomBehind;
         return me;
     };
 })(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Wysiwyg.js.map

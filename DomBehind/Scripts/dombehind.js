@@ -664,12 +664,24 @@ if( typeof module !== 'undefined' && module != null ) {
   module.exports = LZString
 }
 
+// Copyright 2013 Basarat Ali Syed. All Rights Reserved.
+//
+// Licensed under MIT open source license http://opensource.org/licenses/MIT
+//
+// Orginal javascript code was by Mauricio Santos
+/**
+ * @namespace Top level namespace for collections, a TypeScript data structure library.
+ */
 var collections;
 (function (collections) {
     var _hasOwnProperty = Object.prototype.hasOwnProperty;
     var has = function (obj, prop) {
         return _hasOwnProperty.call(obj, prop);
     };
+    /**
+     * Default function to compare element order.
+     * @function
+     */
     function defaultCompare(a, b) {
         if (a < b) {
             return -1;
@@ -682,10 +694,18 @@ var collections;
         }
     }
     collections.defaultCompare = defaultCompare;
+    /**
+     * Default function to test equality.
+     * @function
+     */
     function defaultEquals(a, b) {
         return a === b;
     }
     collections.defaultEquals = defaultEquals;
+    /**
+     * Default function to convert an object to a string.
+     * @function
+     */
     function defaultToString(item) {
         if (item === null) {
             return 'COLLECTION_NULL';
@@ -701,6 +721,9 @@ var collections;
         }
     }
     collections.defaultToString = defaultToString;
+    /**
+    * Joins all the properies of the object using the provided join string
+    */
     function makeString(item, join = ",") {
         if (item === null) {
             return 'COLLECTION_NULL';
@@ -727,18 +750,34 @@ var collections;
         }
     }
     collections.makeString = makeString;
+    /**
+     * Checks if the given argument is a function.
+     * @function
+     */
     function isFunction(func) {
         return (typeof func) === 'function';
     }
     collections.isFunction = isFunction;
+    /**
+     * Checks if the given argument is undefined.
+     * @function
+     */
     function isUndefined(obj) {
         return (typeof obj) === 'undefined';
     }
     collections.isUndefined = isUndefined;
+    /**
+     * Checks if the given argument is a string.
+     * @function
+     */
     function isString(obj) {
         return Object.prototype.toString.call(obj) === '[object String]';
     }
     collections.isString = isString;
+    /**
+     * Reverses a compare function.
+     * @function
+     */
     function reverseCompareFunction(compareFunction) {
         if (!collections.isFunction(compareFunction)) {
             return function (a, b) {
@@ -760,14 +799,31 @@ var collections;
         }
     }
     collections.reverseCompareFunction = reverseCompareFunction;
+    /**
+     * Returns an equal function given a compare function.
+     * @function
+     */
     function compareToEquals(compareFunction) {
         return function (a, b) {
             return compareFunction(a, b) === 0;
         };
     }
     collections.compareToEquals = compareToEquals;
+    /**
+     * @namespace Contains various functions for manipulating arrays.
+     */
     let arrays;
     (function (arrays) {
+        /**
+         * Returns the position of the first occurrence of the specified item
+         * within the specified array.
+         * @param {*} array the array in which to search the element.
+         * @param {Object} item the element to search.
+         * @param {function(Object,Object):boolean=} equalsFunction optional function used to
+         * check equality between 2 elements.
+         * @return {number} the position of the first occurrence of the specified element
+         * within the specified array, or -1 if not found.
+         */
         function indexOf(array, item, equalsFunction) {
             var equals = equalsFunction || collections.defaultEquals;
             var length = array.length;
@@ -779,6 +835,16 @@ var collections;
             return -1;
         }
         arrays.indexOf = indexOf;
+        /**
+         * Returns the position of the last occurrence of the specified element
+         * within the specified array.
+         * @param {*} array the array in which to search the element.
+         * @param {Object} item the element to search.
+         * @param {function(Object,Object):boolean=} equalsFunction optional function used to
+         * check equality between 2 elements.
+         * @return {number} the position of the last occurrence of the specified element
+         * within the specified array or -1 if not found.
+         */
         function lastIndexOf(array, item, equalsFunction) {
             var equals = equalsFunction || collections.defaultEquals;
             var length = array.length;
@@ -790,10 +856,26 @@ var collections;
             return -1;
         }
         arrays.lastIndexOf = lastIndexOf;
+        /**
+         * Returns true if the specified array contains the specified element.
+         * @param {*} array the array in which to search the element.
+         * @param {Object} item the element to search.
+         * @param {function(Object,Object):boolean=} equalsFunction optional function to
+         * check equality between 2 elements.
+         * @return {boolean} true if the specified array contains the specified element.
+         */
         function contains(array, item, equalsFunction) {
             return arrays.indexOf(array, item, equalsFunction) >= 0;
         }
         arrays.contains = contains;
+        /**
+         * Removes the first ocurrence of the specified element from the specified array.
+         * @param {*} array the array in which to search element.
+         * @param {Object} item the element to search.
+         * @param {function(Object,Object):boolean=} equalsFunction optional function to
+         * check equality between 2 elements.
+         * @return {boolean} true if the array changed after this call.
+         */
         function remove(array, item, equalsFunction) {
             var index = arrays.indexOf(array, item, equalsFunction);
             if (index < 0) {
@@ -803,6 +885,16 @@ var collections;
             return true;
         }
         arrays.remove = remove;
+        /**
+         * Returns the number of elements in the specified array equal
+         * to the specified object.
+         * @param {Array} array the array in which to determine the frequency of the element.
+         * @param {Object} item the element whose frequency is to be determined.
+         * @param {function(Object,Object):boolean=} equalsFunction optional function used to
+         * check equality between 2 elements.
+         * @return {number} the number of elements in the specified array
+         * equal to the specified object.
+         */
         function frequency(array, item, equalsFunction) {
             var equals = equalsFunction || collections.defaultEquals;
             var length = array.length;
@@ -815,6 +907,17 @@ var collections;
             return freq;
         }
         arrays.frequency = frequency;
+        /**
+         * Returns true if the two specified arrays are equal to one another.
+         * Two arrays are considered equal if both arrays contain the same number
+         * of elements, and all corresponding pairs of elements in the two
+         * arrays are equal and are in the same order.
+         * @param {Array} array1 one array to be tested for equality.
+         * @param {Array} array2 the other array to be tested for equality.
+         * @param {function(Object,Object):boolean=} equalsFunction optional function used to
+         * check equality between elemements in the arrays.
+         * @return {boolean} true if the two arrays are equal
+         */
         function equals(array1, array2, equalsFunction) {
             var equals = equalsFunction || collections.defaultEquals;
             if (array1.length !== array2.length) {
@@ -829,10 +932,22 @@ var collections;
             return true;
         }
         arrays.equals = equals;
+        /**
+         * Returns shallow a copy of the specified array.
+         * @param {*} array the array to copy.
+         * @return {Array} a copy of the specified array
+         */
         function copy(array) {
             return array.concat();
         }
         arrays.copy = copy;
+        /**
+         * Swaps the elements at the specified positions in the specified array.
+         * @param {Array} array The array in which to swap elements.
+         * @param {number} i the index of one element to be swapped.
+         * @param {number} j the index of the other element to be swapped.
+         * @return {boolean} true if the array is defined and the indexes are valid.
+         */
         function swap(array, i, j) {
             if (i < 0 || i >= array.length || j < 0 || j >= array.length) {
                 return false;
@@ -847,6 +962,14 @@ var collections;
             return '[' + array.toString() + ']';
         }
         arrays.toString = toString;
+        /**
+         * Executes the provided function once for each element present in this array
+         * starting from index 0 to length - 1.
+         * @param {Array} array The array in which to iterate.
+         * @param {function(Object):*} callback function to execute, it is
+         * invoked with one argument: the element value, to break the iteration you can
+         * optionally return false.
+         */
         function forEach(array, callback) {
             var lenght = array.length;
             for (var i = 0; i < lenght; i++) {
@@ -858,11 +981,40 @@ var collections;
         arrays.forEach = forEach;
     })(arrays = collections.arrays || (collections.arrays = {}));
     class LinkedList {
+        /**
+        * Creates an empty Linked List.
+        * @class A linked list is a data structure consisting of a group of nodes
+        * which together represent a sequence.
+        * @constructor
+        */
         constructor() {
+            /**
+            * First node in the list
+            * @type {Object}
+            * @private
+            */
             this.firstNode = null;
+            /**
+            * Last node in the list
+            * @type {Object}
+            * @private
+            */
             this.lastNode = null;
+            /**
+            * Number of elements in the list
+            * @type {number}
+            * @private
+            */
             this.nElements = 0;
         }
+        /**
+        * Adds an element to this list.
+        * @param {Object} item element to be added.
+        * @param {number=} index optional index to add the element. If no index is specified
+        * the element is added to the end of this list.
+        * @return {boolean} true if the element was added or false if the index is invalid
+        * or if the element is undefined.
+        */
         add(item, index) {
             if (collections.isUndefined(index)) {
                 index = this.nElements;
@@ -872,14 +1024,17 @@ var collections;
             }
             var newNode = this.createNode(item);
             if (this.nElements === 0) {
+                // First node in the list.
                 this.firstNode = newNode;
                 this.lastNode = newNode;
             }
             else if (index === this.nElements) {
+                // Insert at the end.
                 this.lastNode.next = newNode;
                 this.lastNode = newNode;
             }
             else if (index === 0) {
+                // Change first node.
                 newNode.next = this.firstNode;
                 this.firstNode = newNode;
             }
@@ -891,18 +1046,34 @@ var collections;
             this.nElements++;
             return true;
         }
+        /**
+        * Returns the first element in this list.
+        * @return {*} the first element of the list or undefined if the list is
+        * empty.
+        */
         first() {
             if (this.firstNode !== null) {
                 return this.firstNode.element;
             }
             return undefined;
         }
+        /**
+        * Returns the last element in this list.
+        * @return {*} the last element in the list or undefined if the list is
+        * empty.
+        */
         last() {
             if (this.lastNode !== null) {
                 return this.lastNode.element;
             }
             return undefined;
         }
+        /**
+         * Returns the element at the specified position in this list.
+         * @param {number} index desired index.
+         * @return {*} the element at the given index or undefined if the index is
+         * out of bounds.
+         */
         elementAtIndex(index) {
             var node = this.nodeAtIndex(index);
             if (node === null) {
@@ -910,6 +1081,26 @@ var collections;
             }
             return node.element;
         }
+        /**
+         * Returns the index in this list of the first occurrence of the
+         * specified element, or -1 if the List does not contain this element.
+         * <p>If the elements inside this list are
+         * not comparable with the === operator a custom equals function should be
+         * provided to perform searches, the function must receive two arguments and
+         * return true if they are equal, false otherwise. Example:</p>
+         *
+         * <pre>
+         * var petsAreEqualByName = function(pet1, pet2) {
+         *  return pet1.name === pet2.name;
+         * }
+         * </pre>
+         * @param {Object} item element to search for.
+         * @param {function(Object,Object):boolean=} equalsFunction Optional
+         * function used to check if two elements are equal.
+         * @return {number} the index in this list of the first occurrence
+         * of the specified element, or -1 if this list does not contain the
+         * element.
+         */
         indexOf(item, equalsFunction) {
             var equalsF = equalsFunction || collections.defaultEquals;
             if (collections.isUndefined(item)) {
@@ -926,9 +1117,42 @@ var collections;
             }
             return -1;
         }
+        /**
+           * Returns true if this list contains the specified element.
+           * <p>If the elements inside the list are
+           * not comparable with the === operator a custom equals function should be
+           * provided to perform searches, the function must receive two arguments and
+           * return true if they are equal, false otherwise. Example:</p>
+           *
+           * <pre>
+           * var petsAreEqualByName = function(pet1, pet2) {
+           *  return pet1.name === pet2.name;
+           * }
+           * </pre>
+           * @param {Object} item element to search for.
+           * @param {function(Object,Object):boolean=} equalsFunction Optional
+           * function used to check if two elements are equal.
+           * @return {boolean} true if this list contains the specified element, false
+           * otherwise.
+           */
         contains(item, equalsFunction) {
             return (this.indexOf(item, equalsFunction) >= 0);
         }
+        /**
+         * Removes the first occurrence of the specified element in this list.
+         * <p>If the elements inside the list are
+         * not comparable with the === operator a custom equals function should be
+         * provided to perform searches, the function must receive two arguments and
+         * return true if they are equal, false otherwise. Example:</p>
+         *
+         * <pre>
+         * var petsAreEqualByName = function(pet1, pet2) {
+         *  return pet1.name === pet2.name;
+         * }
+         * </pre>
+         * @param {Object} item element to be removed from this list, if present.
+         * @return {boolean} true if the list contained the specified element.
+         */
         remove(item, equalsFunction) {
             var equalsF = equalsFunction || collections.defaultEquals;
             if (this.nElements < 1 || collections.isUndefined(item)) {
@@ -961,11 +1185,24 @@ var collections;
             }
             return false;
         }
+        /**
+         * Removes all of the elements from this list.
+         */
         clear() {
             this.firstNode = null;
             this.lastNode = null;
             this.nElements = 0;
         }
+        /**
+         * Returns true if this list is equal to the given list.
+         * Two lists are equal if they have the same elements in the same order.
+         * @param {LinkedList} other the other list.
+         * @param {function(Object,Object):boolean=} equalsFunction optional
+         * function used to check if two elements are equal. If the elements in the lists
+         * are custom objects you should provide a function, otherwise
+         * the === operator is used to check equality between elements.
+         * @return {boolean} true if this list is equal to the given list.
+         */
         equals(other, equalsFunction) {
             var eqF = equalsFunction || collections.defaultEquals;
             if (!(other instanceof collections.LinkedList)) {
@@ -976,6 +1213,9 @@ var collections;
             }
             return this.equalsAux(this.firstNode, other.firstNode, eqF);
         }
+        /**
+        * @private
+        */
         equalsAux(n1, n2, eqF) {
             while (n1 !== null) {
                 if (!eqF(n1.element, n2.element)) {
@@ -986,12 +1226,18 @@ var collections;
             }
             return true;
         }
+        /**
+         * Removes the element at the specified position in this list.
+         * @param {number} index given index.
+         * @return {*} removed element or undefined if the index is out of bounds.
+         */
         removeElementAtIndex(index) {
             if (index < 0 || index >= this.nElements) {
                 return undefined;
             }
             var element;
             if (this.nElements === 1) {
+                //First node in the list.
                 element = this.firstNode.element;
                 this.firstNode = null;
                 this.lastNode = null;
@@ -1014,6 +1260,12 @@ var collections;
             this.nElements--;
             return element;
         }
+        /**
+         * Executes the provided function once for each element present in this list in order.
+         * @param {function(Object):*} callback function to execute, it is
+         * invoked with one argument: the element value, to break the iteration you can
+         * optionally return false.
+         */
         forEach(callback) {
             var currentNode = this.firstNode;
             while (currentNode !== null) {
@@ -1023,6 +1275,10 @@ var collections;
                 currentNode = currentNode.next;
             }
         }
+        /**
+         * Reverses the order of the elements in this linked list (makes the last
+         * element first, and the first element last).
+         */
         reverse() {
             var previous = null;
             var current = this.firstNode;
@@ -1037,6 +1293,12 @@ var collections;
             this.firstNode = this.lastNode;
             this.lastNode = temp;
         }
+        /**
+         * Returns an array containing all of the elements in this list in proper
+         * sequence.
+         * @return {Array.<*>} an array containing all of the elements in this list,
+         * in proper sequence.
+         */
         toArray() {
             var array = [];
             var currentNode = this.firstNode;
@@ -1046,15 +1308,26 @@ var collections;
             }
             return array;
         }
+        /**
+         * Returns the number of elements in this list.
+         * @return {number} the number of elements in this list.
+         */
         size() {
             return this.nElements;
         }
+        /**
+         * Returns true if this list contains no elements.
+         * @return {boolean} true if this list contains no elements.
+         */
         isEmpty() {
             return this.nElements <= 0;
         }
         toString() {
             return collections.arrays.toString(this.toArray());
         }
+        /**
+         * @private
+         */
         nodeAtIndex(index) {
             if (index < 0 || index >= this.nElements) {
                 return null;
@@ -1068,20 +1341,48 @@ var collections;
             }
             return node;
         }
+        /**
+         * @private
+         */
         createNode(item) {
             return {
                 element: item,
                 next: null
             };
         }
-    }
+    } // End of linked list 
     collections.LinkedList = LinkedList;
     class Dictionary {
+        /**
+         * Creates an empty dictionary.
+         * @class <p>Dictionaries map keys to values; each key can map to at most one value.
+         * This implementation accepts any kind of objects as keys.</p>
+         *
+         * <p>If the keys are custom objects a function which converts keys to unique
+         * strings must be provided. Example:</p>
+         * <pre>
+         * function petToString(pet) {
+         *  return pet.name;
+         * }
+         * </pre>
+         * @constructor
+         * @param {function(Object):string=} toStrFunction optional function used
+         * to convert keys to strings. If the keys aren't strings or if toString()
+         * is not appropriate, a custom function which receives a key and returns a
+         * unique string must be provided.
+         */
         constructor(toStrFunction) {
             this.table = {};
             this.nElements = 0;
             this.toStr = toStrFunction || collections.defaultToString;
         }
+        /**
+         * Returns the value to which this dictionary maps the specified key.
+         * Returns undefined if this dictionary contains no mapping for this key.
+         * @param {Object} key key whose associated value is to be returned.
+         * @return {*} the value to which this dictionary maps the specified key or
+         * undefined if the map contains no mapping for this key.
+         */
         getValue(key) {
             var pair = this.table['$' + this.toStr(key)];
             if (collections.isUndefined(pair)) {
@@ -1089,6 +1390,16 @@ var collections;
             }
             return pair.value;
         }
+        /**
+         * Associates the specified value with the specified key in this dictionary.
+         * If the dictionary previously contained a mapping for this key, the old
+         * value is replaced by the specified value.
+         * @param {Object} key key with which the specified value is to be
+         * associated.
+         * @param {Object} value value to be associated with the specified key.
+         * @return {*} previous value associated with the specified key, or undefined if
+         * there was no mapping for the key or if the key/value are undefined.
+         */
         setValue(key, value) {
             if (collections.isUndefined(key) || collections.isUndefined(value)) {
                 return undefined;
@@ -1109,6 +1420,13 @@ var collections;
             };
             return ret;
         }
+        /**
+         * Removes the mapping for this key from this dictionary if it is present.
+         * @param {Object} key key whose mapping is to be removed from the
+         * dictionary.
+         * @return {*} previous value associated with specified key, or undefined if
+         * there was no mapping for key.
+         */
         remove(key) {
             var k = '$' + this.toStr(key);
             var previousElement = this.table[k];
@@ -1119,6 +1437,10 @@ var collections;
             }
             return undefined;
         }
+        /**
+         * Returns an array containing all of the keys in this dictionary.
+         * @return {Array} an array containing all of the keys in this dictionary.
+         */
         keys() {
             var array = [];
             for (var name in this.table) {
@@ -1129,6 +1451,10 @@ var collections;
             }
             return array;
         }
+        /**
+         * Returns an array containing all of the values in this dictionary.
+         * @return {Array} an array containing all of the values in this dictionary.
+         */
         values() {
             var array = [];
             for (var name in this.table) {
@@ -1139,6 +1465,13 @@ var collections;
             }
             return array;
         }
+        /**
+        * Executes the provided function once for each key-value pair
+        * present in this dictionary.
+        * @param {function(Object,Object):*} callback function to execute, it is
+        * invoked with two arguments: key and value. To break the iteration you can
+        * optionally return false.
+        */
         forEach(callback) {
             for (var name in this.table) {
                 if (has(this.table, name)) {
@@ -1150,16 +1483,35 @@ var collections;
                 }
             }
         }
+        /**
+         * Returns true if this dictionary contains a mapping for the specified key.
+         * @param {Object} key key whose presence in this dictionary is to be
+         * tested.
+         * @return {boolean} true if this dictionary contains a mapping for the
+         * specified key.
+         */
         containsKey(key) {
             return !collections.isUndefined(this.getValue(key));
         }
+        /**
+        * Removes all mappings from this dictionary.
+        * @this {collections.Dictionary}
+        */
         clear() {
             this.table = {};
             this.nElements = 0;
         }
+        /**
+         * Returns the number of keys in this dictionary.
+         * @return {number} the number of key-value mappings in this dictionary.
+         */
         size() {
             return this.nElements;
         }
+        /**
+         * Returns true if this dictionary contains no mappings.
+         * @return {boolean} true if this dictionary contains no mappings.
+         */
         isEmpty() {
             return this.nElements <= 0;
         }
@@ -1170,8 +1522,13 @@ var collections;
             });
             return toret + "\n}";
         }
-    }
+    } // End of dictionary
     collections.Dictionary = Dictionary;
+    /**
+     * This class is used by the LinkedDictionary Internally
+     * Has to be a class, not an interface, because it needs to have
+     * the 'unlink' function defined.
+     */
     class LinkedDictionaryPair {
         constructor(key, value) {
             this.key = key;
@@ -1190,6 +1547,11 @@ var collections;
             this.head.next = this.tail;
             this.tail.prev = this.head;
         }
+        /**
+         * Inserts the new node to the 'tail' of the list, updating the
+         * neighbors, and moving 'this.tail' (the End of List indicator) that
+         * to the end.
+         */
         appendToTail(entry) {
             var lastNode = this.tail.prev;
             lastNode.next = entry;
@@ -1197,6 +1559,9 @@ var collections;
             entry.next = this.tail;
             this.tail.prev = entry;
         }
+        /**
+         * Retrieves a linked dictionary from the table internally
+         */
         getLinkedDictionaryPair(key) {
             if (collections.isUndefined(key)) {
                 return undefined;
@@ -1205,6 +1570,13 @@ var collections;
             var pair = (this.table[k]);
             return pair;
         }
+        /**
+         * Returns the value to which this dictionary maps the specified key.
+         * Returns undefined if this dictionary contains no mapping for this key.
+         * @param {Object} key key whose associated value is to be returned.
+         * @return {*} the value to which this dictionary maps the specified key or
+         * undefined if the map contains no mapping for this key.
+         */
         getValue(key) {
             var pair = this.getLinkedDictionaryPair(key);
             if (!collections.isUndefined(pair)) {
@@ -1212,30 +1584,67 @@ var collections;
             }
             return undefined;
         }
+        /**
+         * Removes the mapping for this key from this dictionary if it is present.
+         * Also, if a value is present for this key, the entry is removed from the
+         * insertion ordering.
+         * @param {Object} key key whose mapping is to be removed from the
+         * dictionary.
+         * @return {*} previous value associated with specified key, or undefined if
+         * there was no mapping for key.
+         */
         remove(key) {
             var pair = this.getLinkedDictionaryPair(key);
             if (!collections.isUndefined(pair)) {
-                super.remove(key);
-                pair.unlink();
+                super.remove(key); // This will remove it from the table
+                pair.unlink(); // This will unlink it from the chain
                 return pair.value;
             }
             return undefined;
         }
+        /**
+        * Removes all mappings from this LinkedDictionary.
+        * @this {collections.LinkedDictionary}
+        */
         clear() {
             super.clear();
             this.head.next = this.tail;
             this.tail.prev = this.head;
         }
+        /**
+         * Internal function used when updating an existing KeyValue pair.
+         * It places the new value indexed by key into the table, but maintains
+         * its place in the linked ordering.
+         */
         replace(oldPair, newPair) {
             var k = '$' + this.toStr(newPair.key);
+            // set the new Pair's links to existingPair's links
             newPair.next = oldPair.next;
             newPair.prev = oldPair.prev;
+            // Delete Existing Pair from the table, unlink it from chain.
+            // As a result, the nElements gets decremented by this operation
             this.remove(oldPair.key);
+            // Link new Pair in place of where oldPair was,
+            // by pointing the old pair's neighbors to it.
             newPair.prev.next = newPair;
             newPair.next.prev = newPair;
             this.table[k] = newPair;
+            // To make up for the fact that the number of elements was decremented,
+            // We need to increase it by one.
             ++this.nElements;
         }
+        /**
+         * Associates the specified value with the specified key in this dictionary.
+         * If the dictionary previously contained a mapping for this key, the old
+         * value is replaced by the specified value.
+         * Updating of a key that already exists maintains its place in the
+         * insertion order into the map.
+         * @param {Object} key key with which the specified value is to be
+         * associated.
+         * @param {Object} value value to be associated with the specified key.
+         * @return {*} previous value associated with the specified key, or undefined if
+         * there was no mapping for the key or if the key/value are undefined.
+         */
         setValue(key, value) {
             if (collections.isUndefined(key) || collections.isUndefined(value)) {
                 return undefined;
@@ -1243,6 +1652,8 @@ var collections;
             var existingPair = this.getLinkedDictionaryPair(key);
             var newPair = new LinkedDictionaryPair(key, value);
             var k = '$' + this.toStr(key);
+            // If there is already an element for that key, we 
+            // keep it's place in the LinkedList
             if (!collections.isUndefined(existingPair)) {
                 this.replace(existingPair, newPair);
                 return existingPair.value;
@@ -1254,6 +1665,12 @@ var collections;
                 return undefined;
             }
         }
+        /**
+         * Returns an array containing all of the keys in this LinkedDictionary, ordered
+         * by insertion order.
+         * @return {Array} an array containing all of the keys in this LinkedDictionary,
+         * ordered by insertion order.
+         */
         keys() {
             var array = [];
             this.forEach((key, value) => {
@@ -1261,6 +1678,12 @@ var collections;
             });
             return array;
         }
+        /**
+         * Returns an array containing all of the values in this LinkedDictionary, ordered by
+         * insertion order.
+         * @return {Array} an array containing all of the values in this LinkedDictionary,
+         * ordered by insertion order.
+         */
         values() {
             var array = [];
             this.forEach((key, value) => {
@@ -1268,6 +1691,14 @@ var collections;
             });
             return array;
         }
+        /**
+        * Executes the provided function once for each key-value pair
+        * present in this LinkedDictionary. It is done in the order of insertion
+        * into the LinkedDictionary
+        * @param {function(Object,Object):*} callback function to execute, it is
+        * invoked with two arguments: key and value. To break the iteration you can
+        * optionally return false.
+        */
         forEach(callback) {
             var crawlNode = this.head.next;
             while (crawlNode.next != null) {
@@ -1278,14 +1709,75 @@ var collections;
                 crawlNode = crawlNode.next;
             }
         }
-    }
+    } // End of LinkedDictionary
     collections.LinkedDictionary = LinkedDictionary;
+    // /**
+    //  * Returns true if this dictionary is equal to the given dictionary.
+    //  * Two dictionaries are equal if they contain the same mappings.
+    //  * @param {collections.Dictionary} other the other dictionary.
+    //  * @param {function(Object,Object):boolean=} valuesEqualFunction optional
+    //  * function used to check if two values are equal.
+    //  * @return {boolean} true if this dictionary is equal to the given dictionary.
+    //  */
+    // collections.Dictionary.prototype.equals = function(other,valuesEqualFunction) {
+    // 	var eqF = valuesEqualFunction || collections.defaultEquals;
+    // 	if(!(other instanceof collections.Dictionary)){
+    // 		return false;
+    // 	}
+    // 	if(this.size() !== other.size()){
+    // 		return false;
+    // 	}
+    // 	return this.equalsAux(this.firstNode,other.firstNode,eqF);
+    // }
     class MultiDictionary {
+        /**
+         * Creates an empty multi dictionary.
+         * @class <p>A multi dictionary is a special kind of dictionary that holds
+         * multiple values against each key. Setting a value into the dictionary will
+         * add the value to an array at that key. Getting a key will return an array,
+         * holding all the values set to that key.
+         * You can configure to allow duplicates in the values.
+         * This implementation accepts any kind of objects as keys.</p>
+         *
+         * <p>If the keys are custom objects a function which converts keys to strings must be
+         * provided. Example:</p>
+         *
+         * <pre>
+         * function petToString(pet) {
+           *  return pet.name;
+           * }
+         * </pre>
+         * <p>If the values are custom objects a function to check equality between values
+         * must be provided. Example:</p>
+         *
+         * <pre>
+         * function petsAreEqualByAge(pet1,pet2) {
+           *  return pet1.age===pet2.age;
+           * }
+         * </pre>
+         * @constructor
+         * @param {function(Object):string=} toStrFunction optional function
+         * to convert keys to strings. If the keys aren't strings or if toString()
+         * is not appropriate, a custom function which receives a key and returns a
+         * unique string must be provided.
+         * @param {function(Object,Object):boolean=} valuesEqualsFunction optional
+         * function to check if two values are equal.
+         *
+         * @param allowDuplicateValues
+         */
         constructor(toStrFunction, valuesEqualsFunction, allowDuplicateValues = false) {
             this.dict = new Dictionary(toStrFunction);
             this.equalsF = valuesEqualsFunction || collections.defaultEquals;
             this.allowDuplicate = allowDuplicateValues;
         }
+        /**
+        * Returns an array holding the values to which this dictionary maps
+        * the specified key.
+        * Returns an empty array if this dictionary contains no mappings for this key.
+        * @param {Object} key key whose associated values are to be returned.
+        * @return {Array} an array holding the values to which this dictionary maps
+        * the specified key.
+        */
         getValue(key) {
             var values = this.dict.getValue(key);
             if (collections.isUndefined(values)) {
@@ -1293,6 +1785,14 @@ var collections;
             }
             return collections.arrays.copy(values);
         }
+        /**
+         * Adds the value to the array associated with the specified key, if
+         * it is not already present.
+         * @param {Object} key key with which the specified value is to be
+         * associated.
+         * @param {Object} value the value to add to the array at the key
+         * @return {boolean} true if the value was not already associated with that key.
+         */
         setValue(key, value) {
             if (collections.isUndefined(key) || collections.isUndefined(value)) {
                 return false;
@@ -1310,6 +1810,17 @@ var collections;
             array.push(value);
             return true;
         }
+        /**
+         * Removes the specified values from the array of values associated with the
+         * specified key. If a value isn't given, all values associated with the specified
+         * key are removed.
+         * @param {Object} key key whose mapping is to be removed from the
+         * dictionary.
+         * @param {Object=} value optional argument to specify the value to remove
+         * from the array associated with the specified key.
+         * @return {*} true if the dictionary changed, false if the key doesn't exist or
+         * if the specified value isn't associated with the specified key.
+         */
         remove(key, value) {
             if (collections.isUndefined(value)) {
                 var v = this.dict.remove(key);
@@ -1324,9 +1835,17 @@ var collections;
             }
             return false;
         }
+        /**
+         * Returns an array containing all of the keys in this dictionary.
+         * @return {Array} an array containing all of the keys in this dictionary.
+         */
         keys() {
             return this.dict.keys();
         }
+        /**
+         * Returns an array containing all of the values in this dictionary.
+         * @return {Array} an array containing all of the values in this dictionary.
+         */
         values() {
             var values = this.dict.values();
             var array = [];
@@ -1338,34 +1857,128 @@ var collections;
             }
             return array;
         }
+        /**
+         * Returns true if this dictionary at least one value associatted the specified key.
+         * @param {Object} key key whose presence in this dictionary is to be
+         * tested.
+         * @return {boolean} true if this dictionary at least one value associatted
+         * the specified key.
+         */
         containsKey(key) {
             return this.dict.containsKey(key);
         }
+        /**
+         * Removes all mappings from this dictionary.
+         */
         clear() {
             this.dict.clear();
         }
+        /**
+         * Returns the number of keys in this dictionary.
+         * @return {number} the number of key-value mappings in this dictionary.
+         */
         size() {
             return this.dict.size();
         }
+        /**
+         * Returns true if this dictionary contains no mappings.
+         * @return {boolean} true if this dictionary contains no mappings.
+         */
         isEmpty() {
             return this.dict.isEmpty();
         }
-    }
+    } // end of multi dictionary 
     collections.MultiDictionary = MultiDictionary;
     class Heap {
+        /**
+         * Creates an empty Heap.
+         * @class
+         * <p>A heap is a binary tree, where the nodes maintain the heap property:
+         * each node is smaller than each of its children and therefore a MinHeap
+         * This implementation uses an array to store elements.</p>
+         * <p>If the inserted elements are custom objects a compare function must be provided,
+         *  at construction time, otherwise the <=, === and >= operators are
+         * used to compare elements. Example:</p>
+         *
+         * <pre>
+         * function compare(a, b) {
+         *  if (a is less than b by some ordering criterion) {
+         *     return -1;
+         *  } if (a is greater than b by the ordering criterion) {
+         *     return 1;
+         *  }
+         *  // a must be equal to b
+         *  return 0;
+         * }
+         * </pre>
+         *
+         * <p>If a Max-Heap is wanted (greater elements on top) you can a provide a
+         * reverse compare function to accomplish that behavior. Example:</p>
+         *
+         * <pre>
+         * function reverseCompare(a, b) {
+         *  if (a is less than b by some ordering criterion) {
+         *     return 1;
+         *  } if (a is greater than b by the ordering criterion) {
+         *     return -1;
+         *  }
+         *  // a must be equal to b
+         *  return 0;
+         * }
+         * </pre>
+         *
+         * @constructor
+         * @param {function(Object,Object):number=} compareFunction optional
+         * function used to compare two elements. Must return a negative integer,
+         * zero, or a positive integer as the first argument is less than, equal to,
+         * or greater than the second.
+         */
         constructor(compareFunction) {
+            /**
+             * Array used to store the elements od the heap.
+             * @type {Array.<Object>}
+             * @private
+             */
             this.data = [];
             this.compare = compareFunction || collections.defaultCompare;
         }
+        /**
+         * Returns the index of the left child of the node at the given index.
+         * @param {number} nodeIndex The index of the node to get the left child
+         * for.
+         * @return {number} The index of the left child.
+         * @private
+         */
         leftChildIndex(nodeIndex) {
             return (2 * nodeIndex) + 1;
         }
+        /**
+         * Returns the index of the right child of the node at the given index.
+         * @param {number} nodeIndex The index of the node to get the right child
+         * for.
+         * @return {number} The index of the right child.
+         * @private
+         */
         rightChildIndex(nodeIndex) {
             return (2 * nodeIndex) + 2;
         }
+        /**
+         * Returns the index of the parent of the node at the given index.
+         * @param {number} nodeIndex The index of the node to get the parent for.
+         * @return {number} The index of the parent.
+         * @private
+         */
         parentIndex(nodeIndex) {
             return Math.floor((nodeIndex - 1) / 2);
         }
+        /**
+         * Returns the index of the smaller child node (if it exists).
+         * @param {number} leftChild left child index.
+         * @param {number} rightChild right child index.
+         * @return {number} the index with the minimum value or -1 if it doesn't
+         * exists.
+         * @private
+         */
         minIndex(leftChild, rightChild) {
             if (rightChild >= this.data.length) {
                 if (leftChild >= this.data.length) {
@@ -1384,6 +1997,11 @@ var collections;
                 }
             }
         }
+        /**
+         * Moves the node at the given index up to its proper place in the heap.
+         * @param {number} index The index of the node to move up.
+         * @private
+         */
         siftUp(index) {
             var parent = this.parentIndex(index);
             while (index > 0 && this.compare(this.data[parent], this.data[index]) > 0) {
@@ -1392,7 +2010,13 @@ var collections;
                 parent = this.parentIndex(index);
             }
         }
+        /**
+         * Moves the node at the given index down to its proper place in the heap.
+         * @param {number} nodeIndex The index of the node to move down.
+         * @private
+         */
         siftDown(nodeIndex) {
+            //smaller child index
             var min = this.minIndex(this.leftChildIndex(nodeIndex), this.rightChildIndex(nodeIndex));
             while (min >= 0 && this.compare(this.data[nodeIndex], this.data[min]) > 0) {
                 collections.arrays.swap(this.data, min, nodeIndex);
@@ -1400,6 +2024,11 @@ var collections;
                 min = this.minIndex(this.leftChildIndex(nodeIndex), this.rightChildIndex(nodeIndex));
             }
         }
+        /**
+         * Retrieves but does not remove the root element of this heap.
+         * @return {*} The value at the root of the heap. Returns undefined if the
+         * heap is empty.
+         */
         peek() {
             if (this.data.length > 0) {
                 return this.data[0];
@@ -1408,6 +2037,11 @@ var collections;
                 return undefined;
             }
         }
+        /**
+         * Adds the given element into the heap.
+         * @param {*} element the element.
+         * @return true if the element was added or fals if it is undefined.
+         */
         add(element) {
             if (collections.isUndefined(element)) {
                 return undefined;
@@ -1416,6 +2050,11 @@ var collections;
             this.siftUp(this.data.length - 1);
             return true;
         }
+        /**
+         * Retrieves and removes the root element of this heap.
+         * @return {*} The value removed from the root of the heap. Returns
+         * undefined if the heap is empty.
+         */
         removeRoot() {
             if (this.data.length > 0) {
                 var obj = this.data[0];
@@ -1428,67 +2067,178 @@ var collections;
             }
             return undefined;
         }
+        /**
+         * Returns true if this heap contains the specified element.
+         * @param {Object} element element to search for.
+         * @return {boolean} true if this Heap contains the specified element, false
+         * otherwise.
+         */
         contains(element) {
             var equF = collections.compareToEquals(this.compare);
             return collections.arrays.contains(this.data, element, equF);
         }
+        /**
+         * Returns the number of elements in this heap.
+         * @return {number} the number of elements in this heap.
+         */
         size() {
             return this.data.length;
         }
+        /**
+         * Checks if this heap is empty.
+         * @return {boolean} true if and only if this heap contains no items; false
+         * otherwise.
+         */
         isEmpty() {
             return this.data.length <= 0;
         }
+        /**
+         * Removes all of the elements from this heap.
+         */
         clear() {
             this.data.length = 0;
         }
+        /**
+         * Executes the provided function once for each element present in this heap in
+         * no particular order.
+         * @param {function(Object):*} callback function to execute, it is
+         * invoked with one argument: the element value, to break the iteration you can
+         * optionally return false.
+         */
         forEach(callback) {
             collections.arrays.forEach(this.data, callback);
         }
     }
     collections.Heap = Heap;
     class Stack {
+        /**
+         * Creates an empty Stack.
+         * @class A Stack is a Last-In-First-Out (LIFO) data structure, the last
+         * element added to the stack will be the first one to be removed. This
+         * implementation uses a linked list as a container.
+         * @constructor
+         */
         constructor() {
             this.list = new LinkedList();
         }
+        /**
+         * Pushes an item onto the top of this stack.
+         * @param {Object} elem the element to be pushed onto this stack.
+         * @return {boolean} true if the element was pushed or false if it is undefined.
+         */
         push(elem) {
             return this.list.add(elem, 0);
         }
+        /**
+         * Pushes an item onto the top of this stack.
+         * @param {Object} elem the element to be pushed onto this stack.
+         * @return {boolean} true if the element was pushed or false if it is undefined.
+         */
         add(elem) {
             return this.list.add(elem, 0);
         }
+        /**
+         * Removes the object at the top of this stack and returns that object.
+         * @return {*} the object at the top of this stack or undefined if the
+         * stack is empty.
+         */
         pop() {
             return this.list.removeElementAtIndex(0);
         }
+        /**
+         * Looks at the object at the top of this stack without removing it from the
+         * stack.
+         * @return {*} the object at the top of this stack or undefined if the
+         * stack is empty.
+         */
         peek() {
             return this.list.first();
         }
+        /**
+         * Returns the number of elements in this stack.
+         * @return {number} the number of elements in this stack.
+         */
         size() {
             return this.list.size();
         }
+        /**
+         * Returns true if this stack contains the specified element.
+         * <p>If the elements inside this stack are
+         * not comparable with the === operator, a custom equals function should be
+         * provided to perform searches, the function must receive two arguments and
+         * return true if they are equal, false otherwise. Example:</p>
+         *
+         * <pre>
+         * var petsAreEqualByName (pet1, pet2) {
+         *  return pet1.name === pet2.name;
+         * }
+         * </pre>
+         * @param {Object} elem element to search for.
+         * @param {function(Object,Object):boolean=} equalsFunction optional
+         * function to check if two elements are equal.
+         * @return {boolean} true if this stack contains the specified element,
+         * false otherwise.
+         */
         contains(elem, equalsFunction) {
             return this.list.contains(elem, equalsFunction);
         }
+        /**
+         * Checks if this stack is empty.
+         * @return {boolean} true if and only if this stack contains no items; false
+         * otherwise.
+         */
         isEmpty() {
             return this.list.isEmpty();
         }
+        /**
+         * Removes all of the elements from this stack.
+         */
         clear() {
             this.list.clear();
         }
+        /**
+         * Executes the provided function once for each element present in this stack in
+         * LIFO order.
+         * @param {function(Object):*} callback function to execute, it is
+         * invoked with one argument: the element value, to break the iteration you can
+         * optionally return false.
+         */
         forEach(callback) {
             this.list.forEach(callback);
         }
-    }
+    } // End of stack 
     collections.Stack = Stack;
     class Queue {
+        /**
+         * Creates an empty queue.
+         * @class A queue is a First-In-First-Out (FIFO) data structure, the first
+         * element added to the queue will be the first one to be removed. This
+         * implementation uses a linked list as a container.
+         * @constructor
+         */
         constructor() {
             this.list = new LinkedList();
         }
+        /**
+         * Inserts the specified element into the end of this queue.
+         * @param {Object} elem the element to insert.
+         * @return {boolean} true if the element was inserted, or false if it is undefined.
+         */
         enqueue(elem) {
             return this.list.add(elem);
         }
+        /**
+         * Inserts the specified element into the end of this queue.
+         * @param {Object} elem the element to insert.
+         * @return {boolean} true if the element was inserted, or false if it is undefined.
+         */
         add(elem) {
             return this.list.add(elem);
         }
+        /**
+         * Retrieves and removes the head of this queue.
+         * @return {*} the head of this queue, or undefined if this queue is empty.
+         */
         dequeue() {
             if (this.list.size() !== 0) {
                 var el = this.list.first();
@@ -1497,39 +2247,119 @@ var collections;
             }
             return undefined;
         }
+        /**
+         * Retrieves, but does not remove, the head of this queue.
+         * @return {*} the head of this queue, or undefined if this queue is empty.
+         */
         peek() {
             if (this.list.size() !== 0) {
                 return this.list.first();
             }
             return undefined;
         }
+        /**
+         * Returns the number of elements in this queue.
+         * @return {number} the number of elements in this queue.
+         */
         size() {
             return this.list.size();
         }
+        /**
+         * Returns true if this queue contains the specified element.
+         * <p>If the elements inside this stack are
+         * not comparable with the === operator, a custom equals function should be
+         * provided to perform searches, the function must receive two arguments and
+         * return true if they are equal, false otherwise. Example:</p>
+         *
+         * <pre>
+         * var petsAreEqualByName (pet1, pet2) {
+         *  return pet1.name === pet2.name;
+         * }
+         * </pre>
+         * @param {Object} elem element to search for.
+         * @param {function(Object,Object):boolean=} equalsFunction optional
+         * function to check if two elements are equal.
+         * @return {boolean} true if this queue contains the specified element,
+         * false otherwise.
+         */
         contains(elem, equalsFunction) {
             return this.list.contains(elem, equalsFunction);
         }
+        /**
+         * Checks if this queue is empty.
+         * @return {boolean} true if and only if this queue contains no items; false
+         * otherwise.
+         */
         isEmpty() {
             return this.list.size() <= 0;
         }
+        /**
+         * Removes all of the elements from this queue.
+         */
         clear() {
             this.list.clear();
         }
+        /**
+         * Executes the provided function once for each element present in this queue in
+         * FIFO order.
+         * @param {function(Object):*} callback function to execute, it is
+         * invoked with one argument: the element value, to break the iteration you can
+         * optionally return false.
+         */
         forEach(callback) {
             this.list.forEach(callback);
         }
-    }
+    } // End of queue
     collections.Queue = Queue;
     class PriorityQueue {
+        /**
+         * Creates an empty priority queue.
+         * @class <p>In a priority queue each element is associated with a "priority",
+         * elements are dequeued in highest-priority-first order (the elements with the
+         * highest priority are dequeued first). Priority Queues are implemented as heaps.
+         * If the inserted elements are custom objects a compare function must be provided,
+         * otherwise the <=, === and >= operators are used to compare object priority.</p>
+         * <pre>
+         * function compare(a, b) {
+         *  if (a is less than b by some ordering criterion) {
+         *     return -1;
+         *  } if (a is greater than b by the ordering criterion) {
+         *     return 1;
+         *  }
+         *  // a must be equal to b
+         *  return 0;
+         * }
+         * </pre>
+         * @constructor
+         * @param {function(Object,Object):number=} compareFunction optional
+         * function used to compare two element priorities. Must return a negative integer,
+         * zero, or a positive integer as the first argument is less than, equal to,
+         * or greater than the second.
+         */
         constructor(compareFunction) {
             this.heap = new Heap(collections.reverseCompareFunction(compareFunction));
         }
+        /**
+         * Inserts the specified element into this priority queue.
+         * @param {Object} element the element to insert.
+         * @return {boolean} true if the element was inserted, or false if it is undefined.
+         */
         enqueue(element) {
             return this.heap.add(element);
         }
+        /**
+         * Inserts the specified element into this priority queue.
+         * @param {Object} element the element to insert.
+         * @return {boolean} true if the element was inserted, or false if it is undefined.
+         */
         add(element) {
             return this.heap.add(element);
         }
+        /**
+         * Retrieves and removes the highest priority element of this queue.
+         * @return {*} the the highest priority element of this queue,
+         *  or undefined if this queue is empty.
+         */
         dequeue() {
             if (this.heap.size() !== 0) {
                 var el = this.heap.peek();
@@ -1538,33 +2368,91 @@ var collections;
             }
             return undefined;
         }
+        /**
+         * Retrieves, but does not remove, the highest priority element of this queue.
+         * @return {*} the highest priority element of this queue, or undefined if this queue is empty.
+         */
         peek() {
             return this.heap.peek();
         }
+        /**
+         * Returns true if this priority queue contains the specified element.
+         * @param {Object} element element to search for.
+         * @return {boolean} true if this priority queue contains the specified element,
+         * false otherwise.
+         */
         contains(element) {
             return this.heap.contains(element);
         }
+        /**
+         * Checks if this priority queue is empty.
+         * @return {boolean} true if and only if this priority queue contains no items; false
+         * otherwise.
+         */
         isEmpty() {
             return this.heap.isEmpty();
         }
+        /**
+         * Returns the number of elements in this priority queue.
+         * @return {number} the number of elements in this priority queue.
+         */
         size() {
             return this.heap.size();
         }
+        /**
+         * Removes all of the elements from this priority queue.
+         */
         clear() {
             this.heap.clear();
         }
+        /**
+         * Executes the provided function once for each element present in this queue in
+         * no particular order.
+         * @param {function(Object):*} callback function to execute, it is
+         * invoked with one argument: the element value, to break the iteration you can
+         * optionally return false.
+         */
         forEach(callback) {
             this.heap.forEach(callback);
         }
-    }
+    } // end of priority queue
     collections.PriorityQueue = PriorityQueue;
     class Set {
+        /**
+         * Creates an empty set.
+         * @class <p>A set is a data structure that contains no duplicate items.</p>
+         * <p>If the inserted elements are custom objects a function
+         * which converts elements to strings must be provided. Example:</p>
+         *
+         * <pre>
+         * function petToString(pet) {
+         *  return pet.name;
+         * }
+         * </pre>
+         *
+         * @constructor
+         * @param {function(Object):string=} toStringFunction optional function used
+         * to convert elements to strings. If the elements aren't strings or if toString()
+         * is not appropriate, a custom function which receives a onject and returns a
+         * unique string must be provided.
+         */
         constructor(toStringFunction) {
             this.dictionary = new Dictionary(toStringFunction);
         }
+        /**
+         * Returns true if this set contains the specified element.
+         * @param {Object} element element to search for.
+         * @return {boolean} true if this set contains the specified element,
+         * false otherwise.
+         */
         contains(element) {
             return this.dictionary.containsKey(element);
         }
+        /**
+         * Adds the specified element to this set if it is not already present.
+         * @param {Object} element the element to insert.
+         * @return {boolean} true if this set did not already contain the specified element.
+         */
         add(element) {
             if (this.contains(element) || collections.isUndefined(element)) {
                 return false;
@@ -1574,6 +2462,11 @@ var collections;
                 return true;
             }
         }
+        /**
+         * Performs an intersecion between this an another set.
+         * Removes all values that are not present this set and the given set.
+         * @param {collections.Set} otherSet other set.
+         */
         intersection(otherSet) {
             var set = this;
             this.forEach(function (element) {
@@ -1583,6 +2476,11 @@ var collections;
                 return true;
             });
         }
+        /**
+         * Performs a union between this an another set.
+         * Adds all values from the given set to this set.
+         * @param {collections.Set} otherSet other set.
+         */
         union(otherSet) {
             var set = this;
             otherSet.forEach(function (element) {
@@ -1590,6 +2488,11 @@ var collections;
                 return true;
             });
         }
+        /**
+         * Performs a difference between this an another set.
+         * Removes from this set all the values that are present in the given set.
+         * @param {collections.Set} otherSet other set.
+         */
         difference(otherSet) {
             var set = this;
             otherSet.forEach(function (element) {
@@ -1597,6 +2500,11 @@ var collections;
                 return true;
             });
         }
+        /**
+         * Checks whether the given set contains all the elements in this set.
+         * @param {collections.Set} otherSet other set.
+         * @return {boolean} true if this set is a subset of the given set.
+         */
         isSubsetOf(otherSet) {
             if (this.size() > otherSet.size()) {
                 return false;
@@ -1611,6 +2519,10 @@ var collections;
             });
             return isSub;
         }
+        /**
+         * Removes the specified element from this set if it is present.
+         * @return {boolean} true if this set contained the specified element.
+         */
         remove(element) {
             if (!this.contains(element)) {
                 return false;
@@ -1620,34 +2532,85 @@ var collections;
                 return true;
             }
         }
+        /**
+         * Executes the provided function once for each element
+         * present in this set.
+         * @param {function(Object):*} callback function to execute, it is
+         * invoked with one arguments: the element. To break the iteration you can
+         * optionally return false.
+         */
         forEach(callback) {
             this.dictionary.forEach(function (k, v) {
                 return callback(v);
             });
         }
+        /**
+         * Returns an array containing all of the elements in this set in arbitrary order.
+         * @return {Array} an array containing all of the elements in this set.
+         */
         toArray() {
             return this.dictionary.values();
         }
+        /**
+         * Returns true if this set contains no elements.
+         * @return {boolean} true if this set contains no elements.
+         */
         isEmpty() {
             return this.dictionary.isEmpty();
         }
+        /**
+         * Returns the number of elements in this set.
+         * @return {number} the number of elements in this set.
+         */
         size() {
             return this.dictionary.size();
         }
+        /**
+         * Removes all of the elements from this set.
+         */
         clear() {
             this.dictionary.clear();
         }
+        /*
+        * Provides a string representation for display
+        */
         toString() {
             return collections.arrays.toString(this.toArray());
         }
-    }
+    } // end of Set
     collections.Set = Set;
     class Bag {
+        /**
+         * Creates an empty bag.
+         * @class <p>A bag is a special kind of set in which members are
+         * allowed to appear more than once.</p>
+         * <p>If the inserted elements are custom objects a function
+         * which converts elements to unique strings must be provided. Example:</p>
+         *
+         * <pre>
+         * function petToString(pet) {
+         *  return pet.name;
+         * }
+         * </pre>
+         *
+         * @constructor
+         * @param {function(Object):string=} toStrFunction optional function used
+         * to convert elements to strings. If the elements aren't strings or if toString()
+         * is not appropriate, a custom function which receives an object and returns a
+         * unique string must be provided.
+         */
         constructor(toStrFunction) {
             this.toStrF = toStrFunction || collections.defaultToString;
             this.dictionary = new Dictionary(this.toStrF);
             this.nElements = 0;
         }
+        /**
+        * Adds nCopies of the specified object to this bag.
+        * @param {Object} element element to add.
+        * @param {number=} nCopies the number of copies to add, if this argument is
+        * undefined 1 copy is added.
+        * @return {boolean} true unless element is undefined.
+        */
         add(element, nCopies = 1) {
             if (collections.isUndefined(element) || nCopies <= 0) {
                 return false;
@@ -1665,6 +2628,11 @@ var collections;
             this.nElements += nCopies;
             return true;
         }
+        /**
+        * Counts the number of copies of the specified object in this bag.
+        * @param {Object} element the object to search for..
+        * @return {number} the number of copies of the object, 0 if not found
+        */
         count(element) {
             if (!this.contains(element)) {
                 return 0;
@@ -1673,9 +2641,24 @@ var collections;
                 return this.dictionary.getValue(element).copies;
             }
         }
+        /**
+         * Returns true if this bag contains the specified element.
+         * @param {Object} element element to search for.
+         * @return {boolean} true if this bag contains the specified element,
+         * false otherwise.
+         */
         contains(element) {
             return this.dictionary.containsKey(element);
         }
+        /**
+        * Removes nCopies of the specified object to this bag.
+        * If the number of copies to remove is greater than the actual number
+        * of copies in the Bag, all copies are removed.
+        * @param {Object} element element to remove.
+        * @param {number=} nCopies the number of copies to remove, if this argument is
+        * undefined 1 copy is removed.
+        * @return {boolean} true if at least 1 element was removed.
+        */
         remove(element, nCopies = 1) {
             if (collections.isUndefined(element) || nCopies <= 0) {
                 return false;
@@ -1698,6 +2681,11 @@ var collections;
                 return true;
             }
         }
+        /**
+         * Returns an array containing all of the elements in this big in arbitrary order,
+         * including multiple copies.
+         * @return {Array} an array containing all of the elements in this bag.
+         */
         toArray() {
             var a = [];
             var values = this.dictionary.values();
@@ -1712,6 +2700,10 @@ var collections;
             }
             return a;
         }
+        /**
+         * Returns a set of unique elements in this bag.
+         * @return {collections.Set<T>} a set of unique elements in this bag.
+         */
         toSet() {
             var toret = new Set(this.toStrF);
             var elements = this.dictionary.values();
@@ -1722,6 +2714,13 @@ var collections;
             }
             return toret;
         }
+        /**
+         * Executes the provided function once for each element
+         * present in this bag, including multiple copies.
+         * @param {function(Object):*} callback function to execute, it is
+         * invoked with one argument: the element. To break the iteration you can
+         * optionally return false.
+         */
         forEach(callback) {
             this.dictionary.forEach(function (k, v) {
                 var value = v.value;
@@ -1734,24 +2733,75 @@ var collections;
                 return true;
             });
         }
+        /**
+         * Returns the number of elements in this bag.
+         * @return {number} the number of elements in this bag.
+         */
         size() {
             return this.nElements;
         }
+        /**
+         * Returns true if this bag contains no elements.
+         * @return {boolean} true if this bag contains no elements.
+         */
         isEmpty() {
             return this.nElements === 0;
         }
+        /**
+         * Removes all of the elements from this bag.
+         */
         clear() {
             this.nElements = 0;
             this.dictionary.clear();
         }
-    }
+    } // End of bag 
     collections.Bag = Bag;
     class BSTree {
+        /**
+         * Creates an empty binary search tree.
+         * @class <p>A binary search tree is a binary tree in which each
+         * internal node stores an element such that the elements stored in the
+         * left subtree are less than it and the elements
+         * stored in the right subtree are greater.</p>
+         * <p>Formally, a binary search tree is a node-based binary tree data structure which
+         * has the following properties:</p>
+         * <ul>
+         * <li>The left subtree of a node contains only nodes with elements less
+         * than the node's element</li>
+         * <li>The right subtree of a node contains only nodes with elements greater
+         * than the node's element</li>
+         * <li>Both the left and right subtrees must also be binary search trees.</li>
+         * </ul>
+         * <p>If the inserted elements are custom objects a compare function must
+         * be provided at construction time, otherwise the <=, === and >= operators are
+         * used to compare elements. Example:</p>
+         * <pre>
+         * function compare(a, b) {
+         *  if (a is less than b by some ordering criterion) {
+         *     return -1;
+         *  } if (a is greater than b by the ordering criterion) {
+         *     return 1;
+         *  }
+         *  // a must be equal to b
+         *  return 0;
+         * }
+         * </pre>
+         * @constructor
+         * @param {function(Object,Object):number=} compareFunction optional
+         * function used to compare two elements. Must return a negative integer,
+         * zero, or a positive integer as the first argument is less than, equal to,
+         * or greater than the second.
+         */
         constructor(compareFunction) {
             this.root = null;
             this.compare = compareFunction || collections.defaultCompare;
             this.nElements = 0;
         }
+        /**
+         * Adds the specified element to this tree if it is not already present.
+         * @param {Object} element the element to insert.
+         * @return {boolean} true if this tree did not already contain the specified element.
+         */
         add(element) {
             if (collections.isUndefined(element)) {
                 return false;
@@ -1762,22 +2812,43 @@ var collections;
             }
             return false;
         }
+        /**
+         * Removes all of the elements from this tree.
+         */
         clear() {
             this.root = null;
             this.nElements = 0;
         }
+        /**
+         * Returns true if this tree contains no elements.
+         * @return {boolean} true if this tree contains no elements.
+         */
         isEmpty() {
             return this.nElements === 0;
         }
+        /**
+         * Returns the number of elements in this tree.
+         * @return {number} the number of elements in this tree.
+         */
         size() {
             return this.nElements;
         }
+        /**
+         * Returns true if this tree contains the specified element.
+         * @param {Object} element element to search for.
+         * @return {boolean} true if this tree contains the specified element,
+         * false otherwise.
+         */
         contains(element) {
             if (collections.isUndefined(element)) {
                 return false;
             }
             return this.searchNode(this.root, element) !== null;
         }
+        /**
+         * Removes the specified element from this tree if it is present.
+         * @return {boolean} true if this tree contained the specified element.
+         */
         remove(element) {
             var node = this.searchNode(this.root, element);
             if (node === null) {
@@ -1787,39 +2858,82 @@ var collections;
             this.nElements--;
             return true;
         }
+        /**
+         * Executes the provided function once for each element present in this tree in
+         * in-order.
+         * @param {function(Object):*} callback function to execute, it is invoked with one
+         * argument: the element value, to break the iteration you can optionally return false.
+         */
         inorderTraversal(callback) {
             this.inorderTraversalAux(this.root, callback, {
                 stop: false
             });
         }
+        /**
+         * Executes the provided function once for each element present in this tree in pre-order.
+         * @param {function(Object):*} callback function to execute, it is invoked with one
+         * argument: the element value, to break the iteration you can optionally return false.
+         */
         preorderTraversal(callback) {
             this.preorderTraversalAux(this.root, callback, {
                 stop: false
             });
         }
+        /**
+         * Executes the provided function once for each element present in this tree in post-order.
+         * @param {function(Object):*} callback function to execute, it is invoked with one
+         * argument: the element value, to break the iteration you can optionally return false.
+         */
         postorderTraversal(callback) {
             this.postorderTraversalAux(this.root, callback, {
                 stop: false
             });
         }
+        /**
+         * Executes the provided function once for each element present in this tree in
+         * level-order.
+         * @param {function(Object):*} callback function to execute, it is invoked with one
+         * argument: the element value, to break the iteration you can optionally return false.
+         */
         levelTraversal(callback) {
             this.levelTraversalAux(this.root, callback);
         }
+        /**
+         * Returns the minimum element of this tree.
+         * @return {*} the minimum element of this tree or undefined if this tree is
+         * is empty.
+         */
         minimum() {
             if (this.isEmpty()) {
                 return undefined;
             }
             return this.minimumAux(this.root).element;
         }
+        /**
+         * Returns the maximum element of this tree.
+         * @return {*} the maximum element of this tree or undefined if this tree is
+         * is empty.
+         */
         maximum() {
             if (this.isEmpty()) {
                 return undefined;
             }
             return this.maximumAux(this.root).element;
         }
+        /**
+         * Executes the provided function once for each element present in this tree in inorder.
+         * Equivalent to inorderTraversal.
+         * @param {function(Object):*} callback function to execute, it is
+         * invoked with one argument: the element value, to break the iteration you can
+         * optionally return false.
+         */
         forEach(callback) {
             this.inorderTraversal(callback);
         }
+        /**
+         * Returns an array containing all of the elements in this tree in in-order.
+         * @return {Array} an array containing all of the elements in this tree in in-order.
+         */
         toArray() {
             var array = [];
             this.inorderTraversal(function (element) {
@@ -1828,9 +2942,16 @@ var collections;
             });
             return array;
         }
+        /**
+         * Returns the height of this tree.
+         * @return {number} the height of this tree or -1 if is empty.
+         */
         height() {
             return this.heightAux(this.root);
         }
+        /**
+        * @private
+        */
         searchNode(node, element) {
             var cmp = null;
             while (node !== null && cmp !== 0) {
@@ -1844,6 +2965,9 @@ var collections;
             }
             return node;
         }
+        /**
+        * @private
+        */
         transplant(n1, n2) {
             if (n1.parent === null) {
                 this.root = n2;
@@ -1858,6 +2982,9 @@ var collections;
                 n2.parent = n1.parent;
             }
         }
+        /**
+        * @private
+        */
         removeNode(node) {
             if (node.leftCh === null) {
                 this.transplant(node, node.rightCh);
@@ -1877,6 +3004,9 @@ var collections;
                 y.leftCh.parent = y;
             }
         }
+        /**
+        * @private
+        */
         inorderTraversalAux(node, callback, signal) {
             if (node === null || signal.stop) {
                 return;
@@ -1891,6 +3021,9 @@ var collections;
             }
             this.inorderTraversalAux(node.rightCh, callback, signal);
         }
+        /**
+        * @private
+        */
         levelTraversalAux(node, callback) {
             var queue = new Queue();
             if (node !== null) {
@@ -1909,6 +3042,9 @@ var collections;
                 }
             }
         }
+        /**
+        * @private
+        */
         preorderTraversalAux(node, callback, signal) {
             if (node === null || signal.stop) {
                 return;
@@ -1923,6 +3059,9 @@ var collections;
             }
             this.preorderTraversalAux(node.rightCh, callback, signal);
         }
+        /**
+        * @private
+        */
         postorderTraversalAux(node, callback, signal) {
             if (node === null || signal.stop) {
                 return;
@@ -1937,24 +3076,36 @@ var collections;
             }
             signal.stop = callback(node.element) === false;
         }
+        /**
+        * @private
+        */
         minimumAux(node) {
             while (node.leftCh !== null) {
                 node = node.leftCh;
             }
             return node;
         }
+        /**
+        * @private
+        */
         maximumAux(node) {
             while (node.rightCh !== null) {
                 node = node.rightCh;
             }
             return node;
         }
+        /**
+          * @private
+          */
         heightAux(node) {
             if (node === null) {
                 return -1;
             }
             return Math.max(this.heightAux(node.leftCh), this.heightAux(node.rightCh)) + 1;
         }
+        /*
+        * @private
+        */
         insertNode(node) {
             var parent = null;
             var position = this.root;
@@ -1975,6 +3126,7 @@ var collections;
             }
             node.parent = parent;
             if (parent === null) {
+                // tree is empty
                 this.root = node;
             }
             else if (this.compare(node.element, parent.element) < 0) {
@@ -1985,6 +3137,9 @@ var collections;
             }
             return node;
         }
+        /**
+        * @private
+        */
         createNode(element) {
             return {
                 element: element,
@@ -1993,9 +3148,9 @@ var collections;
                 parent: null
             };
         }
-    }
+    } // end of BSTree
     collections.BSTree = BSTree;
-})(collections || (collections = {}));
+})(collections || (collections = {})); // End of module 
 //# sourceMappingURL=collections.js.map
 // https://stackoverflow.com/questions/9514179/how-to-find-the-operating-system-version-using-javascript/9514341
 // https://jsfiddle.net/ChristianL/AVyND/
@@ -2768,6 +3923,8 @@ var collections;
     }
 
 })();
+// http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+// https://gist.github.com/jcxplorer/823878
 function NewUid() {
     var uuid = "", i, random;
     for (i = 0; i < 32; i++) {
@@ -2841,12 +3998,15 @@ var DomBehind;
         }
         get ErrorTitle() {
             if (this.JqXHR) {
+                // MVC Controller経由の緩いコントラクト
                 let json = this.JqXHR.responseJSON;
                 if (json && json.Message) {
                     return json.Message;
                 }
+                // ERROR HTMLからタイトル抜粋
                 return $(this.JqXHR.responseText).filter("title").text();
             }
+            // JqueryAjax以外
             return `${this.TextStatus}:${this.ErrorThrown}`;
         }
         ToString() {
@@ -2897,10 +4057,17 @@ var DomBehind;
 //# sourceMappingURL=ApplicationException.js.map
 var DomBehind;
 (function (DomBehind) {
+    /**
+     * define typed events
+     */
     class TypedEvent {
         constructor() {
+            // #region implements interface of IEventName
+            // #endregion
+            // #region implements interface of IEvent
             this.handlers = [];
             this._disposed = false;
+            // #endregion
         }
         get EventName() {
             return this._eventName;
@@ -2908,26 +4075,41 @@ var DomBehind;
         set EventName(value) {
             this._eventName = value;
         }
+        /**
+         * Handle the defined event
+         * @param handler
+         */
         AddHandler(handler) {
             this.handlers.push(handler);
         }
+        /**
+         * Remove the handle from the defined event
+         * @param handler
+         */
         RemoveHandler(handler) {
             this.handlers = this.handlers.filter(h => h !== handler);
         }
+        /**
+         * Notify all of the handle
+         * @param sender
+         * @param data
+         */
         Raise(sender, data) {
             this.handlers.slice(0).forEach(h => h(sender, data));
         }
+        // #endregion
         Clear() {
             $.each(this.handlers, (i, each) => {
                 this.handlers[i] = null;
             });
             this.handlers = [];
         }
-        Ensure(behavior) {
+        Ensure(behavior /*: Data.ActionBindingBehavior */) {
             if (this.EnsureHandler) {
                 this.EnsureHandler(behavior);
             }
         }
+        // #region IDisposable
         Dispose() {
             if (!this._disposed) {
                 if (this.handlers) {
@@ -2938,6 +4120,9 @@ var DomBehind;
         }
     }
     DomBehind.TypedEvent = TypedEvent;
+    /**
+     * Generate a typed event class.
+     */
     class EventBuilder {
         constructor(eventName) {
             this._eventName = eventName;
@@ -2948,9 +4133,17 @@ var DomBehind;
             event.EnsureHandler = this.ensureHandler;
             return event;
         }
+        /**
+         * It gets the event name.
+         * Event name will be used in JQuery
+         */
         get EventName() {
             return this._eventName;
         }
+        /**
+         * Generate a typed event class.
+         * @param eventName
+         */
         static RegisterAttached(eventName, ensure) {
             let builder = new EventBuilder(eventName);
             builder.ensureHandler = ensure;
@@ -2988,10 +4181,13 @@ var DomBehind;
 (function (DomBehind) {
     class NotifiableImp {
         constructor() {
+            // #region INotifyPropertyChanged
             this.PropertyChanged = new DomBehind.TypedEvent();
             this._dic = {};
             this._disposed = false;
         }
+        // #endregion
+        // #region Property Backing Store
         GetProperty(name, defaultValue) {
             let obj = this._dic[name];
             return Object.IsNullOrUndefined(obj) ? defaultValue : obj;
@@ -3007,6 +4203,8 @@ var DomBehind;
             }
             return result;
         }
+        // #endregion
+        // #region Dispose
         Dispose() {
             if (!this._disposed) {
                 this._dic = null;
@@ -3016,6 +4214,7 @@ var DomBehind;
             }
             this._disposed = true;
         }
+        // #endregion
         OnPropertyChanged(name) {
             this.PropertyChanged.Raise(this, new DomBehind.PropertyChangedEventArgs(name));
         }
@@ -3077,6 +4276,7 @@ var DomBehind;
             return path.split(".").slice(1).join(".");
         }
         static NameOf(expression) {
+            // console.info(`★${expression}`);
             let result = "";
             if (LamdaExpression.IsSupportES6()) {
                 result = expression.toString();
@@ -3085,6 +4285,7 @@ var DomBehind;
                 try {
                     let m = LamdaExpression._extractor_Minified.exec(expression + "");
                     let s = m[1].trim();
+                    // console.info(`★${s}`);
                     if (s.charAt(s.length - 1) === "}" ||
                         s.charAt(s.length - 1) === ";") {
                         m = LamdaExpression._extractor.exec(expression + "");
@@ -3119,6 +4320,7 @@ var DomBehind;
             return exp.GetValue();
         }
     }
+    // http://stackoverflow.com/questions/29191451/get-name-of-variable-in-typescript
     LamdaExpression._extractor = new RegExp("return (.*);");
     LamdaExpression._extractor_Minified = new RegExp("return (.*)}");
     DomBehind.LamdaExpression = LamdaExpression;
@@ -3296,10 +4498,22 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
+        /**
+         * Describes the timing of binding source updates.
+         */
         let UpdateSourceTrigger;
         (function (UpdateSourceTrigger) {
+            /**
+             * Updates the binding source only when you call the UpdateSource method.
+             */
             UpdateSourceTrigger[UpdateSourceTrigger["Explicit"] = 0] = "Explicit";
+            /**
+             * Updates the binding source whenever the binding target element loses focus.
+             */
             UpdateSourceTrigger[UpdateSourceTrigger["LostForcus"] = 1] = "LostForcus";
+            /**
+             * This is for extension
+             */
             UpdateSourceTrigger[UpdateSourceTrigger["PropertyChanged"] = 2] = "PropertyChanged";
         })(UpdateSourceTrigger = Data.UpdateSourceTrigger || (Data.UpdateSourceTrigger = {}));
     })(Data = DomBehind.Data || (DomBehind.Data = {}));
@@ -3328,8 +4542,10 @@ var DomBehind;
 var DomBehind;
 (function (DomBehind) {
     class Observable {
+        // #endregion
         constructor(source, option) {
             this.source = source;
+            // #region INotifyPropertyChanged
             this.PropertyChanging = new DomBehind.TypedEvent();
             this.PropertyChanged = new DomBehind.TypedEvent();
             if (source == null)
@@ -3546,6 +4762,7 @@ Object.defineProperty(String.prototype, "ExtendedPrototype", {
     }, []);
 });
 //# sourceMappingURL=EnumerableExtensions.js.map
+// declare var Object: ObjectConstructor;
 Object.IsNullOrUndefined = (obj) => {
     if (obj == null)
         return true;
@@ -3566,6 +4783,7 @@ Object.IsPromise = value => {
     return promiseThenSrc === valueThenSrc;
 };
 //# sourceMappingURL=ObjectExtensions.js.map
+// declare var String: StringConstructor;
 String.IsNullOrEmpty = (str) => !str;
 String.IsNullOrWhiteSpace = (s) => String.IsNullOrEmpty(s) || s.replace(/\s/g, '').length < 1;
 String.Split = function (s, sep) {
@@ -3650,7 +4868,7 @@ var StringSplitOptions;
     return rpt;
 });
 "PadLeft".ExtendedPrototype(String.prototype, function (totalWidth, paddingChar) {
-    totalWidth = totalWidth >> 0;
+    totalWidth = totalWidth >> 0; //truncate if number or convert non-number to 0;
     paddingChar = String((typeof paddingChar !== 'undefined' ? paddingChar : ' '));
     if (this.length > totalWidth) {
         return String(this);
@@ -3658,13 +4876,13 @@ var StringSplitOptions;
     else {
         totalWidth = totalWidth - this.length;
         if (totalWidth > paddingChar.length) {
-            paddingChar += paddingChar.Repeat(totalWidth / paddingChar.length);
+            paddingChar += paddingChar.Repeat(totalWidth / paddingChar.length); //append to original to ensure we are longer than needed
         }
         return paddingChar.slice(0, totalWidth) + String(this);
     }
 });
 "PadRight".ExtendedPrototype(String.prototype, function (totalWidth, paddingChar) {
-    totalWidth = totalWidth >> 0;
+    totalWidth = totalWidth >> 0; //floor if number or convert non-number to 0;
     paddingChar = String((typeof paddingChar !== 'undefined' ? paddingChar : ' '));
     if (this.length > totalWidth) {
         return String(this);
@@ -3672,7 +4890,7 @@ var StringSplitOptions;
     else {
         totalWidth = totalWidth - this.length;
         if (totalWidth > paddingChar.length) {
-            paddingChar += paddingChar.Repeat(totalWidth / paddingChar.length);
+            paddingChar += paddingChar.Repeat(totalWidth / paddingChar.length); //append to original to ensure we are longer than needed
         }
         return String(this) + paddingChar.slice(0, totalWidth);
     }
@@ -3778,6 +4996,7 @@ $.AbsoluteUri = function (uri) {
         return uri;
     if (uri.toLowerCase().StartsWith("https://"))
         return uri;
+    // let rootUri = $.GetLocalStorage("RootUri", "");
     return `${location.origin}/${uri}`;
 };
 const w_dynamicPrefix = "__Framework";
@@ -3907,28 +5126,60 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
+        /**
+         * To communicate the View and ViewModel properties using JQuery
+         */
         class DependencyProperty {
+            // #region  constructor
             constructor(name) {
                 this._propertyName = name;
             }
+            // #endregion
+            // #region PropertyName
             get PropertyName() {
                 return this._propertyName;
             }
+            // #endregion
+            // #region GetValue-SetValue
+            /**
+             * Using JQuery to get the value from the View
+             */
             get GetValue() {
                 return this._getter;
             }
+            /**
+             * Using JQuery and set the value to View
+             */
             get SetValue() {
                 return this._setter;
             }
+            // #endregion
+            // #region UpdateSourceTrigger
+            /**
+             * Default UpdateSourceTrigger
+             */
             get UpdateSourceTrigger() {
                 return this._updateSourceTrigger;
             }
+            // #endregion
+            // #region Binding Mode
             get BindingMode() {
                 return this._bindingMode;
             }
+            // #endregion
+            // #region Ensure Action
             get Ensure() {
                 return this._ensure;
             }
+            // #endregion
+            // #region static method
+            /**
+             * It defines the communication using JQuery
+             * @param propertyName
+             * @param getValue
+             * @param setValue
+             * @param updateSourceTrigger
+             */
             static RegisterAttached(propertyName, getValue, setValue, defaultUpdateSourceTrigger = Data.UpdateSourceTrigger.Explicit, mode = Data.BindingMode.TwoWay, ensure) {
                 let dp = new DependencyProperty(propertyName);
                 dp._getter = getValue;
@@ -3947,6 +5198,9 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
+        /**
+         * policy on binding
+         */
         class BindingPolicy {
             constructor() {
                 this.Trigger = Data.UpdateSourceTrigger.Explicit;
@@ -3962,13 +5216,20 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
+        /**
+         * supports the link of the view and the view model
+         */
         class BindingBehavior {
             constructor() {
+                // #region property
                 this.BindingPolicy = new Data.BindingPolicy();
                 this.Priolity = 0;
                 this.AdditionalInfo = new collections.LinkedDictionary();
                 this._disposed = false;
+                // #endregion
             }
+            // #endregion
+            // #region Dispose
             Dispose() {
                 if (!this._disposed) {
                     this.DataContext = null;
@@ -3985,6 +5246,9 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
+        /**
+         * linking the properties of the view and the ViewModel
+         */
         class DataBindingBehavior extends Data.BindingBehavior {
             constructor() {
                 super(...arguments);
@@ -3992,6 +5256,7 @@ var DomBehind;
                 this.UpdateSourceEvent = new DomBehind.TypedEvent();
                 this.UpdateTargetEvent = new DomBehind.TypedEvent();
                 this.Events = [];
+                // #endregion
             }
             get PInfo() {
                 return this._pinfo;
@@ -4004,6 +5269,10 @@ var DomBehind;
                     this.Marks.push(newValue.MemberPath);
                 }
             }
+            // #region UpdateSource - UpdateTarget
+            /**
+             *  ValueCore is the input value of the view that is not transferred to the ViewModel
+             */
             get ValueCore() {
                 let value = this.Property.GetValue(this.Element);
                 if (!Object.IsNullOrUndefined(this.BindingPolicy.Converter) &&
@@ -4012,6 +5281,9 @@ var DomBehind;
                 }
                 return value;
             }
+            /**
+             * Sends the current binding target value to the binding source property
+             */
             UpdateSource() {
                 if (this.BindingPolicy.Mode === Data.BindingMode.OneWay)
                     return;
@@ -4026,6 +5298,9 @@ var DomBehind;
                     this.DataContext.PropertyChanged.Raise(this, e);
                 }
             }
+            /**
+             * Forces a data transfer from the binding source property to the binding target property.
+             */
             UpdateTarget() {
                 if (Object.IsNullOrUndefined(this.Property))
                     return;
@@ -4040,6 +5315,8 @@ var DomBehind;
                     this.UpdateTargetEvent.Raise(this, value);
                 }
             }
+            // #endregion
+            // #region Ensure
             Ensure() {
                 if (this.BindingPolicy.Trigger === Data.UpdateSourceTrigger.LostForcus) {
                     let event = 'focusout';
@@ -4064,6 +5341,8 @@ var DomBehind;
                     }
                 });
             }
+            // #endregion
+            // #region Dispose
             Dispose() {
                 if (!this._disposed) {
                     this.EventsOff();
@@ -4162,11 +5441,19 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
+        /**
+         * linked the method of the View of the event and the ViewModel
+         */
         class ActionBindingBehavior extends Data.BindingBehavior {
             constructor() {
+                // #region Event property
                 super(...arguments);
+                // #endregion
+                // #region ActionPolicy
                 this.ActionPolicyCollection = [];
+                // #endregion
             }
+            // #region Ensure
             Ensure() {
                 this.ActionHandle = x => this.OnTrigger(x);
                 if (this.Event && this.Event) {
@@ -4209,6 +5496,13 @@ var DomBehind;
                 });
                 return list[0];
             }
+            // #endregion
+            // #region Do
+            /**
+             * Run the linked action
+             * @param sender
+             * @param e
+             */
             Do(sender, e) {
                 if (!this.AllowBubbling) {
                     if (e.stopPropagation) {
@@ -4233,6 +5527,8 @@ var DomBehind;
                     return result;
                 });
             }
+            // #endregion
+            // #region Dispose
             Dispose() {
                 if (!this._disposed) {
                     if (!Object.IsNullOrUndefined(this.Element)) {
@@ -4293,11 +5589,19 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
+        /**
+         * provides the ability to easily use behaviors
+         */
         class BindingBehaviorCollection extends collections.LinkedList {
             constructor() {
+                // #region Ensure
                 super(...arguments);
                 this._disposed = false;
+                // #endregion
             }
+            /**
+             * Ensure
+             */
             Ensure() {
                 var sortedList = [];
                 var grouping = this.toArray().GroupBy(x => x.Element);
@@ -4313,6 +5617,12 @@ var DomBehind;
                     x.Ensure();
                 });
             }
+            // #endregion
+            // #region List
+            /**
+             * lists the more behaviors
+             * @param mark
+             */
             ListDataBindingBehavior(mark) {
                 let list = this.toArray().filter(x => x instanceof Data.DataBindingBehavior);
                 if (!String.IsNullOrWhiteSpace(mark)) {
@@ -4320,18 +5630,32 @@ var DomBehind;
                 }
                 return list;
             }
+            // #endregion
+            // #region UpdateTarget - UpdateSource
+            /**
+             * Forces a data transfer from the binding source property to the binding target property.
+             * @param mark
+             */
             UpdateTarget(mark) {
                 var list = this.ListDataBindingBehavior(mark);
                 $.each(list, (i, x) => {
                     x.UpdateTarget();
                 });
             }
+            /**
+             * Sends the current binding target value to the binding source property
+             * @param mark
+             */
             UpdateSource(mark) {
                 var list = this.ListDataBindingBehavior(mark);
                 $.each(list, (i, x) => {
                     x.UpdateSource();
                 });
             }
+            // #endregion
+            // #region
+            // #endregion
+            // #region Dispose
             Dispose() {
                 if (!this._disposed) {
                     $.each(this.toArray(), (i, x) => x.Dispose());
@@ -4346,7 +5670,11 @@ var DomBehind;
 //# sourceMappingURL=BindingBehaviorCollection.js.map
 var DomBehind;
 (function (DomBehind) {
+    /**
+     * support the construction of behavior
+     */
     class BindingBehaviorBuilder {
+        // #region constructor
         constructor(owner) {
             this.Owner = owner;
         }
@@ -4361,10 +5689,19 @@ var DomBehind;
             this.CurrentBehavior = null;
             return this;
         }
+        // #endregion
         SetValue(dp, value) {
             dp.SetValue(this.CurrentElement, value, this.CurrentBehavior);
             return this;
         }
+        // #region Binding is linking the properties of the view and the view model
+        /**
+         * linking the properties of the view and the view model
+         * @param property
+         * @param getter
+         * @param setter
+         * @param updateTrigger is update timing of view model
+         */
         Binding(property, bindingExpression, mode, updateTrigger) {
             let behavior = this.Add(new DomBehind.Data.DataBindingBehavior());
             behavior.Property = property;
@@ -4375,8 +5712,13 @@ var DomBehind;
             let dataBindingBuilder = new DomBehind.Data.DataBindingBehaviorBuilder(this.Owner);
             dataBindingBuilder.CurrentBehavior = this.CurrentBehavior;
             dataBindingBuilder.CurrentElement = this.CurrentElement;
+            // default PartialMark is PropertyName
             return dataBindingBuilder.PartialMark(behavior.PInfo.MemberPath);
         }
+        /**
+         * Assign "IValueConverter"
+         * @param conv
+         */
         SetConverter(conv) {
             this.CurrentBehavior.BindingPolicy.Converter = conv;
             return this;
@@ -4399,6 +5741,8 @@ var DomBehind;
             this.CurrentBehavior.BindingPolicy.Converter = conv;
             return this;
         }
+        // #endregion
+        // #region BindingViewModel
         BindingViewViewModel(view, viewModel) {
             let behavior = this.Add(new DomBehind.Data.ViewViewModelBindingBehavior());
             behavior.GetView = view;
@@ -4424,6 +5768,12 @@ var DomBehind;
             }
             return result;
         }
+        // #endregion
+        // #region Add
+        /**
+         * Register the behavior
+         * @param behavior
+         */
         Add(behavior) {
             this.CurrentBehavior = behavior;
             behavior.DataContext = this.Owner.DataContext;
@@ -4453,18 +5803,29 @@ var DomBehind;
     var Data;
     (function (Data) {
         class DataBindingBehaviorBuilder extends DomBehind.BindingBehaviorBuilder {
+            // #region constructor
             constructor(owner) {
                 super(owner);
             }
             get Behavior() {
                 return this.CurrentBehavior;
             }
+            // #endregion
+            /**
+             * Give any of the mark to the property.
+             * It is possible to perform partial updating and partial validation.
+             * @param region
+             */
             PartialMark(...mark) {
                 $.each(mark, (i, value) => {
                     this.Behavior.Marks.push(value);
                 });
                 return this;
             }
+            /**
+             *
+             * @param converter
+             */
             Converter(converter) {
                 this.Behavior.BindingPolicy.Converter = converter;
                 return this;
@@ -4484,12 +5845,14 @@ var DomBehind;
     var Data;
     (function (Data) {
         class ActionBindingBehaviorBuilder extends DomBehind.BindingBehaviorBuilder {
+            // #region constructor
             constructor(owner) {
                 super(owner);
             }
             get Behavior() {
                 return this.CurrentBehavior;
             }
+            // #endregion
             ActionPolicy(...policies) {
                 $.each(policies, (i, x) => {
                     this.Behavior.ActionPolicyCollection.push(x);
@@ -4505,7 +5868,15 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
+        /**
+         * Apply any of the policy to the bindable action
+         */
         class ActionPolicy {
+            // #endregion
+            /**
+             *
+             * @param func
+             */
             Do(func) {
                 let result;
                 try {
@@ -4676,6 +6047,7 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
+        // #region http://gasparesganga.com/labs/jquery-loading-overlay/
         class DefaultWaitingOverlayOption {
             constructor() {
                 this.Color = "rgba(255, 255, 255, 0.8)";
@@ -4805,6 +6177,7 @@ var DomBehind;
             }
         }
         Data.WaitingOverlayActionPolicy = WaitingOverlayActionPolicy;
+        // #endregion
         class ElementWaitingOverlayActionPolicy extends WaitingOverlayActionPolicy {
             constructor(element, option) {
                 super(option);
@@ -4848,6 +6221,7 @@ var DomBehind;
 (function (DomBehind) {
     var Data;
     (function (Data) {
+        // SuppressDuplicateActionPolicy is the work
         class SuppressDuplicateWorkException extends DomBehind.Exception {
             constructor() { super("This exception is a safe exception issued to prevent double press"); }
         }
@@ -4911,6 +6285,7 @@ var DomBehind;
                     d.resolve();
                     return;
                 }
+                // 
                 this.Upgrade(x.version + 1, y => {
                     let newDb = y.target.result;
                     if (newDb && newDb.deleteObjectStore)
@@ -5043,6 +6418,7 @@ var DomBehind;
                     cursor.continue();
                 }
                 else {
+                    // cursor is end;
                     d.resolve(list.toArray());
                 }
             };
@@ -5069,6 +6445,7 @@ var DomBehind;
                         else {
                             newStore = newDb.createObjectStore(this.TableName, { keyPath: "__identity", autoIncrement: true });
                         }
+                        // 
                         newStore.transaction.oncomplete = e => {
                             newDb.close();
                             this.Upsert(entity, primaryKey).done(x => d.resolve()).fail(x => d.reject(x));
@@ -5156,6 +6533,7 @@ var DomBehind;
             return p;
         }
         Upgrade(version, action) {
+            // let d = $.Deferred<any>();
             let factory = window.indexedDB;
             let openRequest = factory.open(this.DbName, version);
             openRequest.onsuccess = e => {
@@ -5259,6 +6637,7 @@ var DomBehind;
                 }
                 container.find(".close").on("click", (e, args) => {
                     $(e.target).trigger(OnModalCloseEventName, args);
+                    // e.data.trigger(OnModalCloseEventName, args);
                 });
                 if (!setting.ShowCloseButton) {
                     container.find(".close").hide();
@@ -5277,7 +6656,10 @@ var DomBehind;
                             .css("left", setting.StartupLocationLeft);
                     }
                 }
+                //// domに追加
+                //overlay.append(container);
                 let modal = container.find(".modal-dialog");
+                // use jquery ui
                 if (modal.draggable) {
                     modal.draggable({
                         handle: ".modal-header",
@@ -5297,6 +6679,7 @@ var DomBehind;
                 if (setting.AllowCloseByClickOverlay) {
                     overlay.click(overlay, e => {
                         $(e.target).trigger(OnModalCloseEventName);
+                        // e.data.trigger(OnModalCloseEventName);
                     });
                     container.click(e => {
                         e.stopPropagation();
@@ -5324,6 +6707,7 @@ var DomBehind;
                         }
                     });
                 });
+                // domに追加
                 overlay.append(container);
                 container.hide().show(0);
                 return d.promise();
@@ -5415,6 +6799,7 @@ var DomBehind;
                 }
                 return errorMessage;
             }
+            // #region Dispose
             Dispose() {
                 if (!this._disposed) {
                 }
@@ -5436,6 +6821,7 @@ var DomBehind;
             constructor() {
                 super(...arguments);
                 this._disposed = false;
+                // #endregion
             }
             RemoveValidator() {
                 $.each(this.toArray(), (i, x) => x.RemoveValidation());
@@ -5456,6 +6842,7 @@ var DomBehind;
                 });
                 return result;
             }
+            // #region Dispose
             Dispose() {
                 if (!this._disposed) {
                     $.each(this.toArray(), (i, x) => x.Dispose());
@@ -5476,6 +6863,7 @@ var DomBehind;
             constructor() {
                 super("maxlength");
             }
+            // #region Dispose
             Dispose() {
                 if (!this._disposed) {
                     super.Dispose();
@@ -5552,6 +6940,7 @@ var DomBehind;
                 }
                 return message;
             }
+            // #region Dispose
             Dispose() {
                 if (!this._disposed) {
                     super.Dispose();
@@ -5583,6 +6972,7 @@ var DomBehind;
             constructor() {
                 super("required");
             }
+            // #region Dispose
             Dispose() {
                 if (!this._disposed) {
                     super.Dispose();
@@ -5871,6 +7261,9 @@ var DomBehind;
             });
         }
     }
+    /**
+     * Gets or sets the val attribute of the element
+     */
     UIElement.ValueProperty = DomBehind.Data.DependencyProperty.RegisterAttached("val", x => x.val(), (x, y) => x.val(y), DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
     UIElement.TextProperty = DomBehind.Data.DependencyProperty.RegisterAttached("text", x => x.text(), (x, y) => x.text(y), DomBehind.Data.UpdateSourceTrigger.LostForcus, DomBehind.Data.BindingMode.TwoWay);
     UIElement.SrcProperty = DomBehind.Data.DependencyProperty.RegisterAttached("src", x => x.attr("src"), (x, y) => x.attr("src", y), DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
@@ -5886,6 +7279,7 @@ var DomBehind;
             x.removeAttr("disabled");
             x.removeClass("disabled");
         }
+        // set an disable style on nearby label
         if (x.is('input[type=radio]') ||
             x.is('input[type=checkbox]')) {
             let parent = x.closest("label");
@@ -5922,6 +7316,7 @@ var DomBehind;
         }
     }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.TwoWay);
     UIElement.OpacityProperty = DomBehind.Data.DependencyProperty.RegisterAttached("opacity", x => {
+        // OneWay
     }, (el, newValue) => {
         el.css("opacity", newValue);
     }, DomBehind.Data.UpdateSourceTrigger.Explicit, DomBehind.Data.BindingMode.OneWay);
@@ -6056,30 +7451,102 @@ var DomBehind;
         me.CurrentElement.attr("type", typeName);
         return me;
     };
+    /**
+     * HTML5
+     */
     let InputType;
     (function (InputType) {
+        /**
+         * hidden
+         */
         InputType[InputType["Hidden"] = 0] = "Hidden";
+        /**
+         * text
+         */
         InputType[InputType["Text"] = 1] = "Text";
+        /**
+         * search
+         */
         InputType[InputType["Search"] = 2] = "Search";
+        /**
+         * tel
+         */
         InputType[InputType["Tel"] = 3] = "Tel";
+        /**
+         * url
+         */
         InputType[InputType["Url"] = 4] = "Url";
+        /**
+         * email
+         */
         InputType[InputType["Email"] = 5] = "Email";
+        /**
+         * password
+         */
         InputType[InputType["Password"] = 6] = "Password";
+        /**
+         * datetime
+         */
         InputType[InputType["DateTime"] = 7] = "DateTime";
+        /**
+         * date
+         */
         InputType[InputType["Date"] = 8] = "Date";
+        /**
+         * month
+         */
         InputType[InputType["Month"] = 9] = "Month";
+        /**
+         * week
+         */
         InputType[InputType["Week"] = 10] = "Week";
+        /**
+         * time
+         */
         InputType[InputType["Time"] = 11] = "Time";
+        /**
+         * datetime-local
+         */
         InputType[InputType["DateTimeLocal"] = 12] = "DateTimeLocal";
+        /**
+         * number
+         */
         InputType[InputType["Number"] = 13] = "Number";
+        /**
+         * range
+         */
         InputType[InputType["Range"] = 14] = "Range";
+        /**
+         * color
+         */
         InputType[InputType["Color"] = 15] = "Color";
+        /**
+         * checkbox
+         */
         InputType[InputType["Checkbox"] = 16] = "Checkbox";
+        /**
+         * radio
+         */
         InputType[InputType["Radio"] = 17] = "Radio";
+        /**
+         * file
+         */
         InputType[InputType["File"] = 18] = "File";
+        /**
+         * submit
+         */
         InputType[InputType["Submit"] = 19] = "Submit";
+        /**
+         * image
+         */
         InputType[InputType["Image"] = 20] = "Image";
+        /**
+         * reset
+         */
         InputType[InputType["Reset"] = 21] = "Reset";
+        /**
+         * button
+         */
         InputType[InputType["Button"] = 22] = "Button";
     })(InputType = DomBehind.InputType || (DomBehind.InputType = {}));
 })(DomBehind || (DomBehind = {}));
@@ -6217,6 +7684,7 @@ var DomBehind;
                         this.RenderOption(this.Behavior.Element, source, value);
                     });
                 }
+                // this.Behavior.Element.selectpicker('refresh');
                 this.Select(source);
             }
             get Multiple() {
@@ -6230,6 +7698,7 @@ var DomBehind;
                     value = $.extend(value, ExtendIIdentity());
                 if (!value.DisplayMemberPath)
                     value = $.extend(value, this.EnsureDisplayMemberPath(source.DisplayMemberPath));
+                // HACK bootstrap-select.js val method
                 let option = $(`<option uuid="${value.__uuid}">${Selector.GetDisplayValue(value, source.DisplayMemberPath)}</option>`);
                 option.appendTo(element);
                 value = $.extend(value, this.EnsureElement(option));
@@ -6436,6 +7905,7 @@ var DomBehind;
                     var titleCss = this.IsActive ? 'active' : '';
                     this.Header = $(`<li class="${titleCss}" uuid="${this.Option.__uuid}">`).appendTo(this.HeaderContainer);
                     this.Option.__header = this.Header;
+                    // content
                     var contentCss = this.IsActive ? 'tab-pane fade in active' : 'tab-pane fade';
                     this.Content = $(`<div class="${contentCss}" id="${this.Option.__uuid}">`).appendTo(this.ContentContainer);
                     this.Option.__content = this.Content;
@@ -6451,6 +7921,7 @@ var DomBehind;
                         this.PropertyChangedSafeHandle = (sender, e) => this.OnRecievePropertyChanged(e);
                         behavior.ViewModel.PropertyChanged.AddHandler(this.PropertyChangedSafeHandle);
                     });
+                    // 
                     var uriOption = this.Option;
                     if (uriOption.Uri) {
                         this.Content.load(uriOption.Uri);
@@ -6519,12 +7990,16 @@ var DomBehind;
         }
     }
     DomBehind.MessaageBox = MessaageBox;
+    // デフォルトのビルトイン
     MessaageBox.BuiltIn(() => DefaultMessageContainer);
     class DefaultMessageContainer {
         ShowMessage(message, title, status) {
+            // デフォルトのアラートメッセージ
             window.alert(message);
         }
         ShowYesNo(message, title, option) {
+            // window.confirm はjavascriptを止めるタイプのメッセージボックスなので、このほうが嬉しいシチュエーションの方がエンタープライズだと多いと思われる
+            // 通常、JSやCSS系のFWだとjavascriptを止めないで、callbackでOK、Cancelなどを実行するが、それでも良いなら割とデザインに幅が広がる
             if (window.confirm(message)) {
                 if (option && option.yesCallback) {
                     option.yesCallback();
@@ -6537,6 +8012,8 @@ var DomBehind;
             }
         }
         ShowOkCancel(message, title, option) {
+            // window.confirm はjavascriptを止めるタイプのメッセージボックスなので、このほうが嬉しいシチュエーションの方がエンタープライズだと多いと思われる
+            // 通常、JSやCSS系のFWだとjavascriptを止めないで、callbackでOK、Cancelなどを実行するが、それでも良いなら割とデザインに幅が広がる
             if (window.confirm(message)) {
                 if (option && option.okCallback) {
                     option.okCallback();
@@ -6700,6 +8177,7 @@ var DomBehind;
             let rowContainer = $(`<div class="templateRowContainer"></div>`);
             $.each(newValue.ToArray(), (i, value) => {
                 let newRow = template.clone();
+                // Make a reference to dom
                 value.__element = newRow;
                 let twowayMarks = new Array();
                 $.each(this.Columns, (k, column) => {
@@ -6713,17 +8191,28 @@ var DomBehind;
                         }
                     }
                     if (el.length !== 0) {
+                        // property binding
                         if (column.expression && column.dependencyProperty) {
+                            // one time
                             let ret = column.expression(value);
                             if (column.convertTarget) {
                                 ret = column.convertTarget(ret, el);
                             }
                             column.dependencyProperty.SetValue(el, ret);
+                            // two way
                             if (column.mode === DomBehind.Data.BindingMode.TwoWay) {
                                 let path = DomBehind.LamdaExpression.Path(column.expression);
                                 twowayMarks.push({ column: column, element: el, marks: path });
+                                //let observe = Observable.Register(value, path);
+                                //observe.PropertyChanged.AddHandler((sender, d) => {
+                                //    if (sender) {
+                                //        let v = sender[d.Name];
+                                //        column.dependencyProperty.SetValue(el, v);
+                                //    }
+                                //});
                             }
                         }
+                        // event binding
                         if (column.expressionAction && column.attachedEvent) {
                             let newEvent = column.attachedEvent.Create();
                             newEvent.AddHandler((sener, e) => {
@@ -6738,10 +8227,12 @@ var DomBehind;
                                     }
                                 }
                             });
+                            // 
                             if (el.is("a") && !el.attr("href")) {
                                 el.attr("href", "javascript:void(0);");
                             }
                         }
+                        // alternate style
                         if (this.AlternateStyle) {
                             if (i % 2 !== 0) {
                                 let el = newRow.find(this.AlternateStyle.Selector);
@@ -6758,7 +8249,7 @@ var DomBehind;
                         if (sender) {
                             let twowayList = twowayMarks.Where(x => x.marks === d.Name);
                             for (var i = 0; i < twowayList.length; i++) {
-                                let v = sender[d.Name];
+                                let v = sender[d.Name]; /* ループの中で、常にプロパティに再アクセスして、元の値を参照する */
                                 let twoway = twowayList[i];
                                 if (twoway.column.convertTarget) {
                                     v = twoway.column.convertTarget(v, twoway.element);
@@ -7394,6 +8885,7 @@ var DomBehind;
             if (!id) {
                 return;
             }
+            // let stack: Array<{ Uri: string, Title: string }> = JSON.parse(decodeURIComponent(json.Value));
             let stack = this.BuildStack(id.Value);
             if (!stack) {
                 return;
@@ -7406,6 +8898,7 @@ var DomBehind;
                 else {
                     let a = $(`<a href="javascript:void(0);">${value.Title}</a>`);
                     a.click(e => {
+                        // タップして戻る際にイベントが取れないので発行する
                         let newE = new Event("breadbrumbTapped");
                         newE.__title = value.Title;
                         newE.__uri = value.Uri;
@@ -7464,6 +8957,7 @@ var DomBehind;
             let style = $(`#${Appeal.styleIdentity}`);
             if (style.length === 0) {
                 let head = document.head || document.getElementsByTagName('head')[0];
+                // https://stackoverflow.com/questions/524696/how-to-create-a-style-tag-with-javascript
                 let newStyle = document.createElement('style');
                 head.appendChild(newStyle);
                 newStyle.type = 'text/css';
@@ -7535,6 +9029,7 @@ var DomBehind;
                 let left = offset.left;
                 let leftOffset = Number(el.css("margin-left").replace(/[^-\d\.]/g, '')) +
                     Number(el.css("margin-right").replace(/[^-\d\.]/g, ''));
+                // jquery ui select
                 if (el.is('select') && top === 0 && left === 0) {
                     let nextSpan = el.next("span");
                     if (nextSpan.length !== 0) {
@@ -7666,6 +9161,7 @@ var DomBehind;
             }
         }
         static Register(behavior) {
+            // ID for pointing to the instant of the behavior
             let identity = `id-${NewUid()}`;
             behavior.Option.container.attr(FlipBehavior.IdentityKey, identity);
             window[identity] = behavior;
@@ -7682,6 +9178,7 @@ var DomBehind;
     }
     FlipBehavior.IdentityKey = "flip-identity";
     FlipBehavior.IsFlipProperty = DomBehind.Data.DependencyProperty.RegisterAttached("isflip", el => {
+        // oneway
     }, (el, newValue) => {
         let identity = el.attr(FlipBehavior.IdentityKey);
         let behavior = window[identity];
@@ -7805,6 +9302,10 @@ var DomBehind;
         static Resolve() {
             if (Application._app)
                 return;
+            //let me: any = this;
+            //let appFactory = new TypedFactory(me);
+            //let app = appFactory.CreateInstance();
+            //Application._app = <Application>app;
             let me = this;
             $(document).ready(function () {
                 let appFactory = new DomBehind.TypedFactory(me);
@@ -7817,6 +9318,7 @@ var DomBehind;
                 };
             });
         }
+        //Back Button in Browser using jquery?
         OnBrowserBack() { }
         SafeAction(func, context, ...args) {
             try {
@@ -7843,9 +9345,15 @@ var DomBehind;
 //# sourceMappingURL=Application.js.map
 var DomBehind;
 (function (DomBehind) {
+    /**
+     * It is the code behind the view
+     * to promotes component-oriented developers
+     */
     class BizView {
         constructor() {
+            // #region Container is HTML(JQuery)
             this._disposed = false;
+            // #endregion
         }
         get Container() {
             return this._container;
@@ -7859,6 +9367,8 @@ var DomBehind;
                 this._container = value;
             }
         }
+        // #endregion
+        // #region DataContext is ViewModel
         get DataContext() {
             return this._dataContext;
         }
@@ -7867,10 +9377,14 @@ var DomBehind;
                 this._dataContext = value;
             }
         }
+        // #endregion
+        // #region may be inherited
         OnDataContextPropertyChanged(sender, e) {
             this.UpdateTarget(e.Name);
         }
         ViewLoaded(responseText, textStatus, XMLHttpRequest) { }
+        // #endregion
+        // #region Ensure
         Ensure() {
             if (!this.DataContext)
                 return;
@@ -7884,6 +9398,7 @@ var DomBehind;
             this.BuildBinding();
             this.Subscribe();
             this.BindingBehaviors.Ensure();
+            // 利用ライブラリ固有のヴァリデーション方言を吸収する
             if (this.DependencyValidateSetup) {
                 this.DependencyValidateSetup();
             }
@@ -7904,24 +9419,40 @@ var DomBehind;
                 activate();
             }
         }
+        // #endregion
+        // #region Event subscribe
         UnSubscribe() {
         }
         Subscribe() {
         }
+        //#endregion
+        /**
+         * start the build of the binding
+         */
         CreateBindingBuilder() {
             let builder = new DomBehind.BindingBehaviorBuilder(this);
             builder.Element(this.Container).BindingAction(DomBehind.UIElement.Initialize, vm => vm.Initialize());
             builder.Element(this.Container).BindingAction(DomBehind.UIElement.Activate, vm => vm.Activate());
             return builder;
         }
+        /**
+         * Forces a data transfer from the binding source property to the binding target property.
+         * @param mark
+         */
         UpdateTarget(mark) {
             if (this.BindingBehaviors)
                 this.BindingBehaviors.UpdateTarget(mark);
         }
+        /**
+         * Sends the current binding target value to the binding source property
+         * @param mark
+         */
         UpdateSource(mark) {
             if (this.BindingBehaviors)
                 this.BindingBehaviors.UpdateSource(mark);
         }
+        // #endregion
+        // #region Validate
         Validate(mark) {
             let result = true;
             if (this.BindingBehaviors) {
@@ -7931,7 +9462,11 @@ var DomBehind;
                         result = false;
                     }
                 });
+                //if (result) {
+                //    this.RemoveValidator(mark);
+                //} 
             }
+            // サードパーティやNugetライブラリ拡張用
             if (this.DependencyValidate) {
                 this.DependencyValidate(mark);
             }
@@ -7942,6 +9477,7 @@ var DomBehind;
                 value.BindingPolicy.Validators.RemoveValidator();
             });
             this.Container.ClearCustomError();
+            // サードパーティやNugetライブラリ拡張用
             if (this.DependencyValidateClear) {
                 this.DependencyValidateClear(mark);
             }
@@ -7951,10 +9487,13 @@ var DomBehind;
                 value.BindingPolicy.Validators.ClearValidator();
             });
             this.Container.ClearCustomError();
+            // サードパーティやNugetライブラリ拡張用
             if (this.DependencyValidateClear) {
                 this.DependencyValidateClear(mark);
             }
         }
+        // #endregion
+        // #region Dispose
         Dispose() {
             if (!this._disposed) {
                 this.UnSubscribe();
@@ -7982,9 +9521,17 @@ var DomBehind;
 //# sourceMappingURL=BizView.js.map
 var DomBehind;
 (function (DomBehind) {
+    /**
+     * ViewModel
+     * to promotes component-oriented developers
+     */
     class BizViewModel extends DomBehind.NotifiableImp {
         constructor() {
             super();
+            // #endregion
+            // #region IsWaiting
+            // #endregion
+            // #region Initialize
             this.Initialized = false;
             DomBehind.Locator.Push(this);
         }
@@ -8017,6 +9564,7 @@ var DomBehind;
                 return;
             container.css("display", value ? "display" : "none");
         }
+        // #region View Property
         get View() {
             return this._view;
         }
@@ -8028,17 +9576,32 @@ var DomBehind;
         }
         OnViewChanged() {
         }
+        /**
+         * inherit if necessary View Activate method.
+         */
         Activate() { }
+        // #endregion 
+        // #region Update
+        /**
+         * Forces a data transfer from the binding source property to the binding target property.
+         * @param mark
+         */
         UpdateTarget(mark) {
             if (this.View) {
                 this.View.UpdateTarget(mark);
             }
         }
+        /**
+         * Sends the current binding target value to the binding source property
+         * @param mark
+         */
         UpdateSource(mark) {
             if (this.View) {
                 this.View.UpdateSource(mark);
             }
         }
+        // #endregion
+        // #region
         Validate(mark) {
             let result = false;
             if (this.View) {
@@ -8070,6 +9633,8 @@ var DomBehind;
             let lastErrors = this.LastErrors(mark).Select(x => new DomBehind.ApplicationException(x.Message));
             throw new DomBehind.ApplicationAggregateException(lastErrors);
         }
+        // #endregion
+        // #region 
         WaitingOverlay(func, handled, image) {
             var overlayPolocy = new DomBehind.Data.WindowWaitingOverlayActionPolicy();
             if (image) {
@@ -8089,6 +9654,8 @@ var DomBehind;
             var invoker = behavior.CreateActionInvoker(list);
             return invoker.Do(func);
         }
+        // #endregion
+        // IExceptionHandling 実装
         Catch(ex) {
             if (ex.Data instanceof DomBehind.AjaxException) {
             }
@@ -8096,12 +9663,14 @@ var DomBehind;
         get Navigator() {
             return DomBehind.Application.Current.Navigator;
         }
+        // #region IsEnabled
         get IsEnabled() {
             return this.GetProperty("IsEnabled", true);
         }
         set IsEnabled(value) {
             this.SetProperty("IsEnabled", value);
         }
+        // #endregion 
         ShowInfomation(message, title) {
             DomBehind.MessaageBox.ShowMessage(message, title, DomBehind.MessageStatus.Infomation);
         }
@@ -8120,6 +9689,7 @@ var DomBehind;
         ShowOkCancel(message, title, option) {
             DomBehind.MessaageBox.ShowOkCancel(message, title, option);
         }
+        // #region Dispose
         Dispose() {
             if (!this._disposed) {
                 super.Dispose();
@@ -8164,8 +9734,10 @@ class annotationCollection {
     Pop(peek) {
         $.each(this.ToArray(), (i, each) => {
             if (!peek) {
+                // 消す（ポップする）
                 this.Remove(each.Selector, each.ResolveViewType, each.ResolveViewModelType);
             }
+            // リトライ
             $.BindingAnnotation(each.Selector, each.ResolveViewType, each.ResolveViewModelType);
         });
     }
@@ -8175,8 +9747,10 @@ $.BindingAnnotation = function (selector, resolveViewType, resolveViewModelType)
     let d = $.Deferred();
     let view = $(selector);
     view.ready(function (e) {
+        // other page or lazy loaded
         let ele = $(selector);
         if (ele.length === 0) {
+            // 未登録の場合
             if (!__lazyCollection.Any(selector, resolveViewType, resolveViewModelType)) {
                 __lazyCollection.Add(selector, resolveViewType, resolveViewModelType);
             }
@@ -8261,6 +9835,7 @@ var DomBehind;
     DomBehind.Locator = Locator;
 })(DomBehind || (DomBehind = {}));
 //# sourceMappingURL=Locator.js.map
+// デフォルトポリシーの上書き
 $.validator.setDefaults({
     ignore: "",
     errorPlacement: function (error, element) {
@@ -8274,16 +9849,35 @@ $.validator.setDefaults({
             if (post.length != 0) {
                 error.insertAfter(post);
             }
+            // 直近のFormからツリー検索
             let form = element.closest("form");
             let closet = form.find(`[for="${id}"]`);
             if (closet.length != 0) {
                 error.insertAfter(closet);
             }
+            // エラー項目が明示的に指定していない場合は、デフォルトのエラー挿入に従う
             if (pre.length === 0 && post.length === 0 && closet.length === 0) {
                 error.insertAfter(element);
             }
         }
     }
+    // 上述の errorPlacement をコメントアウトして、下記を復帰するとポップアップスタイルのValidationが有効化する
+    //,
+    //showErrors: function (errorMap, errorList) {
+    //    $.each(this.successList, function (index, value) {
+    //        $(value).popover('hide');
+    //    });
+    //    $.each(errorList, function (index, value) {
+    //        var _popover = $(value.element).popover({
+    //            trigger: 'manual',
+    //            placement: 'auto right',
+    //            content: value.message,
+    //            template: "<div class='popover popover-validation' role='tooltip'><div class='arrow'></div><h3 class='popover-title'></h3><div class='popover-content'></div></div>"
+    //        });
+    //        _popover.data('bs.popover').options.content = value.message; // popover要素のテキストを更新する
+    //        $(value.element).popover('show');
+    //    });
+    //}
 });
 var DomBehind;
 (function (DomBehind) {
@@ -8302,6 +9896,7 @@ var DomBehind;
         if (container.length == 0) {
             console.debug("Validation using setCustomValidity must be enclosed in a form tag.");
         }
+        // name 属性、classに一意なIDを付与する
         $.each(me.BindingBehaviors.ListDataBindingBehavior(), (i, behavior) => {
             $.each(behavior.BindingPolicy.Validators.toArray(), (k, validator) => {
                 let el = behavior.Element;
@@ -8314,11 +9909,15 @@ var DomBehind;
                 if (!el.hasClass(cls)) {
                     el.addClass(cls);
                 }
+                // Jquery validatorの実装上、Name属性がない場合はエラー項目名が一意にならない
                 let name = el.attr("name");
                 if (String.IsNullOrWhiteSpace(name)) {
                     el.attr("name", `name-${identity}`);
                 }
                 let funcName = `func-${identity}`;
+                // なぜか、jQuery.Validationの 1.11.1 だと ルート指定がcls名じゃないんだけど
+                // js追っていくとそうなっているので暫定。もしかしたら、
+                //let o = JSON.parse(`{ "${cls}": { "${funcName}": true } }`);
                 let o = JSON.parse(`{ "${funcName}": { "${funcName}": true }  }`);
                 $.validator.addClassRules(cls, o);
                 if (validator instanceof DomBehind.Validation.RequiredValidator) {
@@ -8351,6 +9950,7 @@ var DomBehind;
             $.each(behavior.BindingPolicy.Validators.toArray(), (k, validator) => {
                 let el = behavior.Element;
                 if (validator instanceof DomBehind.Validation.RequiredValidator) {
+                    // HTML5 の required バリデーションが上書きするので、JqueryValidation使う場合は削除する
                     if (el.attr(validator.Attribute)) {
                         el.removeAttr(validator.Attribute);
                     }
@@ -8358,6 +9958,9 @@ var DomBehind;
                 el.valid();
             });
         });
+        // デバックしやすいように...
+        // let result = container.valid();
+        // return result;
     };
     DomBehind.BizView.prototype.DependencyValidateClear = function (mark) {
         let me = this;

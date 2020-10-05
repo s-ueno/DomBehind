@@ -31,7 +31,7 @@ var DomBehind;
         CalendarHeaderButtons[CalendarHeaderButtons["title"] = 128] = "title";
         CalendarHeaderButtons[CalendarHeaderButtons["today"] = 256] = "today";
     })(CalendarHeaderButtons = DomBehind.CalendarHeaderButtons || (DomBehind.CalendarHeaderButtons = {}));
-    var EventDataWrapper = (function () {
+    var EventDataWrapper = /** @class */ (function () {
         function EventDataWrapper() {
             this.CalendarBindings = {};
         }
@@ -39,14 +39,14 @@ var DomBehind;
             get: function () {
                 return this.GetValue("id");
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "title", {
             get: function () {
                 return this.GetValue("title");
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "start", {
@@ -54,7 +54,7 @@ var DomBehind;
                 var value = this.GetValue("start");
                 return moment(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "end", {
@@ -62,84 +62,84 @@ var DomBehind;
                 var value = this.GetValue("end");
                 return moment(value);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "allDay", {
             get: function () {
                 return this.GetValue("allDay");
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "url", {
             get: function () {
                 return this.GetValue("url");
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "className", {
             get: function () {
                 return this.GetValue("className");
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "editable", {
             get: function () {
                 return this.GetValue("editable", true);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "color", {
             get: function () {
                 return this.GetValue("color");
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "backgroundColor", {
             get: function () {
                 return this.GetValue("backgroundColor");
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "borderColor", {
             get: function () {
                 return this.GetValue("borderColor");
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "textColor", {
             get: function () {
                 return this.GetValue("textColor");
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "rendering", {
             get: function () {
                 return this.GetValue("rendering");
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "startEditable", {
             get: function () {
                 return this.GetValue("startEditable", true);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(EventDataWrapper.prototype, "overlap", {
             get: function () {
                 return this.GetValue("overlap", true);
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         EventDataWrapper.prototype.GetValue = function (key, defaultValue) {
@@ -154,7 +154,7 @@ var DomBehind;
         };
         return EventDataWrapper;
     }());
-    var Calendar = (function (_super) {
+    var Calendar = /** @class */ (function (_super) {
         __extends(Calendar, _super);
         function Calendar() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -165,6 +165,7 @@ var DomBehind;
             var _this = this;
             _super.prototype.Ensure.call(this);
             this.Option = $.extend(true, this.DefaultOption, this.Option);
+            // ユニークなIDを属性に付与した上で、グローバル管理
             var identity = "id-" + NewUid();
             this.Element.attr("fullCalendar-identity", identity);
             window[identity] = this;
@@ -182,6 +183,7 @@ var DomBehind;
                 scrollTime: this.ParseScrollTime(this.Option.scrollTime),
                 slotDuration: this.ParseSlotDuration(this.Option.slotDuration),
             };
+            // patch
             option.eventAfterAllRender = function (view) {
             };
             if (this.Option.eventClick) {
@@ -200,6 +202,7 @@ var DomBehind;
                 };
             }
             if (this.Option.dayClick) {
+                // hack d.tsがjsの変更に追いついていない
                 option.dayClick = function (date, jsEvent, view) {
                     var e = {
                         event: jsEvent,
@@ -227,6 +230,9 @@ var DomBehind;
                             original: e,
                         };
                         _this.Option.viewModeClick(_this.DataContext, eventArgs);
+                        //Application.Current.SafeAction((vm: any, option: ICalendarOption<any>, e: ICalendarEventArgs) => {
+                        //    option.viewModeClick(vm, e);
+                        //}, this.DataContext, this.DataContext, this.Option, eventArgs);
                     });
                 }
                 var agendaWeekButton = this.Element.find(".fc-agendaWeek-button span");
@@ -322,7 +328,7 @@ var DomBehind;
                     lang: "ja",
                 };
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(Calendar.prototype, "ItemsSource", {
@@ -338,7 +344,7 @@ var DomBehind;
                 });
                 this.Element.fullCalendar("addEventSource", events.toArray());
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Calendar.prototype.RemoveAll = function () {
@@ -358,7 +364,7 @@ var DomBehind;
         return Calendar;
     }(DomBehind.Data.DataBindingBehavior));
     DomBehind.Calendar = Calendar;
-    var CalendarBindingBehaviorBuilder = (function (_super) {
+    var CalendarBindingBehaviorBuilder = /** @class */ (function (_super) {
         __extends(CalendarBindingBehaviorBuilder, _super);
         function CalendarBindingBehaviorBuilder(owner) {
             return _super.call(this, owner) || this;
@@ -433,3 +439,4 @@ var DomBehind;
         return newMe;
     };
 })(DomBehind || (DomBehind = {}));
+//# sourceMappingURL=Calendar.js.map
