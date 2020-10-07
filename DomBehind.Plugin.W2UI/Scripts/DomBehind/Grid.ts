@@ -13,8 +13,10 @@
         multiSelect?: boolean;
         dragAndDropRow?: boolean;
 
-        onSelect?: (x: TViewModel, args) => void;
-        onDoubleClick?: (x: TViewModel, args) => void;
+
+        onSelect?: (x: TViewModel, args, e) => void;
+        onDoubleClick?: (x: TViewModel, args, e) => void;
+
         isSpinning?: (x: TViewModel) => boolean;
 
         footerOption?: IFooterOption<TViewModel>;
@@ -448,7 +450,7 @@
             let obj = this.Grid.get(recId);
 
             this.SuppressListCollectionViewAction(x => x.Current = obj);
-            this.GridOption.onSelect(sender, obj);
+            this.GridOption.onSelect(sender, obj, e);
         }
         public OnDoubleClick(sender, e) {
             if (this.GridOption && this.GridOption.onDoubleClick) {
@@ -458,7 +460,7 @@
                     let recId = e.recid;
                     let obj = grid.get(recId);
                     this.SuppressListCollectionViewAction(x => x.Current = obj);
-                    this.GridOption.onDoubleClick(sender, obj);
+                    this.GridOption.onDoubleClick(sender, obj, e);
 
 
                     //if (!Object.IsNullOrUndefined(recId)) {

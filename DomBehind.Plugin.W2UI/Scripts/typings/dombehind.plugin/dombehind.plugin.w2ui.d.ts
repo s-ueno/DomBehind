@@ -31,8 +31,8 @@ declare namespace DomBehind {
     interface IGridOption<TViewModel> {
         multiSelect?: boolean;
         dragAndDropRow?: boolean;
-        onSelect?: (x: TViewModel, args: any) => void;
-        onDoubleClick?: (x: TViewModel, args: any) => void;
+        onSelect?: (x: TViewModel, args: any, e: any) => void;
+        onDoubleClick?: (x: TViewModel, args: any, e: any) => void;
         isSpinning?: (x: TViewModel) => boolean;
         footerOption?: IFooterOption<TViewModel>;
         headerOption?: IHeaderOption<TViewModel>;
@@ -59,6 +59,9 @@ declare namespace DomBehind {
         advancedSearch?: FieldType;
         renderType?: RenderType;
     }
+    /**
+     * シンプルなカスタム表示
+     * */
     enum RenderType {
         Number = 1,
         Currency = 2,
@@ -140,11 +143,45 @@ declare namespace DomBehind {
         constructor(owner: BizView);
         protected get DefaultOption(): IColumnBindingOption;
         ColumnBinding(title: string, binding: (row: T) => any, option?: IColumnBinding<T>): W2GridBindingBehaviorBuilder<T>;
+        /**
+         * 行スタイルをバインドします。
+         *
+         * ラムダで指定されたプロパティに格納する例：
+         *  "background-color: #FBFEC0"
+         *
+         *  注意点として、RowStyleBindingとCellStyleBindingはどちらかしか利用できません。
+         *  Rowのスタイル適用　+　Cellに個別スタイルを適用する場合は、CellStyleBinding + RowCssBinding を利用してください。
+         *
+         * @param styleBinding　style属性値の文字列を示すプロパティ先をラムダで指定します。
+         *
+         */
         RowStyleBinding(styleBinding: (row: T) => any, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;
+        /**
+         * 任意のclass属性を行にバインドします
+         *
+         * @param classBinding css名の文字列を示すプロパティ先をラムダで指定します
+         *
+         */
         RowCssBinding(classBinding: (row: T) => any, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;
+        /**
+         * セルスタイルをバインドします。
+         *
+         * ラムダで指定されたプロパティに格納する例（SampleIDフィールド、SampleNameフィールドがあるとして）：
+         *  '{ "SampleID": "background-color: #FBFEC0; color: red", "SampleName": "background-color: #FBFEC0" }'
+         *
+         *  注意点として、RowStyleBindingとCellStyleBindingはどちらかしか利用できません。
+         *  Rowのスタイル適用　+　Cellに個別スタイルを適用する場合は、CellStyleBinding + RowCssBinding を利用してください。
+         *
+         * @param cellStyleBinding style属性値の文字列を示すプロパティ先をラムダで指定します。ただし、列を示すJSON形式です
+         */
         CellStyleBinding(cellStyleBinding: (row: T) => any, convertTarget?: (obj: any) => string): W2GridBindingBehaviorBuilder<T>;
     }
     interface BindingBehaviorBuilder<T> {
+        /**
+         * Divタグにw2layout機構を組み込みます。
+         * 実装例：
+         *
+         */
         BuildGrid<TRow>(itemSource: (x: T) => any, option?: IGridOption<T>): W2GridBindingBehaviorBuilder<TRow>;
     }
 }
